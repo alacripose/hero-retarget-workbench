@@ -1,8 +1,8 @@
-"""Build a self-contained Deadlock Model Forge Blender addon zip.
+"""Build a self-contained Hero Retarget Workbench Blender addon zip.
 
 The addon resolves its bundled ``forge`` package when installed through
 Blender's Add-ons installer. The archive contains one top-level
-``deadlock_model_forge`` directory, which is the layout Blender expects.
+``hero_retarget_workbench`` directory, which is the layout Blender expects.
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from pathlib import Path
 import blake3
 
 ROOT = Path(__file__).resolve().parents[1]
-ADDON = ROOT / "blender" / "deadlock_model_forge"
+ADDON = ROOT / "blender" / "hero_retarget_workbench"
 CORE = ROOT / "forge"
 DEFAULT_OUT = ROOT / "dist"
 
@@ -108,10 +108,10 @@ def build_addon(out_dir: Path | None = None) -> BuiltAddon:
     version = addon_version()
     destination = Path(out_dir) if out_dir is not None else DEFAULT_OUT
     destination.mkdir(parents=True, exist_ok=True)
-    archive_path = destination / f"deadlock_model_forge-{version}.zip"
+    archive_path = destination / f"hero_retarget_workbench-{version}.zip"
 
     with tempfile.TemporaryDirectory(prefix="dmf-build-") as temporary:
-        staging = Path(temporary) / "deadlock_model_forge"
+        staging = Path(temporary) / "hero_retarget_workbench"
         _copy_tree(ADDON, staging)
         _copy_tree(CORE, staging / "forge")
         files = _validate_source(staging)

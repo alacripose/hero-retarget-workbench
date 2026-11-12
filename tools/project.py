@@ -1,4 +1,4 @@
-"""Project commands for Deadlock Model Forge.
+"""Project commands for Hero Retarget Workbench.
 
 Run from the repository root with Python 3.11+:
     python tools/project.py doctor
@@ -36,7 +36,7 @@ from forge.stage import MaterialCopy, StageError, StageRequest, material_files, 
 LEDGER = ROOT / "ledger" / "ledger.jsonl"
 GATE_STATE = ROOT / "ledger" / "gate-state.json"
 STATUS = ROOT / "STATUS.md"
-AUTHORITY = ROOT / "logs" / "authority" / "2026-11-12-deadlock-model-forge.jsonl"
+AUTHORITY = ROOT / "logs" / "authority" / "2026-11-12-hero-retarget-workbench.jsonl"
 
 
 def utc() -> str:

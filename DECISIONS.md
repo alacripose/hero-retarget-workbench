@@ -137,7 +137,7 @@ match, and the tick must be current. Export refuses a stale, refused, unchecked
 or missing proof.
 
 **Consequence:** `forge/proof.py` uses BLAKE3, `requirements.txt` declares
-`blake3==1.0.11`, and `blender/deadlock_model_forge/_vendor/blake3` carries the
+`blake3==1.0.11`, and `blender/hero_retarget_workbench/_vendor/blake3` carries the
 Windows extension into the installable zip. SHA-256 remains only as named legacy
 stage evidence; new proof identity never falls back to it. The schema ids are
 hash-pinned, not numeric `/1` ids.

@@ -21,7 +21,7 @@ no releases.
    request. It runs the existing tests, builds the addon zip, and uploads the
    zip as a workflow artifact.
 2. A version tag matching `v*` runs the same test and build job first, then
-   publishes a GitHub release with the built `deadlock_model_forge-<version>.zip`
+   publishes a GitHub release with the built `hero_retarget_workbench-<version>.zip`
    attached.
 3. The release job fails if the zip version does not match the tag. It creates a
    missing release and replaces the asset on a rerun, so a release is not left

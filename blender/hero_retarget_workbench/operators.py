@@ -1,4 +1,4 @@
-"""Operators for the Deadlock Model Forge workflow."""
+"""Operators for the Hero Retarget Workbench workflow."""
 from __future__ import annotations
 
 import json

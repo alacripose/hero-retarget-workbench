@@ -3,7 +3,7 @@
 Run from the forge checkout:
 
   blender -b --factory-startup --python tools/blender_workbench_probe.py -- \
-    --report artifacts/receipts/deadlock-model-forge-workbench.json
+    --report artifacts/receipts/hero-retarget-workbench-workbench.json
 
 The probe builds two tiny rigs and meshes. It exercises the code paths that do
 not need a visible viewport: registration, bone scan, rename, rest alignment,
@@ -24,7 +24,7 @@ from pathlib import Path
 import bpy
 
 REPO = Path(__file__).resolve().parents[1]
-PACKAGE = REPO / "blender" / "deadlock_model_forge"
+PACKAGE = REPO / "blender" / "hero_retarget_workbench"
 _spec = importlib.util.spec_from_file_location(
     "dmf_workbench_probe",
     PACKAGE / "__init__.py",
@@ -40,7 +40,7 @@ _spec.loader.exec_module(dmf)
 def parse_args() -> argparse.Namespace:
     argv = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
     parser = argparse.ArgumentParser()
-    parser.add_argument("--report", default="artifacts/receipts/deadlock-model-forge-workbench.json")
+    parser.add_argument("--report", default="artifacts/receipts/hero-retarget-workbench-workbench.json")
     return parser.parse_args(argv)
 
 

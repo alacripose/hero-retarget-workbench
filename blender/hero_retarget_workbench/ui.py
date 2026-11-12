@@ -143,7 +143,7 @@ def _job(layout, settings) -> None:
 
 
 class DMF_PT_main(Panel):
-    bl_label = "Deadlock Model Forge"
+    bl_label = "Hero Retarget Workbench"
     bl_idname = "DMF_PT_main"
     bl_description = "Port a custom mesh onto a live Deadlock hero with an explicit bone map and an Axis proof"
     bl_icon = "OUTLINER_OB_ARMATURE"

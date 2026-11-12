@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This repository is the Deadlock Model Forge. The owner is `ala`. The work is a
+This repository is the Hero Retarget Workbench. The owner is `ala`. The work is a
 Blender 5.4 addon for porting a custom model onto a live Deadlock hero, using
 Source 2 Viewer output and the CSDK13 compiler.
 
@@ -8,7 +8,7 @@ Read this before changing code, docs, or a ticket.
 
 ## Authority
 
-The owner request is recorded in `logs/authority/2026-11-12-deadlock-model-forge.jsonl`.
+The owner request is recorded in `logs/authority/2026-11-12-hero-retarget-workbench.jsonl`.
 The governing corrections are:
 
 1. Extract the hero from the current live release game with Source 2 Viewer.
@@ -105,7 +105,7 @@ selftest` to prove the parser gate rejects a planted parser.
   120 bones, 67 weighted groups, 4 material slots) was exported and compiled.
   The re-imported DMX preserved all counts; compile returned 0 with 1 compiled,
   0 failed, 5 warnings (the extra `body` LOD warning joins the three LOD
-  warnings). Receipt: `artifacts/receipts/deadlock-model-forge-real.json`.
+  warnings). Receipt: `artifacts/receipts/hero-retarget-workbench-real.json`.
 
 ## 2026-11-12 — manual workbench, Axis proof and BLAKE3
 
@@ -134,7 +134,7 @@ the fuck would I want to use legacy"*.
   named checks. No proof or a stale/refused/unchecked proof blocks
   `dmf.export_stage` with `axis-proof-refused`.
 - BLAKE3 is the current identity. `requirements.txt` declares `blake3==1.0.11`;
-  `blender/deadlock_model_forge/_vendor/blake3` carries the Windows extension
+  `blender/hero_retarget_workbench/_vendor/blake3` carries the Windows extension
   into the installable zip. New proof identity never falls back to SHA-256.
   SHA-256 remains only as named legacy stage evidence and older ledger rows.
 - Proof and weight-schema ids are hash-pinned (`dmf.retarget.proof/<32 hex>`,

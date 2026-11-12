@@ -1,4 +1,4 @@
-"""Deadlock Model Forge: Blender 5.4 sidebar addon."""
+"""Hero Retarget Workbench: Blender 5.4 sidebar addon."""
 from __future__ import annotations
 
 import sys
@@ -17,9 +17,9 @@ if (_PACKAGE / "_vendor").is_dir() and str(_PACKAGE / "_vendor") not in sys.path
     sys.path.append(str(_PACKAGE / "_vendor"))
 
 bl_info = {
-    "name": "Deadlock Model Forge",
-    "author": "Deadlock Model Forge",
-    "version": (0, 2, 3),
+    "name": "Hero Retarget Workbench",
+    "author": "ala",
+    "version": (0, 2, 4),
     "blender": (5, 4, 0),
     "location": "View3D > Sidebar > Deadlock",
     "description": "Fit and retarget a custom model onto a live Deadlock hero, then stage the unchanged S2V vmdl for CSDK13",

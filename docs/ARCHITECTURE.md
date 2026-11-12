@@ -91,7 +91,7 @@ CSDK and does not alter the staged vmdl.
 
 ### Blender addon
 
-`blender/deadlock_model_forge/` is an Operate-mode sidebar:
+`blender/hero_retarget_workbench/` is an Operate-mode sidebar:
 
 - hero detection/extraction and vmdl selection;
 - hero body import through PulseSrcOps;

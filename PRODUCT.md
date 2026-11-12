@@ -2,7 +2,7 @@
 
 ## Product
 
-Deadlock Model Forge is a Blender 5.4 addon for porting a custom model onto a
+Hero Retarget Workbench is a Blender 5.4 addon for porting a custom model onto a
 live Deadlock hero. It is a tool, not a hosted service or a public website.
 
 ## User
@@ -57,6 +57,6 @@ install path. It is separate from the native Blender sidebar, which remains the
 Operate surface. The landing page does not add a second product claim: the
 README, STATUS.md, tickets, and ledger remain the evidence record.
 
-The public source repository is `alacripose/deadlock-model-forge`. The landing
+The public source repository is `alacripose/hero-retarget-workbench`. The landing
 page links to that repository and to `README.md`, `docs/ARCHITECTURE.md`, and
 `STATUS.md` after the first push.

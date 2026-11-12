@@ -1,4 +1,4 @@
-"""Settings for the Deadlock Model Forge workbench."""
+"""Settings for the Hero Retarget Workbench workbench."""
 from __future__ import annotations
 
 import os

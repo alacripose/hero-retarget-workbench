@@ -22,7 +22,7 @@ import bpy
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "blender"))
-import deadlock_model_forge as dmf  # noqa: E402
+import hero_retarget_workbench as dmf  # noqa: E402
 
 
 def digest(path: Path) -> str:

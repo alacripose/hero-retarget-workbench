@@ -8,7 +8,7 @@ Run from the forge checkout:
     --vmdl artifacts/vmdl-decompile/models/heroes_staging/haze/haze.vmdl \
     --materials-root artifacts/haze-materials \
     --stage artifacts/stage-real \
-    --report artifacts/receipts/deadlock-model-forge-real.json
+    --report artifacts/receipts/hero-retarget-workbench-real.json
 
 The probe uses the extracted hero body itself as the replacement mesh. That is a
 real skinned, multi-material mesh, not a generated placeholder. It records the
@@ -30,7 +30,7 @@ import bpy
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "blender"))
-import deadlock_model_forge as dmf  # noqa: E402
+import hero_retarget_workbench as dmf  # noqa: E402
 
 
 def digest(path: Path) -> str:

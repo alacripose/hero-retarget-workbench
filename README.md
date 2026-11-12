@@ -1,4 +1,4 @@
-# Deadlock Model Forge
+# Hero Retarget Workbench
 
 A Blender 5.4 addon and small Python core for porting a custom model onto a
 live Deadlock hero.
@@ -19,7 +19,7 @@ keeps Blender's own controls.
 
 | Path | Purpose |
 |---|---|
-| `blender/deadlock_model_forge/` | Blender addon: hero picker, custom import, collection-scoped parts, per-slot materials, fit, retarget, stage, compile |
+| `blender/hero_retarget_workbench/` | Blender addon: hero picker, custom import, collection-scoped parts, per-slot materials, fit, retarget, stage, compile |
 | `forge/` | Live path detection, S2V wrapper, axis transforms, name matching, staging, compiler invocation |
 | `tools/project.py` | Command surface: `doctor`, `heroes`, `extract`, `stage`, `compile`, `gate`, `status`, `selftest` |
 | `tools/build_addon.py` | Build the self-contained addon zip for Blender's Add-ons installer |
@@ -53,12 +53,12 @@ python tools/build_addon.py
 ```
 
 The builder reads the version from `bl_info` and writes
-`dist/deadlock_model_forge-<version>.zip`. The archive carries the `forge/` core,
+`dist/hero_retarget_workbench-<version>.zip`. The archive carries the `forge/` core,
 so the installed addon does not import from the checkout. Runtime files go to
 Blender's user data directory.
 
 In Blender 5.4, open Preferences → Add-ons, choose **Install from Disk**, and
-select the zip. Enable **Deadlock Model Forge**, then enable **PulseSrcOps**.
+select the zip. Enable **Hero Retarget Workbench**, then enable **PulseSrcOps**.
 SourceIO is needed only for compiled Source 2 assets. The live DMX path does not
 use it.
 
@@ -73,14 +73,14 @@ The sidebar is in **3D Viewport → Sidebar → Deadlock**.
 and every version tag. It runs the unit tests, builds the addon zip, and uploads
 the zip as a workflow artifact on Windows with Python 3.13.
 
-A tag such as `v0.2.3` also runs the release job after the test job. The job
+A tag such as `v0.2.4` also runs the release job after the test job. The job
 checks that the zip version matches the tag, then creates or updates the release
-with `deadlock_model_forge-<version>.zip` attached. A rerun replaces the asset
+with `hero_retarget_workbench-<version>.zip` attached. A rerun replaces the asset
 rather than leaving the release without a zip.
 
 ```bash
-git tag v0.2.3
-git push origin v0.2.3
+git tag v0.2.4
+git push origin v0.2.4
 ```
 
 The tag must match `bl_info["version"]`. The workflow rejects a mismatch before
@@ -151,8 +151,8 @@ it publishes anything.
 
 ```bash
 python tools/build_addon.py
-blender -b --factory-startup --python tools/blender_workbench_probe.py -- --report artifacts/receipts/deadlock-model-forge-workbench.json
-blender -b --factory-startup --python tools/blender_zip_probe.py -- --zip dist/deadlock_model_forge-0.2.3.zip --report artifacts/receipts/deadlock-model-forge-zip.json
+blender -b --factory-startup --python tools/blender_workbench_probe.py -- --report artifacts/receipts/hero-retarget-workbench-workbench.json
+blender -b --factory-startup --python tools/blender_zip_probe.py -- --zip dist/hero_retarget_workbench-0.2.4.zip --report artifacts/receipts/hero-retarget-workbench-zip.json
 python tools/project.py doctor
 python tools/project.py heroes
 python tools/project.py extract --hero haze --out artifacts/extractions/haze
@@ -273,7 +273,7 @@ smoke-material texture). The output is
 `artifacts/stage-real/compiled/haze_real/models/heroes_staging/haze/haze.vmdl_c`,
 4,320,714 bytes,
 `098b576fd382c6dccbb00d81f7f3327e3f0060cdc7fc1866b97c3958fbe07d60`.
-The receipt is `artifacts/receipts/deadlock-model-forge-real.json`.
+The receipt is `artifacts/receipts/hero-retarget-workbench-real-parts.json`.
 
 What this proves: the replacement mesh path preserves geometry, skeleton, vertex
 groups, weights, material slots and polygon material assignment through a real
@@ -293,7 +293,7 @@ there is no SHA-256 fallback for new proof identity.
 - `blender_workbench_probe.py` passes: bone scan/rename/alignment, `FOLD` and
   `KEEP` extras, chunked weight solve, background job value, BLAKE3 proof
   `current`, changed bytes refused, export refused with `axis-proof-refused`.
-  Report: `artifacts/receipts/deadlock-model-forge-workbench.json`.
+  Report: `artifacts/receipts/hero-retarget-workbench-workbench.json`.
 - The real Haze body probe passes with `CUSTOM` weights: 33,366 vertices, 120
   bones, 67 groups, 53,834 links and 4 materials survive the export; all seven
   comparisons match; vmdl unchanged. Proof digest
@@ -313,9 +313,9 @@ there is no SHA-256 fallback for new proof identity.
   `content` and `game`; a failed compile leaves the previous output alone.
 - The extracted-zip probe passes: 30 files, 7 panels, 24 workbench operators,
   40 operator classes total, 48 UI icons validated; `blake3` loads from the zip,
-  not the checkout. Build: 271,772 bytes, SHA-256
-  `9432147f4ef0fa7fc768d48fb6960371ad7f97e0b5a1eec89831e89b8bb09529`,
-  BLAKE3 `c6a4f52c507597852eafa2624d0678c590078eb6e214d174dcef02714272b5b9`.
+  not the checkout. Build: 271,958 bytes, SHA-256
+  `86638ab3da3c8e12017c839a43a1a7658cecd28d37cc4fc7a48db9f3a964bebc`,
+  BLAKE3 `b68ba1364a61c8c251d8f45592523739a377b6ccbe9445be448c2fb556b9b537`.
 - `blender_probe.py` scans a two-part collection, selects each active part,
   appends every hero slot, replaces one selected slot, clears one slot and
   appends it back, then stages the DMX. The exported active part retains the

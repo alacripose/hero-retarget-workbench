@@ -44,7 +44,7 @@ jobs:
       - name: Upload addon zip
         uses: actions/upload-artifact@v4
         with:
-          name: deadlock-model-forge-zip
+          name: hero-retarget-workbench-zip
           path: dist/*.zip
           if-no-files-found: error
 
@@ -59,7 +59,7 @@ jobs:
       - name: Download built zip
         uses: actions/download-artifact@v4
         with:
-          name: deadlock-model-forge-zip
+          name: hero-retarget-workbench-zip
           path: dist
 
       - name: Publish release with zip
@@ -70,13 +70,13 @@ jobs:
           set -euo pipefail
           tag="${GITHUB_REF_NAME}"
           expected="${tag#v}"
-          zip_file=$(find dist -maxdepth 1 -type f -name 'deadlock_model_forge-*.zip' -print -quit)
+          zip_file=$(find dist -maxdepth 1 -type f -name 'hero_retarget_workbench-*.zip' -print -quit)
           if [ -z "${zip_file}" ]; then
             echo "The test job produced no addon zip." >&2
             exit 1
           fi
           actual=$(basename "${zip_file}" .zip)
-          actual="${actual#deadlock_model_forge-}"
+          actual="${actual#hero_retarget_workbench-}"
           if [ "${actual}" != "${expected}" ]; then
             echo "Tag ${tag} expects version ${expected}, but the zip is ${actual}." >&2
             exit 1
@@ -86,7 +86,7 @@ jobs:
           else
             gh release create "${tag}" "${zip_file}" \
               -R "${GITHUB_REPOSITORY}" \
-              --title "Deadlock Model Forge ${tag}" \
+              --title "Hero Retarget Workbench ${tag}" \
               --generate-notes
           fi
           gh release edit "${tag}" -R "${GITHUB_REPOSITORY}" --draft=false

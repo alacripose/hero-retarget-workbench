@@ -47,12 +47,12 @@ def _import_root(settings) -> Path:
 
 def workspace_root() -> Path:
     try:
-        location = bpy.utils.user_resource("DATAFILES", path="deadlock_model_forge", create=True)
+        location = bpy.utils.user_resource("DATAFILES", path="hero_retarget_workbench", create=True)
         if location:
             return Path(location)
     except Exception:
         pass
-    return Path.home() / "Documents" / "deadlock-model-forge"
+    return Path.home() / "Documents" / "hero-retarget-workbench"
 
 
 def project_root(settings) -> Path:

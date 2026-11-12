@@ -1,8 +1,8 @@
 """Verify the built addon zip is self-contained and registers in Blender.
 
   blender -b --factory-startup --python tools/blender_zip_probe.py -- \
-    --zip dist/deadlock_model_forge-0.2.3.zip \
-    --report artifacts/receipts/deadlock-model-forge-zip.json
+    --zip dist/hero_retarget_workbench-0.2.4.zip \
+    --report artifacts/receipts/hero-retarget-workbench-zip.json
 
 The probe deliberately imports from an extracted copy instead of the checkout,
 so a missing vendored BLAKE3 extension or a missing module fails here.
@@ -70,19 +70,19 @@ def main() -> int:
         with zipfile.ZipFile(archive) as bundle:
             names = bundle.namelist()
             bundle.extractall(temp)
-        package_root = temp / "deadlock_model_forge"
+        package_root = temp / "hero_retarget_workbench"
         if not (package_root / "__init__.py").is_file():
-            raise RuntimeError("zip does not contain deadlock_model_forge/__init__.py")
+            raise RuntimeError("zip does not contain hero_retarget_workbench/__init__.py")
         if not (package_root / "_vendor" / "blake3").is_dir():
             raise RuntimeError("zip does not carry the vendored blake3 package")
 
         for name in list(sys.modules):
-            if name == "deadlock_model_forge" or name.startswith("deadlock_model_forge."):
+            if name == "hero_retarget_workbench" or name.startswith("hero_retarget_workbench."):
                 del sys.modules[name]
             if name == "blake3" or name.startswith("blake3."):
                 del sys.modules[name]
         sys.path.insert(0, str(temp))
-        import deadlock_model_forge as dmf
+        import hero_retarget_workbench as dmf
         import blake3
 
         if package_root.resolve() not in Path(dmf.__file__).resolve().parents:
@@ -90,7 +90,7 @@ def main() -> int:
         vendor_root = (package_root / "_vendor" / "blake3").resolve()
         if vendor_root not in Path(blake3.__file__).resolve().parents:
             raise RuntimeError(f"blake3 was not imported from the zip: {blake3.__file__}")
-        if dmf.bl_info["version"] != (0, 2, 3):
+        if dmf.bl_info["version"] != (0, 2, 4):
             raise RuntimeError(f"unexpected version: {dmf.bl_info['version']}")
 
         dmf.register()

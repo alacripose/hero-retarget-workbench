@@ -8,7 +8,7 @@ Run from the forge checkout:
     --vmdl artifacts/vmdl-decompile/models/heroes_staging/haze/haze.vmdl \
     --materials-root artifacts/haze-materials \
     --stage artifacts/lod-material-probe \
-    --report artifacts/receipts/deadlock-model-forge-lod-material.json \
+    --report artifacts/receipts/hero-retarget-workbench-lod-material.json \
     --compile
 
 The probe uses the real Haze body as the ported mesh, gives it one custom vmat
@@ -36,7 +36,7 @@ REPO = Path(__file__).resolve().parents[1]
 # The user's Blender may already have an installed copy of this addon in its
 # addon scan. Load the checkout under a private module name so the probe always
 # exercises the source being edited, even under --factory-startup.
-_PACKAGE = REPO / "blender" / "deadlock_model_forge"
+_PACKAGE = REPO / "blender" / "hero_retarget_workbench"
 _spec = importlib.util.spec_from_file_location(
     "dmf_lod_probe",
     _PACKAGE / "__init__.py",

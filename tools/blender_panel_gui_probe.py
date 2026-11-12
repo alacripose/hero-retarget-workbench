@@ -14,7 +14,7 @@ from pathlib import Path
 import bpy
 
 REPO = Path(__file__).resolve().parents[1]
-PACKAGE = REPO / "blender" / "deadlock_model_forge"
+PACKAGE = REPO / "blender" / "hero_retarget_workbench"
 SPEC = importlib.util.spec_from_file_location(
     "dmf_compare_gui_probe",
     PACKAGE / "__init__.py",
