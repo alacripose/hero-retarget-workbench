@@ -1,6 +1,6 @@
 # TICKET-0006 — Rename to Hero Retarget Workbench
 
-**Status:** active.
+**Status:** done; repository and release verified 2026-11-12.
 **Owner:** ala
 **Authority:** `logs/authority/2026-11-12-hero-retarget-workbench.jsonl`
 **Opened:** 2026-11-12
@@ -21,6 +21,7 @@ close to `Deadlock Forge`:
    landing page, CI artifact, and release title use the new name.
 3. The package slug becomes `hero_retarget_workbench`; the repository becomes
    `hero-retarget-workbench`; archive paths use `hero_retarget_workbench-<version>.zip`.
+   The rename releases as version `0.2.4`.
 4. The release page for the current build carries a zip with the new name, and
    no old-name zip remains as an alternative download.
 5. Internal operator IDs keep the `dmf.*` prefix as a compatibility boundary.
@@ -46,6 +47,11 @@ close to `Deadlock Forge`:
 - The latest published release is titled with the new name and has a new-name
   zip asset; the old-name release asset is deleted.
 - The landing page and README links resolve to the renamed repository.
+- The public release is `v0.2.4`; the old `v0.2.3` release and tag are removed.
+- Main CI run `43311632441` and tag CI run `43311644789` both pass.
+- The downloaded release asset `hero_retarget_workbench-0.2.4.zip` (272,442
+  bytes, SHA-256 `25c8691c5517b9c3ae4b426c4ae92d7dd23e8ae977dcc7f0769789edea29e492`)
+  imports with 7 panels, 40 operator classes, and 48 icons.
 
 ## Evidence
 
