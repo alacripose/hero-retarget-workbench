@@ -28,6 +28,7 @@ REQUIRED = (
     "core.py",
     "jobs.py",
     "operators.py",
+    "parts.py",
     "properties.py",
     "proofing.py",
     "ui.py",

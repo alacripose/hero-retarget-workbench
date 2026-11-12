@@ -115,8 +115,8 @@ def _wrapped(layout, text: str, icon: str = "INFO", alert: bool = False, width: 
         row.label(text=line, icon=icon if index == 0 else "BLANK1")
 
 
-def _hint(layout, text: str, icon: str = "INFO", alert: bool = False) -> None:
-    _wrapped(layout, text, icon, alert=alert)
+def _hint(layout, text: str, icon: str = "INFO", alert: bool = False, width: int = 36) -> None:
+    _wrapped(layout, text, icon, alert=alert, width=width)
 
 
 def _path_row(layout, settings, prop: str, label: str, button: str = "", icon: str = "FILEBROWSER") -> None:
@@ -230,6 +230,108 @@ class DMF_PT_source(Panel):
         custom.prop(settings, "fit_scale", text="Scale")
         custom.prop(settings, "fit_to_height", text="Match hero height")
         _primary(custom, "dmf.fit", "Fit to hero", "TRANSFORM_ORIGINS", enabled=not settings.job_running)
+
+
+class DMF_PT_parts(Panel):
+    bl_label = "Parts & Materials"
+    bl_idname = "DMF_PT_parts"
+    bl_parent_id = "DMF_PT_main"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+
+    def draw(self, context):
+        settings = context.scene.dmf
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+
+        collection_box = _section(
+            layout,
+            "Part collection",
+            "GROUP",
+            f"{len(settings.parts)} parts" if settings.parts else "not scanned",
+        )
+        collection_box.prop(settings, "custom_collection", text="")
+        actions = collection_box.row(align=True)
+        actions.operator("dmf.use_active_collection", text="Use active collection", icon="GROUP")
+        actions.operator("dmf.scan_parts", text="", icon="FILE_REFRESH")
+        _hint(
+            collection_box,
+            "Child collections are included. A custom import creates its own collection.",
+            "INFO",
+            width=26,
+        )
+
+        if not settings.parts:
+            _hint(collection_box, "No parts scanned. Choose a collection and scan it before selecting a part.", "QUESTION", width=26)
+        else:
+            row = collection_box.row(align=True)
+            row.template_list(
+                "DMF_UL_parts",
+                "parts",
+                settings,
+                "parts",
+                settings,
+                "part_index",
+                rows=4,
+            )
+            index = max(0, min(settings.part_index, len(settings.parts) - 1))
+            part = settings.parts[index].object
+            if part is not None:
+                collection_box.operator("dmf.use_part", text=f"Use part: {_short(part.name, 28)}", icon="OBJECT_DATA")
+                if settings.custom_mesh is None:
+                    collection_box.label(text="Active part: not set. Press Use part.", icon="QUESTION")
+                else:
+                    collection_box.label(text=f"Active part: {_short(settings.custom_mesh.name, 28)}", icon="INFO")
+            else:
+                collection_box.label(text="Selected object is gone. Scan again.", icon="ERROR")
+            _hint(collection_box, "Fit, weights, materials and export use the active part. A row is only selected until you press Use part.", "INFO", width=26)
+
+        material_box = _section(
+            layout,
+            "Material slots",
+            "MATERIAL",
+            f"{settings.source_material_count} source / {settings.material_count} part",
+        )
+        material_box.prop(settings, "material_source", text="Source")
+        scan = material_box.row(align=True)
+        scan.operator("dmf.scan_materials", text="Scan slots", icon="FILE_REFRESH")
+        if settings.material_source is None:
+            _hint(material_box, "Set a source object, usually the hero body, then scan its slots.", "QUESTION")
+        elif settings.custom_mesh is None:
+            _hint(material_box, "Choose an active part before assigning material slots.", "QUESTION")
+        else:
+            material_box.label(text="Source slots", icon="IMPORT")
+            material_box.template_list(
+                "DMF_UL_materials",
+                "source_materials",
+                settings,
+                "source_materials",
+                settings,
+                "source_material_index",
+                rows=3,
+            )
+            material_box.label(text="Part slots", icon="MATERIAL")
+            material_box.template_list(
+                "DMF_UL_materials",
+                "part_materials",
+                settings,
+                "part_materials",
+                settings,
+                "part_material_index",
+                rows=3,
+            )
+            actions = material_box.column(align=True)
+            actions.operator("dmf.assign_material", text="Assign selected material", icon="FORWARD")
+            actions.operator("dmf.append_material", text="Append as new slot", icon="ADD")
+            actions.operator("dmf.clear_part_material", text="Clear selected slot", icon="REMOVE")
+            _hint(
+                material_box,
+                "Assign replaces the selected part slot. Append adds a slot. Clear removes the slot and remaps faces.",
+                "INFO",
+                width=26,
+            )
 
 
 class DMF_PT_compare(Panel):
@@ -404,7 +506,6 @@ class DMF_PT_weights(Panel):
         box.prop(settings, "proof_ticket", text="Ticket")
         _hint(box, "Export refuses when the proof is stale, unchecked, or any named check fails.", "LOCKED")
 
-        layout.operator("dmf.copy_materials", text="Replace with hero materials", icon="MATERIAL")
 
 
 class DMF_PT_handoff(Panel):
@@ -439,7 +540,7 @@ class DMF_PT_handoff(Panel):
         _primary(handoff, "dmf.compile", "Compile with CSDK13", "PLAY", enabled=not settings.job_running)
 
 
-CLASSES = (DMF_PT_main, DMF_PT_source, DMF_PT_compare, DMF_PT_skeleton, DMF_PT_weights, DMF_PT_handoff)
+CLASSES = (DMF_PT_main, DMF_PT_source, DMF_PT_parts, DMF_PT_compare, DMF_PT_skeleton, DMF_PT_weights, DMF_PT_handoff)
 
 
 def register() -> None:

@@ -531,7 +531,7 @@
         <aside class="panel" aria-label="Haze workbench readout">
           <div class="panel-head">
             <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
-            <span>workbench / 0.2.2</span>
+            <span>workbench / 0.2.3</span>
           </div>
           <div class="panel-body">
             <div class="panel-id"><span>haze.port</span><span>ready</span></div>
@@ -557,9 +557,9 @@
       <div class="wrap">
         <ul class="audit-list">
           <li><strong>53</strong> tests pass</li>
-          <li><strong>6</strong> native panels</li>
+          <li><strong>7</strong> native panels</li>
           <li><strong>24</strong> workbench operators</li>
-          <li><strong>45</strong> UI icons validated</li>
+          <li><strong>48</strong> UI icons validated</li>
           <li><strong class="good">0</strong> vmdl writes</li>
         </ul>
       </div>
@@ -570,7 +570,7 @@
         <div class="section-head">
           <div>
             <p class="kicker">The workbench</p>
-            <h2 id="workbench-title">Five panels.<br>One sidebar.</h2>
+            <h2 id="workbench-title">Six panels.<br>One sidebar.</h2>
           </div>
           <p class="section-note">Each stage reports what it found. An unmatched group or refused proof stays visible where it happened.</p>
         </div>
@@ -582,6 +582,15 @@
               <h3>Start from the live build.</h3>
               <p>Source 2 Viewer lists every hero in the current install. The selected hero is extracted once; its vmdl and clips stay as S2V wrote them, and the extraction keeps the skin.</p>
               <p class="stage-proof">67 entries / 63 body models / build 6861</p>
+            </div>
+          </article>
+
+          <article class="stage">
+            <p class="stage-label">parts &amp; materials</p>
+            <div>
+              <h3>Pick the part. Pick the slot.</h3>
+              <p>A custom import lands in its own collection. The panel lists every part, makes the active one explicit, and assigns one source slot to one part slot.</p>
+              <p class="stage-proof">collection-scoped / assign or append / no replace-all</p>
             </div>
           </article>
 
@@ -697,7 +706,7 @@
               <span>build / checkout</span>
             </div>
             <pre class="terminal-body"><code><span class="cmd">python tools/build_addon.py</span>
-<span class="comment"># dist/deadlock_model_forge-0.2.2.zip</span>
+<span class="comment"># dist/deadlock_model_forge-0.2.3.zip</span>
 <span class="cmd">python tools/project.py doctor</span>
 <span class="cmd">python tools/project.py selftest</span>
 
@@ -729,7 +738,7 @@
   <footer>
     <div class="wrap foot-row">
       <div>
-        <div class="foot-brand"><span class="mark" aria-hidden="true"></span><span>Blender 5.4 addon / build 0.2.2</span></div>
+        <div class="foot-brand"><span class="mark" aria-hidden="true"></span><span>Blender 5.4 addon / build 0.2.3</span></div>
         <p class="foot-note">Deadlock is a Valve game. This project is not affiliated with Valve.</p>
       </div>
       <div class="foot-links">

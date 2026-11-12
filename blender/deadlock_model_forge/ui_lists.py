@@ -12,6 +12,11 @@ _ICONS = {
 }
 
 
+def _short(value: str, limit: int = 28) -> str:
+    text = " ".join((value or "").split())
+    return text if len(text) <= limit else text[: limit - 3].rstrip() + "..."
+
+
 class DMF_UL_bone_map(UIList):
     bl_idname = "DMF_UL_bone_map"
 
@@ -32,7 +37,34 @@ class DMF_UL_bone_map(UIList):
             row.label(text="", icon="INFO")
 
 
-CLASSES = (DMF_UL_bone_map,)
+class DMF_UL_parts(UIList):
+    bl_idname = "DMF_UL_parts"
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        obj = item.object
+        if obj is None:
+            row.label(text="missing part", icon="ERROR")
+            return
+        row.label(text=_short(obj.name), icon="MESH_DATA")
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=f"{len(obj.data.vertices):,}v / {len(obj.data.materials)}m")
+
+
+class DMF_UL_materials(UIList):
+    bl_idname = "DMF_UL_materials"
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        material = item.material
+        row.label(text=_short(item.label or (material.name if material else "empty slot")), icon="MATERIAL" if material else "BLANK1")
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=f"[{item.slot_index}]")
+
+
+CLASSES = (DMF_UL_bone_map, DMF_UL_parts, DMF_UL_materials)
 
 
 def register() -> None:

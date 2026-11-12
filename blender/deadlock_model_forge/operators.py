@@ -14,7 +14,7 @@ import bpy
 from bpy.props import StringProperty
 from bpy.types import Operator
 
-from . import core, jobs, properties, proofing, weights
+from . import core, jobs, parts, properties, proofing, weights
 
 
 def _status(settings, message: str, kind: str = "INFO") -> None:
@@ -23,33 +23,6 @@ def _status(settings, message: str, kind: str = "INFO") -> None:
 
 def _new_objects(before: set[str]) -> list[bpy.types.Object]:
     return [obj for obj in bpy.context.scene.objects if obj.name not in before]
-
-
-def _assign_hero_materials(target, source) -> int:
-    """Copy hero slots onto the custom mesh and keep face material indices sane.
-
-    A name match wins. Otherwise the old slot index is kept when it still exists,
-    which preserves multi-material customs instead of assigning every face to the
-    first hero slot.
-    """
-    old_names = [material.name if material else "" for material in target.data.materials]
-    old_indices = [polygon.material_index for polygon in target.data.polygons]
-    hero_materials = [material for material in source.data.materials if material is not None]
-    target.data.materials.clear()
-    for material in hero_materials:
-        target.data.materials.append(material)
-    by_name = {material.name: index for index, material in enumerate(hero_materials)}
-    remap = {}
-    for old_index, name in enumerate(old_names):
-        if name in by_name:
-            remap[old_index] = by_name[name]
-        elif old_index < len(hero_materials):
-            remap[old_index] = old_index
-        elif hero_materials:
-            remap[old_index] = 0
-    for polygon, old_index in zip(target.data.polygons, old_indices):
-        polygon.material_index = remap.get(old_index, 0)
-    return len(hero_materials)
 
 
 @dataclass(frozen=True)
@@ -232,6 +205,8 @@ class DMF_OT_import_hero(Operator):
             return {"CANCELLED"}
         settings.target_armature = arm
         settings.target_body = mesh
+        settings.material_source = mesh
+        parts.scan_materials(settings)
         if settings.extraction_dir:
             settings.target_dmx_relative = _logical_relative(
                 path,
@@ -239,7 +214,6 @@ class DMF_OT_import_hero(Operator):
                 f"{Path(settings.hero_model_path).parent.as_posix()}/{path.name}" if settings.hero_model_path else f"models/heroes_staging/{settings.hero_slug or 'hero'}/{path.name}",
             )
         context.view_layer.objects.active = arm
-        settings.material_count = len(mesh.data.materials)
         proofing.bump_tick(settings)
         _status(settings, f"Hero ready: {len(arm.data.bones)} bones, {len(mesh.data.vertices):,} vertices", "OK")
         return {"FINISHED"}
@@ -248,7 +222,7 @@ class DMF_OT_import_hero(Operator):
 class DMF_OT_import_custom(Operator):
     bl_idname = "dmf.import_custom"
     bl_label = "Import Custom Model"
-    bl_description = "Import a custom glTF, GLB, FBX, OBJ, or DMX and select its mesh"
+    bl_description = "Import a custom glTF, GLB, FBX, OBJ, or DMX and scan its collection parts"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -282,12 +256,24 @@ class DMF_OT_import_custom(Operator):
             _status(settings, "The custom import produced no mesh", "ERROR")
             self.report({"ERROR"}, "The custom import produced no mesh")
             return {"CANCELLED"}
-        settings.custom_mesh = mesh
+        collection = parts.capture_import(context, path, _new_objects(before))
+        settings.custom_collection = collection
+        settings.custom_mesh = None
         settings.custom_armature = arm
+        if settings.material_source is None and settings.target_body is not None:
+            settings.material_source = settings.target_body
+        count = parts.scan_parts(settings)
+        settings.custom_mesh = None
+        settings.custom_armature = arm
+        parts.scan_materials(settings)
         context.view_layer.objects.active = mesh
         mesh.select_set(True)
         proofing.bump_tick(settings)
-        _status(settings, f"Custom mesh ready: {len(mesh.data.vertices):,} vertices", "OK")
+        _status(
+            settings,
+            f"Custom import ready: {count} parts in {collection.name}; choose a part in Parts & Materials",
+            "OK",
+        )
         return {"FINISHED"}
 
 
@@ -332,20 +318,144 @@ class DMF_OT_fit(Operator):
         return {"FINISHED"}
 
 
-class DMF_OT_copy_materials(Operator):
-    bl_idname = "dmf.copy_materials"
-    bl_label = "Use Hero Materials"
-    bl_description = "Put the imported live hero material slots on the custom mesh"
+class DMF_OT_use_active_collection(Operator):
+    bl_idname = "dmf.use_active_collection"
+    bl_label = "Use Active Collection"
+    bl_description = "Use the active Blender collection as the custom part scope and scan its mesh objects"
 
     def execute(self, context):
         settings = context.scene.dmf
-        source = settings.target_body
-        target = settings.custom_mesh
-        if source is None or target is None:
-            self.report({"ERROR"}, "Import both the hero body and a custom mesh")
+        try:
+            collection = context.view_layer.active_layer_collection.collection
+            if collection is None:
+                raise RuntimeError("part-collection-missing: the active layer has no collection")
+            settings.custom_collection = collection
+            count = parts.scan_parts(settings)
+            active = settings.custom_mesh.name if settings.custom_mesh is not None else "none"
+            _status(settings, f"Scoped {count} parts in {collection.name}; active part {active}", "OK" if count else "WARN")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
-        settings.material_count = _assign_hero_materials(target, source)
-        _status(settings, f"Copied {settings.material_count} hero material slots; .vmat files stay verbatim", "OK")
+        return {"FINISHED"}
+
+
+class DMF_OT_scan_parts(Operator):
+    bl_idname = "dmf.scan_parts"
+    bl_label = "Scan Parts"
+    bl_description = "Scan the selected collection and child collections for mesh parts; do not assign materials"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            count = parts.scan_parts(settings)
+            active = settings.custom_mesh.name if settings.custom_mesh is not None else "none"
+            _status(settings, f"Scanned {count} parts; active part {active}", "OK" if count else "WARN")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
+class DMF_OT_use_part(Operator):
+    bl_idname = "dmf.use_part"
+    bl_label = "Use Active Part"
+    bl_description = "Make the selected collection row the active custom part for fit, weights, materials and export"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            obj = parts.use_part(settings, settings.part_index)
+            proofing.bump_tick(settings)
+            _status(
+                settings,
+                f"Active part {obj.name}: {len(obj.data.vertices):,} vertices, {len(obj.data.materials)} material slots",
+                "OK",
+            )
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
+class DMF_OT_scan_materials(Operator):
+    bl_idname = "dmf.scan_materials"
+    bl_label = "Scan Material Slots"
+    bl_description = "Refresh the source object's slots and the active part's slots without assigning either"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            source_count, part_count = parts.scan_materials(settings)
+            source_name = settings.material_source.name if settings.material_source is not None else "none"
+            _status(
+                settings,
+                f"Material source {source_name}: {source_count} slots; active part: {part_count} slots",
+                "OK" if source_count else "WARN",
+            )
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
+class DMF_OT_assign_material(Operator):
+    bl_idname = "dmf.assign_material"
+    bl_label = "Assign Selected Material"
+    bl_description = "Replace the selected active-part material slot with the selected source slot; never copies every slot"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            material, slot, added = parts.assign_material(settings, append=False)
+            target = settings.custom_mesh
+            _status(
+                settings,
+                f"Assigned {material} to {target.name} slot {slot} ({'appended' if added else 'replaced'}); other slots unchanged",
+                "OK",
+            )
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
+class DMF_OT_append_material(Operator):
+    bl_idname = "dmf.append_material"
+    bl_label = "Append Selected Material"
+    bl_description = "Append the selected source slot to the active part instead of replacing a slot"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            material, slot, _ = parts.assign_material(settings, append=True)
+            target = settings.custom_mesh
+            _status(settings, f"Appended {material} to {target.name} slot {slot}; existing slots unchanged", "OK")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
+class DMF_OT_clear_part_material(Operator):
+    bl_idname = "dmf.clear_part_material"
+    bl_label = "Clear Part Slot"
+    bl_description = "Remove the selected active-part material slot and remap face material indices"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            removed, slot = parts.clear_material(settings)
+            _status(settings, f"Cleared {removed} from active part slot {slot}; face indices remapped", "OK")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
         return {"FINISHED"}
 
 
@@ -736,8 +846,14 @@ CLASSES = (
     DMF_OT_extract,
     DMF_OT_import_hero,
     DMF_OT_import_custom,
+    DMF_OT_use_active_collection,
+    DMF_OT_scan_parts,
+    DMF_OT_use_part,
+    DMF_OT_scan_materials,
+    DMF_OT_assign_material,
+    DMF_OT_append_material,
+    DMF_OT_clear_part_material,
     DMF_OT_fit,
-    DMF_OT_copy_materials,
     DMF_OT_retarget,
     DMF_OT_export_stage,
     DMF_OT_compile,

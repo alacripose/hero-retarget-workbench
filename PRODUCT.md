@@ -14,11 +14,12 @@ and a custom mesh. They need a repeatable handoff, not a tutorial.
 ## Job
 
 Choose a hero from the current live build, import its real body and materials,
-map and rename the custom skeleton, compare both models in a split viewport,
-solve and prove the weights, then produce a compiler-ready addon folder without
-touching the hero vmdl. The user makes the mapping and extra-bone decisions; the
-addon must show what succeeded, what was skipped, and what still needs a real
-compiler run.
+choose the custom collection parts and active part, assign material slots one
+at a time, map and rename the custom skeleton, compare both models in a split
+viewport, solve and prove the weights, then produce a compiler-ready addon
+folder without touching the hero vmdl. The user makes the mapping, extra-bone
+and material-slot decisions; the addon must show what succeeded, what was
+skipped, and what still needs a real compiler run.
 
 ## Truth and constraints
 
@@ -26,7 +27,10 @@ compiler run.
 - CSDK13 is only the compiler.
 - The S2V vmdl is opaque and is copied unchanged.
 - Materials are copied as live `.vmat` files, not rebuilt.
-- The addon handles the custom model, fit, retargeting, and materials.
+- Material slots are assigned one source slot at a time to one active part;
+  there is no replace-all material action.
+- The addon handles the custom model, collection parts, fit, retargeting, and
+  material slots.
 - Failure messages must name the missing file, object, or stage rather than
   offering a generic success state.
 

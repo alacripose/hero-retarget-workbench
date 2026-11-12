@@ -1,7 +1,7 @@
 """Verify the built addon zip is self-contained and registers in Blender.
 
   blender -b --factory-startup --python tools/blender_zip_probe.py -- \
-    --zip dist/deadlock_model_forge-0.2.2.zip \
+    --zip dist/deadlock_model_forge-0.2.3.zip \
     --report artifacts/receipts/deadlock-model-forge-zip.json
 
 The probe deliberately imports from an extracted copy instead of the checkout,
@@ -90,7 +90,7 @@ def main() -> int:
         vendor_root = (package_root / "_vendor" / "blake3").resolve()
         if vendor_root not in Path(blake3.__file__).resolve().parents:
             raise RuntimeError(f"blake3 was not imported from the zip: {blake3.__file__}")
-        if dmf.bl_info["version"] != (0, 2, 2):
+        if dmf.bl_info["version"] != (0, 2, 3):
             raise RuntimeError(f"unexpected version: {dmf.bl_info['version']}")
 
         dmf.register()
@@ -100,12 +100,12 @@ def main() -> int:
         panels = len(dmf.ui.CLASSES)
         workbench = len(dmf.workbench.CLASSES)
         operators = len(dmf.operators.CLASSES) + workbench
-        if panels != 6:
-            raise RuntimeError(f"expected 6 panel classes, found {panels}")
+        if panels != 7:
+            raise RuntimeError(f"expected 7 panel classes, found {panels}")
         if workbench != 24:
             raise RuntimeError(f"expected 24 workbench operators, found {workbench}")
-        if operators != 34:
-            raise RuntimeError(f"expected 34 operator classes in total, found {operators}")
+        if operators != 40:
+            raise RuntimeError(f"expected 40 operator classes in total, found {operators}")
         valid_icons = {
             item.identifier
             for item in bpy.types.UILayout.bl_rna.functions["label"].parameters["icon"].enum_items

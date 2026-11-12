@@ -61,6 +61,7 @@ def run() -> None:
         ui_region = next(item for item in areas[0].regions if item.type == "UI")
         for panel in (
             "DMF_PT_source",
+            "DMF_PT_parts",
             "DMF_PT_compare",
             "DMF_PT_skeleton",
             "DMF_PT_weights",

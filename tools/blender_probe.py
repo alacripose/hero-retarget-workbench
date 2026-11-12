@@ -89,9 +89,38 @@ def main() -> int:
     bpy.ops.mesh.primitive_cube_add()
     custom = bpy.context.active_object
     custom.name = "probe_custom"
+    collection = bpy.data.collections.new("probe_parts")
+    bpy.context.scene.collection.children.link(collection)
+    for old in list(custom.users_collection):
+        old.objects.unlink(custom)
+    collection.objects.link(custom)
+    bpy.ops.mesh.primitive_cube_add(location=(2.0, 0.0, 0.0))
+    other = bpy.context.active_object
+    other.name = "probe_other_part"
+    for old in list(other.users_collection):
+        old.objects.unlink(other)
+    collection.objects.link(other)
+    settings.custom_collection = collection
     settings.custom_mesh = custom
     settings.target_armature = armature
     settings.target_body = body
+    settings.material_source = body
+    result = bpy.ops.dmf.scan_parts()
+    assert "FINISHED" in result, result
+    assert len(settings.parts) == 2, len(settings.parts)
+    other_index = next(index for index, part in enumerate(settings.parts) if part.object == other)
+    custom_index = next(index for index, part in enumerate(settings.parts) if part.object == custom)
+    settings.part_index = other_index
+    result = bpy.ops.dmf.use_part()
+    assert "FINISHED" in result, result
+    assert settings.custom_mesh == other
+    settings.part_index = custom_index
+    result = bpy.ops.dmf.use_part()
+    assert "FINISHED" in result, result
+    assert settings.custom_mesh == custom
+    result = bpy.ops.dmf.scan_materials()
+    assert "FINISHED" in result, result
+    assert settings.source_material_count == len(body.data.materials)
     settings.weight_mode = "HYBRID"
     settings.proof_presenter = "probe"
     settings.proof_ticket = "TICKET-0002"
@@ -104,7 +133,22 @@ def main() -> int:
     assert "FINISHED" in result, result
     settle_weight_job(settings)
     assert any(modifier.type == "ARMATURE" for modifier in custom.modifiers)
-    result = bpy.ops.dmf.copy_materials()
+    for index in range(len(body.data.materials)):
+        settings.source_material_index = index
+        result = bpy.ops.dmf.append_material()
+        assert "FINISHED" in result, result
+    assert len(custom.data.materials) == len(body.data.materials)
+    settings.part_material_index = 0
+    settings.source_material_index = 0
+    result = bpy.ops.dmf.assign_material()
+    assert "FINISHED" in result, result
+    assert len(custom.data.materials) == len(body.data.materials)
+    settings.part_material_index = len(custom.data.materials) - 1
+    result = bpy.ops.dmf.clear_part_material()
+    assert "FINISHED" in result, result
+    assert len(custom.data.materials) == len(body.data.materials) - 1
+    settings.source_material_index = len(body.data.materials) - 1
+    result = bpy.ops.dmf.append_material()
     assert "FINISHED" in result, result
     assert len(custom.data.materials) == len(body.data.materials)
 

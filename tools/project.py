@@ -145,7 +145,7 @@ def write_status(checks: list[tuple[str, bool, str]]) -> None:
             "",
             "## Surface",
             "",
-            "- Blender 5.4 addon: hero picker, custom model import, fit, split compare, bone map, manual rename/alignment, HYBRID/CUSTOM/ENVELOPE retarget, Axis proof, material handoff, stage, compile.",
+            "- Blender 5.4 addon: hero picker, custom model import, collection-scoped parts, per-slot material assignment, fit, split compare, bone map, manual rename/alignment, HYBRID/CUSTOM/ENVELOPE retarget, Axis proof, stage, compile.",
             "- Live game build: read from `game/citadel/steam.inf` at run time.",
             "- S2V: hero inventory and extraction; vmdl is copied byte-for-byte.",
             "- CSDK13: resourcecompiler invocation through a temporary build mirror; no persistent source copy.",

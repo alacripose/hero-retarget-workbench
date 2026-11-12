@@ -54,6 +54,21 @@ class DMF_ProofCheck(PropertyGroup):
     detail: StringProperty(name="Detail", default="")
 
 
+class DMF_Part(PropertyGroup):
+    object: PointerProperty(
+        name="Mesh part",
+        description="A mesh object in the selected collection that can be made the active part",
+        type=Object,
+        poll=lambda self, obj: obj.type == "MESH",
+    )
+
+
+class DMF_MaterialRow(PropertyGroup):
+    material: PointerProperty(name="Material", type=bpy.types.Material)
+    slot_index: IntProperty(name="Slot", default=-1)
+    label: StringProperty(name="Label", default="")
+
+
 class DMF_Settings(PropertyGroup):
     project_root: StringProperty(
         name="Forge project",
@@ -110,10 +125,32 @@ class DMF_Settings(PropertyGroup):
         description="glTF, GLB, FBX, OBJ, or DMX to port",
         subtype="FILE_PATH",
     )
+    custom_collection: PointerProperty(
+        name="Part collection",
+        description="Blender collection whose mesh objects are the custom model parts. Child collections are included",
+        type=bpy.types.Collection,
+    )
     custom_mesh: PointerProperty(name="Mesh", type=Object, poll=lambda self, obj: obj.type == "MESH")
     custom_armature: PointerProperty(name="Rig", type=Object, poll=lambda self, obj: obj.type == "ARMATURE")
     target_armature: PointerProperty(name="Hero skeleton", type=Object, poll=lambda self, obj: obj.type == "ARMATURE")
     target_body: PointerProperty(name="Hero body", type=Object, poll=lambda self, obj: obj.type == "MESH")
+
+    parts: CollectionProperty(
+        type=DMF_Part,
+        description="Mesh objects found in the selected part collection",
+    )
+    part_index: IntProperty(name="Part row", default=0)
+    material_source: PointerProperty(
+        name="Material source",
+        description="Object whose material slots are the source list; defaults to the hero body",
+        type=Object,
+        poll=lambda self, obj: obj.type == "MESH",
+    )
+    source_materials: CollectionProperty(type=DMF_MaterialRow)
+    source_material_index: IntProperty(name="Source slot", default=0)
+    source_material_count: IntProperty(name="Source slots", default=0)
+    part_materials: CollectionProperty(type=DMF_MaterialRow)
+    part_material_index: IntProperty(name="Part slot", default=0)
     axis_preset: EnumProperty(
         name="Fit transform",
         description="Change this only if the custom model uses a different axis system",
@@ -330,7 +367,7 @@ class DMF_Settings(PropertyGroup):
     exported_dmx: StringProperty(name="Exported DMX", subtype="FILE_PATH", default="")
 
 
-CLASSES = (DMF_BoneEntry, DMF_ProofCheck, DMF_Settings)
+CLASSES = (DMF_BoneEntry, DMF_ProofCheck, DMF_Part, DMF_MaterialRow, DMF_Settings)
 
 
 def register() -> None:

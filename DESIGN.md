@@ -75,3 +75,19 @@ The page is a technical dossier: the live-build workbench readout, the measured
 Haze export and compile readings, the hard boundaries, the install commands, and
 the family register. It uses the real test and evidence counts from README and
 STATUS. It does not add a marketing claim or a second design authority.
+
+## 2026-11-12: parts and material slots
+
+The Parts & Materials panel is the sixth native subpanel. It has two explicit
+lists: collection parts and material slots. The part list is collection-scoped
+and includes child collections. Selecting a row is not the same as using a part;
+the `Use part` action names the active object and the status line reports it.
+The material panel shows a source list and an active-part slot list. Actions are
+one source slot to one part slot: replace, append, or clear. The panel does not
+offer a replace-all button, and it does not choose a nearest material or part.
+
+At the default sidebar width the two material lists are stacked, not placed
+side by side, so a material name and its slot index remain readable. Hints are
+short enough not to clip at that width. The primary actions are stacked full
+width; the check is the real-window screenshot at
+`artifacts/receipts/parts-panel.png`.

@@ -1,0 +1,92 @@
+name: CI and release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test and build
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install runtime dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Build addon zip
+        run: python tools/build_addon.py
+
+      - name: Show zip identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -l dist
+          sha256sum dist/*.zip
+
+      - name: Upload addon zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: deadlock-model-forge-zip
+          path: dist/*.zip
+          if-no-files-found: error
+
+  release:
+    name: Publish tagged release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download built zip
+        uses: actions/download-artifact@v4
+        with:
+          name: deadlock-model-forge-zip
+          path: dist
+
+      - name: Publish release with zip
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          expected="${tag#v}"
+          zip_file=$(find dist -maxdepth 1 -type f -name 'deadlock_model_forge-*.zip' -print -quit)
+          if [ -z "${zip_file}" ]; then
+            echo "The test job produced no addon zip." >&2
+            exit 1
+          fi
+          actual=$(basename "${zip_file}" .zip)
+          actual="${actual#deadlock_model_forge-}"
+          if [ "${actual}" != "${expected}" ]; then
+            echo "Tag ${tag} expects version ${expected}, but the zip is ${actual}." >&2
+            exit 1
+          fi
+          if gh release view "${tag}" -R "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release upload "${tag}" "${zip_file}" -R "${GITHUB_REPOSITORY}" --clobber
+          else
+            gh release create "${tag}" "${zip_file}" \
+              -R "${GITHUB_REPOSITORY}" \
+              --title "Deadlock Model Forge ${tag}" \
+              --generate-notes
+          fi
+          gh release edit "${tag}" -R "${GITHUB_REPOSITORY}" --draft=false

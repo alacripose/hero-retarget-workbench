@@ -19,7 +19,7 @@ keeps Blender's own controls.
 
 | Path | Purpose |
 |---|---|
-| `blender/deadlock_model_forge/` | Blender addon: hero picker, custom import, fit, retarget, materials, stage, compile |
+| `blender/deadlock_model_forge/` | Blender addon: hero picker, custom import, collection-scoped parts, per-slot materials, fit, retarget, stage, compile |
 | `forge/` | Live path detection, S2V wrapper, axis transforms, name matching, staging, compiler invocation |
 | `tools/project.py` | Command surface: `doctor`, `heroes`, `extract`, `stage`, `compile`, `gate`, `status`, `selftest` |
 | `tools/build_addon.py` | Build the self-contained addon zip for Blender's Add-ons installer |
@@ -67,6 +67,25 @@ the addon then uses the checkout's `forge/` package and writes under the checkou
 
 The sidebar is in **3D Viewport → Sidebar → Deadlock**.
 
+## Continuous integration and releases
+
+`.github/workflows/ci.yml` runs on every push to `main`, every pull request,
+and every version tag. It runs the unit tests, builds the addon zip, and uploads
+the zip as a workflow artifact on Windows with Python 3.13.
+
+A tag such as `v0.2.3` also runs the release job after the test job. The job
+checks that the zip version matches the tag, then creates or updates the release
+with `deadlock_model_forge-<version>.zip` attached. A rerun replaces the asset
+rather than leaving the release without a zip.
+
+```bash
+git tag v0.2.3
+git push origin v0.2.3
+```
+
+The tag must match `bl_info["version"]`. The workflow rejects a mismatch before
+it publishes anything.
+
 ## Workflow
 
 1. **Detect Live Build** — finds the current install and lists every hero
@@ -101,8 +120,16 @@ The sidebar is in **3D Viewport → Sidebar → Deadlock**.
     origin, evidence, tick span, world digest, presenter, ticket and named checks
     (coverage, normalization, influence limit, bone map, binding, extra bones,
     deformation). Export refuses a stale, unchecked or refused proof.
-11. **Use Hero Materials** — puts the live hero material slots on the custom
-    mesh. The material root is a content root: it must contain the
+11. **Parts & Materials**: a custom import creates a collection for its
+    objects. Choose that collection (or the active collection), press **Scan
+    parts**, select a row and press **Use part**. Choose the **Source** object
+    (usually the hero body), press **Scan slots**, then select one source slot
+    and one part slot. **Assign selected material** replaces that part slot;
+    **Append as new slot** adds one; **Clear selected slot** removes one and
+    remaps face indices. There is no all-slot material copy. Fit, weights,
+    materials, and export read the active part; the panel never substitutes the
+    largest imported mesh.
+    The material root is a content root: it must contain the
     `models/**/materials/*.vmat` tree and the texture images those materials
     reference. Staging preserves relative paths and copies only material
     assets, not notes, JSON, model clips, or arbitrary files.
@@ -125,7 +152,7 @@ The sidebar is in **3D Viewport → Sidebar → Deadlock**.
 ```bash
 python tools/build_addon.py
 blender -b --factory-startup --python tools/blender_workbench_probe.py -- --report artifacts/receipts/deadlock-model-forge-workbench.json
-blender -b --factory-startup --python tools/blender_zip_probe.py -- --zip dist/deadlock_model_forge-0.2.2.zip --report artifacts/receipts/deadlock-model-forge-zip.json
+blender -b --factory-startup --python tools/blender_zip_probe.py -- --zip dist/deadlock_model_forge-0.2.3.zip --report artifacts/receipts/deadlock-model-forge-zip.json
 python tools/project.py doctor
 python tools/project.py heroes
 python tools/project.py extract --hero haze --out artifacts/extractions/haze
@@ -256,10 +283,10 @@ unit.
 
 ## 2026-11-12 — manual workbench and Axis proof
 
-The one-click queue was replaced by five native subpanels: Source, Compare,
-Skeleton, Weights & Proof, and Compiler Handoff. The proof gate is BLAKE3 and the
-built addon carries the vendored `blake3` extension; there is no SHA-256 fallback
-for new proof identity.
+The one-click queue was replaced by six native subpanels: Source, Parts &
+Materials, Compare, Skeleton, Weights & Proof, and Compiler Handoff. The proof
+gate is BLAKE3 and the built addon carries the vendored `blake3` extension;
+there is no SHA-256 fallback for new proof identity.
 
 - 53 unit tests pass. `gate` passes all five checks; `selftest` rejects the
   planted KV3 parser.
@@ -284,15 +311,22 @@ for new proof identity.
   `artifacts/stage-real/compiled/haze_real`: 1 `.vmdl_c`, 6 `.vmat_c`, 29
   `.vtex_c`. Both `dmf_build_*` temporary folders were removed from CSDK
   `content` and `game`; a failed compile leaves the previous output alone.
-- The extracted-zip probe passes: 29 files, 6 panels, 24 workbench operators,
-  34 operator classes total, 45 UI icons validated; `blake3` loads from the zip,
-  not the checkout. Build: 268,057 bytes, SHA-256
-  `646d9a30c5445db08fcdea3e83160a5cfa33c13b57d9da7d18abf68efa5b6a43`,
-  BLAKE3 `a619381da1a715089a257d88e2c922143f5422ba3022e12e750cb2a0a41de276`.
+- The extracted-zip probe passes: 30 files, 7 panels, 24 workbench operators,
+  40 operator classes total, 48 UI icons validated; `blake3` loads from the zip,
+  not the checkout. Build: 271,772 bytes, SHA-256
+  `9432147f4ef0fa7fc768d48fb6960371ad7f97e0b5a1eec89831e89b8bb09529`,
+  BLAKE3 `c6a4f52c507597852eafa2624d0678c590078eb6e214d174dcef02714272b5b9`.
+- `blender_probe.py` scans a two-part collection, selects each active part,
+  appends every hero slot, replaces one selected slot, clears one slot and
+  appends it back, then stages the DMX. The exported active part retains the
+  expected material slots.
 - `blender_panel_gui_probe.py` opened a real Blender window, invoked
-  `dmf.compare_split`, called all five subpanels, and saved
-  `artifacts/receipts/compare-panel.png`. The Compare panel was blank because
-  `SPLITSCREEN` was not a Blender 5.4 icon; `SMOOTH` and `NORMALIZE` had the same
+  `dmf.compare_split`, called all six subpanels, and saved
+  `artifacts/receipts/compare-panel.png`. `blender_parts_gui_probe.py` opened
+  the Parts & Materials panel with three parts and three source slots at sidebar
+  width and saved `artifacts/receipts/parts-panel.png`.
+  The Compare panel was blank because `SPLITSCREEN` was not a Blender 5.4
+  icon; `SMOOTH` and `NORMALIZE` had the same
   defect in Weights & Proof. All three now use valid icons.
 - `impeccable detect` returned `[]` for the UI source.
 

@@ -177,8 +177,21 @@ def main() -> int:
         body, armature = import_body(source_dmx)
         settings.target_body = body
         settings.target_armature = armature
+        collection = bpy.data.collections.new("real_probe_parts")
+        bpy.context.scene.collection.children.link(collection)
+        for old in list(body.users_collection):
+            old.objects.unlink(body)
+        collection.objects.link(body)
+        settings.custom_collection = collection
         settings.custom_mesh = body
         settings.custom_armature = armature
+        settings.material_source = body
+        result = bpy.ops.dmf.scan_parts()
+        if "FINISHED" not in result:
+            raise RuntimeError(f"part scan failed: {result} status={settings.status}")
+        result = bpy.ops.dmf.scan_materials()
+        if "FINISHED" not in result:
+            raise RuntimeError(f"material scan failed: {result} status={settings.status}")
         source_metrics = mesh_metrics(body)
         source_metrics["bones"] = len(armature.data.bones)
         source_metrics["bone_names"] = [bone.name for bone in armature.data.bones]
@@ -217,10 +230,14 @@ def main() -> int:
             "after": mesh_metrics(body),
         }
 
-        materials = bpy.ops.dmf.copy_materials()
-        if "FINISHED" not in materials:
-            raise RuntimeError(f"material assignment failed: {materials} status={settings.status}")
+        for index in range(settings.source_material_count):
+            settings.source_material_index = index
+            settings.part_material_index = index
+            materials = bpy.ops.dmf.assign_material()
+            if "FINISHED" not in materials:
+                raise RuntimeError(f"material assignment failed: {materials} status={settings.status}")
         report["materials"] = {
+            "mode": "selected-slot",
             "count": settings.material_count,
             "after": mesh_metrics(body),
         }
