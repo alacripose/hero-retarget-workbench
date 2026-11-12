@@ -193,13 +193,13 @@ class DMF_PT_setup(Panel):
 
         tools = _section(layout, "Tool paths", "PREFERENCES", "saved in this file")
         tools.prop(settings, "deadlock_root", text="Deadlock install")
-        tools.prop(settings, "s2v_cli", text="Source 2 Viewer")
+        tools.prop(settings, "s2v_cli", text="Source 2 Viewer CLI")
         tools.prop(settings, "csdk_root", text="CSDK13")
         actions = tools.row(align=True)
         actions.operator("dmf.detect_paths", text="Detect installed", icon="FILE_REFRESH")
         _hint(
             tools,
-            "These values are saved in this .blend. Set them once, then use File > Defaults > Save Startup File to make them the default for new files.",
+            "Choose Source2Viewer-CLI.exe, not the Source2Viewer.exe GUI. These values are saved in this .blend; use File > Defaults > Save Startup File to make them the default for new files.",
             "INFO",
             width=32,
         )

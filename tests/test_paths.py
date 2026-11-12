@@ -80,6 +80,18 @@ class PathConfigurationTests(unittest.TestCase):
     def test_a_directory_may_be_chosen_for_the_viewer(self):
         self.assertEqual(paths.find_s2v(self.s2v.parent), self.s2v)
 
+    def test_the_viewer_gui_is_not_accepted_as_the_cli(self):
+        gui = self.s2v.with_name("Source2Viewer.exe")
+        gui.write_bytes(b"gui")
+        self.assertIsNone(paths.find_s2v(gui))
+
+    def test_gui_path_reports_a_specific_problem(self):
+        gui = self.s2v.with_name("Source2Viewer.exe")
+        gui.write_bytes(b"gui")
+        env = paths.detect(deadlock_root=self.game, s2v_cli=gui, csdk_root=self.csdk)
+        self.assertIsNone(env.s2v)
+        self.assertTrue(any("GUI selected" in item for item in env.problems))
+
     def test_personal_folders_are_not_candidates(self):
         home = self.root / "home"
         (home / "Documents" / "openlock_modern" / "tools" / "s2v").mkdir(parents=True)

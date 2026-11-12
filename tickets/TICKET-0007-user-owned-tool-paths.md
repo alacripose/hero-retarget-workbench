@@ -56,7 +56,7 @@ The owner rejected machine-specific defaults and script-provided paths:
 - `artifacts/receipts/compare-panel.png`
 - `ledger/ledger.jsonl`
 
-All 58 unit tests pass. The extracted zip reports 8 panels, 41 operator
+All 60 unit tests pass. The extracted zip reports 8 panels, 41 operator
 classes, 50 icons, `path_config_saved: true`, `path_detect_operator: true`, and
 `path_namespace_isolated: true`. The installed addon was then run against the
 user's actual Deadlock 6861, Source 2 Viewer, and CSDK13 paths; `detect_paths`
@@ -67,6 +67,11 @@ top-level `forge` module. The new addon now imports its own
 `hero_retarget_workbench.forge` namespace, so the old module cannot supply the
 old `detect()` signature. The Setup panel drew in a real Blender window
 alongside the six workflow subpanels.
+
+The installed addon now rejects the `Source2Viewer.exe` GUI with a specific
+message and accepts `Source2Viewer-CLI.exe`; a real extraction through the CLI
+listed 67 heroes and emitted Haze's vmdl, body DMX, and 458 DMX files. Receipt:
+`artifacts/receipts/hero-retarget-workbench-s2v-cli.json`.
 
 GitHub Actions run `43317516973` passed on `5c48744`: 58 unit tests, addon zip
 build, zip identity, and artifact upload. The release job was skipped because

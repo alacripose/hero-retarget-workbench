@@ -82,7 +82,7 @@ class DMF_Settings(PropertyGroup):
     )
     s2v_cli: StringProperty(
         name="Source 2 Viewer CLI",
-        description="Source2Viewer-CLI executable; saved with this .blend",
+        description="Source2Viewer-CLI.exe, not the Source2Viewer.exe GUI; saved with this .blend",
         subtype="FILE_PATH",
     )
     csdk_root: StringProperty(

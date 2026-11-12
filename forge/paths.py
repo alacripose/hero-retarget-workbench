@@ -182,11 +182,21 @@ def find_game(
     return None, None, problems
 
 
+S2V_CLI_NAMES = ("Source2Viewer-CLI.exe", "Source2Viewer-CLI")
+
+
 def find_s2v(explicit: str | Path | None = None) -> Path | None:
     configured = explicit if explicit is not None else os.environ.get("S2V_CLI")
     if configured is not None and str(configured).strip():
-        return _file_candidate(configured, ("Source2Viewer-CLI.exe", "Source2Viewer-CLI"))
-    for name in ("Source2Viewer-CLI.exe", "Source2Viewer-CLI"):
+        path = Path(configured).expanduser()
+        if path.is_dir():
+            return _file_candidate(path, S2V_CLI_NAMES)
+        # Source2Viewer.exe is the GUI. It accepts a double-click, but it does
+        # not perform the CLI extraction commands this addon sends.
+        if path.is_file() and path.name.lower() in {name.lower() for name in S2V_CLI_NAMES}:
+            return path
+        return None
+    for name in S2V_CLI_NAMES:
         found = shutil.which(name)
         if found:
             return Path(found)
@@ -260,5 +270,10 @@ def detect(
     ):
         if path is None:
             detail = f" at {configured}" if configured is not None and str(configured).strip() else ""
-            env.problems.append(f"{name} was not found{detail}")
+            if name == "Source 2 Viewer" and configured and Path(str(configured)).name.lower() == "source2viewer.exe":
+                env.problems.append(
+                    "Source 2 Viewer GUI selected; choose Source2Viewer-CLI.exe in Setup for VPK extraction"
+                )
+            else:
+                env.problems.append(f"{name} was not found{detail}")
     return env

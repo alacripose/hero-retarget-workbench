@@ -72,7 +72,7 @@ class DMF_OT_detect_paths(Operator):
             missing = [
                 name
                 for name, value in (
-                    ("Source 2 Viewer CLI", env.s2v),
+                    ("Source 2 Viewer CLI (choose Source2Viewer-CLI.exe, not the GUI)", env.s2v),
                     ("CSDK13 root", env.csdk_root),
                 )
                 if value is None
@@ -104,6 +104,11 @@ class DMF_OT_detect(Operator):
                 env = core.detect_environment(settings, module)
                 if not env.game_root:
                     raise RuntimeError("Live game not found. Choose the Steam Deadlock folder in Setup.")
+                if not env.s2v:
+                    raise RuntimeError(
+                        "Source 2 Viewer CLI not found. Choose Source2Viewer-CLI.exe in Setup; "
+                        "Source2Viewer.exe is the GUI and cannot extract VPK files for the addon."
+                    )
                 progress(0.25, "reading hero table through S2V")
                 heroes = module["live"].list_heroes(env)
                 return env, heroes

@@ -74,8 +74,9 @@ The sidebar is in **3D Viewport → Sidebar → Deadlock**.
 ### Set the tool paths once
 
 1. Open the **Setup** subpanel.
-2. Set **Deadlock install** to the Steam `Deadlock` folder, **Source 2 Viewer**
-   to `Source2Viewer-CLI.exe`, and **CSDK13** to the folder containing
+2. Set **Deadlock install** to the Steam `Deadlock` folder, **Source 2 Viewer
+   CLI** to `Source2Viewer-CLI.exe` (not the `Source2Viewer.exe` GUI), and
+   **CSDK13** to the folder containing
    `game/bin/win64/resourcecompiler.exe`.
 3. Press **Detect installed** to fill any blank field from Steam, `PATH`, or the
    environment. A value you set is never replaced by another install.
@@ -306,7 +307,7 @@ The one-click queue was replaced by seven native subpanels: Setup, Source, Parts
 gate is BLAKE3 and the built addon carries the vendored `blake3` extension;
 there is no SHA-256 fallback for new proof identity.
 
-- 58 unit tests pass. `gate` passes all five checks; `selftest` rejects the
+- 60 unit tests pass. `gate` passes all five checks; `selftest` rejects the
   planted KV3 parser.
 - `blender_workbench_probe.py` passes: bone scan/rename/alignment, `FOLD` and
   `KEEP` extras, chunked weight solve, background job value, BLAKE3 proof
@@ -332,9 +333,9 @@ there is no SHA-256 fallback for new proof identity.
 - The extracted-zip probe passes: 30 files, 8 panels, 41 operator classes,
   50 UI icons validated; `blake3` loads from the zip, not the checkout. The probe
   saves a `.blend` with the three Setup paths, reopens it, and reads the same
-  values. Build: 273,624 bytes, SHA-256
-  `360e1849bb682b3e81d2d6c1346f735be7fcfb256d46056e4c7e15fccf3bb686`,
-  BLAKE3 `df6a347a8f2c2a1d4ec4021d00d54b67b737c459117a10c4da0e7e41ea93382d`.
+  values. Build: 273,938 bytes, SHA-256
+  `373358426e60aec5098a5128fd149a104b82930ae40e9d299538a033aafee85c`,
+  BLAKE3 `d43c924c9d1c7440895b87a809579450085a247b9e32eed5951114fb22b0ca0b`.
 - `blender_probe.py` scans a two-part collection, selects each active part,
   appends every hero slot, replaces one selected slot, clears one slot and
   appends it back, then stages the DMX. The exported active part retains the

@@ -163,6 +163,19 @@ def main() -> int:
         (csdk_fixture / "game" / "bin" / "win64" / "resourcecompiler.exe").write_bytes(b"compiler")
         (csdk_fixture / "game" / "citadel").mkdir(parents=True)
         (csdk_fixture / "game" / "citadel" / "gameinfo.gi").write_text("gameinfo", encoding="utf-8")
+
+        # The GUI accepts a double-click but does not run the addon's CLI
+        # extraction command. It must be rejected, not silently used.
+        gui = temp / "Source2Viewer.exe"
+        gui.write_bytes(b"gui")
+        reloaded.s2v_cli = str(gui)
+        result = bpy.ops.dmf.detect_paths()
+        if "FINISHED" not in result:
+            raise RuntimeError(f"detect_paths did not finish for the GUI: {result}")
+        if reloaded.status_kind != "WARN" or "Source2Viewer-CLI" not in reloaded.status:
+            raise RuntimeError(f"the GUI was not rejected: {reloaded.status}")
+
+        reloaded.s2v_cli = expected_paths["s2v_cli"]
         result = bpy.ops.dmf.detect_paths()
         if "FINISHED" not in result:
             raise RuntimeError(f"detect_paths did not finish: {result}")
@@ -194,6 +207,7 @@ def main() -> int:
             "path_config_saved": True,
             "path_detect_operator": True,
             "path_namespace_isolated": True,
+            "s2v_gui_rejected": True,
             "blake3_module": str(Path(blake3.__file__).resolve()),
         }
         report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
