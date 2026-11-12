@@ -67,3 +67,10 @@ top-level `forge` module. The new addon now imports its own
 `hero_retarget_workbench.forge` namespace, so the old module cannot supply the
 old `detect()` signature. The Setup panel drew in a real Blender window
 alongside the six workflow subpanels.
+
+GitHub Actions run `43317516973` passed on `5c48744`: 58 unit tests, addon zip
+build, zip identity, and artifact upload. The release job was skipped because
+this was a push to `main`, not a version tag. The CI-built zip is 274,119 bytes
+(SHA-256 `f6f7ae99ff32278a38ae45b23b89f2b0c4c1c9ce10170bbff6471698c1248abd`); the
+local working-tree zip is 273,624 bytes because Windows CI checks out different
+line endings and timestamps.
