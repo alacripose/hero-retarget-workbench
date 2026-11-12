@@ -31,17 +31,21 @@ keeps Blender's own controls.
 
 - Deadlock installed through Steam (currently observed build **6861**, version
   date **Nov 09 2026**).
-- Source 2 Viewer CLI. Default probe: `<home>\Documents\openlock_modern\tools\s2v\Source2Viewer-CLI.exe`.
+- Source 2 Viewer CLI, selected in the addon's **Setup** panel.
 - Blender 5.4 with **PulseSrcOps** enabled (DMX import/export) and SourceIO
   available (Source 2 assets). Observed: PulseSrcOps 2.1.2, SourceIO 5.5.2.
-- A reduced CSDK13 install with `game/bin/win64/resourcecompiler.exe`.
+- A reduced CSDK13 install with `game/bin/win64/resourcecompiler.exe`, selected
+  in the addon's **Setup** panel.
 - BLAKE3 1.0.11 for proof identity and stage evidence. The built addon carries
   the vendored Windows extension; the checkout install is declared in
   `requirements.txt`. There is no SHA-256 fallback for new proof identity.
 
-Set `DEADLOCK_GAME`, `S2V_CLI`, `BLENDER`, or `CSDK13_ROOT` when the paths are
-different. `python tools/project.py doctor` reports what was found without
-guessing.
+The addon stores the Deadlock install, Source 2 Viewer CLI, CSDK13 root, and
+workspace on the scene. They are saved in the `.blend`; use **File → Defaults →
+Save Startup File** to make them the default for new files. No machine-specific
+folder is a built-in default. The headless `tools/project.py` command still
+accepts `DEADLOCK_GAME`, `S2V_CLI`, `BLENDER`, and `CSDK13_ROOT` as explicit
+overrides.
 
 ## Build and install the Blender addon
 
@@ -67,20 +71,34 @@ the addon then uses the checkout's `forge/` package and writes under the checkou
 
 The sidebar is in **3D Viewport → Sidebar → Deadlock**.
 
+### Set the tool paths once
+
+1. Open the **Setup** subpanel.
+2. Set **Deadlock install** to the Steam `Deadlock` folder, **Source 2 Viewer**
+   to `Source2Viewer-CLI.exe`, and **CSDK13** to the folder containing
+   `game/bin/win64/resourcecompiler.exe`.
+3. Press **Detect installed** to fill any blank field from Steam, `PATH`, or the
+   environment. A value you set is never replaced by another install.
+4. Save the `.blend`. To apply the same paths to every new file, use
+   **File → Defaults → Save Startup File** after setting them.
+
+The Setup fields are scene properties, not a launcher script. A teammate with a
+newer Deadlock build or a different drive updates the fields in their own file.
+
 ## Continuous integration and releases
 
 `.github/workflows/ci.yml` runs on every push to `main`, every pull request,
 and every version tag. It runs the unit tests, builds the addon zip, and uploads
 the zip as a workflow artifact on Windows with Python 3.13.
 
-A tag such as `v0.2.4` also runs the release job after the test job. The job
+A tag such as `v0.2.5` also runs the release job after the test job. The job
 checks that the zip version matches the tag, then creates or updates the release
 with `hero_retarget_workbench-<version>.zip` attached. A rerun replaces the asset
 rather than leaving the release without a zip.
 
 ```bash
-git tag v0.2.4
-git push origin v0.2.4
+git tag v0.2.5
+git push origin v0.2.5
 ```
 
 The tag must match `bl_info["version"]`. The workflow rejects a mismatch before
@@ -88,7 +106,7 @@ it publishes anything.
 
 ## Workflow
 
-1. **Detect Live Build** — finds the current install and lists every hero
+1. **Detect Live Build** — uses the paths from Setup and lists every hero
    declared by the live build through S2V. On build 6861 this is 67 entries
    across `heroes_staging` and `heroes_wip`; 63 have body models. Four
    in-development entries declare a model path that is not in the build. S2V
@@ -152,7 +170,7 @@ it publishes anything.
 ```bash
 python tools/build_addon.py
 blender -b --factory-startup --python tools/blender_workbench_probe.py -- --report artifacts/receipts/hero-retarget-workbench-workbench.json
-blender -b --factory-startup --python tools/blender_zip_probe.py -- --zip dist/hero_retarget_workbench-0.2.4.zip --report artifacts/receipts/hero-retarget-workbench-zip.json
+blender -b --factory-startup --python tools/blender_zip_probe.py -- --zip dist/hero_retarget_workbench-0.2.5.zip --report artifacts/receipts/hero-retarget-workbench-zip.json
 python tools/project.py doctor
 python tools/project.py heroes
 python tools/project.py extract --hero haze --out artifacts/extractions/haze
@@ -283,12 +301,12 @@ unit.
 
 ## 2026-11-12 — manual workbench and Axis proof
 
-The one-click queue was replaced by six native subpanels: Source, Parts &
-Materials, Compare, Skeleton, Weights & Proof, and Compiler Handoff. The proof
+The one-click queue was replaced by seven native subpanels: Setup, Source, Parts
+& Materials, Compare, Skeleton, Weights & Proof, and Compiler Handoff. The proof
 gate is BLAKE3 and the built addon carries the vendored `blake3` extension;
 there is no SHA-256 fallback for new proof identity.
 
-- 53 unit tests pass. `gate` passes all five checks; `selftest` rejects the
+- 58 unit tests pass. `gate` passes all five checks; `selftest` rejects the
   planted KV3 parser.
 - `blender_workbench_probe.py` passes: bone scan/rename/alignment, `FOLD` and
   `KEEP` extras, chunked weight solve, background job value, BLAKE3 proof
@@ -311,17 +329,18 @@ there is no SHA-256 fallback for new proof identity.
   `artifacts/stage-real/compiled/haze_real`: 1 `.vmdl_c`, 6 `.vmat_c`, 29
   `.vtex_c`. Both `dmf_build_*` temporary folders were removed from CSDK
   `content` and `game`; a failed compile leaves the previous output alone.
-- The extracted-zip probe passes: 30 files, 7 panels, 24 workbench operators,
-  40 operator classes total, 48 UI icons validated; `blake3` loads from the zip,
-  not the checkout. Build: 271,958 bytes, SHA-256
-  `86638ab3da3c8e12017c839a43a1a7658cecd28d37cc4fc7a48db9f3a964bebc`,
-  BLAKE3 `b68ba1364a61c8c251d8f45592523739a377b6ccbe9445be448c2fb556b9b537`.
+- The extracted-zip probe passes: 30 files, 8 panels, 41 operator classes,
+  50 UI icons validated; `blake3` loads from the zip, not the checkout. The probe
+  saves a `.blend` with the three Setup paths, reopens it, and reads the same
+  values. Build: 273,624 bytes, SHA-256
+  `360e1849bb682b3e81d2d6c1346f735be7fcfb256d46056e4c7e15fccf3bb686`,
+  BLAKE3 `df6a347a8f2c2a1d4ec4021d00d54b67b737c459117a10c4da0e7e41ea93382d`.
 - `blender_probe.py` scans a two-part collection, selects each active part,
   appends every hero slot, replaces one selected slot, clears one slot and
   appends it back, then stages the DMX. The exported active part retains the
   expected material slots.
 - `blender_panel_gui_probe.py` opened a real Blender window, invoked
-  `dmf.compare_split`, called all six subpanels, and saved
+  `dmf.compare_split`, called all seven subpanels, and saved
   `artifacts/receipts/compare-panel.png`. `blender_parts_gui_probe.py` opened
   the Parts & Materials panel with three parts and three source slots at sidebar
   width and saved `artifacts/receipts/parts-panel.png`.

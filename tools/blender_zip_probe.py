@@ -1,7 +1,7 @@
 """Verify the built addon zip is self-contained and registers in Blender.
 
   blender -b --factory-startup --python tools/blender_zip_probe.py -- \
-    --zip dist/hero_retarget_workbench-0.2.4.zip \
+    --zip dist/hero_retarget_workbench-0.2.5.zip \
     --report artifacts/receipts/hero-retarget-workbench-zip.json
 
 The probe deliberately imports from an extracted copy instead of the checkout,
@@ -90,22 +90,34 @@ def main() -> int:
         vendor_root = (package_root / "_vendor" / "blake3").resolve()
         if vendor_root not in Path(blake3.__file__).resolve().parents:
             raise RuntimeError(f"blake3 was not imported from the zip: {blake3.__file__}")
-        if dmf.bl_info["version"] != (0, 2, 4):
+        if dmf.bl_info["version"] != (0, 2, 5):
             raise RuntimeError(f"unexpected version: {dmf.bl_info['version']}")
 
         dmf.register()
         if not hasattr(bpy.types.Scene, "dmf"):
             raise RuntimeError("register did not add Scene.dmf")
         settings = bpy.context.scene.dmf
+
+        # Simulate the real machine: the old addon left a top-level ``forge``
+        # module in sys.modules. The new addon must import its own bundle.
+        import types
+
+        stale_forge = types.ModuleType("forge")
+        stale_forge.__file__ = "<stale deadlock_model_forge>"
+        sys.modules["forge"] = stale_forge
+        bundled = dmf.core.core(settings)
+        if "hero_retarget_workbench.forge.paths" not in bundled["paths"].__name__:
+            raise RuntimeError(f"core imported the stale forge module: {bundled['paths'].__name__}")
+
         panels = len(dmf.ui.CLASSES)
         workbench = len(dmf.workbench.CLASSES)
         operators = len(dmf.operators.CLASSES) + workbench
-        if panels != 7:
-            raise RuntimeError(f"expected 7 panel classes, found {panels}")
+        if panels != 8:
+            raise RuntimeError(f"expected 8 panel classes, found {panels}")
         if workbench != 24:
             raise RuntimeError(f"expected 24 workbench operators, found {workbench}")
-        if operators != 40:
-            raise RuntimeError(f"expected 40 operator classes in total, found {operators}")
+        if operators != 41:
+            raise RuntimeError(f"expected 41 operator classes in total, found {operators}")
         valid_icons = {
             item.identifier
             for item in bpy.types.UILayout.bl_rna.functions["label"].parameters["icon"].enum_items
@@ -117,6 +129,49 @@ def main() -> int:
             raise RuntimeError(f"invalid Blender icons in ui.py: {invalid_icons}")
         if not hasattr(bpy.ops.dmf, "mint_proof"):
             raise RuntimeError("proof operator was not registered")
+        if not hasattr(bpy.ops.dmf, "detect_paths"):
+            raise RuntimeError("path detection operator was not registered")
+
+        expected_paths = {
+            "deadlock_root": str(temp / "Deadlock"),
+            "s2v_cli": str(temp / "Source2Viewer-CLI.exe"),
+            "csdk_root": str(temp / "CSDK13"),
+        }
+        for name, value in expected_paths.items():
+            setattr(settings, name, value)
+        settings.project_root = str(temp / "workspace")
+        saved_blend = temp / "path-config.blend"
+        bpy.ops.wm.save_as_mainfile(filepath=str(saved_blend))
+        bpy.ops.wm.open_mainfile(filepath=str(saved_blend))
+        reloaded = bpy.context.scene.dmf
+        for name, value in expected_paths.items():
+            if getattr(reloaded, name) != value:
+                raise RuntimeError(f"{name} did not survive the .blend save: {getattr(reloaded, name)!r}")
+        if reloaded.project_root != str(temp / "workspace"):
+            raise RuntimeError("workspace folder did not survive the .blend save")
+
+        game_fixture = Path(expected_paths["deadlock_root"])
+        (game_fixture / "game" / "citadel").mkdir(parents=True)
+        (game_fixture / "game" / "citadel" / "gameinfo.gi").write_text("gameinfo", encoding="utf-8")
+        (game_fixture / "game" / "citadel" / "pak01_dir.vpk").write_text("vpk", encoding="utf-8")
+        (game_fixture / "game" / "citadel" / "steam.inf").write_text(
+            "ClientVersion=6861\nVersionDate=Nov 09 2026\n", encoding="utf-8"
+        )
+        Path(expected_paths["s2v_cli"]).write_bytes(b"s2v")
+        csdk_fixture = Path(expected_paths["csdk_root"])
+        (csdk_fixture / "game" / "bin" / "win64").mkdir(parents=True)
+        (csdk_fixture / "game" / "bin" / "win64" / "resourcecompiler.exe").write_bytes(b"compiler")
+        (csdk_fixture / "game" / "citadel").mkdir(parents=True)
+        (csdk_fixture / "game" / "citadel" / "gameinfo.gi").write_text("gameinfo", encoding="utf-8")
+        result = bpy.ops.dmf.detect_paths()
+        if "FINISHED" not in result:
+            raise RuntimeError(f"detect_paths did not finish: {result}")
+        if reloaded.build != "6861 Nov 09 2026":
+            raise RuntimeError(f"detect_paths did not read the configured build: {reloaded.build!r}")
+        if reloaded.status_kind != "OK":
+            raise RuntimeError(f"detect_paths did not find all configured tools: {reloaded.status}")
+
+        settings = reloaded
         settings.proof_presenter = "zip-probe"
         settings.proof_ticket = "TICKET-0002"
         dmf.unregister()
@@ -136,6 +191,9 @@ def main() -> int:
             "operators": operators,
             "workbench_operators": workbench,
             "icons_checked": len(used_icons),
+            "path_config_saved": True,
+            "path_detect_operator": True,
+            "path_namespace_isolated": True,
             "blake3_module": str(Path(blake3.__file__).resolve()),
         }
         report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")

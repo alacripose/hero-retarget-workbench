@@ -48,7 +48,7 @@ def _run(env: Environment, command: list[str], log_path: Path, timeout: int) -> 
 def compile_vmdl(env: Environment, vmdl: Path, *, log_path: Path, timeout: int = 1800) -> CompileResult:
     """Compile an absolute vmdl path. Prefer compile_stage for a real addon."""
     if env.resourcecompiler is None or not env.resourcecompiler.is_file():
-        raise CompileError("resourcecompiler-missing: install CSDK13 and set CSDK13_ROOT")
+        raise CompileError("resourcecompiler-missing: choose the CSDK13 root in the addon Setup panel")
     if env.csdk_gameinfo is None:
         raise CompileError("csdk-gameinfo-missing: CSDK13 game/citadel/gameinfo.gi was not found")
     if not vmdl.is_file():
@@ -100,9 +100,9 @@ def compile_stage(
     the user's real ``citadel_addons`` folders are not touched.
     """
     if env.resourcecompiler is None or not env.resourcecompiler.is_file():
-        raise CompileError("resourcecompiler-missing: install CSDK13 and set CSDK13_ROOT")
+        raise CompileError("resourcecompiler-missing: choose the CSDK13 root in the addon Setup panel")
     if env.csdk_root is None or env.csdk_gameinfo is None:
-        raise CompileError("csdk-incomplete: content or game/citadel/gameinfo.gi was not found")
+        raise CompileError("csdk-incomplete: choose a CSDK13 root with content and game/citadel/gameinfo.gi in Setup")
     source = stage_root / "content" / "citadel_addons" / addon_name
     manifest_path = source / "stage.json"
     if not manifest_path.is_file():

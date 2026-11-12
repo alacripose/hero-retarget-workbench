@@ -71,8 +71,23 @@ class DMF_MaterialRow(PropertyGroup):
 
 class DMF_Settings(PropertyGroup):
     project_root: StringProperty(
-        name="Forge project",
-        description="The repository that contains forge/ and tools/project.py",
+        name="Workspace folder",
+        description="Where this addon keeps extractions, proofs, logs and the compiler handoff when it is not bundled",
+        subtype="DIR_PATH",
+    )
+    deadlock_root: StringProperty(
+        name="Deadlock install",
+        description="The Steam Deadlock folder that contains game/citadel/gameinfo.gi; saved with this .blend",
+        subtype="DIR_PATH",
+    )
+    s2v_cli: StringProperty(
+        name="Source 2 Viewer CLI",
+        description="Source2Viewer-CLI executable; saved with this .blend",
+        subtype="FILE_PATH",
+    )
+    csdk_root: StringProperty(
+        name="CSDK13 root",
+        description="The CSDK13 folder that contains game/bin/win64/resourcecompiler.exe; saved with this .blend",
         subtype="DIR_PATH",
     )
     hero_slug: EnumProperty(name="Hero", items=hero_items)

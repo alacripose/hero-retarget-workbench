@@ -84,6 +84,15 @@ selftest` to prove the parser gate rejects a planted parser.
 - Blender: `C:\Program Files (x86)\Steam\steamapps\common\Blender\blender.exe`,
   **5.4.0 Alpha**.
 - CSDK13: `<home>\Downloads\Reduced_CSDK_13`.
+
+**2026-11-12 — user-owned paths (owner correction).** The paths above are
+observations of the owner's machine, not addon defaults. The addon's Setup
+panel stores the Deadlock install, Source 2 Viewer CLI, CSDK13 root, and
+workspace as scene properties, so they are saved in the `.blend` and can be
+saved into the startup file. Detection prefers those values; environment
+variables are a headless fallback. No personal home-directory or drive-letter
+path is a built-in candidate. See `TICKET-0007`.
+
 - PulseSrcOps imports/exports DMX; its exporter writes a DMX named after the
   exported object. The addon temporarily names the mesh after the target DMX
   stem so the handoff has the expected filename.

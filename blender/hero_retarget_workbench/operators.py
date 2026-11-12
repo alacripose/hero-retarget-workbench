@@ -51,6 +51,43 @@ def _pick_imported(before: set[str]) -> tuple[bpy.types.Object | None, bpy.types
     return mesh, arm
 
 
+class DMF_OT_detect_paths(Operator):
+    bl_idname = "dmf.detect_paths"
+    bl_label = "Detect Installed Tools"
+    bl_description = "Fill the Setup fields from Steam, PATH, the environment, and any paths already set in this file"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            module = core.core(settings)
+            env = core.detect_environment(settings, module)
+            if env.game_root is None:
+                raise RuntimeError("Deadlock install not found. Choose the Steam Deadlock folder in Setup.")
+            settings.deadlock_root = str(env.game_root)
+            settings.build = f"{env.build} {env.version_date}".strip()
+            if env.s2v is not None:
+                settings.s2v_cli = str(env.s2v)
+            if env.csdk_root is not None:
+                settings.csdk_root = str(env.csdk_root)
+            missing = [
+                name
+                for name, value in (
+                    ("Source 2 Viewer CLI", env.s2v),
+                    ("CSDK13 root", env.csdk_root),
+                )
+                if value is None
+            ]
+            if missing:
+                _status(settings, f"Build {settings.build or 'unknown'}; set " + " and ".join(missing), "WARN")
+            else:
+                _status(settings, f"Build {settings.build or 'unknown'}; all tool paths found", "OK")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
 class DMF_OT_detect(Operator):
     bl_idname = "dmf.detect"
     bl_label = "Detect Live Build"
@@ -64,9 +101,9 @@ class DMF_OT_detect(Operator):
 
             def work(progress):
                 progress(0.05, "reading live install")
-                env = module["paths"].detect()
+                env = core.detect_environment(settings, module)
                 if not env.game_root:
-                    raise RuntimeError("Live game not found. Set DEADLOCK_GAME to the Steam Deadlock folder.")
+                    raise RuntimeError("Live game not found. Choose the Steam Deadlock folder in Setup.")
                 progress(0.25, "reading hero table through S2V")
                 heroes = module["live"].list_heroes(env)
                 return env, heroes
@@ -79,6 +116,9 @@ class DMF_OT_detect(Operator):
                 if old and old != "NONE" and any(hero.slug == old for hero in heroes):
                     settings.hero_slug = old
                 settings.build = f"{env.build} {env.version_date}".strip()
+                settings.deadlock_root = str(env.game_root) if env.game_root else settings.deadlock_root
+                settings.s2v_cli = str(env.s2v) if env.s2v else settings.s2v_cli
+                settings.csdk_root = str(env.csdk_root) if env.csdk_root else settings.csdk_root
                 settings.project_root = str(root)
                 _status(settings, f"{len(heroes)} hero entries on build {settings.build}", "OK")
 
@@ -119,7 +159,7 @@ class DMF_OT_extract(Operator):
 
             def work(progress):
                 progress(0.1, "reading live install")
-                env = module["paths"].detect()
+                env = core.detect_environment(settings, module)
                 progress(0.2, "reading hero table through S2V")
                 heroes = module["live"].list_heroes(env)
                 hero = next((item for item in heroes if item.slug == slug), None)
@@ -790,7 +830,7 @@ class DMF_OT_compile(Operator):
 
             def work(progress):
                 progress(0.1, "detecting CSDK13")
-                env = module["paths"].detect()
+                env = core.detect_environment(settings, module)
                 progress(0.25, "running resourcecompiler")
                 return module["compile"].compile_stage(env, stage_dir, addon_name, log_path=log_path)
 
@@ -842,6 +882,7 @@ class DMF_OT_pick_vmdl(Operator):
 
 
 CLASSES = (
+    DMF_OT_detect_paths,
     DMF_OT_detect,
     DMF_OT_extract,
     DMF_OT_import_hero,

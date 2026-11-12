@@ -177,6 +177,43 @@ class DMF_PT_main(Panel):
         _job(layout, settings)
 
 
+class DMF_PT_setup(Panel):
+    bl_label = "Setup"
+    bl_idname = "DMF_PT_setup"
+    bl_parent_id = "DMF_PT_main"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+
+    def draw(self, context):
+        settings = context.scene.dmf
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+
+        tools = _section(layout, "Tool paths", "PREFERENCES", "saved in this file")
+        tools.prop(settings, "deadlock_root", text="Deadlock install")
+        tools.prop(settings, "s2v_cli", text="Source 2 Viewer")
+        tools.prop(settings, "csdk_root", text="CSDK13")
+        actions = tools.row(align=True)
+        actions.operator("dmf.detect_paths", text="Detect installed", icon="FILE_REFRESH")
+        _hint(
+            tools,
+            "These values are saved in this .blend. Set them once, then use File > Defaults > Save Startup File to make them the default for new files.",
+            "INFO",
+            width=32,
+        )
+
+        workspace = _section(layout, "Workspace", "FILE_FOLDER", "optional")
+        workspace.prop(settings, "project_root", text="Folder")
+        _hint(
+            workspace,
+            "Blank uses Blender's user data folder when the addon is installed from a zip.",
+            "INFO",
+            width=32,
+        )
+
+
 class DMF_PT_source(Panel):
     bl_label = "Source"
     bl_idname = "DMF_PT_source"
@@ -540,7 +577,7 @@ class DMF_PT_handoff(Panel):
         _primary(handoff, "dmf.compile", "Compile with CSDK13", "PLAY", enabled=not settings.job_running)
 
 
-CLASSES = (DMF_PT_main, DMF_PT_source, DMF_PT_parts, DMF_PT_compare, DMF_PT_skeleton, DMF_PT_weights, DMF_PT_handoff)
+CLASSES = (DMF_PT_main, DMF_PT_setup, DMF_PT_source, DMF_PT_parts, DMF_PT_compare, DMF_PT_skeleton, DMF_PT_weights, DMF_PT_handoff)
 
 
 def register() -> None:

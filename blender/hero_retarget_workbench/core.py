@@ -70,15 +70,30 @@ def project_root(settings) -> Path:
 
 
 def core(settings):
-    _import_root(settings)
-    from forge import compile, live, paths, stage
+    if bundled_core():
+        # Import the addon's own bundle. A previously enabled addon can leave a
+        # top-level ``forge`` module in sys.modules; reusing it would mix the old
+        # path contract with this addon's Setup fields.
+        from .forge import compile, live, paths, stage
+    else:
+        _import_root(settings)
+        from forge import compile, live, paths, stage
 
     return {"compile": compile, "live": live, "paths": paths, "stage": stage}
 
 
+def detect_environment(settings, module=None):
+    """Detect with the user's scene paths ahead of environment and Steam fallbacks."""
+    module = module or core(settings)
+    return module["paths"].detect(
+        deadlock_root=settings.deadlock_root or None,
+        s2v_cli=settings.s2v_cli or None,
+        csdk_root=settings.csdk_root or None,
+    )
+
+
 def env(settings):
-    module = core(settings)
-    detected = module["paths"].detect()
+    detected = detect_environment(settings)
     if detected.game_root:
         settings.build = f"{detected.build} {detected.version_date}".strip()
     return detected

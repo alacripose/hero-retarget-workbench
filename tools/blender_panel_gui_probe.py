@@ -60,6 +60,7 @@ def run() -> None:
             print("LOCAL_VIEW", area.x, area.y, area.spaces.active.local_view is not None)
         ui_region = next(item for item in areas[0].regions if item.type == "UI")
         for panel in (
+            "DMF_PT_setup",
             "DMF_PT_source",
             "DMF_PT_parts",
             "DMF_PT_compare",

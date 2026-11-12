@@ -531,7 +531,7 @@
         <aside class="panel" aria-label="Haze workbench readout">
           <div class="panel-head">
             <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
-            <span>workbench / 0.2.4</span>
+            <span>workbench / 0.2.5</span>
           </div>
           <div class="panel-body">
             <div class="panel-id"><span>haze.port</span><span>ready</span></div>
@@ -556,10 +556,10 @@
     <div class="audit" aria-label="Build readings">
       <div class="wrap">
         <ul class="audit-list">
-          <li><strong>53</strong> tests pass</li>
-          <li><strong>7</strong> native panels</li>
+          <li><strong>58</strong> tests pass</li>
+          <li><strong>8</strong> native panels</li>
           <li><strong>24</strong> workbench operators</li>
-          <li><strong>48</strong> UI icons validated</li>
+          <li><strong>50</strong> UI icons validated</li>
           <li><strong class="good">0</strong> vmdl writes</li>
         </ul>
       </div>
@@ -570,7 +570,7 @@
         <div class="section-head">
           <div>
             <p class="kicker">The workbench</p>
-            <h2 id="workbench-title">Six panels.<br>One sidebar.</h2>
+            <h2 id="workbench-title">Seven panels.<br>One sidebar.</h2>
           </div>
           <p class="section-note">Each stage reports what it found. An unmatched group or refused proof stays visible where it happened.</p>
         </div>
@@ -698,7 +698,7 @@
             <p class="kicker">Install</p>
             <h2 id="install-title">Build the addon zip.</h2>
             <p>The builder reads the version from <code>bl_info</code> and writes a self-contained zip under <code>dist/</code>. The installed addon carries its own <code>forge/</code> core and the vendored BLAKE3 extension.</p>
-            <p>Install it in Blender 5.4 from Preferences → Add-ons → Install from Disk. Enable PulseSrcOps before the workbench.</p>
+            <p>Install it in Blender 5.4 from Preferences → Add-ons → Install from Disk. Enable PulseSrcOps before the workbench. Open the <b>Setup</b> panel and choose the Deadlock install, Source 2 Viewer CLI, and CSDK13 root; the values are saved in the <code>.blend</code>.</p>
           </div>
           <div class="terminal">
             <div class="terminal-head">
@@ -706,7 +706,7 @@
               <span>build / checkout</span>
             </div>
             <pre class="terminal-body"><code><span class="cmd">python tools/build_addon.py</span>
-<span class="comment"># dist/hero_retarget_workbench-0.2.4.zip</span>
+<span class="comment"># dist/hero_retarget_workbench-0.2.5.zip</span>
 <span class="cmd">python tools/project.py doctor</span>
 <span class="cmd">python tools/project.py selftest</span>
 
@@ -718,6 +718,7 @@
           <p><b>Blender</b>5.4 with PulseSrcOps for DMX import and export. SourceIO is needed for compiled Source 2 assets.</p>
           <p><b>Source</b>Deadlock on Steam and the Source 2 Viewer CLI. The live build is read from the install at run time.</p>
           <p><b>Compiler</b>A reduced CSDK13 install with <code>resourcecompiler.exe</code>. The addon never uses CSDK hero files as model source.</p>
+          <p><b>Paths</b>One Setup panel per file, or save the paths into your startup file. No personal folder is a built-in default.</p>
         </div>
       </div>
     </section>
@@ -738,7 +739,7 @@
   <footer>
     <div class="wrap foot-row">
       <div>
-        <div class="foot-brand"><span class="mark" aria-hidden="true"></span><span>Blender 5.4 addon / build 0.2.4</span></div>
+        <div class="foot-brand"><span class="mark" aria-hidden="true"></span><span>Blender 5.4 addon / build 0.2.5</span></div>
         <p class="foot-note">Deadlock is a Valve game. This project is not affiliated with Valve.</p>
       </div>
       <div class="foot-links">

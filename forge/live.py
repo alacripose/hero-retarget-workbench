@@ -41,9 +41,9 @@ class Extraction:
 
 def _run(env: Environment, args: list[str], *, timeout: int = 900) -> subprocess.CompletedProcess[str]:
     if env.s2v is None:
-        raise LiveError("source-2-viewer-missing: set S2V_CLI or install Source2Viewer-CLI")
+        raise LiveError("source-2-viewer-missing: choose the Source 2 Viewer CLI in the addon Setup panel")
     if env.vpk is None or env.gameinfo is None:
-        raise LiveError("live-game-missing: set DEADLOCK_GAME to the Steam Deadlock folder")
+        raise LiveError("live-game-missing: choose the Steam Deadlock folder in the addon Setup panel")
     command = [
         str(env.s2v),
         "-i",
