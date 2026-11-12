@@ -8,7 +8,7 @@ import shutil
 import tempfile
 from dataclasses import dataclass
 from fractions import Fraction
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import bpy
 from bpy.props import StringProperty
@@ -40,6 +40,21 @@ def _logical_relative(path: str | Path, root: Path, fallback: str) -> str:
     if relative.parts and relative.parts[0].lower() == "models":
         return relative.as_posix()
     return fallback
+
+
+def _model_material_path(settings) -> str:
+    """The content-relative folder a model's materials belong in.
+
+    Source 2 addons keep a model's materials next to the model's vmdl under a
+    ``materials`` folder. A bare DMX material token resolves at the content root,
+    which is why a VPK built from the addon tree otherwise gets root-level vmats.
+    """
+    for relative in (settings.vmdl_relative, settings.target_dmx_relative):
+        normalized = (relative or "").replace("\\", "/").strip("/")
+        parent = PurePosixPath(normalized).parent
+        if parent.as_posix() not in ("", "."):
+            return (parent / "materials").as_posix()
+    return "materials"
 
 
 def _pick_imported(before: set[str]) -> tuple[bpy.types.Object | None, bpy.types.Object | None]:
@@ -626,6 +641,12 @@ class DMF_OT_export_stage(Operator):
         old_engine = scene.vs.engine
         old_dmx_format = scene.vs.dmx_format
         old_encoding = scene.vs.dmx_encoding
+        old_material_paths = [item.path for item in scene.vs.material_paths]
+        old_material_indices = {
+            material.name: material.vs.material_path_index
+            for material in bpy.data.materials
+            if hasattr(material, "vs")
+        }
         old_export_entries = [
             {
                 "name": row.name,
@@ -654,6 +675,12 @@ class DMF_OT_export_stage(Operator):
             joined.vs.generate_lods = lod_count > 0
             joined.vs.lod_count = max(1, lod_count)
             joined.vs.decimate_factor = float(lod_decimate)
+            scene.vs.material_paths.clear()
+            scene.vs.material_paths.add().path = _model_material_path(settings)
+            scene.vs.material_paths_index = 0
+            for slot in joined.material_slots:
+                if slot.material is not None and hasattr(slot.material, "vs"):
+                    slot.material.vs.material_path_index = "0"
             scene.vs.export_path = str(destination) + os.sep
             scene.vs.export_format = "DMX"
             scene.vs.engine = "SOURCE"
@@ -730,6 +757,13 @@ class DMF_OT_export_stage(Operator):
                 fresh_scene.vs.engine = old_engine
                 fresh_scene.vs.dmx_format = old_dmx_format
                 fresh_scene.vs.dmx_encoding = old_encoding
+                fresh_scene.vs.material_paths.clear()
+                for path in old_material_paths:
+                    fresh_scene.vs.material_paths.add().path = path
+                for material_name, path_index in old_material_indices.items():
+                    restored_material = bpy.data.materials.get(material_name)
+                    if restored_material is not None and hasattr(restored_material, "vs"):
+                        restored_material.vs.material_path_index = path_index
                 fresh_scene.vs.export_list.clear()
                 for entry in old_export_entries:
                     row = fresh_scene.vs.export_list.add()

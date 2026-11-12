@@ -196,8 +196,30 @@ The Doorman vmdl has a separate head mesh. The Mayu collection is therefore
 exported in two deliberate subsets for this port: body (body, both Deagles and
 the ribbon tail) and head (head, lenses and hair). The body and head DMXs and
 their LODs replace the vmdl's existing mesh paths; the vmdl stays byte-for-byte
-unchanged. The head UI variant uses the head DMX. `de_Mods_2.vmat` is a
-root-level copy of `deagle.vmat` so the DMX material token resolves.
+unchanged. The head UI variant uses the head DMX.
+
+## 2026-11-12 — VPK material convention
+
+**Owner correction, verbatim:** *"Okay well when I create the vpk from the csdk
+game folder it's going to include all of the files in the addon directory and
+with the materials not in the you know materials folder that makes it break
+valve convention"*.
+
+PulseSrcOps writes `mtlName` as `scene.vs.material_paths[index]` joined with the
+material basename. `DMF_OT_export_stage` now derives the model's materials folder
+from `vmdl_relative` (falling back to `target_dmx_relative`), sets that path for
+the joined export, assigns material path index 0, and restores the scene's old
+material paths and indices in `finally`. Slashes must not be put in material
+names: PulseSrcOps sanitizes them to underscores and produces references like
+`models_heroes_wip_doorman_v2_materials_body.vmat`, which do not resolve.
+
+The conventional layout is `models/<model>/materials/<material>.vmat` (for Mayu,
+`models/heroes_wip/doorman_v2/materials/`). The game addon must contain only the
+compiled tree: no root vmats, no `tools_asset_info.bin`, no thumbnail cache, no
+unused particles or stale clips. A VPK built from
+`game/citadel_addons/<addon>` then contains only the model, its nested materials,
+and the default materials the compiler pulled in. The 12 Mayu source material
+assets live under the same nested folder in the content addon.
 
 The split compile returned 0 with 43 compiled files and 23 warnings: six
 >4-weight warnings (the owner records >4 weights as supported by a modeldoc
