@@ -8,6 +8,7 @@ import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .hashes import blake3_file
 from .paths import Environment
 
 
@@ -121,6 +122,9 @@ def compile_stage(
     build_game = env.csdk_root / "game" / "citadel_addons" / build_name
     try:
         shutil.copytree(source, build_content, dirs_exist_ok=True)
+        # Hash the copy the compiler is about to read.
+        if blake3_file(build_content / vmdl_relative) != manifest.get("vmdl_blake3"):
+            raise CompileError("staged-vmdl-changed: it no longer matches stage.json; stage again")
         input_relative = Path("citadel_addons") / build_name / vmdl_relative
         command = [
             str(env.resourcecompiler),

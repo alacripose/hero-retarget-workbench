@@ -5,7 +5,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from forge.compile import compile_stage
+from forge.compile import CompileError, compile_stage
+from forge.hashes import blake3_hex
 from forge.paths import Environment
 
 
@@ -31,7 +32,9 @@ class CompileStageTests(unittest.TestCase):
         (self.source / "models" / "heroes" / "haze" / "haze.vmdl").write_bytes(b"vmdl")
         (self.source / "models" / "heroes" / "haze" / "haze_body.dmx").write_bytes(b"dmx")
         (self.source / "stage.json").write_text(
-            json.dumps({"vmdl": "models/heroes/haze/haze.vmdl"}),
+            json.dumps(
+                {"vmdl": "models/heroes/haze/haze.vmdl", "vmdl_blake3": blake3_hex(b"vmdl")}
+            ),
             encoding="utf-8",
         )
         self.env = Environment(
@@ -104,6 +107,16 @@ class CompileStageTests(unittest.TestCase):
         self.assertEqual(old.read_bytes(), b"old")
         self.assertEqual(list(self.content_root.iterdir()), [])
         self.assertEqual(list(self.game_root.iterdir()), [])
+
+    def test_compile_refuses_a_vmdl_changed_after_staging(self):
+        (self.source / "models" / "heroes" / "haze" / "haze.vmdl").write_bytes(b"edited")
+
+        with patch("forge.compile._run") as run:
+            with self.assertRaisesRegex(CompileError, "staged-vmdl-changed"):
+                compile_stage(self.env, self.stage, "haze", log_path=self.log)
+
+        run.assert_not_called()
+        self.assertEqual(list(self.content_root.iterdir()), [])
 
 
 if __name__ == "__main__":
