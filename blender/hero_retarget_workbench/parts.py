@@ -33,6 +33,41 @@ def collection_armatures(collection) -> list[bpy.types.Object]:
     return [obj for obj in collection_objects(collection) if obj.type == "ARMATURE"]
 
 
+def export_meshes(settings) -> list[bpy.types.Object]:
+    """Every mesh part that belongs in the exported model.
+
+    The active part is the working part for fit, weights and material edits.
+    Export is deliberately different: a ported character is usually split into
+    body, head, hair, accessories and weapon meshes, and selecting one part must
+    not silently drop the rest. The selected collection is the export scope.
+    """
+    collection = settings.custom_collection
+    if collection is not None:
+        rows = [
+            obj
+            for obj in collection_meshes(collection)
+            if obj.data is not None and len(obj.data.vertices) > 0
+        ]
+        if rows:
+            return rows
+
+    rows = []
+    seen = set()
+    for row in settings.parts:
+        obj = row.object
+        if obj is None or obj.data is None or not len(obj.data.vertices):
+            continue
+        if obj.name in seen:
+            continue
+        seen.add(obj.name)
+        rows.append(obj)
+    if rows:
+        return rows
+
+    mesh = settings.custom_mesh
+    return [mesh] if mesh is not None and mesh.data is not None else []
+
+
 def largest_armature(collection) -> bpy.types.Object | None:
     arms = collection_armatures(collection)
     return max(arms, key=lambda obj: len(obj.data.bones)) if arms else None

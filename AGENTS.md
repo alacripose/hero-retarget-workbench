@@ -172,3 +172,38 @@ S2V's decompiled text; it does not use a general KeyValues reader.
 On build 6861 the table has 67 entries; 63 have body models. The four
 in-development entries without a body are still listed so the table is complete;
 extraction names the declared path when the build cannot supply it.
+
+## 2026-11-12 — collection export and the Mayu body/head split
+
+**Owner correction, verbatim:** *"god we're supposed to be porting the thicc mayu
+over the doorman and not have the doorman be the only thing visible, that
+includes the deagle parts and the hair"*.
+
+The installed addon was showing the original Doorman because the DMX under
+`doorman_doorman.dmx` was still the original binary. The workbench only exported
+the active part. `parts.export_meshes` now returns every non-empty mesh in the
+selected collection, and `DMF_OT_export_stage` duplicates and joins them into a
+temporary collection before export; the owner's scene objects are untouched.
+
+PulseSrcOps calls `bpy.ops.ed.undo()` inside its own `finally` block. When that
+runs under the addon operator after a joined/LOD export, Blender 5.4 crashes
+with `EXCEPTION_ACCESS_VIOLATION`. The export raises `bpy.app.debug_value` above
+1 for the PulseSrcOps call and restores it afterward; PulseSrcOps' own guard
+skips the nested undo. This is a workaround for its exporter, not a project
+undo policy.
+
+The Doorman vmdl has a separate head mesh. The Mayu collection is therefore
+exported in two deliberate subsets for this port: body (body, both Deagles and
+the ribbon tail) and head (head, lenses and hair). The body and head DMXs and
+their LODs replace the vmdl's existing mesh paths; the vmdl stays byte-for-byte
+unchanged. The head UI variant uses the head DMX. `de_Mods_2.vmat` is a
+root-level copy of `deagle.vmat` so the DMX material token resolves.
+
+The split compile returned 0 with 43 compiled files and 23 warnings: six
+>4-weight warnings (the owner records >4 weights as supported by a modeldoc
+option) and reduced-CSDK door-material warnings. The compiled `doorman.vmdl_c`
+is 4,820,622 bytes and contains `Body`, `Head`, `Lenses`, `hair` and
+`de_mods_2`; `doorman_head` and `doorman_hair` are absent. The installed addon
+is under `Reduced_CSDK_13\content\citadel_addons\thicc_mayu_v3` and
+`...\game\citadel_addons\thicc_mayu_v3`. The CSDK modeldoc crash remains a
+separate investigation and no `.vnmskel` is bundled.

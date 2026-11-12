@@ -535,10 +535,74 @@ class DMF_OT_retarget(Operator):
         return {"FINISHED"}
 
 
+def _join_export_parts(context, settings, collection, source_parts, armature):
+    """Duplicate and join every custom part without changing the scene meshes."""
+    duplicates = []
+    for obj in source_parts:
+        if obj.data is None or not len(obj.data.vertices):
+            continue
+        duplicate = obj.copy()
+        duplicate.data = obj.data.copy()
+        duplicate.name = f"DMF export {obj.name}"
+        world = obj.matrix_world.copy()
+        duplicate.parent = None
+        duplicate.matrix_world = world
+        collection.objects.link(duplicate)
+        if hasattr(duplicate, "vs"):
+            duplicate.vs.export = True
+        duplicates.append((obj, duplicate))
+
+    if not duplicates:
+        raise RuntimeError("Choose a custom collection with at least one mesh before export")
+
+    armatures = {
+        modifier.object
+        for _, duplicate in duplicates
+        for modifier in duplicate.modifiers
+        if modifier.type == "ARMATURE" and modifier.object is not None
+    }
+    if len(armatures) > 1:
+        names = ", ".join(sorted(obj.name for obj in armatures))
+        raise RuntimeError(
+            f"mixed-armature: the export parts use more than one skeleton ({names}); "
+            "bind them to one target skeleton before export"
+        )
+    if armature is None:
+        armature = next(iter(armatures), None)
+    if armature is None:
+        raise RuntimeError("Choose the hero skeleton before export")
+
+    if context.object is not None and context.object.mode != "OBJECT":
+        bpy.ops.object.mode_set(mode="OBJECT")
+    active_source = settings.custom_mesh if settings.custom_mesh in source_parts else None
+    if active_source is None:
+        active_source = max(source_parts, key=lambda obj: len(obj.data.vertices))
+    active = next(duplicate for source, duplicate in duplicates if source == active_source)
+    bpy.ops.object.select_all(action="DESELECT")
+    for _, duplicate in duplicates:
+        duplicate.select_set(True)
+    context.view_layer.objects.active = active
+    result = bpy.ops.object.join()
+    if "FINISHED" not in result:
+        raise RuntimeError("Blender could not join the custom parts for export")
+    joined = context.view_layer.objects.active
+    joined.name = "DMF joined export"
+    if not any(
+        modifier.type == "ARMATURE" and modifier.object is armature
+        for modifier in joined.modifiers
+    ):
+        modifier = joined.modifiers.new(name="DMF export armature", type="ARMATURE")
+        modifier.object = armature
+    collection.objects.link(armature)
+    if hasattr(armature, "vs"):
+        armature.vs.export = True
+    return joined, armature, [joined.name]
+
+
 class DMF_OT_export_stage(Operator):
     bl_idname = "dmf.export_stage"
     bl_label = "Export & Stage"
-    bl_description = "Export the custom mesh as DMX, then copy the unchanged S2V vmdl and its materials into a CSDK13 handoff"
+    bl_description = "Join every mesh in the custom collection, export it as one DMX, then copy the unchanged S2V vmdl and its materials into a CSDK13 handoff"
 
     def _export(
         self,
@@ -553,11 +617,10 @@ class DMF_OT_export_stage(Operator):
         scene_name = scene.name
         if not hasattr(scene, "vs"):
             raise RuntimeError("PulseSrcOps is required for DMX export; enable it in Blender")
-        custom = settings.custom_mesh
+        source_parts = parts.export_meshes(settings)
+        if not source_parts:
+            raise RuntimeError("Choose a custom collection or mesh before export")
         armature = settings.target_armature
-        if custom is None:
-            raise RuntimeError("Choose a custom mesh before export")
-        old_name = custom.name
         old_path = scene.vs.export_path
         old_format = scene.vs.export_format
         old_engine = scene.vs.engine
@@ -574,46 +637,32 @@ class DMF_OT_export_stage(Operator):
         ]
         old_export_flags = {
             obj.name: bool(getattr(getattr(obj, "vs", None), "export", False))
-            for obj in (custom, armature)
+            for obj in (*source_parts, armature)
             if obj is not None
         }
-        old_lods = {
-            "generate_lods": bool(getattr(custom.vs, "generate_lods", False)),
-            "lod_count": int(getattr(custom.vs, "lod_count", 1)),
-            "decimate_factor": float(getattr(custom.vs, "decimate_factor", 50.0)),
-        }
-        blocking = bpy.data.objects.get(target_stem)
-        blocking_name = None
-        blocking_temp_name = None
         collection = bpy.data.collections.new("DMF Export")
         collection_name = collection.name
         scene.collection.children.link(collection)
+        temporary_names = []
         try:
-            # The imported hero body can share the target DMX stem. Move it aside
-            # so the custom object can take the stem without Blender suffixing it.
-            if blocking is not None and blocking is not custom:
-                blocking_name = blocking.name
-                blocking.name = f"DMF hero source {target_stem}"
-                blocking_temp_name = blocking.name
             # The ported model owns its material slots. Overwriting them with the
             # hero's pbr.vfx/NPR slots is an explicit button, never an export side
             # effect. A custom slot path survives into the DMX unchanged.
-            custom.vs.generate_lods = lod_count > 0
-            custom.vs.lod_count = max(1, lod_count)
-            custom.vs.decimate_factor = float(lod_decimate)
+            joined, armature, temporary_names = _join_export_parts(
+                context, settings, collection, source_parts, armature
+            )
+            joined.vs.generate_lods = lod_count > 0
+            joined.vs.lod_count = max(1, lod_count)
+            joined.vs.decimate_factor = float(lod_decimate)
             scene.vs.export_path = str(destination) + os.sep
             scene.vs.export_format = "DMX"
             scene.vs.engine = "SOURCE"
             scene.vs.dmx_format = "22_modeldoc"
             scene.vs.dmx_encoding = "3"
-            custom.name = target_stem
-            collection.objects.link(custom)
-            if armature is not None:
-                collection.objects.link(armature)
             collection.vs.export = True
-            for obj in (custom, armature):
-                if obj is not None:
-                    obj.vs.export = True
+            joined.vs.export = True
+            if armature is not None:
+                armature.vs.export = True
             # A dedicated collection makes PulseSrcOps export exactly this mesh
             # and its armature, instead of every selected object's collection.
             scene.vs.export_list.clear()
@@ -622,7 +671,17 @@ class DMF_OT_export_stage(Operator):
             row.ob_type = "COLLECTION"
             row.icon = "GROUP"
             row.collection = collection
-            result = bpy.ops.export_scene.smd(collection=collection.name)
+            # PulseSrcOps pushes an undo step and calls bpy.ops.ed.undo() in
+            # its finally block. Running that nested undo while this operator is
+            # still on the stack crashes Blender 5.4 with joined/LOD meshes.
+            # debug_value > 1 makes PulseSrcOps skip its own undo rollback; the
+            # temporary objects here are ours, not scene edits that need rollback.
+            old_debug_value = bpy.app.debug_value
+            bpy.app.debug_value = max(2, old_debug_value)
+            try:
+                result = bpy.ops.export_scene.smd(collection=collection.name)
+            finally:
+                bpy.app.debug_value = old_debug_value
             if "FINISHED" not in result:
                 raise RuntimeError("PulseSrcOps did not finish the DMX export")
             dmx_files = sorted(destination.rglob("*.dmx"))
@@ -663,27 +722,8 @@ class DMF_OT_export_stage(Operator):
         finally:
             # PulseSrcOps pushes and rolls back an undo step during export. That can
             # invalidate Python references even when the datablocks still exist, so
-            # resolve the mesh and the temporary collection again by name.
-            fresh = bpy.data.objects.get(target_stem) or bpy.data.objects.get(old_name)
+            # resolve the scene and the temporary collection again by name.
             fresh_scene = core.fresh_scene(scene_name)
-            if fresh is not None:
-                fresh.name = old_name
-                if hasattr(fresh, "vs"):
-                    fresh.vs.generate_lods = old_lods["generate_lods"]
-                    fresh.vs.lod_count = old_lods["lod_count"]
-                    fresh.vs.decimate_factor = old_lods["decimate_factor"]
-                if fresh_scene is not None:
-                    try:
-                        fresh_scene.dmf.custom_mesh = fresh
-                    except Exception:
-                        pass
-            if blocking_name and blocking_temp_name:
-                blocker = bpy.data.objects.get(blocking_temp_name)
-                if blocker is not None:
-                    try:
-                        blocker.name = blocking_name
-                    except Exception:
-                        pass
             if fresh_scene is not None:
                 fresh_scene.vs.export_path = old_path
                 fresh_scene.vs.export_format = old_format
@@ -707,6 +747,11 @@ class DMF_OT_export_stage(Operator):
                         restored_object.vs.export = export_flag
             fresh_collection = bpy.data.collections.get(collection_name)
             if fresh_collection is not None:
+                # PulseSrcOps generates temporary LOD armatures and then rolls
+                # back an undo step. Deleting those datablocks here can leave a
+                # dangling depsgraph reference and crash Blender. Unlinking the
+                # temporary collection is enough; unsaved orphans are dropped
+                # when the user saves the .blend.
                 for obj in list(fresh_collection.objects):
                     fresh_collection.objects.unlink(obj)
                 if fresh_scene is not None:
@@ -738,7 +783,14 @@ class DMF_OT_export_stage(Operator):
         stage_dir = Path(bpy.path.abspath(settings.stage_dir)) if settings.stage_dir else (
             core.project_root(settings) / "artifacts" / "staged" / settings.addon_name
         )
-        custom_slots = len(settings.custom_mesh.data.materials) if settings.custom_mesh else 0
+        source_parts = parts.export_meshes(settings)
+        custom_slots = len({
+            material.name
+            for part in source_parts
+            for material in part.data.materials
+            if material is not None
+        })
+        part_count = len(source_parts)
         export_dir = Path(tempfile.mkdtemp(prefix="dmf-export-"))
         try:
             existing_lods = module["stage"].target_lod_relatives(extraction, settings.target_dmx_relative)
@@ -800,7 +852,7 @@ class DMF_OT_export_stage(Operator):
             settings.exported_dmx = str(exported.primary)
             _status(
                 settings,
-                f"Staged {settings.addon_name}: {len(staged.custom_lods)} LODs, {custom_slots} custom slots, "
+                f"Staged {settings.addon_name}: {part_count} parts joined, {len(staged.custom_lods)} LODs, {custom_slots} custom slots, "
                 f"{staged.material_count} material files ({staged.material_texture_count} textures), "
                 f"{staged.custom_material_count} custom; vmdl unchanged ({staged.vmdl_blake3[:10]})",
                 "OK",

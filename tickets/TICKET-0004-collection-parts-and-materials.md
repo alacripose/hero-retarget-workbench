@@ -63,3 +63,13 @@ The concrete requirements:
 - `artifacts/receipts/deadlock-model-forge-real-parts.json`
 - `artifacts/parts-probe-stage/content/citadel_addons/probe/stage.json`
 - `ledger/ledger.jsonl`
+
+## 2026-11-12 — multi-part export supersedes the no-merge non-goal
+
+The owner's Mayu port requires every collection part in the exported model,
+including both Deagles and the hair. The earlier non-goal that export reads only
+the active part is superseded by `TICKET-0008`: export joins the whole custom
+collection into a temporary mesh, and the Mayu vmdl's separate head slot is
+replaced from a head-only DMX so the original Doorman head/hair cannot remain
+visible. The rest of this ticket's selection and material-slot behavior is
+unchanged.
