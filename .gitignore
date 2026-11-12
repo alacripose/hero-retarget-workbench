@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+!blender/deadlock_model_forge/_vendor/blake3/*.pyd
+*.blend1
+.venv/
+artifacts/
+dist/
+logs/

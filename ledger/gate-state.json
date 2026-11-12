@@ -1,0 +1,7 @@
+{
+  "unit tests": "pass",
+  "python compileall": "pass",
+  "no KV3 parser in source": "pass",
+  "no vmdl writes in forge": "pass",
+  "blake3 dependency": "pass"
+}
