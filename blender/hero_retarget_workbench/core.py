@@ -100,6 +100,31 @@ def is_csdk_install(path) -> bool:
     )
 
 
+def csdk_addon_root(settings) -> Path | None:
+    """The CSDK13 install that holds this addon.
+
+    A configured Install root wins only when it is really a CSDK13 install; a
+    leftover stage folder is ignored so the addon cannot land where the
+    compiler and modeldoc never look.
+    """
+    configured = Path(bpy.path.abspath(settings.stage_dir)) if settings.stage_dir else None
+    if configured is not None and is_csdk_install(configured):
+        return configured
+    setup = Path(bpy.path.abspath(settings.csdk_root)) if settings.csdk_root else None
+    if setup is not None and is_csdk_install(setup):
+        return setup
+    return configured
+
+
+def csdk_addon_folder(settings) -> Path | None:
+    """The installed content addon folder, content/citadel_addons/<addon>."""
+    root = csdk_addon_root(settings)
+    name = (settings.addon_name or "").strip().strip("/\\")
+    if root is None or not name or "/" in name or "\\" in name:
+        return None
+    return root / "content" / "citadel_addons" / name
+
+
 def env(settings):
     detected = detect_environment(settings)
     if detected.game_root:
