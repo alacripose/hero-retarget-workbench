@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+import tempfile
 from pathlib import Path
 
 import bpy
@@ -46,10 +47,23 @@ def setup() -> None:
         cls.bl_category = "Item"
     dmf.register()
     settings = bpy.context.scene.dmf
-    settings.build = "6861 Nov 09 2026"
-    settings.status = "Hero extracted; import the skeleton, then fit your model."
-    settings.status_kind = "INFO"
     settings.addon_name = "thicc_mayu_v3"
+
+    # Reproduce the state the owner photographed: a detected build with no S2V
+    # CLI and no CSDK, so the status bubble shows the real wording at its real
+    # length.
+    fixture = Path(tempfile.mkdtemp(prefix="dmf-ui-")) / "Deadlock"
+    (fixture / "game" / "citadel").mkdir(parents=True)
+    (fixture / "game" / "citadel" / "gameinfo.gi").write_text("gameinfo", encoding="utf-8")
+    (fixture / "game" / "citadel" / "pak01_dir.vpk").write_text("vpk", encoding="utf-8")
+    (fixture / "game" / "citadel" / "steam.inf").write_text(
+        "ClientVersion=6861\nVersionDate=Nov 09 2026\n", encoding="utf-8"
+    )
+    settings.deadlock_root = str(fixture)
+    settings.s2v_cli = ""
+    settings.csdk_root = ""
+    bpy.ops.dmf.detect_paths()
+    print(f"SIDEBAR status={settings.status!r} kind={settings.status_kind}", flush=True)
     area = view3d()
     if area is None:
         raise RuntimeError("no 3D viewport")

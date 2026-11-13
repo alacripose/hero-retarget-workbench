@@ -93,23 +93,23 @@ class DMF_OT_detect_paths(Operator):
             )
             if env.csdk_root is not None:
                 settings.csdk_root = str(env.csdk_root)
+            # Short tokens: the bubble is one line per part, not a paragraph, and
+            # the Setup panel already explains the CLI-versus-GUI distinction.
             missing = [
                 name
                 for name, value in (
-                    ("Source 2 Viewer CLI (choose Source2Viewer-CLI.exe, not the GUI)", env.s2v),
+                    ("S2V CLI", env.s2v),
                     ("CSDK13 root", env.csdk_root),
                 )
                 if value is None
             ]
-            note = f" (using {env.s2v.name} beside the chosen file)" if swapped else ""
+            # The card above already shows the build; the bubble only carries what
+            # is missing, so it stays one line instead of repeating the header.
+            note = " · CLI beside the pick" if swapped else ""
             if missing:
-                _status(
-                    settings,
-                    f"Build {settings.build or 'unknown'}; set " + " and ".join(missing) + note,
-                    "WARN",
-                )
+                _status(settings, "Set " + " and ".join(missing) + note, "WARN")
             else:
-                _status(settings, f"Build {settings.build or 'unknown'}; all tool paths found{note}", "OK")
+                _status(settings, f"All tool paths found{note}", "OK")
         except Exception as error:
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))
@@ -154,7 +154,7 @@ class DMF_OT_detect(Operator):
                 settings.s2v_cli = str(env.s2v) if env.s2v else settings.s2v_cli
                 settings.csdk_root = str(env.csdk_root) if env.csdk_root else settings.csdk_root
                 settings.project_root = str(root)
-                _status(settings, f"{len(heroes)} hero entries on build {settings.build}", "OK")
+                _status(settings, f"{len(heroes)} heroes · build {settings.build}", "OK")
 
             def failed(error):
                 _status(settings, str(error), "ERROR")
@@ -246,7 +246,7 @@ class DMF_OT_extract(Operator):
             message = jobs.start(settings, "Extracting hero", work, done, failed)
             if message:
                 raise RuntimeError(message)
-            _status(settings, "Extracting the hero; S2V and file inventory run off the main thread", "BUSY")
+            _status(settings, "Extracting the hero; S2V runs in the background", "BUSY")
         except Exception as error:
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))

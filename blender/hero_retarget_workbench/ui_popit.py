@@ -54,11 +54,19 @@ def glyphs(layout, buttons, enabled: bool = True, labels: dict | None = None):
     return row
 
 
-def bubble(layout, text: str, icon: str = "INFO", alert: bool = False, width: int = 30):
-    """The one message a page is allowed. Short, and only when it matters."""
+def bubble(layout, text: str, icon: str = "INFO", alert: bool = False, width: int = 32, max_lines: int = 3):
+    """The one message a page is allowed.
+
+    A bubble that silently cuts a sentence in half looks broken, so anything
+    longer than the lines it is given ends in an ellipsis and the full text stays
+    in the status report. Callers keep their own wording short.
+    """
     box = layout.box()
     lines = textwrap.wrap(" ".join((text or "").split()), width=width, break_on_hyphens=False) or [""]
-    for index, line in enumerate(lines[:2]):
+    shown = lines[:max_lines]
+    if len(lines) > max_lines:
+        shown[-1] = shown[-1].rstrip(" ,;.") + "…"
+    for index, line in enumerate(shown):
         row = box.row(align=True)
         row.alert = alert
         row.label(text=line, icon=icon if index == 0 else "BLANK1")

@@ -77,6 +77,26 @@ Popit's lime-on-blue is a game surface, not a dark editor. What survives:
   LIVE GAME headers and the one labelled Detect action.
 - `tools/blender_zip_probe.py` reasserts panel registration at 14 panels.
 
+## Correction: the bubble must not clip a sentence
+
+**Owner, with a capture:** *"you made a change to the ui without followng the popit
+convention and now the text is broken here"* — the status bubble read
+`Build 6861 Nov 09 2026; set` / `Source 2 Viewer CLI (choose` because the status
+string was a two-part sentence running past the two lines the bubble allowed.
+
+Three faults, all fixed:
+
+1. The bubble truncated at a fixed line count with no ellipsis, so a long message
+   looked like a rendering bug rather than a long message. `ui_popit.bubble` now
+   takes `max_lines` (default 3) and ends an over-long message with `…`; the full
+   text stays in the status report.
+2. The status repeated the build, which the page card already shows in its right
+   column. It now carries only what is missing — `Set S2V CLI and CSDK13 root`,
+   one line — and `All tool paths found` when nothing is.
+3. The missing-tool names carried the whole GUI-versus-CLI explanation inside a
+   status string. They are short tokens now (`S2V CLI`, `CSDK13 root`); the GUI
+   explanation lives in the Setup bubble beside the field it is about.
+
 ## Not claimed
 
 The folded sub-panels were not opened in the screenshot, so their contents are
