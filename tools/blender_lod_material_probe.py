@@ -239,7 +239,9 @@ def main() -> int:
         if "FINISHED" not in export_stage:
             raise RuntimeError(f"export/stage failed: {export_stage} status={settings.status}")
         settings = bpy.context.scene.dmf
-        stage_root = stage / "content" / "citadel_addons" / addon
+        stage_root = (
+            Path(bpy.path.abspath(settings.stage_dir)) / "content" / "citadel_addons" / addon
+        )
         manifest_path = stage_root / "stage.json"
         staged_vmdl = stage_root / vmdl_relative
         staged_base = stage_root / target_relative

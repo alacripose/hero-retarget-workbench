@@ -292,9 +292,14 @@ This reverses the 2026-11-12 disposable-mirror correction and supersedes the
 temporary-folder paragraph of `DECISIONS.md` D-04.
 
 - Export & stage installs at `<csdk>/content/citadel_addons/<addon>`, named by
-  the **Addon** field. The **Install root** field overrides the destination;
-  blank means the CSDK13 root from Setup. There is no `artifacts/staged`
-  default any more.
+  the **Addon** field. There is no `artifacts/staged` default any more.
+- **Install root** is a destination override only when it is itself a CSDK13
+  install (`game/bin/win64/resourcecompiler.exe`, or `content/citadel_addons`
+  with `game/citadel`). A value left over from the old stage-folder contract is
+  ignored and the Setup CSDK13 root is used, because installing into a folder
+  the compiler and modeldoc never read is how the 2026-11-13 report happened.
+  The panel prints the resolved `content\citadel_addons\<addon>` path and warns
+  when the field is being ignored.
 - Staging merges into an existing addon folder: it overwrites the files the
   stage owns and never deletes the folder, so unrelated files in an addon that
   is open in modeldoc survive. The addon's vmdl is still replaced by the

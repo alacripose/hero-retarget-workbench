@@ -864,16 +864,22 @@ class DMF_OT_export_stage(Operator):
                 if not custom_root.is_dir():
                     raise RuntimeError(f"The model materials root is missing: {custom_root}")
                 custom_materials = module["stage"].material_files(custom_root)
-            if settings.stage_dir:
-                destination = Path(bpy.path.abspath(settings.stage_dir))
-            else:
-                detected = core.detect_environment(settings, module)
-                if detected.csdk_root is None:
-                    raise RuntimeError(
-                        "CSDK13 root is not set; choose it in Setup so Export & stage can install "
-                        f"{settings.addon_name} under content/citadel_addons"
-                    )
+            detected = core.detect_environment(settings, module)
+            configured = Path(bpy.path.abspath(settings.stage_dir)) if settings.stage_dir else None
+            if configured is not None and core.is_csdk_install(configured):
+                destination = configured
+            elif detected.csdk_root is not None:
+                # An Install root that is not a CSDK13 install (an older stage
+                # folder saved in this .blend) would put the addon where the
+                # compiler and modeldoc never look. Install into the CSDK root.
                 destination = detected.csdk_root
+            elif configured is not None:
+                destination = configured
+            else:
+                raise RuntimeError(
+                    "CSDK13 root is not set; choose it in Setup so Export & stage can install "
+                    f"{settings.addon_name} under content/citadel_addons"
+                )
             request = module["stage"].StageRequest(
                 extraction_root=extraction,
                 vmdl=vmdl,
