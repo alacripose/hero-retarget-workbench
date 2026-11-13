@@ -114,14 +114,21 @@ def main() -> int:
             raise RuntimeError(f"core imported the stale forge module: {bundled['paths'].__name__}")
 
         panels = len(dmf.ui.CLASSES)
-        if panels != 14:
-            raise RuntimeError(f"expected 14 panel classes, found {panels}")
+        if panels != 15:
+            raise RuntimeError(f"expected 15 panel classes, found {panels}")
         # Every operator the package defines has to reach dmf.*, and every
         # registered one has to come from a CLASSES tuple. A count constant here
         # only records how many existed the day it was typed.
         registered = [
             cls
-            for group in (dmf.ui.CLASSES, dmf.operators.CLASSES, dmf.workbench.CLASSES)
+            for group in (
+                dmf.ui.CLASSES,
+                dmf.operators.CLASSES,
+                dmf.workbench.CLASSES,
+                dmf.rules.CLASSES,
+                dmf.poseview.CLASSES,
+                dmf.clipops.CLASSES,
+            )
             for cls in group
             if isinstance(cls, type) and issubclass(cls, bpy.types.Operator)
         ]
@@ -134,7 +141,7 @@ def main() -> int:
             raise RuntimeError(f"operators registered but not reachable: {unregistered}")
         defined = {
             value
-            for module in (dmf.operators, dmf.workbench)
+            for module in (dmf.operators, dmf.workbench, dmf.rules, dmf.poseview, dmf.clipops)
             for name in dir(module)
             if name.startswith("DMF_OT_")
             for value in (getattr(module, name),)

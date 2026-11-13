@@ -14,6 +14,8 @@ import bpy
 from bpy.props import StringProperty
 from bpy.types import Operator
 
+from forge import naming
+
 from . import core, jobs, parts, properties, proofing, weights
 
 
@@ -330,10 +332,16 @@ class DMF_OT_import_custom(Operator):
             _status(settings, "The custom import produced no mesh", "ERROR")
             self.report({"ERROR"}, "The custom import produced no mesh")
             return {"CANCELLED"}
-        collection = parts.capture_import(context, path, _new_objects(before))
+        collection = parts.capture_import(
+            context,
+            path,
+            _new_objects(before),
+            parts.stale_prefixes(settings),
+        )
         settings.custom_collection = collection
         settings.custom_mesh = None
         settings.custom_armature = arm
+        settings.custom_name = naming.model_name(path.stem)
         if settings.material_source is None and settings.target_body is not None:
             settings.material_source = settings.target_body
         count = parts.scan_parts(settings)
@@ -1301,6 +1309,28 @@ class DMF_OT_update_old_addon(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_apply_model_name(Operator):
+    bl_idname = "dmf.apply_model_name"
+    bl_label = "Name Model"
+    bl_description = "Rename the imported collection, rig and parts from the model name, dropping an old rig prefix"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            counts = parts.name_model(settings)
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        proofing.bump_tick(settings)
+        _status(
+            settings,
+            f"Named {counts['parts']} parts under {settings.custom_name}; renamed {counts['renamed']}",
+            "OK",
+        )
+        return {"FINISHED"}
+
+
 class DMF_OT_pick_vmdl(Operator):
     bl_idname = "dmf.pick_vmdl"
     bl_label = "Choose vmdl"
@@ -1330,6 +1360,7 @@ CLASSES = (
     DMF_OT_extract,
     DMF_OT_import_hero,
     DMF_OT_import_custom,
+    DMF_OT_apply_model_name,
     DMF_OT_use_active_collection,
     DMF_OT_scan_parts,
     DMF_OT_use_part,

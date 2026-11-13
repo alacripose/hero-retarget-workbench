@@ -369,3 +369,49 @@ better layout and descriptions (not an excuse to claudify the prose)"*
 - `impeccable` is mandatory for UI edits and lives at `C:\Users\ala\.agents\skills\impeccable`.
   If the session's skill catalog omits it, read it from that path.
 - Record the collision in `logs/authority/` in the active project instead of re-litigating it.
+
+## 2026-11-13 — 0.4.0: rule-based mapping, live ref pose, clip import
+
+**Owner request, verbatim:** *"the next step for the bone remapping work is the
+regex style bone mappings auto rules, so when I map something like elbow_L to map
+to say arm_lower_L it knows that elbow_r for example would map to arm_lower_r and
+provide a smart auto rules panel so mapping can be done faster instead of one
+bone at a damn time. as well, oftentimes models will import in a t-pose instead
+of a ref pose so there needs to be a way to see as the bones get mapped you can
+see where they move into the ref pose in real time or the animation in the
+animation split view. Also it needs to be able to import the ag1/ag2 clips and
+animations automatically …"* Authority:
+`logs/authority/2026-11-13-bone-rules-ref-pose-clips.jsonl`; contract:
+`TICKET-0015`.
+
+- **Rules are suggestions, not guesses.** `forge/bonerules.py` learns a side
+  rule from any mapped row whose source and target share a side
+  (`elbow_L -> arm_lower_L` gives `elbow_* -> arm_lower_*`), keeps any regex rule
+  the user writes, and only offers a target that exists on the hero skeleton and
+  that no other row already uses. `forge/names.py` is unchanged: an unmatched
+  weighted group is still a row the user decides.
+- Typing a target in Skeleton learns the rule and writes the exact opposite-side
+  row immediately (`DMF_BoneEntry.target`'s update callback -> `rules.auto_fill`).
+  `rules.suppressed()` guards every programmatic batch, including
+  `workbench.scan_bone_map`, so a scan never looks like the user mapping a bone.
+- **The ref pose is a pose, never a rest edit.** `poseview.py` sets each mapped
+  custom bone's pose matrix to the hero bone's rest orientation while keeping the
+  custom bone's own head position; no keys are written and clearing restores the
+  identity basis. The panel reports the source stance (T / A / down) from the
+  mapped upper-arm bones, or from the rig's own naming when nothing is mapped.
+- **Clips are imported from the DMX half only.** `forge/clips.py` classifies
+  `.dmx`, `.vnmclip`, `.vnmskel`, `.vnmgraph` and their `_c` forms by filename,
+  pairs a DMX with the vnmclip it replaces, and never opens a compiled file —
+  this tree still decodes no compiled game data. `clipops.py` imports editable
+  clips onto the hero rig one file per timer step and records the action
+  PulseSrcOps created for each.
+- **Clip export is not built.** Import, rename, preview and delete of the
+  imported actions exist; writing them back to DMX does not, and the Animations
+  page says that in those words rather than calling it a next step.
+- **A port no longer inherits the last port's names.** `forge/naming.py` strips a
+  stale leading prefix made of whole tokens (the hero's body/armature name, its
+  first token, the addon name, the vmdl stem) and keeps the part word, so
+  `shiv_body` imported for Gold Ship becomes `body` under a `DMF Gold_Ship`
+  collection. The Model name field and `dmf.apply_model_name` re-apply it later.
+  The probe writes its fixture inside `artifacts/probes/`, not to a scratch
+  folder, so the render can be reproduced.

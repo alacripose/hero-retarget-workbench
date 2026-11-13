@@ -83,7 +83,56 @@ class DMF_UL_materials(UIList):
         right.label(text=f"[{item.slot_index}]")
 
 
-CLASSES = (DMF_UL_bone_map, DMF_UL_hierarchy, DMF_UL_parts, DMF_UL_materials)
+class DMF_UL_rules(UIList):
+    bl_idname = "DMF_UL_bone_rules"
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        row.prop(item, "enabled", text="", emboss=False, icon="CHECKBOX_HLT" if item.enabled else "CHECKBOX_DEHLT")
+        pattern = item.source or "pattern"
+        target = item.target or "no target"
+        if item.regex:
+            row.label(text=_short(f"{pattern} -> {target}", 22), icon="DRIVER")
+            right = row.row(align=True)
+            right.alignment = "RIGHT"
+            right.label(text="regex")
+            return
+        stem = target.rsplit("_", 1)[0] if target.rsplit("_", 1)[-1] in ("L", "R") else target
+        row.label(text=_short(f"{pattern}* -> {stem}*", 22), icon="LINKED")
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text="" if item.origin == "learned" else item.origin)
+
+
+class DMF_UL_clips(UIList):
+    bl_idname = "DMF_UL_clips"
+
+    _ICONS = {
+        "EDITABLE": "ACTION",
+        "IMPORTED": "CHECKMARK",
+        "FAILED": "ERROR",
+        "OPAQUE": "LOCKED",
+    }
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        row.label(text=_short(item.label or item.name, 26), icon=self._ICONS.get(item.state, "ACTION"))
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        tag = item.kind if item.kind != "dmx" else ("dmx_c" if item.compiled else "dmx")
+        right.label(text=tag)
+        if item.action and item.action != item.label:
+            right.label(text="", icon="ACTION")
+
+
+CLASSES = (
+    DMF_UL_bone_map,
+    DMF_UL_hierarchy,
+    DMF_UL_parts,
+    DMF_UL_materials,
+    DMF_UL_rules,
+    DMF_UL_clips,
+)
 
 
 def register() -> None:

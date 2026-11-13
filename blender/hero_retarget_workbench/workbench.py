@@ -119,6 +119,8 @@ def bone_chain(settings, name: str) -> list[str]:
 def scan_bone_map(settings) -> int:
     from forge.names import match
 
+    from . import rules
+
     sources = _sources(settings)
     targets = _targets(settings)
     if not targets:
@@ -134,21 +136,24 @@ def scan_bone_map(settings) -> int:
         for source in group
     }
     settings.bone_map.clear()
-    for source in sources:
-        entry = settings.bone_map.add()
-        entry.source = source
-        if source in collision_sources:
-            entry.state = "UNMATCHED"
-            entry.target = ""
-            entry.note = "ambiguous target; choose one explicitly"
-        elif source in result.mapping:
-            entry.state = "MAPPED"
-            entry.target = result.mapping[source]
-            entry.note = "exact or normalized"
-        else:
-            entry.state = "UNMATCHED"
-            entry.target = ""
-            entry.note = "no exact or normalized target"
+    # A scan writes every row programmatically: the rule callbacks must not
+    # treat those writes as the user mapping a bone.
+    with rules.suppressed():
+        for source in sources:
+            entry = settings.bone_map.add()
+            entry.source = source
+            if source in collision_sources:
+                entry.state = "UNMATCHED"
+                entry.target = ""
+                entry.note = "ambiguous target; choose one explicitly"
+            elif source in result.mapping:
+                entry.state = "MAPPED"
+                entry.target = result.mapping[source]
+                entry.note = "exact or normalized"
+            else:
+                entry.state = "UNMATCHED"
+                entry.target = ""
+                entry.note = "no exact or normalized target"
     settings.bone_map_index = 0
     return len(sources)
 
