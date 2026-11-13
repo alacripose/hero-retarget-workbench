@@ -8,6 +8,7 @@ loaded by file location.
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -26,7 +27,8 @@ dmf = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = dmf
 SPEC.loader.exec_module(dmf)
 
-OUT = REPO / "artifacts" / "ui-pass" / "sidebar.png"
+MODE_ENV = os.environ.get("DMF_PROBE_MODE", "rules").strip().lower()
+OUT = REPO / "artifacts" / "ui-pass" / f"sidebar-{MODE_ENV}.png"
 
 
 def view3d():
@@ -64,13 +66,13 @@ def setup() -> None:
     # probe-only: the shipped addon stays on its Deadlock tab.
     for cls in dmf.ui.CLASSES:
         cls.bl_category = "Item"
-        if cls.bl_idname == "DMF_PT_animations":
-            # Open the clips page for this render only: a folded panel cannot be
-            # checked for layout, and the shipped default stays folded.
+        if cls.bl_idname in KEEP_OPEN:
+            # Open the page this render checks: a folded panel cannot be checked
+            # for layout, and the shipped defaults stay as they are.
             cls.bl_options = set()
-        elif cls.bl_idname not in ("DMF_PT_main", "DMF_PT_skeleton", "DMF_PT_skeleton_bones"):
-            # Fold the pages above Skeleton for this render only: the screenshot
-            # has one window height and Skeleton is below two open pages.
+        else:
+            # Fold everything else: one window height has to hold the page under
+            # review, its editor and its list.
             cls.bl_options = {"DEFAULT_CLOSED"}
     dmf.register()
     settings = bpy.context.scene.dmf
@@ -126,7 +128,14 @@ def setup() -> None:
     rows = {entry.source: entry for entry in settings.bone_map}
     rows["elbow_L"].state = "MAPPED"
     rows["elbow_L"].target = "arm_lower_L"
+    shoulder_rule = settings.bone_rules.add()
+    shoulder_rule.source = "shoulder"
+    shoulder_rule.target = "arm_upper_L"
+    shoulder_rule.side_aware = True
+    shoulder_rule.state = "MAPPED"
+    shoulder_rule.origin = "user"
     dmf.rules.fill(settings)
+    settings.bone_rule_index = 0
     dmf.poseview.refresh(settings)
     settings.pose_preview = True
     print(
@@ -141,6 +150,16 @@ def setup() -> None:
     space.show_region_ui = True
     print("SIDEBAR tabs", [item for item in dir(space) if "categor" in item.lower()], flush=True)
 
+
+
+# Which pages this render keeps open. Set DMF_PROBE_MODE=skeleton to check the
+# ref-pose section, rules (the default) to check the rule editor.
+MODE = MODE_ENV
+KEEP_OPEN = (
+    {"DMF_PT_main", "DMF_PT_rules", "DMF_PT_animations"}
+    if MODE != "skeleton"
+    else {"DMF_PT_main", "DMF_PT_skeleton"}
+)
 
 
 def scroll_sidebar(steps: int = 40) -> None:
@@ -179,7 +198,7 @@ def shoot() -> None:
     except Exception as error:
         print("SIDEBAR redraw failed", type(error).__name__, error, flush=True)
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    scroll_sidebar()
+    scroll_sidebar(10)
     bpy.ops.screen.screenshot(filepath=str(OUT))
     print(f"SIDEBAR screenshot {OUT}", flush=True)
     print(f"SIDEBAR panels={len(dmf.ui.CLASSES)}", flush=True)

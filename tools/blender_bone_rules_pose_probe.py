@@ -87,6 +87,8 @@ def main() -> int:
             ("elbow_R", (-0.4, 0.0, 1.4), (-0.8, 0.0, 1.4), "pelvis"),
             ("shoulder_L", (0.1, 0.0, 1.45), (0.4, 0.0, 1.45), "pelvis"),
             ("shoulder_R", (-0.1, 0.0, 1.45), (-0.4, 0.0, 1.45), "pelvis"),
+            ("Sp_Hi_Mskirt0_B_00", (0.0, 0.05, 1.1), (0.0, 0.1, 1.0), "pelvis"),
+            ("Sp_Hi_Mskirt0_B_01", (0.0, -0.05, 1.1), (0.0, -0.1, 1.0), "pelvis"),
         ],
     )
     # The hero rig rests in an A-pose: its arms are already lowered.
@@ -112,7 +114,15 @@ def main() -> int:
     count = dmf.workbench.scan_bone_map(settings)
     checks["scan_rows"] = count
     rows = {entry.source: entry for entry in settings.bone_map}
-    assert set(rows) == {"pelvis", "elbow_L", "elbow_R", "shoulder_L", "shoulder_R"}, rows
+    assert set(rows) == {
+        "pelvis",
+        "elbow_L",
+        "elbow_R",
+        "shoulder_L",
+        "shoulder_R",
+        "Sp_Hi_Mskirt0_B_00",
+        "Sp_Hi_Mskirt0_B_01",
+    }, rows
 
     # --- typing one target answers its mirror ---------------------------
     rows["elbow_L"].state = "MAPPED"
@@ -125,13 +135,32 @@ def main() -> int:
     checks["rules_learned"] = [f"{row.source}->{row.target}" for row in settings.bone_rules]
     assert any(row.source == "elbow" for row in settings.bone_rules), checks["rules_learned"]
 
-    # --- the button fills the rest --------------------------------------
+    # --- rules the user writes by hand, applied by the button -----------
+    shoulder_rule = settings.bone_rules.add()
+    shoulder_rule.source = "shoulder"
+    shoulder_rule.target = "arm_upper_L"
+    shoulder_rule.side_aware = True
+    shoulder_rule.state = "MAPPED"
+    shoulder_rule.origin = "user"
+    skirt_rule = settings.bone_rules.add()
+    skirt_rule.source = "Sp_Hi_Mskirt*"
+    skirt_rule.target = ""
+    skirt_rule.state = "EXTRA"
+    skirt_rule.side_aware = False
+    skirt_rule.origin = "user"
+
     filled = dmf.rules.fill(settings)
     checks["filled"] = filled
     checks["shoulder_L"] = rows["shoulder_L"].target
     checks["shoulder_R"] = rows["shoulder_R"].target
+    checks["skirt_states"] = {name: rows[name].state for name in ("Sp_Hi_Mskirt0_B_00", "Sp_Hi_Mskirt0_B_01")}
+    checks["rule_kinds"] = [dmf.rules.rule_of(row).kind for row in settings.bone_rules]
     assert rows["shoulder_L"].target == "arm_upper_L", checks["shoulder_L"]
     assert rows["shoulder_R"].target == "arm_upper_R", checks["shoulder_R"]
+    assert checks["skirt_states"] == {
+        "Sp_Hi_Mskirt0_B_00": "EXTRA",
+        "Sp_Hi_Mskirt0_B_01": "EXTRA",
+    }, checks["skirt_states"]
 
     # --- stance: the source is level, the hero is lowered ---------------
     checks["source_stance"] = dmf.poseview.stance(settings)

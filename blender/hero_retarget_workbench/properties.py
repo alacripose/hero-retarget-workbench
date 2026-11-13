@@ -138,7 +138,21 @@ class DMF_BoneRule(PropertyGroup):
         description="Take the side token from the source and write it into the target",
         default=True,
     )
-    origin: StringProperty(name="From", description="learned, builtin or regex", default="learned")
+    state: EnumProperty(
+        name="Sets row to",
+        description="What a row this rule answers becomes",
+        items=[
+            ("MAPPED", "Mapped", "Map the row onto the target bone"),
+            ("EXTRA", "Extra", "Keep the row as an appendage; the extra-bone policy decides how"),
+            ("IGNORED", "Ignored", "Drop the row's weights"),
+        ],
+        default="MAPPED",
+    )
+    origin: StringProperty(
+        name="From",
+        description="Where the rule came from: a typed row, a bone-map row, or you",
+        default="user",
+    )
     enabled: BoolProperty(name="On", description="Use this rule when filling rows", default=True)
     support: IntProperty(name="Support", description="How many mapped rows agree with this rule", default=1)
 
