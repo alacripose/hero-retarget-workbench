@@ -206,7 +206,7 @@ def main() -> int:
             raise RuntimeError(f"detect_paths did not finish for the GUI: {result}")
         if reloaded.s2v_cli != expected_paths["s2v_cli"]:
             raise RuntimeError(f"the GUI path did not resolve to the CLI beside it: {reloaded.s2v_cli!r}")
-        if "beside the chosen file" not in reloaded.status:
+        if "CLI beside the pick" not in reloaded.status:
             raise RuntimeError(f"the substitution was not reported: {reloaded.status!r}")
 
         gui_only = temp / "gui-only"
@@ -216,7 +216,7 @@ def main() -> int:
         result = bpy.ops.dmf.detect_paths()
         if "FINISHED" not in result:
             raise RuntimeError(f"detect_paths did not finish for a GUI-only folder: {result}")
-        if reloaded.status_kind != "WARN" or "GUI" not in reloaded.status:
+        if reloaded.status_kind != "WARN" or "S2V CLI" not in reloaded.status:
             raise RuntimeError(f"a GUI-only folder was not refused: {reloaded.status!r}")
 
         reloaded.s2v_cli = expected_paths["s2v_cli"]

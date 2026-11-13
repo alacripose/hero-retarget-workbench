@@ -237,6 +237,7 @@ class DMF_PT_main(Panel):
             settings.status,
             _STATUS_ICONS.get(settings.status_kind, "STATUS_INFO"),
             alert=settings.status_kind == "ERROR",
+            max_lines=4 if settings.status_kind == "ERROR" else 3,
         )
         _job(layout, settings)
 
