@@ -96,3 +96,26 @@ def test_the_real_extraction_corpus_scans_without_a_vnmclip_reader():
     counts = clips.summary(rows)
     assert counts["dmx"] > 0 and counts["vnmclip"] > 0
     assert counts["editable"] == counts["dmx"]
+
+
+def test_export_folder_never_writes_over_the_extraction(tmp_path: Path):
+    assert clips.export_folder(tmp_path) == tmp_path / "edited"
+    assert clips.export_folder(tmp_path, "D:/written") == Path("D:/written")
+    assert clips.export_folder(None) is None
+    assert clips.export_folder(None, tmp_path) == tmp_path
+
+
+def test_written_path_is_the_anims_layout_a_clip_is_compiled_from(tmp_path: Path):
+    assert clips.written_path(tmp_path, "walk_lower_L") == tmp_path / "anims" / "walk_lower_L.dmx"
+
+
+def test_glob_escape_matches_one_action_name_and_no_others():
+    from fnmatch import fnmatch
+
+    assert clips.glob_escape("walk_lower_L") == "walk_lower_L"
+    escaped = clips.glob_escape("walk*")
+    assert escaped == "walk[*]"
+    assert fnmatch("walk*", escaped)
+    assert not fnmatch("walk_lower_L", escaped)
+    assert not fnmatch("idle", clips.glob_escape("idle?")[:4] + "[?]")
+    assert fnmatch("a[b", clips.glob_escape("a[b"))

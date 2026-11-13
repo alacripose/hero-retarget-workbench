@@ -114,6 +114,7 @@ class DMF_UL_clips(UIList):
     _ICONS = {
         "EDITABLE": "ACTION",
         "IMPORTED": "CHECKMARK",
+        "WRITTEN": "EXPORT",
         "FAILED": "ERROR",
         "OPAQUE": "LOCKED",
     }
@@ -127,6 +128,8 @@ class DMF_UL_clips(UIList):
         right.label(text=tag)
         if item.action and item.action != item.label:
             right.label(text="", icon="ACTION")
+        if item.export_bytes:
+            right.label(text="", icon="EXPORT")
 
 
 CLASSES = (

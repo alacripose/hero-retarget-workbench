@@ -120,6 +120,40 @@ def editable(rows: list[Clip]) -> list[Clip]:
     )
 
 
+def export_folder(clip_folder: Path | str | None, override: str | Path | None = None) -> Path | None:
+    """Where written clips go: the override, else ``<clip folder>/edited``.
+
+    Never the clip folder itself. A write-back that overwrites the extraction is
+    a one-way door: the DMX the owner decompiled is the only copy they have.
+    """
+    if override:
+        return Path(override)
+    if clip_folder is None:
+        return None
+    return Path(clip_folder) / "edited"
+
+
+def glob_escape(name: str) -> str:
+    """Escape ``*``, ``?`` and ``[`` so a name matches exactly that one action.
+
+    PulseSrcOps selects the actions to write per file with an fnmatch glob over
+    every action that has users. A clip called ``walk*`` would otherwise export
+    every action whose name starts with ``walk`` into one file, one after another.
+    """
+    escaped = []
+    for char in name:
+        if char in "*?[":
+            escaped.append("[[]" if char == "[" else f"[{char}]")
+        else:
+            escaped.append(char)
+    return "".join(escaped)
+
+
+def written_path(root: Path | str, label: str) -> Path:
+    """``<root>/anims/<label>.dmx`` — the layout an animgraph clip is compiled from."""
+    return Path(root) / "anims" / f"{label}.dmx"
+
+
 def pairs(rows: list[Clip]) -> dict[str, dict[str, Clip]]:
     """Label -> kind -> clip, so a DMX and the vnmclip it replaces sit together."""
     result: dict[str, dict[str, Clip]] = {}

@@ -611,21 +611,34 @@ class DMF_PT_animations(Panel):
         right.label(text=f"{entry.size:,} bytes")
         if entry.action:
             detail.label(text=f"action {_short(entry.action, 28)}", icon="ACTION")
+        if entry.exported:
+            detail.label(text=_short(Path(entry.exported).name, 30), icon="EXPORT")
 
         actions = box.row(align=True)
         actions.operator("dmf.import_clip", text="Import", icon="IMPORT")
         actions.operator("dmf.preview_clip", text="Preview", icon="PLAY")
+        actions.operator("dmf.export_clip", text="Write", icon="EXPORT")
         prefix = box.row(align=True)
         prefix.prop(settings, "clip_prefix", text="Prefix")
         prefix.operator("dmf.prefix_clips", text="", icon="SORTALPHA")
         box.operator("dmf.clear_clips", text="Clear imported actions", icon="TRASH")
         if settings.clip_note:
             _hint(box, settings.clip_note, "LOCKED", width=30)
+
+        ui_popit.micro(box, "Write back", "EXPORT")
+        _path_row(box, settings, "clip_export_dir", "Folder")
+        write = box.row(align=True)
+        write.operator("dmf.export_clips", text="Write all", icon="EXPORT")
+        write.operator("dmf.cancel_clips", text="Stop", icon="CANCEL")
+        written = sum(1 for row in settings.clips if row.state == "WRITTEN")
+        if written:
+            box.label(text=f"{written} clips written", icon="CHECKMARK")
         _hint(
             box,
-            "Imported actions live in this .blend; export to DMX is not wired into this panel.",
+            "Writes <folder>/anims/<clip>.dmx. The extraction's own clips are never overwritten, "
+            "and the vnmclip beside each clip is left as it is.",
             "INFO",
-            width=30,
+            width=34,
         )
 
 
