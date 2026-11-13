@@ -604,7 +604,7 @@ class DMF_PT_handoff(Panel):
         if settings.body_dmx and not settings.vmdl:
             _hint(handoff, "No S2V vmdl is set. Choose it below if the extraction did not write one.", "STATUS_WARNING", alert=True)
         handoff.prop(settings, "addon_name", text="Addon")
-        _path_row(handoff, settings, "stage_dir", "Stage folder")
+        _path_row(handoff, settings, "stage_dir", "Install root (blank = CSDK13)")
         handoff.label(text="Inside the content tree", icon="FILE")
         handoff.prop(settings, "vmdl_relative", text="vmdl path")
         handoff.prop(settings, "target_dmx_relative", text="DMX path")
@@ -613,7 +613,12 @@ class DMF_PT_handoff(Panel):
         lod.enabled = settings.generate_lods
         lod.prop(settings, "lod_count", text="LOD count (0 = hero)")
         lod.prop(settings, "lod_decimate", text="Decimate per LOD")
-        _hint(handoff, "The S2V vmdl is copied unchanged. Compile uses a temporary CSDK content folder, removes it, and keeps only compiled files under <stage>/compiled.", "LOCKED")
+        _hint(
+            handoff,
+            f"Stage writes content/citadel_addons/{settings.addon_name or '<addon>'} in the CSDK; compile writes "
+            f"game/citadel_addons/{settings.addon_name or '<addon>'}. The S2V vmdl is copied unchanged.",
+            "LOCKED",
+        )
         _primary(handoff, "dmf.export_stage", "Export & stage", "EXPORT", enabled=not settings.job_running)
         _primary(handoff, "dmf.compile", "Compile with CSDK13", "PLAY", enabled=not settings.job_running)
 

@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from forge.compile import compile_stage
+from forge.compile import CompileError, compile_stage
 from forge.paths import Environment
 
 
@@ -46,49 +46,63 @@ class CompileStageTests(unittest.TestCase):
 
     def fake_compile(self, env, command, log_path, timeout):
         input_relative = Path(command[command.index("-i") + 1])
-        build_name = input_relative.parts[1]
-        build_game = env.csdk_root / "game" / "citadel_addons" / build_name
+        addon = input_relative.parts[1]
+        game_addon = env.csdk_root / "game" / "citadel_addons" / addon
         for relative, payload in (
             ("models/heroes/haze/haze.vmdl_c", b"vmdl_c"),
             ("models/heroes/haze/materials/haze.vmat_c", b"vmat_c"),
             ("models/heroes/haze/materials/haze.vtex_c", b"vtex_c"),
             ("tools_asset_info.bin", b"cache"),
         ):
-            path = build_game / relative
+            path = game_addon / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(payload)
         log_path.parent.mkdir(parents=True, exist_ok=True)
         log_path.write_text("$ fake compile\n", encoding="utf-8")
         return subprocess.CompletedProcess(command, 0, "compiled", "")
 
-    def test_compile_uses_a_disposable_mirror_and_copies_only_compiled_files(self):
+    def test_compile_installs_the_addon_into_the_csdk(self):
         with patch("forge.compile._run", side_effect=self.fake_compile):
             result = compile_stage(self.env, self.stage, "haze", log_path=self.log)
 
         self.assertEqual(result.returncode, 0)
-        self.assertIsNone(result.content_addon)
-        self.assertIsNone(result.build_addon)
+        self.assertEqual(result.content_addon, self.content_root / "haze")
+        self.assertTrue(
+            (self.content_root / "haze" / "models" / "heroes" / "haze" / "haze.vmdl").is_file()
+        )
+        game_addon = self.game_root / "haze"
+        self.assertEqual(result.game_addon, game_addon)
         self.assertEqual(
             result.output,
-            self.stage / "compiled" / "haze" / "models" / "heroes" / "haze" / "haze.vmdl_c",
+            game_addon / "models" / "heroes" / "haze" / "haze.vmdl_c",
         )
         self.assertEqual(
-            {path.relative_to(self.stage / "compiled" / "haze").as_posix() for path in result.compiled_files},
+            {path.relative_to(game_addon).as_posix() for path in result.compiled_files},
             {
                 "models/heroes/haze/haze.vmdl_c",
                 "models/heroes/haze/materials/haze.vmat_c",
                 "models/heroes/haze/materials/haze.vtex_c",
             },
         )
-        self.assertFalse(
-            (self.stage / "compiled" / "haze" / "tools_asset_info.bin").exists()
-        )
-        self.assertEqual(list(self.content_root.iterdir()), [])
-        self.assertEqual(list(self.game_root.iterdir()), [])
+        # The compiler's own metadata stays with the addon; it is not reported
+        # as a compiled resource.
+        self.assertTrue((game_addon / "tools_asset_info.bin").is_file())
         self.assertTrue(result.output.is_file())
 
-    def test_failed_compile_removes_the_mirror_and_keeps_the_old_output(self):
-        old = self.stage / "compiled" / "haze" / "models" / "heroes" / "haze" / "haze.vmdl_c"
+    def test_an_existing_addon_keeps_the_files_the_stage_does_not_own(self):
+        keeper = self.content_root / "haze" / "models" / "heroes" / "haze" / "clip.dmx"
+        keeper.parent.mkdir(parents=True)
+        keeper.write_bytes(b"owner clip")
+
+        with patch("forge.compile._run", side_effect=self.fake_compile):
+            compile_stage(self.env, self.stage, "haze", log_path=self.log)
+
+        self.assertEqual(keeper.read_bytes(), b"owner clip")
+        self.assertTrue((self.content_root / "haze" / "stage.json").is_file())
+
+    def test_failed_compile_keeps_the_addon_and_the_old_output(self):
+        game_addon = self.game_root / "haze"
+        old = game_addon / "models" / "heroes" / "haze" / "haze.vmdl_c"
         old.parent.mkdir(parents=True)
         old.write_bytes(b"old")
 
@@ -102,8 +116,11 @@ class CompileStageTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertEqual(result.compiled_files, [])
         self.assertEqual(old.read_bytes(), b"old")
-        self.assertEqual(list(self.content_root.iterdir()), [])
-        self.assertEqual(list(self.game_root.iterdir()), [])
+        self.assertTrue((self.content_root / "haze" / "stage.json").is_file())
+
+    def test_addon_name_cannot_leave_the_addon_root(self):
+        with self.assertRaises(CompileError):
+            compile_stage(self.env, self.stage, "../escape", log_path=self.log)
 
 
 if __name__ == "__main__":

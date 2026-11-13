@@ -278,7 +278,16 @@ def main() -> int:
             compile_result = bpy.ops.dmf.compile()
             if "FINISHED" not in compile_result:
                 raise RuntimeError(f"compile failed: {compile_result} status={settings.status}")
-            compiled = stage / "compiled" / addon / Path(vmdl_relative).with_suffix(".vmdl_c")
+            csdk_root = dmf.core.detect_environment(settings).csdk_root
+            if csdk_root is None:
+                raise RuntimeError("CSDK13 root was not detected; the compiled addon was not installed")
+            compiled = (
+                Path(csdk_root)
+                / "game"
+                / "citadel_addons"
+                / addon
+                / Path(vmdl_relative).with_suffix(".vmdl_c")
+            )
             if not compiled.is_file():
                 raise RuntimeError(f"compile reported success but produced no output: {compiled}")
             log_path = REPO / "logs" / "compile.log"

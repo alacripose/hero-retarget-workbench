@@ -90,8 +90,12 @@ def main() -> int:
         vendor_root = (package_root / "_vendor" / "blake3").resolve()
         if vendor_root not in Path(blake3.__file__).resolve().parents:
             raise RuntimeError(f"blake3 was not imported from the zip: {blake3.__file__}")
-        if dmf.bl_info["version"] != (0, 2, 5):
-            raise RuntimeError(f"unexpected version: {dmf.bl_info['version']}")
+        # The archive name is the release version; bl_info has to agree with it.
+        expected = tuple(int(part) for part in archive.stem.split("-", 1)[-1].split("."))
+        if dmf.bl_info["version"] != expected:
+            raise RuntimeError(
+                f"unexpected version: bl_info is {dmf.bl_info['version']} but the zip is {archive.name}"
+            )
 
         dmf.register()
         if not hasattr(bpy.types.Scene, "dmf"):

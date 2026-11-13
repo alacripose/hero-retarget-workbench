@@ -814,9 +814,6 @@ class DMF_OT_export_stage(Operator):
             return {"CANCELLED"}
         target_stem = Path(settings.target_dmx_relative).stem
         scene_name = context.scene.name
-        stage_dir = Path(bpy.path.abspath(settings.stage_dir)) if settings.stage_dir else (
-            core.project_root(settings) / "artifacts" / "staged" / settings.addon_name
-        )
         source_parts = parts.export_meshes(settings)
         custom_slots = len({
             material.name
@@ -867,6 +864,16 @@ class DMF_OT_export_stage(Operator):
                 if not custom_root.is_dir():
                     raise RuntimeError(f"The model materials root is missing: {custom_root}")
                 custom_materials = module["stage"].material_files(custom_root)
+            if settings.stage_dir:
+                destination = Path(bpy.path.abspath(settings.stage_dir))
+            else:
+                detected = core.detect_environment(settings, module)
+                if detected.csdk_root is None:
+                    raise RuntimeError(
+                        "CSDK13 root is not set; choose it in Setup so Export & stage can install "
+                        f"{settings.addon_name} under content/citadel_addons"
+                    )
+                destination = detected.csdk_root
             request = module["stage"].StageRequest(
                 extraction_root=extraction,
                 vmdl=vmdl,
@@ -875,18 +882,19 @@ class DMF_OT_export_stage(Operator):
                 target_dmx_relative=settings.target_dmx_relative,
                 vmdl_relative=settings.vmdl_relative,
                 addon_name=settings.addon_name,
-                destination=stage_dir,
+                destination=destination,
                 materials=materials,
                 custom_materials=custom_materials,
                 custom_lods=exported.lods,
             )
             staged = module["stage"].stage(request)
             module["stage"].verify(staged)
-            settings.stage_dir = str(staged.root.parents[2]) if len(staged.root.parents) >= 3 else str(stage_dir)
+            settings.stage_dir = str(destination)
             settings.exported_dmx = str(exported.primary)
             _status(
                 settings,
-                f"Staged {settings.addon_name}: {part_count} parts joined, {len(staged.custom_lods)} LODs, {custom_slots} custom slots, "
+                f"Staged {settings.addon_name} into {staged.root}: {part_count} parts joined, "
+                f"{len(staged.custom_lods)} LODs, {custom_slots} custom slots, "
                 f"{staged.material_count} material files ({staged.material_texture_count} textures), "
                 f"{staged.custom_material_count} custom; vmdl unchanged ({staged.vmdl_blake3[:10]})",
                 "OK",
@@ -929,9 +937,10 @@ class DMF_OT_compile(Operator):
                 if result.returncode:
                     _status(settings, f"CSDK13 could not compile the stage; see {result.log}", "ERROR")
                 else:
+                    installed = result.game_addon or result.content_addon
                     _status(
                         settings,
-                        f"CSDK13 compiled {len(result.compiled_files)} files; input vmdl unchanged; temporary CSDK mirror removed",
+                        f"CSDK13 compiled {len(result.compiled_files)} files into {installed}; staged vmdl unchanged",
                         "OK",
                     )
 

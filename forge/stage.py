@@ -210,8 +210,9 @@ def stage(request: StageRequest) -> Staged:
         replacements[relative] = source
 
     root = request.destination.resolve() / "content" / "citadel_addons" / addon
-    if root.exists():
-        shutil.rmtree(root)
+    # The addon folder may already exist in the CSDK and have a modeldoc session
+    # or extra clips in it. Overwrite the files this stage owns and leave the
+    # rest of the folder alone instead of replacing the whole addon.
     root.mkdir(parents=True, exist_ok=True)
 
     vmdl_out = root / vmdl_relative

@@ -406,8 +406,11 @@ class DMF_Settings(PropertyGroup):
         default=False,
     )
     stage_dir: StringProperty(
-        name="Stage folder",
-        description="The compiler handoff folder. Staging copies the vmdl and materials here",
+        name="Install root",
+        description=(
+            "Root holding content/ and game/. Blank installs the addon into the CSDK13 root at "
+            "content/citadel_addons/<addon> so it can be opened in the CSDK itself"
+        ),
         subtype="DIR_PATH",
     )
     status: StringProperty(name="Status", default="Detect the live build to begin")

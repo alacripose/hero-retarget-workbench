@@ -151,9 +151,9 @@ def write_status(checks: list[tuple[str, bool, str]]) -> None:
             "- Blender 5.4 addon: hero picker, custom model import, collection-scoped parts, per-slot material assignment, fit, split compare, bone map, manual rename/alignment, HYBRID/CUSTOM/ENVELOPE retarget, Axis proof, stage, compile.",
             "- Live game build: read from `game/citadel/steam.inf` at run time.",
             "- S2V: hero inventory and extraction; vmdl is copied byte-for-byte.",
-            "- CSDK13: resourcecompiler invocation through a temporary build mirror; no persistent source copy.",
+            "- CSDK13: stage and compile install into `content/citadel_addons/<addon>` and `game/citadel_addons/<addon>` in the CSDK root.",
             "- Proof identity: BLAKE3; SHA-256 remains as legacy stage evidence.",
-            "- CSDK13 compile: temporary build addon; compiled `_c` files copied to the stage, then the CSDK mirror is removed.",
+            "- CSDK13 compile: in place in the content addon; compiled `_c` files stay in the game addon.",
             "- Old addon migration: general old VPK/folder import, automatic cloth/physics section discovery and exact transplant, optional explicit old vmdl selection, custom model/material preservation, and live-model update.",
             "",
             "## Observed evidence",
@@ -383,8 +383,8 @@ def cmd_compile(args: argparse.Namespace) -> int:
             "log": str(result.log),
             "output": str(result.output) if result.output else "",
             "compiled_files": [str(path) for path in result.compiled_files],
-            "content_addon": "",
-            "build_addon_removed": True,
+            "content_addon": str(result.content_addon) if result.content_addon else "",
+            "game_addon": str(result.game_addon) if result.game_addon else "",
         }
     )
     if result.returncode != 0:
@@ -479,8 +479,8 @@ def cmd_update_addon(args: argparse.Namespace) -> int:
                 "log": str(compiled.log),
                 "output": str(compiled.output) if compiled.output else "",
                 "compiled_files": [str(path) for path in compiled.compiled_files],
-                "content_addon": "",
-                "build_addon_removed": True,
+                "content_addon": str(compiled.content_addon) if compiled.content_addon else "",
+                "game_addon": str(compiled.game_addon) if compiled.game_addon else "",
             }
         )
         print(f"compile returncode {compiled.returncode} files {len(compiled.compiled_files)} warnings {warnings}")

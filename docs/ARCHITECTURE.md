@@ -68,7 +68,8 @@ to the operator for display.
 
 Builds the compiler handoff:
 
-- creates `content/citadel_addons/<addon>/`;
+- creates `content/citadel_addons/<addon>/` and merges into it when the addon
+  already exists, leaving files the stage does not own untouched;
 - copies the vmdl unchanged and checks its SHA-256;
 - writes the custom DMX at the logical target path;
 - copies material files and any requested extras;
@@ -79,15 +80,15 @@ hash change.
 
 ### `forge/compile.py`
 
-Copies the staged addon into a unique temporary CSDK build folder under
-`content/citadel_addons/` because that is where `resourcecompiler` resolves
-content, then runs the compiler from the SDK content root. It captures
-stdout/stderr and writes a log. On success it copies only compiled `_c` files
-(the `.vmdl_c` plus generated `.vmat_c`/`.vtex_c`) back under
-`<stage>/compiled/<addon>/`; on failure it preserves the previous compiled
-output. In `finally` it deletes both the temporary content folder and its
-`game/citadel_addons/<build>` counterpart. It does not leave a source mirror in
-CSDK and does not alter the staged vmdl.
+Installs the stage at `content/citadel_addons/<addon>` inside the CSDK13 root,
+because that is where `resourcecompiler` resolves content, and compiles it in
+place from the SDK content root. It captures stdout/stderr and writes a log.
+The compiled `_c` files (the `.vmdl_c` plus generated `.vmat_c`/`.vtex_c`) stay
+in `game/citadel_addons/<addon>`, the folder modeldoc opens and a VPK is packed
+from; on failure the previous compiled output is preserved. Nothing is deleted
+after the build and the staged vmdl is not altered. A stage created outside the
+CSDK is installed into the content addon first, merging into an existing addon
+folder rather than replacing it.
 
 ### Blender addon
 
