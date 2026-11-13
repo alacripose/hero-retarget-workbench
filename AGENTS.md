@@ -106,7 +106,9 @@ path is a built-in candidate. See `TICKET-0007`.
   mirrors the stage into `content/citadel_addons/<addon>`; that mirror is a
   build input and the saved compiled output is copied back to the stage.
 - **2026-11-12 — compile mirror superseded (owner correction).** The persistent
-  mirror was rejected because it floods CSDK with uncompiled sources. Compile
+  mirror was rejected because it floods CSDK with uncompiled sources.
+  *(Superseded 2026-11-13: the owner reversed this and stage/compile now write
+  into the CSDK addon folder. See "CSDK addon install" below.)* Compile
   now uses a unique `dmf_build_<addon>_<random>` content folder, deletes it and
   its `game` counterpart in `finally`, and copies only compiled `_c` files back
   under `<stage>/compiled/<addon>/`. The vmdl source remains unchanged.
@@ -278,3 +280,34 @@ supersedes the prior sentence that the current CSDK had no compiler binary.
 The compiled addon was packed to `artifacts/mayu-launch/mayu_updated.vpk` and installed as `game/citadel/addons/pak01.vpk`; the retail filesystem log mounts that path as `(vpk)`. The client log records `Loaded hero 45/hero_doorman` and the Doorman vmdl camera-pose load. Sandbox rendered the Mayu body, and the `move-1..3.png` sequence shows the dangling key/cloth moving with the character. The witness is agent-run and the captures are rear views; the owner's visual acceptance is separate.
 
 The current run emits 50 `g_tAltColor_Reveal` missing-texture warnings and the old `ui_hero_reveal.vnmclip_c` is absent. The old source vmat carries the same stale derived-texture path; the old compiled VPK's body vmat instead references `b554dcea`, which is present, and the old compiled addon was not run side by side. The attribution is therefore open, not claimed as inherited. Evidence: `artifacts/mayu-launch/launch-report.json` and the `command: launch` ledger row.
+
+## 2026-11-13 — stage and compile install into the CSDK addon
+
+**Owner correction, verbatim:** *"when i press stage it should set up the addon
+with the name that is in the addon text field with the files to compile??? so I
+can open it in the csdk itself??"* Authority:
+`logs/authority/2026-11-13-csdk-addon-install.jsonl`; contract: `TICKET-0010`.
+
+This reverses the 2026-11-12 disposable-mirror correction and supersedes the
+temporary-folder paragraph of `DECISIONS.md` D-04.
+
+- Export & stage installs at `<csdk>/content/citadel_addons/<addon>`, named by
+  the **Addon** field. The **Install root** field overrides the destination;
+  blank means the CSDK13 root from Setup. There is no `artifacts/staged`
+  default any more.
+- Staging merges into an existing addon folder: it overwrites the files the
+  stage owns and never deletes the folder, so unrelated files in an addon that
+  is open in modeldoc survive. The addon's vmdl is still replaced by the
+  byte-for-byte S2V copy; that is the intended port.
+- Compile runs `resourcecompiler -game <csdk>/game/citadel -i
+  citadel_addons/<addon>/<vmdl>` in place, and the compiled `_c` files remain in
+  `<csdk>/game/citadel_addons/<addon>` — the folder modeldoc opens and a VPK is
+  packed from. `compile_stage` reports `content_addon`, `game_addon`,
+  `compiled_files` and `output` from there.
+- No `dmf_build_*` folder and no `finally` deletion remain. Compiler metadata
+  such as `tools_asset_info.bin` now stays in the game addon and is not part of
+  `compiled_files`; strip it before packing a VPK.
+- The source boundary is unchanged: the vmdl is still opaque and copied
+  byte-for-byte by every path except the migration in `forge/migrate.py`.
+- Evidence for this change is the gate plus the fake-compiler unit tests. No
+  real `resourcecompiler` run into `thicc_mayu_v3` has been observed yet.

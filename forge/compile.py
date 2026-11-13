@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
-import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -26,6 +25,7 @@ class CompileResult:
     output: Path | None = None
     compiled_files: list[Path] = field(default_factory=list)
     build_addon: Path | None = None
+    game_addon: Path | None = None
 
 
 def _run(env: Environment, command: list[str], log_path: Path, timeout: int) -> subprocess.CompletedProcess[str]:
@@ -68,17 +68,20 @@ def compile_vmdl(env: Environment, vmdl: Path, *, log_path: Path, timeout: int =
     return CompileResult(command, result.returncode, result.stdout, result.stderr, log_path)
 
 
-def _source_build_name(addon_name: str) -> str:
-    safe = "".join(char if char.isalnum() or char == "_" else "_" for char in addon_name.lower())
-    return (safe or "addon")[:40]
+def _addon_folder(addon_name: str) -> str:
+    """Return the addon folder name, refusing anything that could leave the tree."""
+    name = addon_name.strip().replace("\\", "/").strip("/")
+    if not name or "/" in name or name in {".", ".."}:
+        raise CompileError(f"addon-name-invalid: {addon_name!r}")
+    return name
 
 
-def _compiled_paths(build_addon: Path) -> list[Path]:
-    if not build_addon.is_dir():
+def _compiled_paths(addon_root: Path) -> list[Path]:
+    if not addon_root.is_dir():
         return []
     return [
         path
-        for path in sorted(build_addon.rglob("*"))
+        for path in sorted(addon_root.rglob("*"))
         if path.is_file() and path.name.endswith("_c")
     ]
 
@@ -91,19 +94,24 @@ def compile_stage(
     log_path: Path,
     timeout: int = 1800,
 ) -> CompileResult:
-    """Compile a stage from a disposable CSDK content folder.
+    """Compile the addon in place inside the CSDK13 tree.
 
-    resourcecompiler resolves its content from the SDK's ``content`` directory,
-    so the stage has to be visible there for the build. It is copied into a
-    uniquely named build addon, compiled, and removed in ``finally``. Only the
-    resulting compiled resources are copied back under ``<stage>/compiled``;
-    the user's real ``citadel_addons`` folders are not touched.
+    ``resourcecompiler`` resolves content from the SDK's ``content`` directory,
+    so the stage lives at ``<csdk>/content/citadel_addons/<addon>`` and is
+    compiled from there. The compiled ``_c`` files stay in
+    ``<csdk>/game/citadel_addons/<addon>``: that is the addon folder modeldoc
+    opens and the folder a VPK is packed from. Nothing is copied into a
+    temporary build folder and nothing is deleted afterwards.
+
+    A stage created outside the CSDK is installed into the content addon first
+    (merging, so the addon's other files survive), then compiled from there.
     """
     if env.resourcecompiler is None or not env.resourcecompiler.is_file():
         raise CompileError("resourcecompiler-missing: choose the CSDK13 root in the addon Setup panel")
     if env.csdk_root is None or env.csdk_gameinfo is None:
         raise CompileError("csdk-incomplete: choose a CSDK13 root with content and game/citadel/gameinfo.gi in Setup")
-    source = stage_root / "content" / "citadel_addons" / addon_name
+    addon = _addon_folder(addon_name)
+    source = stage_root / "content" / "citadel_addons" / addon
     manifest_path = source / "stage.json"
     if not manifest_path.is_file():
         raise CompileError(f"stage-manifest-missing: {manifest_path}")
@@ -112,52 +120,39 @@ def compile_stage(
     if not vmdl_relative:
         raise CompileError("stage-manifest-has-no-vmdl")
 
-    content_root = env.csdk_root / "content" / "citadel_addons"
-    content_root.mkdir(parents=True, exist_ok=True)
-    build_content = Path(
-        tempfile.mkdtemp(prefix=f"dmf_build_{_source_build_name(addon_name)}_", dir=content_root)
+    content_addon = env.csdk_root / "content" / "citadel_addons" / addon
+    if content_addon.resolve() != source.resolve():
+        if content_addon.exists():
+            # Merge into the addon the user already has open in CSDK rather
+            # than replacing the folder and its unrelated files.
+            shutil.copytree(source, content_addon, dirs_exist_ok=True)
+        else:
+            shutil.copytree(source, content_addon)
+
+    input_relative = Path("citadel_addons") / addon / vmdl_relative
+    command = [
+        str(env.resourcecompiler),
+        "-nop4",
+        "-f",
+        "-game",
+        str(env.csdk_gameinfo.parent),
+        "-i",
+        str(input_relative),
+    ]
+    result = _run(env, command, log_path, timeout)
+
+    game_addon = env.csdk_root / "game" / "citadel_addons" / addon
+    compiled = _compiled_paths(game_addon)
+    output = game_addon / Path(vmdl_relative).with_suffix(".vmdl_c")
+    return CompileResult(
+        command,
+        result.returncode,
+        result.stdout,
+        result.stderr,
+        log_path,
+        content_addon=content_addon,
+        output=output if output.is_file() else None,
+        compiled_files=compiled if result.returncode == 0 else [],
+        build_addon=None,
+        game_addon=game_addon,
     )
-    build_name = build_content.name
-    build_game = env.csdk_root / "game" / "citadel_addons" / build_name
-    try:
-        shutil.copytree(source, build_content, dirs_exist_ok=True)
-        input_relative = Path("citadel_addons") / build_name / vmdl_relative
-        command = [
-            str(env.resourcecompiler),
-            "-nop4",
-            "-f",
-            "-game",
-            str(env.csdk_gameinfo.parent),
-            "-i",
-            str(input_relative),
-        ]
-        result = _run(env, command, log_path, timeout)
-        compiled = _compiled_paths(build_game)
-        compiled_root = stage_root / "compiled" / addon_name
-        saved: list[Path] = []
-        if result.returncode == 0 and compiled:
-            if compiled_root.exists():
-                shutil.rmtree(compiled_root)
-            for path in compiled:
-                relative = path.relative_to(build_game)
-                target = compiled_root / relative
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(path, target)
-                saved.append(target)
-        output = compiled_root / Path(vmdl_relative).with_suffix(".vmdl_c")
-        return CompileResult(
-            command,
-            result.returncode,
-            result.stdout,
-            result.stderr,
-            log_path,
-            content_addon=None,
-            output=output if output.is_file() else None,
-            compiled_files=saved,
-            build_addon=None,
-        )
-    finally:
-        # The SDK content entry is a build scratch space. Remove both halves so
-        # CSDK is not polluted with uncompiled DMX/vmdl/materials after a build.
-        shutil.rmtree(build_content, ignore_errors=True)
-        shutil.rmtree(build_game, ignore_errors=True)

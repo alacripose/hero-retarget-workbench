@@ -62,6 +62,15 @@ only compiled `_c` files back under `<stage>/compiled/<addon>/`. The source
 vmdl still remains byte-identical, and a failed compile preserves the prior
 compiled output rather than replacing it with a partial tree.
 
+**2026-11-13 — reversed (owner correction).** *"when i press stage it should set
+up the addon with the name that is in the addon text field with the files to
+compile??? so I can open it in the csdk itself??"* Stage now installs the addon
+at `content/citadel_addons/<addon>` in the CSDK13 root (merging into an existing
+addon folder, never deleting its other files), and compile runs in place and
+leaves the compiled `_c` files in `game/citadel_addons/<addon>` — the folder
+modeldoc opens and a VPK is packed from. No temporary `dmf_build_*` folder and
+no deletion step remain.
+
 ## D-05 — Materials are copied, not interpreted
 
 **Status:** accepted.

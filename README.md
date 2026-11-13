@@ -94,14 +94,14 @@ newer Deadlock build or a different drive updates the fields in their own file.
 and every version tag. It runs the unit tests, builds the addon zip, and uploads
 the zip as a workflow artifact on Windows with Python 3.13.
 
-A tag such as `v0.2.5` also runs the release job after the test job. The job
+A tag such as `v0.2.6` also runs the release job after the test job. The job
 checks that the zip version matches the tag, then creates or updates the release
 with `hero_retarget_workbench-<version>.zip` attached. A rerun replaces the asset
 rather than leaving the release without a zip.
 
 ```bash
-git tag v0.2.5
-git push origin v0.2.5
+git tag v0.2.6
+git push origin v0.2.6
 ```
 
 The tag must match `bl_info["version"]`. The workflow rejects a mismatch before
@@ -159,21 +159,22 @@ it publishes anything.
     tree into a CSDK13 handoff. The vmdl hash is recorded and checked after
     staging. `stage.json` records material and texture counts separately.
 13. **Compile with CSDK13** — runs `resourcecompiler` in a background thread.
-    The stage is copied into a unique temporary
-    `content/citadel_addons/dmf_build_<addon>_<random>` folder, compiled with
+    Export & stage installs the addon at `content/citadel_addons/<addon>` in
+    the CSDK13 root named by **Install root** (blank uses the CSDK13 root from
+    Setup), so the addon can be opened in the CSDK itself. Compile then runs
     `resourcecompiler.exe -nop4 -f -game <CSDK game/citadel> -i
-    citadel_addons/<build>/<vmdl>`, and both the temporary content folder and
-    its `game` counterpart are deleted in `finally`. Only compiled `_c` files
-    (`.vmdl_c`, `.vmat_c`, `.vtex_c`, ...) are copied back under
-    `<stage>/compiled/<addon>/`. A failed compile keeps the prior compiled
-    output and leaves no source mirror behind.
+    citadel_addons/<addon>/<vmdl>` in place and leaves the compiled `_c` files
+    (`.vmdl_c`, `.vmat_c`, `.vtex_c`, ...) in `game/citadel_addons/<addon>`,
+    the folder modeldoc opens and a VPK is packed from. Nothing is deleted after
+    the build. A failed compile keeps the prior compiled output. Staging merges
+    into an existing addon folder, so files the workbench does not own survive.
 
 ## Commands
 
 ```bash
 python tools/build_addon.py
 blender -b --factory-startup --python tools/blender_workbench_probe.py -- --report artifacts/receipts/hero-retarget-workbench-workbench.json
-blender -b --factory-startup --python tools/blender_zip_probe.py -- --zip dist/hero_retarget_workbench-0.2.5.zip --report artifacts/receipts/hero-retarget-workbench-zip.json
+blender -b --factory-startup --python tools/blender_zip_probe.py -- --zip dist/hero_retarget_workbench-0.2.6.zip --report artifacts/receipts/hero-retarget-workbench-zip.json
 python tools/project.py doctor
 python tools/project.py heroes
 python tools/project.py extract --hero haze --out artifacts/extractions/haze
