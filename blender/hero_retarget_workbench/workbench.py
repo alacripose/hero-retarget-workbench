@@ -54,6 +54,60 @@ def _targets(settings) -> list[str]:
     return [bone.name for bone in settings.target_armature.data.bones]
 
 
+def build_hierarchy(settings) -> int:
+    """Fill the hierarchy rows from the hero skeleton, depth first.
+
+    Read-only description of the rig: it re-parents nothing. The rig is the
+    source of truth, so a bone that the game animates but the panel cannot show
+    is a visibility bug, not a data one.
+    """
+    armature = settings.target_armature
+    settings.hierarchy.clear()
+    settings.hierarchy_index = 0
+    if armature is None:
+        return 0
+    bones = list(armature.data.bones)
+    children: dict[str, list] = {}
+    roots = []
+    for bone in bones:
+        if bone.parent is None:
+            roots.append(bone)
+        else:
+            children.setdefault(bone.parent.name, []).append(bone)
+
+    rows: list[tuple[str, str, int, int]] = []
+
+    def walk(bone, depth: int) -> None:
+        kids = sorted(children.get(bone.name, []), key=lambda item: item.name)
+        rows.append((bone.name, bone.parent.name if bone.parent else "", depth, len(kids)))
+        for child in kids:
+            walk(child, depth + 1)
+
+    for root in sorted(roots, key=lambda item: item.name):
+        walk(root, 0)
+
+    for name, parent, depth, count in rows:
+        row = settings.hierarchy.add()
+        row.name = name
+        row.parent = parent
+        row.depth = depth
+        row.children = count
+    return len(rows)
+
+
+def bone_chain(settings, name: str) -> list[str]:
+    """Bone and its ancestors, root last. Used by the panel summary."""
+    armature = settings.target_armature
+    if armature is None:
+        return []
+    bone = armature.data.bones.get(name)
+    chain: list[str] = []
+    while bone is not None:
+        chain.append(bone.name)
+        bone = bone.parent
+    return chain
+
+
 def scan_bone_map(settings) -> int:
     from forge.names import match
 
@@ -811,8 +865,70 @@ class DMF_OT_cancel_weight_job(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_refresh_hierarchy(Operator):
+    bl_idname = "dmf.refresh_hierarchy"
+    bl_label = "Refresh Hierarchy"
+    bl_description = "Read the hero skeleton's bone tree into the hierarchy list; it does not change the rig"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        if settings.target_armature is None:
+            message = "Import the hero skeleton before reading its hierarchy"
+            _status(settings, message, "ERROR")
+            self.report({"ERROR"}, message)
+            return {"CANCELLED"}
+        count = build_hierarchy(settings)
+        roots = sum(1 for row in settings.hierarchy if not row.parent)
+        _status(
+            settings,
+            f"{count} bones, {roots} roots, {len(settings.target_armature.data.bones)} in the rig",
+            "OK" if count == len(settings.target_armature.data.bones) else "WARN",
+        )
+        return {"FINISHED"}
+
+
+class DMF_OT_select_hierarchy_bone(Operator):
+    bl_idname = "dmf.select_hierarchy_bone"
+    bl_label = "Select Bone"
+    bl_description = "Select the highlighted bone in the hero rig so it can be posed, aligned or inspected"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        armature = settings.target_armature
+        if armature is None or not settings.hierarchy:
+            message = "Refresh the hierarchy first"
+            self.report({"ERROR"}, message)
+            return {"CANCELLED"}
+        index = max(0, min(settings.hierarchy_index, len(settings.hierarchy) - 1))
+        settings.hierarchy_index = index
+        row = settings.hierarchy[index]
+        bone = armature.data.bones.get(row.name)
+        if bone is None:
+            message = f"{row.name} is no longer in the hero rig; refresh the hierarchy"
+            _status(settings, message, "ERROR")
+            self.report({"ERROR"}, message)
+            return {"CANCELLED"}
+        # Blender 5.4 dropped Bone.select; edit bones still carry it, so a rig
+        # that is already in edit mode gets its selection narrowed to this bone.
+        # object.select_all polls false in edit mode, so that path is separate.
+        if armature.mode == "EDIT":
+            for candidate in armature.data.edit_bones:
+                candidate.select = candidate.name == row.name
+            edit_active = getattr(armature.data.edit_bones, "active", None)
+            if edit_active is not None:
+                armature.data.edit_bones.active = armature.data.edit_bones.get(row.name)
+        else:
+            core.select_only(context, [armature])
+            armature.data.bones.active = bone
+        chain = bone_chain(settings, row.name)
+        _status(settings, f"Active bone {row.name}; chain {' <- '.join(chain)}", "OK")
+        return {"FINISHED"}
+
+
 CLASSES = (
     DMF_OT_scan_bones,
+    DMF_OT_refresh_hierarchy,
+    DMF_OT_select_hierarchy_bone,
     DMF_OT_add_bone_entry,
     DMF_OT_remove_bone_entry,
     DMF_OT_mark_extra,

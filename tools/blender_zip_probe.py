@@ -114,14 +114,37 @@ def main() -> int:
             raise RuntimeError(f"core imported the stale forge module: {bundled['paths'].__name__}")
 
         panels = len(dmf.ui.CLASSES)
-        workbench = len(dmf.workbench.CLASSES)
-        operators = len(dmf.operators.CLASSES) + workbench
         if panels != 9:
             raise RuntimeError(f"expected 9 panel classes, found {panels}")
-        if workbench != 24:
-            raise RuntimeError(f"expected 24 workbench operators, found {workbench}")
-        if operators != 44:
-            raise RuntimeError(f"expected 44 operator classes in total, found {operators}")
+        # Every operator the package defines has to reach dmf.*, and every
+        # registered one has to come from a CLASSES tuple. A count constant here
+        # only records how many existed the day it was typed.
+        registered = [
+            cls
+            for group in (dmf.ui.CLASSES, dmf.operators.CLASSES, dmf.workbench.CLASSES)
+            for cls in group
+            if isinstance(cls, type) and issubclass(cls, bpy.types.Operator)
+        ]
+        unregistered = []
+        for cls in registered:
+            namespace, _, name = cls.bl_idname.partition(".")
+            if namespace != "dmf" or not hasattr(bpy.ops.dmf, name):
+                unregistered.append(cls.bl_idname)
+        if unregistered:
+            raise RuntimeError(f"operators registered but not reachable: {unregistered}")
+        defined = {
+            value
+            for module in (dmf.operators, dmf.workbench)
+            for name in dir(module)
+            if name.startswith("DMF_OT_")
+            for value in (getattr(module, name),)
+            if isinstance(value, type) and issubclass(value, bpy.types.Operator)
+        }
+        unreached = sorted(cls.bl_idname for cls in defined - set(registered))
+        if unreached:
+            raise RuntimeError(f"operators defined but missing from CLASSES: {unreached}")
+        operators = len(registered)
+        print(f"OPERATORS registered={operators} panels={panels}")
         valid_icons = {
             item.identifier
             for item in bpy.types.UILayout.bl_rna.functions["label"].parameters["icon"].enum_items
@@ -210,7 +233,7 @@ def main() -> int:
             "version": ".".join(str(part) for part in dmf.bl_info["version"]),
             "panels": panels,
             "operators": operators,
-            "workbench_operators": workbench,
+            "workbench_operators": len(dmf.workbench.CLASSES),
             "icons_checked": len(used_icons),
             "path_config_saved": True,
             "path_detect_operator": True,
