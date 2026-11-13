@@ -4,6 +4,40 @@ from __future__ import annotations
 from forge import bonerules
 
 
+def _row(source, state, target, scanned, scanned_state, note=""):
+    return {
+        "source": source,
+        "state": state,
+        "target": target,
+        "scanned": scanned,
+        "scanned_state": scanned_state,
+        "note": note,
+    }
+
+
+def test_remembered_keeps_a_row_the_user_typed_and_drops_a_rebuilt_one():
+    rows = [
+        _row("shoulder_L", "MAPPED", "arm_upper_L", "arm_upper_L", "MAPPED"),
+        _row("elbow_R", "MAPPED", "hand_R", "arm_lower_R", "MAPPED"),
+    ]
+    kept = bonerules.remembered(rows)
+    assert "shoulder_L" not in kept
+    assert kept["elbow_R"] == ("MAPPED", "hand_R", "")
+
+
+def test_remembered_keeps_a_state_the_user_chose_over_a_rule():
+    row = _row("skirt_00", "IGNORED", "", "skirt_00", "EXTRA", "rule Sp_*")
+    assert bonerules.remembered([row])["skirt_00"] == ("IGNORED", "", "rule Sp_*")
+
+
+def test_remembered_ignores_an_unanswered_row_and_a_rowless_entry():
+    rows = [
+        _row("unknown_thing", "UNMATCHED", "", "", ""),
+        _row("", "MAPPED", "pelvis", "", ""),
+    ]
+    assert bonerules.remembered(rows) == {}
+
+
 def test_split_side_reads_every_separator_and_case():
     assert bonerules.split_side("elbow_L") == ("elbow", "L")
     assert bonerules.split_side("elbow.l") == ("elbow", "L")

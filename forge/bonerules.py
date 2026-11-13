@@ -226,6 +226,32 @@ def matches(rule: Rule, source: str) -> bool:
     return _candidate(rule, source) is not None
 
 
+def remembered(rows: list[dict]) -> dict[str, tuple[str, str, str]]:
+    """Rows a re-scan must not throw away: the ones the user decided themselves.
+
+    Each map row carries what the last scan or rule pass wrote into it
+    (``scanned`` / ``scanned_state``). A row whose state or target no longer
+    matches that is a row the user typed or chose, so a rescan keeps it and the
+    rules are not allowed to answer it again. Untouched rows — an unanswered row
+    with no target, or one that still holds exactly what was written for it —
+    are rebuilt from the rig and the current rules.
+    """
+    kept: dict[str, tuple[str, str, str]] = {}
+    for row in rows or []:
+        source = str(row.get("source") or "")
+        if not source:
+            continue
+        state = str(row.get("state") or "")
+        target = str(row.get("target") or "")
+        unchanged = target == str(row.get("scanned") or "") and state == str(
+            row.get("scanned_state") or ""
+        )
+        decided = bool(target) or state in STATES
+        if decided and not unchanged:
+            kept[source] = (state, target, str(row.get("note") or ""))
+    return kept
+
+
 def suggest(
     rules: list[Rule],
     sources: list[str],

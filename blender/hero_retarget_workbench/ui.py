@@ -682,6 +682,13 @@ class DMF_PT_skeleton(Panel):
         top = layout.row(align=True)
         top.operator("dmf.scan_bones", text="Scan bone map", icon="FILE_REFRESH")
         top.prop(settings, "bone_filter", text="")
+        if settings.bone_rules:
+            _hint(
+                layout,
+                "Scan matches names, then applies your rules; rows you set yourself stay as they are.",
+                "INFO",
+                width=34,
+            )
 
         pose = _section(layout, "Ref pose", "ARMATURE_DATA", settings.pose_stance or "not read")
         controls = pose.row(align=True)

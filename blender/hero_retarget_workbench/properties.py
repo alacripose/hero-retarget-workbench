@@ -71,6 +71,10 @@ class DMF_BoneEntry(PropertyGroup):
         default="UNMATCHED",
     )
     note: StringProperty(name="Note", default="")
+    # What the last scan or rule pass wrote into this row. A row that no longer
+    # matches is the user's own decision, and a rescan keeps it.
+    scanned: StringProperty(name="Scanned target", default="")
+    scanned_state: StringProperty(name="Scanned state", default="")
 
 
 class DMF_ProofCheck(PropertyGroup):

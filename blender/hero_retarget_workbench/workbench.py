@@ -117,6 +117,13 @@ def bone_chain(settings, name: str) -> list[str]:
 
 
 def scan_bone_map(settings) -> int:
+    """Rebuild the bone map from the rigs: exact/normalized names, then the rules.
+
+    Non-destructive to the user: the objects, the rest poses and the weights are
+    not touched, and a row whose state or target the user set themselves is kept
+    instead of being overwritten by a name match or a rule. Pressing scan is
+    therefore also how a user sees what their rules currently answer.
+    """
     from forge.names import match
 
     from . import rules
@@ -129,6 +136,7 @@ def scan_bone_map(settings) -> int:
         settings.bone_map.clear()
         settings.bone_map_index = 0
         return 0
+    kept = rules.remembered(settings)
     result = match(sources, targets)
     collision_sources = {
         source
@@ -154,6 +162,15 @@ def scan_bone_map(settings) -> int:
                 entry.state = "UNMATCHED"
                 entry.target = ""
                 entry.note = "no exact or normalized target"
+            prior = kept.get(source)
+            if prior is not None:
+                entry.state, entry.target, entry.note = prior
+                continue
+            entry.scanned = entry.target
+            entry.scanned_state = entry.state
+    # The rules answer what the names could not, so the panel shows the map the
+    # solver would actually read after one press of Scan.
+    rules.fill(settings)
     settings.bone_map_index = 0
     return len(sources)
 
@@ -172,7 +189,15 @@ class DMF_OT_scan_bones(Operator):
                 _status(settings, "No custom rig or groups; Surface + envelope will weight the mesh directly", "INFO")
             else:
                 resolved = sum(1 for entry in settings.bone_map if entry.state == "MAPPED")
-                _status(settings, f"Scanned {count} source bones; {resolved} mapped, {count - resolved} need a decision", "OK" if resolved == count else "WARN")
+                by_rules = sum(1 for entry in settings.bone_map if entry.note.startswith("rule "))
+                detail = f"Scanned {count} source bones; {resolved} mapped"
+                if by_rules:
+                    detail += f" ({by_rules} by rules)"
+                _status(
+                    settings,
+                    f"{detail}, {count - resolved} need a decision",
+                    "OK" if resolved == count else "WARN",
+                )
         except Exception as error:
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))

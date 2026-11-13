@@ -108,12 +108,35 @@ def learn_from_map(settings) -> int:
     return len(learned)
 
 
+def rows(settings) -> list[dict]:
+    """The bone map as plain dicts, for the pure rule module."""
+    return [
+        {
+            "source": entry.source,
+            "state": entry.state,
+            "target": entry.target,
+            "note": entry.note,
+            "scanned": entry.scanned,
+            "scanned_state": entry.scanned_state,
+        }
+        for entry in settings.bone_map
+    ]
+
+
+def remembered(settings) -> dict[str, tuple[str, str, str]]:
+    """Rows the user answered themselves, which neither a scan nor a rule may replace."""
+    return bonerules.remembered(rows(settings))
+
+
 def fill(settings) -> int:
-    """Apply the rules to every row that has no target yet."""
+    """Apply the rules to every row the user has not answered themselves."""
     found = bonerules.suggest(panel_rules(settings), [e.source for e in settings.bone_map if e.source], target_names(settings), mapping(settings))
+    kept = set(remembered(settings))
     changed = 0
     with suppressed():
         for entry in settings.bone_map:
+            if entry.source and entry.source in kept:
+                continue
             hit = found.get(entry.source)
             if hit is None:
                 continue
@@ -127,6 +150,10 @@ def fill(settings) -> int:
                 entry.state = "MAPPED"
                 entry.target = hit.target
             entry.note = f"rule {hit.label}"
+            # What a rule wrote is not a decision the user made: a rescan may
+            # answer the row again if the rule changes.
+            entry.scanned = entry.target
+            entry.scanned_state = entry.state
             changed += 1
     return changed
 
@@ -162,6 +189,8 @@ def auto_fill(settings, entry) -> int:
             row.target = bonerules.set_side(entry.target, side)
             row.state = "MAPPED"
             row.note = f"mirror of {entry.source}"
+            row.scanned = row.target
+            row.scanned_state = row.state
             placed += 1
     return placed
 
