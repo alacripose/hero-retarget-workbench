@@ -5,8 +5,10 @@ live Deadlock hero.
 
 The hero is always taken from the current live game with Source 2 Viewer. The
 addon handles the custom model, fitting, retargeting, and materials. CSDK13 is
-the compiler. The hero vmdl is not parsed, rebuilt, or edited: it is copied
-byte-for-byte to the compiler handoff.
+the compiler. The hero vmdl is not parsed, rebuilt, or edited by the normal
+workbench: it is copied byte-for-byte to the compiler handoff. The one named
+exception is the old-addon migration, which transplants exact old top-level
+sections into a new merged vmdl; see `TICKET-0009`.
 
 ## Public landing page
 
@@ -20,8 +22,8 @@ keeps Blender's own controls.
 | Path | Purpose |
 |---|---|
 | `blender/hero_retarget_workbench/` | Blender addon: hero picker, custom import, collection-scoped parts, per-slot materials, fit, retarget, stage, compile |
-| `forge/` | Live path detection, S2V wrapper, axis transforms, name matching, staging, compiler invocation |
-| `tools/project.py` | Command surface: `doctor`, `heroes`, `extract`, `stage`, `compile`, `gate`, `status`, `selftest` |
+| `forge/` | Live path detection, S2V wrapper, axis transforms, name matching, staging, compiler invocation, old-addon migration |
+| `tools/project.py` | Command surface: `doctor`, `heroes`, `extract`, `update-addon`, `stage`, `compile`, `gate`, `status`, `selftest` |
 | `tools/build_addon.py` | Build the self-contained addon zip for Blender's Add-ons installer |
 | `tickets/` | Work contracts and acceptance evidence |
 | `ledger/` | Append-only command/evidence rows and gate state |
@@ -177,6 +179,7 @@ python tools/project.py heroes
 python tools/project.py extract --hero haze --out artifacts/extractions/haze
 python tools/project.py stage --help
 python tools/project.py compile --help
+python tools/project.py update-addon --help
 python tools/project.py gate
 python tools/project.py status
 python tools/project.py selftest
@@ -356,3 +359,46 @@ owner still needs to inspect it. A real custom furry/huge-asset fixture and
 timer chunks under a live event loop are also open. PulseSrcOps warns that a few
 decimated LOD vertices exceed four weight links; the base solve is capped at four
 and this warning is in the LOD decimation/export path.
+
+## 2026-11-13 — Import and update an old addon
+
+The **Update old addon** subpanel accepts an old addon VPK or extracted content
+folder. It extracts the old package with Source 2 Viewer (a folder is used in
+place), extracts the selected live hero, and uses the live model as the base.
+The old `Softbody` and `PhysicsJointList` sections are transplanted exactly, so
+`ClothChain`, `ClothChainHinge`, cloth clusters and `PhysicsJointConical` joints
+survive without being rebuilt. The `Update old addon` panel reports the section
+hashes and cloth-chain counts; the output `stage.json` records them too.
+
+The old model is kept under the default **Preserve custom only** policy when its
+render-mesh paths or DMX bytes differ from the live model. Choose **Always old**
+to force it or **Always live** to use the live meshes while still preserving the
+cloth/physics sections. Old `.vmat`, texture and `.vtex` assets overlay the live
+extraction with relative paths intact; old model, physics and skeleton files are
+copied beside the preserved meshes. The job runs off Blender's main thread and
+then fills the existing Source/Handoff fields, so the preserved old model and
+material root are ready for the normal workbench review and compile flow.
+
+```bash
+python tools/project.py update-addon \
+  --source path/to/old_addon.vpk \
+  --hero doorman \
+  --out artifacts/updates/doorman_updated \
+  --addon doorman_updated \
+  --model auto --compile
+```
+
+Use `--new-extraction` and `--new-vmdl` to reuse an existing live S2V extraction
+instead of extracting the hero again. `--no-materials` keeps only the live
+materials; `--preserve-section` adds another top-level old modeldoc section by
+name. The migration is the one deliberate vmdl-writing path: it copies the old
+sections verbatim and records their old/output SHA-256 hashes. It does not add a
+KV3 parser or reconstruct cloth from inferred fields.
+
+Real Mayu migration on 2026-11-13: the old source addon produced a 343 MB stage
+with 2 cloth chains, 9 hinges, 18 physics joints, 23 old model files, 111 old
+material assets and 89 textures; the old `Softbody` and `PhysicsJointList`
+hashes matched their output hashes. The current reduced CSDK has no
+`resourcecompiler.exe`, so the compile attempt failed before compiling anything
+(`resourcecompiler-missing` / `modeldoc_utils` in the live-game compiler). That
+is recorded as a limitation, not a compile claim; see `TICKET-0009`.

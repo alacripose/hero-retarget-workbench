@@ -269,6 +269,45 @@ class DMF_PT_source(Panel):
         _primary(custom, "dmf.fit", "Fit to hero", "TRANSFORM_ORIGINS", enabled=not settings.job_running)
 
 
+class DMF_PT_update(Panel):
+    bl_label = "Update old addon"
+    bl_idname = "DMF_PT_update"
+    bl_parent_id = "DMF_PT_main"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        settings = context.scene.dmf
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+        box = _section(layout, "Old addon migration", "FILE_REFRESH", settings.update_addon_name or "not set")
+        _path_row(box, settings, "old_vpk", "Old VPK / folder")
+        box.operator("dmf.pick_old_vpk", text="Choose old addon", icon="FILEBROWSER")
+        _path_row(box, settings, "update_output", "Output stage")
+        box.prop(settings, "update_addon_name", text="Updated addon")
+        box.prop(settings, "update_model_policy", text="Old model")
+        options = box.column(align=True)
+        options.prop(settings, "update_preserve_cloth", text="Preserve cloth/physics")
+        options.prop(settings, "update_preserve_materials", text="Preserve old materials")
+        options.prop(settings, "update_replace_output", text="Replace output folder")
+        _hint(
+            box,
+            "Reads the old VPK through S2V, extracts the selected live hero, and transplants the old Softbody and PhysicsJointList sections exactly. The old model and material assets overlay the live extraction.",
+            "INFO",
+            width=32,
+        )
+        _primary(
+            box,
+            "dmf.update_old_addon",
+            "Import & update old addon",
+            "FILE_REFRESH",
+            enabled=not settings.job_running and settings.hero_slug not in ("", "NONE"),
+        )
+
+
 class DMF_PT_parts(Panel):
     bl_label = "Parts & Materials"
     bl_idname = "DMF_PT_parts"
@@ -577,7 +616,7 @@ class DMF_PT_handoff(Panel):
         _primary(handoff, "dmf.compile", "Compile with CSDK13", "PLAY", enabled=not settings.job_running)
 
 
-CLASSES = (DMF_PT_main, DMF_PT_setup, DMF_PT_source, DMF_PT_parts, DMF_PT_compare, DMF_PT_skeleton, DMF_PT_weights, DMF_PT_handoff)
+CLASSES = (DMF_PT_main, DMF_PT_setup, DMF_PT_source, DMF_PT_update, DMF_PT_parts, DMF_PT_compare, DMF_PT_skeleton, DMF_PT_weights, DMF_PT_handoff)
 
 
 def register() -> None:

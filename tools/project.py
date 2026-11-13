@@ -30,8 +30,9 @@ if str(ROOT) not in sys.path:
 from forge.axis import PRESETS, AxisTransform  # noqa: E402
 from forge.compile import CompileError, compile_stage, compile_vmdl  # noqa: E402
 from forge.live import LiveError, extract, inventory, list_heroes  # noqa: E402
+from forge.migrate import DEFAULT_SECTIONS, MigrationError, update_from_package  # noqa: E402
 from forge.paths import detect  # noqa: E402
-from forge.stage import MaterialCopy, StageError, StageRequest, material_files, stage, verify  # noqa: E402
+from forge.stage import MaterialCopy, StageError, StageRequest, digest, material_files, stage, verify  # noqa: E402
 
 LEDGER = ROOT / "ledger" / "ledger.jsonl"
 GATE_STATE = ROOT / "ledger" / "gate-state.json"
@@ -98,6 +99,8 @@ def gate_checks() -> list[tuple[str, bool, str]]:
             "forge",
             "--glob",
             "!__pycache__/**",
+            "--glob",
+            "!migrate.py",
         ],
         cwd=ROOT,
         capture_output=True,
@@ -151,6 +154,7 @@ def write_status(checks: list[tuple[str, bool, str]]) -> None:
             "- CSDK13: resourcecompiler invocation through a temporary build mirror; no persistent source copy.",
             "- Proof identity: BLAKE3; SHA-256 remains as legacy stage evidence.",
             "- CSDK13 compile: temporary build addon; compiled `_c` files copied to the stage, then the CSDK mirror is removed.",
+            "- Old addon migration: old VPK/folder import, exact `Softbody`/`PhysicsJointList` transplant, custom model/material preservation, and live-model update.",
             "",
             "## Observed evidence",
             "",
@@ -177,6 +181,19 @@ def write_status(checks: list[tuple[str, bool, str]]) -> None:
     )
     if latest_workbench:
         lines.append(f"- Workbench probe: `{latest_workbench.get('result', 'unknown')}`; {latest_workbench.get('observed', 'recorded')}")
+    updates = [row for row in rows if row.get("command") == "update-addon"]
+    latest_update = max(
+        updates,
+        key=lambda row: (row.get("cloth_chains", 0), row.get("materials", 0)),
+        default=None,
+    )
+    if latest_update:
+        lines.append(
+            "- Old addon migration: `"
+            f"{latest_update.get('result', 'unknown')}`; {latest_update.get('model_files', 0)} old model files, "
+            f"{latest_update.get('materials', 0)} old material assets, "
+            f"{latest_update.get('cloth_chains', 0)} cloth chains, {latest_update.get('cloth_hinges', 0)} hinges."
+        )
     latest_zip = next(
         (row for row in reversed(rows) if "blender_zip_probe.py" in str(row.get("command", ""))),
         None,
@@ -189,7 +206,7 @@ def write_status(checks: list[tuple[str, bool, str]]) -> None:
             "## Boundaries",
             "",
             "- No KV3 parser.",
-            "- No vmdl reconstruction, metadata extraction, or vmdl rewriting.",
+            "- No vmdl reconstruction, metadata extraction, or vmdl rewriting except the named old-addon migration that transplants old top-level sections.",
             "- The selected DMX and its LOD DMXs are replaced; materials are copied verbatim.",
             "",
         ]
@@ -375,6 +392,103 @@ def cmd_compile(args: argparse.Namespace) -> int:
     return 0 if result.returncode == 0 else result.returncode
 
 
+def cmd_update_addon(args: argparse.Namespace) -> int:
+    env = detect()
+    source = Path(args.source).expanduser()
+    hero = None
+    if args.hero:
+        try:
+            heroes = list_heroes(env)
+        except LiveError as error:
+            print(f"update-addon-failed: {error}", file=sys.stderr)
+            return 2
+        hero = next((item for item in heroes if item.slug.lower() == args.hero.lower()), None)
+        if hero is None:
+            print(f"hero-not-found: {args.hero}", file=sys.stderr)
+            return 2
+    if hero is None and not args.new_extraction:
+        print("update-addon-failed: --hero or --new-extraction is required", file=sys.stderr)
+        return 2
+    addon = args.addon.strip() or f"{source.stem}_updated"
+    sections = tuple(args.preserve_section or DEFAULT_SECTIONS)
+    try:
+        result = update_from_package(
+            env,
+            source,
+            Path(args.out),
+            addon,
+            hero=hero,
+            new_extraction=Path(args.new_extraction) if args.new_extraction else None,
+            new_vmdl=Path(args.new_vmdl) if args.new_vmdl else None,
+            preserve_model=args.model,
+            preserve_materials=not args.no_materials,
+            sections=sections,
+            force=args.force,
+        )
+    except (MigrationError, LiveError, OSError, subprocess.TimeoutExpired) as error:
+        print(f"update-addon-failed: {error}", file=sys.stderr)
+        return 2
+    print(f"updated {result.root}")
+    print(f"vmdl {result.vmdl} sha256={digest(result.vmdl)}")
+    print(f"old_vmdl {result.old_vmdl}")
+    print(f"new_vmdl {result.new_vmdl}")
+    print(f"preserved_model {result.preserved_model} model_files {len(result.model_files)} materials {result.material_count} textures {result.material_texture_count}")
+    for name, action in result.sections.items():
+        print(f"section {name} {action['action']} old={action.get('old_sha256','')[:12]} out={action.get('output_sha256','')[:12]}")
+    manifest = json.loads(result.manifest.read_text(encoding="utf-8"))
+    print(f"cloth_chains {manifest.get('cloth_chains', 0)} cloth_hinges {manifest.get('cloth_hinges', 0)}")
+    append_ledger(
+        {
+            "at": utc(),
+            "command": "update-addon",
+            "result": "pass",
+            "source": str(source),
+            "addon": addon,
+            "output": str(result.root),
+            "old_vmdl": str(result.old_vmdl),
+            "new_vmdl": str(result.new_vmdl),
+            "vmdl_sha256": manifest.get("vmdl_sha256", ""),
+            "preserved_model": result.preserved_model,
+            "model_files": len(result.model_files),
+            "materials": result.material_count,
+            "material_textures": result.material_texture_count,
+            "sections": result.sections,
+            "cloth_chains": manifest.get("cloth_chains", 0),
+            "cloth_hinges": manifest.get("cloth_hinges", 0),
+        }
+    )
+    if args.compile:
+        log_path = ROOT / "logs" / "update-addon-compile.log"
+        try:
+            compiled = compile_stage(env, Path(args.out), addon, log_path=log_path)
+        except (CompileError, OSError, subprocess.TimeoutExpired) as error:
+            print(f"compile-failed: {error}", file=sys.stderr)
+            return 2
+        warnings = len(re.findall(r"RESOURCE COMPILE WARNING:", compiled.stdout + compiled.stderr))
+        append_ledger(
+            {
+                "at": utc(),
+                "command": "compile",
+                "result": "pass" if compiled.returncode == 0 else "fail",
+                "returncode": compiled.returncode,
+                "argv": compiled.command,
+                "warnings": warnings,
+                "stage": str(Path(args.out)),
+                "addon": addon,
+                "log": str(compiled.log),
+                "output": str(compiled.output) if compiled.output else "",
+                "compiled_files": [str(path) for path in compiled.compiled_files],
+                "content_addon": "",
+                "build_addon_removed": True,
+            }
+        )
+        print(f"compile returncode {compiled.returncode} files {len(compiled.compiled_files)} warnings {warnings}")
+        if compiled.returncode != 0:
+            print((compiled.stdout + "\n" + compiled.stderr)[-4000:], file=sys.stderr)
+            return compiled.returncode
+    return 0
+
+
 def cmd_gate(args: argparse.Namespace) -> int:
     checks = gate_checks()
     previous = {}
@@ -423,7 +537,11 @@ def cmd_selftest(args: argparse.Namespace) -> int:
     failures = []
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp) / "repo"
-        shutil.copytree(ROOT, root, ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc"))
+        shutil.copytree(
+            ROOT,
+            root,
+            ignore=shutil.ignore_patterns(".git", "artifacts", "dist", "__pycache__", "*.pyc"),
+        )
         bad = root / "forge" / "_bad.py"
         # Built at runtime so this negative control does not itself trip the source scan.
         bad.write_text("def parse_" + "kv3():\n    return None\n", encoding="utf-8")
@@ -487,6 +605,28 @@ def main(argv: list[str] | None = None) -> int:
     )
     p.add_argument("--custom-lod", action="append", default=[], help="generated LOD DMX in order; replaces the hero LOD slots")
     p.set_defaults(func=cmd_stage)
+
+    p = sub.add_parser(
+        "update-addon",
+        help="import an old addon VPK/folder and migrate it onto the live hero model",
+    )
+    p.add_argument("--source", required=True, help="old .vpk or addon content directory")
+    p.add_argument("--hero", default="", help="live hero slug; required unless --new-extraction is supplied")
+    p.add_argument("--out", required=True, help="migration output/stage root")
+    p.add_argument("--addon", default="", help="new addon folder name; defaults to <source>_updated")
+    p.add_argument("--new-extraction", default="", help="existing live S2V extraction root")
+    p.add_argument("--new-vmdl", default="", help="live vmdl inside --new-extraction")
+    p.add_argument("--model", choices=("auto", "old", "live"), default="auto")
+    p.add_argument(
+        "--preserve-section",
+        action="append",
+        default=[],
+        help="extra top-level modeldoc section to transplant; defaults to Softbody and PhysicsJointList",
+    )
+    p.add_argument("--no-materials", action="store_true", help="do not overlay the old material assets")
+    p.add_argument("--force", action="store_true", help="replace an existing output addon folder")
+    p.add_argument("--compile", action="store_true", help="compile the migrated stage with CSDK13")
+    p.set_defaults(func=cmd_update_addon)
 
     p = sub.add_parser("compile", help="invoke CSDK13 resourcecompiler")
     p.add_argument("--vmdl", default="", help="absolute vmdl path for a direct compile")
