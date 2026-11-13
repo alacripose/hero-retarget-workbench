@@ -1,6 +1,8 @@
 """Collection-scoped custom model parts and explicit material slot assignment."""
 from __future__ import annotations
 
+from pathlib import Path
+
 import bpy
 
 
@@ -151,16 +153,118 @@ def use_part(settings, index: int) -> bpy.types.Object:
     return obj
 
 
-def capture_import(context, path, imported: list[bpy.types.Object]) -> bpy.types.Collection:
-    """Put one import in its own collection so parts and materials can be scoped."""
-    name = f"DMF {path.stem or 'custom'}"
-    collection = bpy.data.collections.new(name)
+def capture_import(
+    context,
+    path,
+    imported: list[bpy.types.Object],
+    prefixes: list[str] | None = None,
+) -> bpy.types.Collection:
+    """Put one import in its own collection and give its parts their own names.
+
+    A port that follows another port arrives carrying the previous rig's names.
+    ``prefixes`` are the stale ones (this hero's body, the addon, the vmdl); a
+    part keeps its own word — body, head, hair — and loses the old owner.
+    """
+    from forge import naming
+
+    taken = {obj.name for obj in bpy.data.objects}
+    plan = naming.part_names([obj.name for obj in imported], list(prefixes or []))
+    for obj in imported:
+        target = plan.get(obj.name, {}).get("object")
+        if not target or target == obj.name:
+            continue
+        if target in taken:
+            # Another object already owns that name; Blender would suffix this one
+            # silently, which is exactly the kind of ghost name this avoids.
+            target = obj.name
+        taken.discard(obj.name)
+        taken.add(target)
+        obj.name = target
+        if obj.data is not None and obj.data.users == 1:
+            obj.data.name = target
+
+    collection = bpy.data.collections.new(naming.collection_name(path))
     context.scene.collection.children.link(collection)
     for obj in imported:
         for old in list(obj.users_collection):
             old.objects.unlink(obj)
         collection.objects.link(obj)
     return collection
+
+
+def name_model(settings) -> dict[str, int]:
+    """Apply the Model name to the imported collection, rig and parts.
+
+    Parts lose a stale prefix and keep their own word; the rig gets ``_rig`` so it
+    never shares a name with the mesh it deforms.
+    """
+    from pathlib import Path
+
+    from forge import naming
+
+    collection = settings.custom_collection
+    armature = settings.custom_armature
+    model = naming.sanitize(settings.custom_name)
+    if not model:
+        raise RuntimeError("model-name-missing: type a model name first")
+    renamed = 0
+    if collection is not None:
+        wanted = f"DMF {model}"
+        if collection.name != wanted:
+            collection.name = wanted
+            renamed += 1
+    if armature is not None:
+        wanted = f"{model}_rig"
+        if armature.name != wanted:
+            armature.name = wanted
+            if armature.data is not None and armature.data.users == 1:
+                armature.data.name = wanted
+            renamed += 1
+    prefixes = stale_prefixes(settings)
+    meshes = collection_meshes(collection) if collection is not None else []
+    plan = naming.part_names([obj.name for obj in meshes], prefixes)
+    for obj in meshes:
+        target = plan.get(obj.name, {}).get("object")
+        if not target or target == obj.name:
+            continue
+        obj.name = target
+        if obj.data is not None and obj.data.users == 1:
+            obj.data.name = target
+        renamed += 1
+    settings.custom_name = model
+    return {"renamed": renamed, "parts": len(meshes)}
+
+
+def stale_prefixes(settings) -> list[str]:
+    """Names a new import must not inherit: the hero, the addon, the vmdl.
+
+    ``shiv_body`` also contributes ``shiv``: a hero's body is usually named
+    ``<hero>_body``, so the hero's own name is the first token of it, and that is
+    the token a previous import leaves on every part it made.
+    """
+    rows: list[str] = []
+    for value in (
+        settings.target_body.name if settings.target_body is not None else "",
+        settings.target_armature.name if settings.target_armature is not None else "",
+        settings.addon_name,
+        Path(settings.vmdl).stem if settings.vmdl else "",
+        Path(settings.hero_model_path).stem if settings.hero_model_path else "",
+    ):
+        value = (value or "").strip()
+        if not value:
+            continue
+        rows.append(value)
+        head = value.split("_")[0]
+        if head and head != value and len(head) >= 4:
+            rows.append(head)
+    seen: set[str] = set()
+    unique: list[str] = []
+    for row in rows:
+        if row.lower() in seen:
+            continue
+        seen.add(row.lower())
+        unique.append(row)
+    return unique
 
 
 def _selected_source(settings) -> tuple[bpy.types.Material, str]:

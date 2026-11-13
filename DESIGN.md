@@ -91,3 +91,24 @@ side by side, so a material name and its slot index remain readable. Hints are
 short enough not to clip at that width. The primary actions are stacked full
 width; the check is the real-window screenshot at
 `artifacts/receipts/parts-panel.png`.
+
+## 2026-11-13 — Skeleton rules, ref pose and the Animations page
+
+Skeleton now opens with the map-wide controls before the per-row editor: Auto
+rules (three glyphs — Learn, Fill, Regex — and a native rule list showing
+`elbow* -> arm_lower*` with an on/off checkbox) and Ref pose (a Show toggle, a
+play glyph that applies it now, and a loop-back glyph that clears it, with the
+source stance as the section's detail). The rule list is two rows so the ref-pose
+controls stay inside one sidebar scroll at the default window height; the row
+editor, bone map and bone list follow in the same order as before.
+
+Animations is a folded page like Compare: a Clips card (`imported/total`), Scan /
+Import all / Stop glyphs, the folder field, a six-row native clip list with the
+kind on the right (`dmx`, `dmx_c`, `vnmclip`, `vnmskel`), the selected file's
+size and action, Import / Preview, a Prefix field with a rename glyph, Clear
+imported actions, and the state notes: compiled clips are listed and never
+opened, and DMX export is not wired into this page.
+
+Status wording follows the same rule as the rest of the surface: one short
+sentence naming what happened and what is left, and an ellipsis rather than a cut
+word when the bubble runs past its lines.

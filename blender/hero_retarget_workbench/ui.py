@@ -308,6 +308,9 @@ class DMF_PT_source(Panel):
         )
         custom.prop(settings, "custom_mesh", text="Mesh")
         custom.prop(settings, "custom_armature", text="Rig")
+        name_row = custom.row(align=True)
+        name_row.prop(settings, "custom_name", text="Name")
+        name_row.operator("dmf.apply_model_name", text="", icon="SORTALPHA")
         fit = custom.row(align=True)
         fit.prop(settings, "axis_preset", text="")
         fit.prop(settings, "fit_scale", text="")
@@ -475,6 +478,82 @@ class DMF_PT_parts_materials(Panel):
         actions.operator("dmf.clear_part_material", text="Clear selected slot", icon="REMOVE")
 
 
+class DMF_PT_animations(Panel):
+    bl_label = "Animations"
+    bl_idname = "DMF_PT_animations"
+    bl_parent_id = "DMF_PT_main"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        settings = context.scene.dmf
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+
+        imported = sum(1 for row in settings.clips if row.state == "IMPORTED")
+        box = ui_popit.title(
+            layout,
+            "Clips",
+            f"{imported}/{len(settings.clips)}" if settings.clips else "not scanned",
+            "ACTION",
+        )
+        ui_popit.glyphs(
+            box,
+            ["dmf.scan_clips", "dmf.import_clips", "dmf.cancel_clips"],
+            labels={"dmf.scan_clips": "Scan", "dmf.import_clips": "Import all", "dmf.cancel_clips": "Stop"},
+        )
+        _path_row(box, settings, "clips_dir", "Folder")
+        if not settings.clips:
+            _hint(
+                box,
+                "Point at the S2V extraction's clip folder, then scan it.",
+                "QUESTION",
+                width=30,
+            )
+            return
+
+        row = box.row()
+        row.template_list(
+            "DMF_UL_clips",
+            "",
+            settings,
+            "clips",
+            settings,
+            "clip_index",
+            rows=6,
+        )
+        index = max(0, min(settings.clip_index, len(settings.clips) - 1))
+        entry = settings.clips[index]
+        detail = box.column(align=True)
+        detail.label(text=_short(entry.name, 32), icon="FILE")
+        meta = detail.row(align=True)
+        meta.label(text=f"{entry.kind}{'_c' if entry.compiled else ''}")
+        right = meta.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=f"{entry.size:,} bytes")
+        if entry.action:
+            detail.label(text=f"action {_short(entry.action, 28)}", icon="ACTION")
+
+        actions = box.row(align=True)
+        actions.operator("dmf.import_clip", text="Import", icon="IMPORT")
+        actions.operator("dmf.preview_clip", text="Preview", icon="PLAY")
+        prefix = box.row(align=True)
+        prefix.prop(settings, "clip_prefix", text="Prefix")
+        prefix.operator("dmf.prefix_clips", text="", icon="SORTALPHA")
+        box.operator("dmf.clear_clips", text="Clear imported actions", icon="TRASH")
+        if settings.clip_note:
+            _hint(box, settings.clip_note, "LOCKED", width=30)
+        _hint(
+            box,
+            "Imported actions live in this .blend; export to DMX is not wired into this panel.",
+            "INFO",
+            width=30,
+        )
+
+
 class DMF_PT_compare(Panel):
     bl_label = "Compare"
     bl_idname = "DMF_PT_compare"
@@ -515,6 +594,57 @@ class DMF_PT_skeleton(Panel):
         top = layout.row(align=True)
         top.operator("dmf.scan_bones", text="Scan bone map", icon="FILE_REFRESH")
         top.prop(settings, "bone_filter", text="")
+
+        rules_box = _section(
+            layout,
+            "Auto rules",
+            "DRIVER",
+            f"{len(settings.bone_rules)} saved" if settings.bone_rules else "none yet",
+        )
+        ui_popit.glyphs(
+            rules_box,
+            ["dmf.learn_rules", "dmf.apply_rules", "dmf.add_rule"],
+            labels={"dmf.learn_rules": "Learn", "dmf.apply_rules": "Fill", "dmf.add_rule": "Regex"},
+        )
+        if settings.bone_rules:
+            list_row = rules_box.row()
+            list_row.template_list(
+                "DMF_UL_bone_rules",
+                "",
+                settings,
+                "bone_rules",
+                settings,
+                "bone_rule_index",
+                rows=2,
+            )
+            side = list_row.column(align=True)
+            side.operator("dmf.remove_rule", text="", icon="REMOVE")
+            side.operator("dmf.clear_rules", text="", icon="TRASH")
+            rule_index = max(0, min(settings.bone_rule_index, len(settings.bone_rules) - 1))
+            rule = settings.bone_rules[rule_index]
+            if rule.regex:
+                edit = rules_box.column(align=True)
+                edit.prop(rule, "source", text="Pattern")
+                edit.prop(rule, "target", text="Replace")
+                edit.prop(rule, "enabled", text="On")
+        else:
+            _hint(
+                rules_box,
+                "Mapping one side answers the other: elbow_L to arm_lower_L places elbow_R.",
+                "INFO",
+                width=30,
+            )
+
+        pose = _section(layout, "Ref pose", "ARMATURE_DATA", settings.pose_stance or "not read")
+        controls = pose.row(align=True)
+        controls.prop(settings, "pose_preview", text="Show", toggle=True)
+        controls.operator("dmf.pose_preview", text="", icon="PLAY")
+        controls.operator("dmf.pose_clear", text="", icon="LOOP_BACK")
+        if settings.pose_preview_error:
+            _hint(pose, settings.pose_preview_error, "ERROR", alert=True, width=30)
+        elif not settings.pose_preview:
+            _hint(pose, "Poses the custom rig in the hero's stance; the rest pose is not edited.", "INFO", width=30)
+
         if not settings.bone_map:
             _hint(layout, "No rows yet. Scan the custom rig or add a row.", "QUESTION", width=30)
             return
@@ -582,6 +712,7 @@ class DMF_PT_skeleton(Panel):
             chain = workbench.bone_chain(settings, chosen.name)
             if chain:
                 _hint(visual, " <- ".join(reversed(chain)), "FILE_PARENT", width=40)
+
 
 
 class DMF_PT_skeleton_bones(Panel):
@@ -830,6 +961,7 @@ CLASSES = (
     DMF_PT_parts_materials,
     DMF_PT_skeleton,
     DMF_PT_skeleton_bones,
+    DMF_PT_animations,
     DMF_PT_compare,
     DMF_PT_weights,
     DMF_PT_weights_manual,

@@ -31,9 +31,34 @@ def set_hero_items(heroes) -> None:
     HERO_ITEMS.extend((hero.slug, hero.title, hero.model_path) for hero in heroes)
 
 
+def _bone_target_changed(self, context) -> None:
+    """A typed target teaches its rule at once and places the mirror row.
+
+    Property callbacks cannot report an error to the user, so every failure is
+    swallowed here and surfaces on the next explicit action instead.
+    """
+    settings = getattr(getattr(context, "scene", None), "dmf", None)
+    if settings is None:
+        return
+    from . import poseview, rules
+
+    try:
+        rules.auto_fill(settings, self)
+    except Exception:
+        pass
+    try:
+        poseview.refresh(settings)
+    except Exception:
+        pass
+
+
 class DMF_BoneEntry(PropertyGroup):
     source: StringProperty(name="Source", description="Bone or vertex group on your model")
-    target: StringProperty(name="Target", description="Hero bone this source drives")
+    target: StringProperty(
+        name="Target",
+        description="Hero bone this source drives; typing one also answers its mirror",
+        update=_bone_target_changed,
+    )
     state: EnumProperty(
         name="State",
         description="What this map row does when the solver runs",
@@ -76,6 +101,21 @@ def _bone_map_toggle(_self, _context) -> None:
     hierarchy_view.invalidate()
 
 
+def _pose_preview_toggle(self, _context) -> None:
+    """Show or clear the hero's reference stance on the mapped custom bones."""
+    from . import poseview
+
+    try:
+        if self.pose_preview:
+            poseview.apply(self)
+            self.pose_preview_error = ""
+        else:
+            poseview.clear(self)
+            self.pose_preview_error = ""
+    except Exception as error:
+        self.pose_preview_error = str(error)
+
+
 class DMF_LodLevel(PropertyGroup):
     object: PointerProperty(
         name="LOD mesh",
@@ -85,6 +125,44 @@ class DMF_LodLevel(PropertyGroup):
     )
     level: IntProperty(name="Level", default=1, min=1)
     vertices: IntProperty(name="Vertices", default=0)
+
+
+class DMF_BoneRule(PropertyGroup):
+    """One pattern rule: a learned side rule, or a regex the user wrote."""
+
+    source: StringProperty(name="Pattern", description="Source stem for a side rule, regex otherwise")
+    target: StringProperty(name="Target", description="Target stem for a side rule, template otherwise")
+    regex: BoolProperty(name="Regex", description="Match the source as a regular expression", default=False)
+    side_aware: BoolProperty(
+        name="Side",
+        description="Take the side token from the source and write it into the target",
+        default=True,
+    )
+    origin: StringProperty(name="From", description="learned, builtin or regex", default="learned")
+    enabled: BoolProperty(name="On", description="Use this rule when filling rows", default=True)
+    support: IntProperty(name="Support", description="How many mapped rows agree with this rule", default=1)
+
+
+class DMF_ClipRow(PropertyGroup):
+    """One animation file found beside the hero extraction."""
+
+    name: StringProperty(name="File", default="")
+    label: StringProperty(name="Clip", default="")
+    kind: StringProperty(name="Kind", default="dmx")
+    compiled: BoolProperty(name="Compiled", default=False)
+    path: StringProperty(name="Path", subtype="FILE_PATH", default="")
+    size: IntProperty(name="Bytes", default=0)
+    action: StringProperty(name="Action", default="")
+    state: EnumProperty(
+        name="State",
+        items=[
+            ("EDITABLE", "Editable", "A decompiled DMX that can be imported"),
+            ("IMPORTED", "Imported", "Imported onto the hero rig as an action"),
+            ("FAILED", "Failed", "The import refused this file; the reason is in the status"),
+            ("OPAQUE", "Opaque", "Compiled game data or a skeleton; listed, never parsed"),
+        ],
+        default="EDITABLE",
+    )
 
 
 class DMF_HierarchyRow(PropertyGroup):
@@ -222,6 +300,47 @@ class DMF_Settings(PropertyGroup):
 
     bone_map: CollectionProperty(type=DMF_BoneEntry)
     bone_map_index: IntProperty(name="Bone map row", default=0)
+    bone_rules: CollectionProperty(
+        type=DMF_BoneRule,
+        description="Patterns learned from mapped rows, plus any regex rule you add",
+    )
+    bone_rule_index: IntProperty(name="Rule row", default=0)
+    pose_preview: BoolProperty(
+        name="Ref pose",
+        description=(
+            "Pose every mapped custom bone in the hero's reference stance, without editing "
+            "the rest pose or writing keys"
+        ),
+        default=False,
+        update=_pose_preview_toggle,
+    )
+    pose_preview_error: StringProperty(
+        name="Ref pose error",
+        description="Why the ref pose could not be applied, shown in Skeleton instead of failing silently",
+        default="",
+    )
+    pose_stance: StringProperty(name="Source stance", default="")
+    custom_name: StringProperty(
+        name="Model name",
+        description=(
+            "What this port is called. Imported parts are named from their own file, and a "
+            "prefix left over from the last rig is dropped"
+        ),
+        default="",
+    )
+    clips_dir: StringProperty(
+        name="Clip folder",
+        description=(
+            "Folder holding the animation DMX clips and their vnmclip pairs; blank uses the "
+            "hero extraction"
+        ),
+        subtype="DIR_PATH",
+    )
+    clips: CollectionProperty(type=DMF_ClipRow, description="Animation clips found in the clip folder")
+    clip_index: IntProperty(name="Clip row", default=0)
+    clip_prefix: StringProperty(name="Prefix", description="Prefix applied to imported action names", default="")
+    clip_note: StringProperty(name="Clip note", default="")
+    clip_imported: IntProperty(name="Imported clips", default=0)
     bone_filter: EnumProperty(
         name="Show",
         description="Filter the bone map without changing what the solver reads",
@@ -524,6 +643,8 @@ CLASSES = (
     DMF_Part,
     DMF_MaterialRow,
     DMF_LodLevel,
+    DMF_BoneRule,
+    DMF_ClipRow,
     DMF_HierarchyRow,
     DMF_Settings,
 )
