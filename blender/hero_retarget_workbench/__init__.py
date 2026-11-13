@@ -19,18 +19,28 @@ if (_PACKAGE / "_vendor").is_dir() and str(_PACKAGE / "_vendor") not in sys.path
 bl_info = {
     "name": "Hero Retarget Workbench",
     "author": "ala",
-    "version": (0, 3, 0),
+    "version": (0, 3, 1),
     "blender": (5, 4, 0),
     "location": "View3D > Sidebar > Deadlock",
     "description": "Fit and retarget a custom model onto a live Deadlock hero, then install the unchanged S2V vmdl as a CSDK13 addon",
     "category": "Import-Export",
 }
 
-from . import jobs, operators, properties, ui, ui_lists, weights, workbench  # noqa: E402
+from . import (  # noqa: E402
+    hierarchy_view,
+    jobs,
+    operators,
+    properties,
+    ui,
+    ui_lists,
+    weights,
+    workbench,
+)
 
 
 def register() -> None:
     properties.register()
+    hierarchy_view.register()
     workbench.register()
     operators.register()
     ui_lists.register()
@@ -42,6 +52,7 @@ def unregister() -> None:
     ui_lists.unregister()
     operators.unregister()
     workbench.unregister()
+    hierarchy_view.unregister()
     weights.unregister()
     jobs.unregister()
     properties.unregister()

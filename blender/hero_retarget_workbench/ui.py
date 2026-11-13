@@ -526,35 +526,71 @@ class DMF_PT_skeleton(Panel):
         _hint(layout, "Rest alignment changes the bind pose; rebind if the mesh already has weights.", "INFO")
 
         layout.separator()
-        tree = _section(layout, "Bone hierarchy", "OUTLINER_OB_ARMATURE", f"{len(settings.hierarchy)} bones")
-        if settings.target_armature is None:
-            _hint(tree, "Import the hero skeleton to read its bone tree.", "QUESTION", width=32)
-        elif not settings.hierarchy:
-            tree.operator("dmf.refresh_hierarchy", text="Read hierarchy", icon="FILE_REFRESH")
-            _hint(tree, "The tree is read from the rig; it never re-parents a bone.", "INFO", width=32)
-        else:
-            actions = tree.row(align=True)
-            actions.operator("dmf.refresh_hierarchy", text="Refresh", icon="FILE_REFRESH")
-            actions.operator("dmf.select_hierarchy_bone", text="Select bone", icon="RESTRICT_SELECT_OFF")
-            tree.template_list(
-                "DMF_UL_hierarchy",
-                "hierarchy",
-                settings,
-                "hierarchy",
-                settings,
-                "hierarchy_index",
-                rows=10,
+        mapped = bool(settings.show_bone_map and settings.target_armature is not None)
+        visual = _section(
+            layout,
+            "Bone map",
+            "VIEW3D",
+            f"{settings.bone_map_plane.lower()}, {len(settings.hierarchy)} bones" if mapped else "off",
+        )
+        controls = visual.row(align=True)
+        controls.prop(settings, "show_bone_map", text="Show map", toggle=True)
+        controls.prop(settings, "bone_map_plane", text="")
+        controls.prop(settings, "bone_map_labels", text="", icon="FONT_DATA")
+        pick = visual.row(align=True)
+        pick.operator("dmf.pick_bone_map", text="Pick a bone in the map", icon="MOUSE_LMB")
+        pick.operator("dmf.refresh_hierarchy", text="", icon="FILE_REFRESH")
+        if settings.bone_map_error:
+            _hint(
+                visual,
+                f"The bone map draw failed: {settings.bone_map_error}",
+                "ERROR",
+                alert=True,
+                width=34,
             )
+        elif settings.target_armature is None:
+            _hint(visual, "Import the hero skeleton; the map draws its rest positions.", "QUESTION", width=32)
+        elif not settings.show_bone_map:
+            _hint(
+                visual,
+                "Every bone head and tail is drawn where it actually sits, coloured by depth, with parent links between heads.",
+                "INFO",
+                width=34,
+            )
+        else:
+            _hint(
+                visual,
+                "Dots are joints and lines are bones. The selected bone is amber, its ancestors orange and its children teal.",
+                "INFO",
+                width=34,
+            )
+
+        if settings.hierarchy:
             index = max(0, min(settings.hierarchy_index, len(settings.hierarchy) - 1))
             chosen = settings.hierarchy[index]
-            summary = tree.row(align=True)
+            summary = visual.row(align=True)
             summary.label(text=_short(chosen.name, 24), icon="BONE_DATA")
             right = summary.row(align=True)
             right.alignment = "RIGHT"
             right.label(text=f"{chosen.children} children" if chosen.children else "leaf")
             chain = workbench.bone_chain(settings, chosen.name)
             if chain:
-                _hint(tree, "Chain: " + " <- ".join(reversed(chain)), "FILE_PARENT", width=34)
+                _hint(visual, "Chain: " + " <- ".join(reversed(chain)), "FILE_PARENT", width=34)
+
+        index_box = _section(layout, "Bone list", "OUTLINER_OB_ARMATURE", "index")
+        if not settings.hierarchy:
+            index_box.operator("dmf.refresh_hierarchy", text="Read bone list", icon="FILE_REFRESH")
+        else:
+            index_box.operator("dmf.select_hierarchy_bone", text="Select bone", icon="RESTRICT_SELECT_OFF")
+            index_box.template_list(
+                "DMF_UL_hierarchy",
+                "hierarchy",
+                settings,
+                "hierarchy",
+                settings,
+                "hierarchy_index",
+                rows=6,
+            )
 
 
 class DMF_PT_weights(Panel):

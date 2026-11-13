@@ -73,6 +73,38 @@ The owner's message, verbatim:
 - `python tools/project.py gate` passes (unit tests, compileall, no KV3 parser,
   no vmdl writes, blake3).
 
+## Correction 2026-11-13: an indented list is not a visual editor
+
+**Owner, verbatim:** *"and I swear to god a list tree for the visual heirarchy
+editor is literally the worst fucking thing you could have gone for, instead of
+something that actually displays bone positions relative to each other?"*
+
+Requirement 1 above was implemented as an indented name list. That is a text
+index, not a spatial view: it cannot show that a neck offset was folded into its
+parent, or that a bone hangs sideways off the wrong joint.
+
+The delivered surface is `hierarchy_view.py`: a bone map drawn as a POST_PIXEL
+overlay in the 3D viewport.
+
+- Every bone is drawn from its rest `head_local` to `tail_local`, projected on a
+  chosen plane (front/side/top), fitted into a card with one uniform scale so an
+  angle in the map is the angle in the rig (`forge/rigmap.layout`).
+- Heads are joints and get a dot; parent links are drawn between heads, which is
+  what makes a folded or re-pointed parent visible.
+- Colour carries depth (warm root, cool tips). The selected bone is amber, its
+  ancestors orange, its children teal; the chain is also printed as text.
+- `dmf.pick_bone_map` is a modal picker: hover highlights the joint under the
+  pointer, left click selects that bone in the rig, Esc cancels. It is an
+  editor, not a picture.
+- The map reports its own draw failure through `bone_map_error`, because a
+  raising POST_PIXEL handler otherwise repeats silently every frame.
+- The name list stays as a secondary index (`Bone list`) with the same selection.
+
+Evidence: `forge/rigmap.py` layout/hit-test unit tests (`tests/test_rigmap.py`,
+12 tests), the headless probe's placement/pick/draw assertions, and a real GUI
+render of the viewport overlay at
+`artifacts/hierarchy-diag/bone-map-viewport.png`.
+
 ## Remaining witness
 
 The real Export & stage run into a CSDK addon was not exercised here: it needs a

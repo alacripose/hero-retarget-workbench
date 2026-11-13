@@ -69,6 +69,13 @@ class DMF_MaterialRow(PropertyGroup):
     label: StringProperty(name="Label", default="")
 
 
+def _bone_map_toggle(_self, _context) -> None:
+    """Drop the cached bone-map layout so the next draw re-reads the rig."""
+    from . import hierarchy_view
+
+    hierarchy_view.invalidate()
+
+
 class DMF_LodLevel(PropertyGroup):
     object: PointerProperty(
         name="LOD mesh",
@@ -400,6 +407,36 @@ class DMF_Settings(PropertyGroup):
         description="Bone hierarchy of the hero skeleton, drawn depth first",
     )
     hierarchy_index: IntProperty(name="Bone row", default=0)
+    show_bone_map: BoolProperty(
+        name="Bone map",
+        description=(
+            "Draw the hero skeleton in the 3D viewport at its rest positions: every bone "
+            "head, tail and parent link, coloured by depth, clickable to select"
+        ),
+        default=False,
+        update=_bone_map_toggle,
+    )
+    bone_map_plane: EnumProperty(
+        name="Plane",
+        description="Which axis pair the bone map looks along",
+        items=[
+            ("FRONT", "Front", "Look along +Y: side-to-side against up"),
+            ("SIDE", "Side", "Look along +X: front-to-back against up"),
+            ("TOP", "Top", "Look along +Z: side-to-side against front-to-back"),
+        ],
+        default="FRONT",
+    )
+    bone_map_labels: BoolProperty(
+        name="All names",
+        description="Label every bone; without it only the selected bone, its chain and its children are named",
+        default=False,
+    )
+    bone_map_hover: StringProperty(name="Hovered bone", default="")
+    bone_map_error: StringProperty(
+        name="Bone map error",
+        description="Set when the bone map's draw handler fails, so a broken pass is visible instead of silent",
+        default="",
+    )
     addon_name: StringProperty(
         name="Addon name",
         description=(
