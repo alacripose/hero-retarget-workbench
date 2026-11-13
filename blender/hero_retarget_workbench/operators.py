@@ -80,8 +80,17 @@ class DMF_OT_detect_paths(Operator):
                 raise RuntimeError("Deadlock install not found. Choose the Steam Deadlock folder in Setup.")
             settings.deadlock_root = str(env.game_root)
             settings.build = f"{env.build} {env.version_date}".strip()
+            chosen_s2v = ""
             if env.s2v is not None:
+                chosen_s2v = str(settings.s2v_cli or "").strip()
                 settings.s2v_cli = str(env.s2v)
+            # A pick that pointed at the GUI still resolves to the CLI beside it;
+            # say so, because the field's value changed without the user asking.
+            swapped = (
+                env.s2v is not None
+                and chosen_s2v
+                and Path(chosen_s2v).name.lower() != env.s2v.name.lower()
+            )
             if env.csdk_root is not None:
                 settings.csdk_root = str(env.csdk_root)
             missing = [
@@ -92,10 +101,15 @@ class DMF_OT_detect_paths(Operator):
                 )
                 if value is None
             ]
+            note = f" (using {env.s2v.name} beside the chosen file)" if swapped else ""
             if missing:
-                _status(settings, f"Build {settings.build or 'unknown'}; set " + " and ".join(missing), "WARN")
+                _status(
+                    settings,
+                    f"Build {settings.build or 'unknown'}; set " + " and ".join(missing) + note,
+                    "WARN",
+                )
             else:
-                _status(settings, f"Build {settings.build or 'unknown'}; all tool paths found", "OK")
+                _status(settings, f"Build {settings.build or 'unknown'}; all tool paths found{note}", "OK")
         except Exception as error:
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))

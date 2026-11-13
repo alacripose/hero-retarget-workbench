@@ -80,17 +80,33 @@ class PathConfigurationTests(unittest.TestCase):
     def test_a_directory_may_be_chosen_for_the_viewer(self):
         self.assertEqual(paths.find_s2v(self.s2v.parent), self.s2v)
 
-    def test_the_viewer_gui_is_not_accepted_as_the_cli(self):
+    def test_a_gui_path_resolves_to_the_cli_beside_it(self):
         gui = self.s2v.with_name("Source2Viewer.exe")
         gui.write_bytes(b"gui")
-        self.assertIsNone(paths.find_s2v(gui))
+        self.assertEqual(paths.find_s2v(gui), self.s2v)
 
-    def test_gui_path_reports_a_specific_problem(self):
+    def test_a_gui_folder_without_a_cli_returns_nothing(self):
+        folder = self.root / "gui-only"
+        folder.mkdir()
+        gui = folder / "Source2Viewer.exe"
+        gui.write_bytes(b"gui")
+        self.assertIsNone(paths.find_s2v(folder))
+
+    def test_a_gui_pick_with_a_cli_beside_it_has_no_note(self):
         gui = self.s2v.with_name("Source2Viewer.exe")
+        gui.write_bytes(b"gui")
+        self.assertIsNone(paths.s2v_gui_note(gui))
+        self.assertIsNone(paths.s2v_gui_note(self.s2v))
+
+    def test_gui_only_path_reports_that_the_gui_has_no_cli_mode(self):
+        folder = self.root / "gui-only"
+        folder.mkdir()
+        gui = folder / "Source2Viewer.exe"
         gui.write_bytes(b"gui")
         env = paths.detect(deadlock_root=self.game, s2v_cli=gui, csdk_root=self.csdk)
         self.assertIsNone(env.s2v)
-        self.assertTrue(any("GUI selected" in item for item in env.problems))
+        self.assertTrue(any("GUI only" in item for item in env.problems))
+        self.assertTrue(any("Source2Viewer-CLI.exe" in item for item in env.problems))
 
     def test_personal_folders_are_not_candidates(self):
         home = self.root / "home"

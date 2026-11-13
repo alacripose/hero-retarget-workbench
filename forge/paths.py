@@ -183,18 +183,33 @@ def find_game(
 
 
 S2V_CLI_NAMES = ("Source2Viewer-CLI.exe", "Source2Viewer-CLI")
+S2V_GUI_NAMES = ("Source2Viewer.exe", "Source2Viewer")
+
+
+def _is_gui(path: Path) -> bool:
+    return path.name.lower() in {name.lower() for name in S2V_GUI_NAMES}
 
 
 def find_s2v(explicit: str | Path | None = None) -> Path | None:
+    """The Source 2 Viewer CLI, from the chosen path or beside it.
+
+    The GUI binary cannot run the extraction commands this addon sends, so it is
+    never returned as the CLI. It does ship beside the CLI, so a path that points
+    at the GUI still resolves: the CLI in the same folder is what the user meant.
+    """
     configured = explicit if explicit is not None else os.environ.get("S2V_CLI")
     if configured is not None and str(configured).strip():
         path = Path(configured).expanduser()
         if path.is_dir():
             return _file_candidate(path, S2V_CLI_NAMES)
-        # Source2Viewer.exe is the GUI. It accepts a double-click, but it does
-        # not perform the CLI extraction commands this addon sends.
-        if path.is_file() and path.name.lower() in {name.lower() for name in S2V_CLI_NAMES}:
-            return path
+        if path.is_file():
+            if path.name.lower() in {name.lower() for name in S2V_CLI_NAMES}:
+                return path
+            # A GUI path, or any other file in the install folder: look for the
+            # CLI that ships next to it instead of refusing the pick outright.
+            sibling = _file_candidate(path.parent, S2V_CLI_NAMES)
+            if sibling is not None:
+                return sibling
         return None
     for name in S2V_CLI_NAMES:
         found = shutil.which(name)
@@ -246,6 +261,28 @@ def read_build(game_dir: Path | None) -> tuple[str, str]:
     return values.get("ClientVersion", ""), values.get("VersionDate", "")
 
 
+def s2v_gui_note(configured: str | Path | None) -> str | None:
+    """Explain a path that only reaches the GUI, since the GUI cannot extract.
+
+    A pick that still resolves to a CLI (the file itself, its folder, or the CLI
+    beside it) has no note: only a path whose folder offers no CLI at all does.
+    """
+    if configured is None or not str(configured).strip():
+        return None
+    if find_s2v(configured) is not None:
+        return None
+    path = Path(str(configured)).expanduser()
+    folder = path if path.is_dir() else path.parent
+    gui = next((folder / name for name in S2V_GUI_NAMES if (folder / name).is_file()), None)
+    if gui is None and not _is_gui(path):
+        return None
+    shown = gui if gui is not None else path
+    return (
+        f"Source 2 Viewer GUI only at {shown}; the GUI has no CLI mode, "
+        "so choose Source2Viewer-CLI.exe in Setup or place it in that folder"
+    )
+
+
 def detect(
     *,
     deadlock_root: str | Path | None = None,
@@ -260,6 +297,10 @@ def detect(
         env.gameinfo = env.game_dir / "citadel" / "gameinfo.gi"
         env.build, env.version_date = read_build(env.game_dir)
     env.s2v = find_s2v(s2v_cli)
+    # find_s2v also reads S2V_CLI itself; the message below has to know that value
+    # too, or a headless run reports a bare "not found" for a path it was given.
+    if s2v_cli is None:
+        s2v_cli = os.environ.get("S2V_CLI")
     env.blender = find_blender(blender_exe)
     env.csdk_root, env.resourcecompiler, env.csdk_gameinfo = find_csdk(csdk_root)
     for name, path, configured in (
@@ -270,10 +311,9 @@ def detect(
     ):
         if path is None:
             detail = f" at {configured}" if configured is not None and str(configured).strip() else ""
-            if name == "Source 2 Viewer" and configured and Path(str(configured)).name.lower() == "source2viewer.exe":
-                env.problems.append(
-                    "Source 2 Viewer GUI selected; choose Source2Viewer-CLI.exe in Setup for VPK extraction"
-                )
+            gui = s2v_gui_note(configured) if name == "Source 2 Viewer" else None
+            if gui is not None:
+                env.problems.append(gui)
             else:
                 env.problems.append(f"{name} was not found{detail}")
     return env

@@ -196,15 +196,28 @@ def main() -> int:
         (csdk_fixture / "game" / "citadel" / "gameinfo.gi").write_text("gameinfo", encoding="utf-8")
 
         # The GUI accepts a double-click but does not run the addon's CLI
-        # extraction command. It must be rejected, not silently used.
+        # extraction command. A pick that points at it must resolve to the CLI
+        # beside it; a folder holding only the GUI must be refused with a reason.
         gui = temp / "Source2Viewer.exe"
         gui.write_bytes(b"gui")
         reloaded.s2v_cli = str(gui)
         result = bpy.ops.dmf.detect_paths()
         if "FINISHED" not in result:
             raise RuntimeError(f"detect_paths did not finish for the GUI: {result}")
-        if reloaded.status_kind != "WARN" or "Source2Viewer-CLI" not in reloaded.status:
-            raise RuntimeError(f"the GUI was not rejected: {reloaded.status}")
+        if reloaded.s2v_cli != expected_paths["s2v_cli"]:
+            raise RuntimeError(f"the GUI path did not resolve to the CLI beside it: {reloaded.s2v_cli!r}")
+        if "beside the chosen file" not in reloaded.status:
+            raise RuntimeError(f"the substitution was not reported: {reloaded.status!r}")
+
+        gui_only = temp / "gui-only"
+        gui_only.mkdir()
+        (gui_only / "Source2Viewer.exe").write_bytes(b"gui")
+        reloaded.s2v_cli = str(gui_only)
+        result = bpy.ops.dmf.detect_paths()
+        if "FINISHED" not in result:
+            raise RuntimeError(f"detect_paths did not finish for a GUI-only folder: {result}")
+        if reloaded.status_kind != "WARN" or "GUI" not in reloaded.status:
+            raise RuntimeError(f"a GUI-only folder was not refused: {reloaded.status!r}")
 
         reloaded.s2v_cli = expected_paths["s2v_cli"]
         result = bpy.ops.dmf.detect_paths()
