@@ -28,9 +28,16 @@ The owner's messages, verbatim:
 1. Export & stage installs the addon at
    `<csdk>/content/citadel_addons/<addon_name>`, where `<addon_name>` is the
    **Addon** field, so the addon exists in the CSDK itself.
-2. The destination root is the **Install root** field; blank means the CSDK13
-   root from Setup. A non-blank root is used as given (headless probes and the
-   CLI pass their own output folder).
+2. The destination root is the **Install root** field only when that folder is
+   itself a CSDK13 install; blank means the CSDK13 root from Setup. A value left
+   over from the old stage-folder contract is ignored, because installing where
+   the compiler and modeldoc never look is the failure this ticket exists to
+   remove. The panel prints the resolved addon path and warns when the field is
+   ignored.
+2b. The owner reported on 2026-11-13 that a stage left
+   `content/citadel_addons/thicc_mayu_v3` untouched; the CSDK addon folder still
+   carried its 2026-11-12 17:21 timestamps and no `stage.json`, so no workbench
+   stage had ever reached it.
 3. Staging merges into an existing addon folder. It overwrites only the files
    the stage owns and never deletes the folder, so other files in an addon the
    owner has open in modeldoc survive.

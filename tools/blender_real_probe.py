@@ -248,7 +248,9 @@ def main() -> int:
         # PulseSrcOps' export pushes an undo step; the addon re-fetches its
         # settings from the scene, and so must this probe.
         settings = bpy.context.scene.dmf
-        stage_root = stage / "content" / "citadel_addons" / addon
+        stage_root = (
+            Path(bpy.path.abspath(settings.stage_dir)) / "content" / "citadel_addons" / addon
+        )
         manifest_path = stage_root / "stage.json"
         staged_vmdl = stage_root / vmdl_relative
         staged_dmx = stage_root / target_relative

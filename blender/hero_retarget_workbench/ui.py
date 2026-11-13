@@ -7,9 +7,12 @@ and the exact refusal that blocks the handoff.
 from __future__ import annotations
 
 import textwrap
+from pathlib import Path
 
 import bpy
 from bpy.types import Panel
+
+from . import core
 
 
 _STATUS_ICONS = {
@@ -42,6 +45,13 @@ def _short(value: str, limit: int = 34) -> str:
     if len(text) <= limit:
         return text
     return text[: limit - 3].rstrip() + "..."
+
+
+def _tail(value: str, limit: int = 46) -> str:
+    text = " ".join((value or "").split())
+    if len(text) <= limit:
+        return text
+    return "..." + text[-(limit - 3):]
 
 
 def _hero_label(settings) -> str:
@@ -605,6 +615,25 @@ class DMF_PT_handoff(Panel):
             _hint(handoff, "No S2V vmdl is set. Choose it below if the extraction did not write one.", "STATUS_WARNING", alert=True)
         handoff.prop(settings, "addon_name", text="Addon")
         _path_row(handoff, settings, "stage_dir", "Install root (blank = CSDK13)")
+        configured = Path(bpy.path.abspath(settings.stage_dir)) if settings.stage_dir else None
+        install = settings.csdk_root if settings.csdk_root else ""
+        install_root = (
+            configured
+            if configured is not None and core.is_csdk_install(configured)
+            else (Path(bpy.path.abspath(install)) if install else None)
+        )
+        if install_root is not None:
+            handoff.label(
+                text=_tail(f"{install_root}\\content\\citadel_addons\\{settings.addon_name}"),
+                icon="FILE_FOLDER",
+            )
+        if configured is not None and install_root is not None and configured != install_root:
+            _hint(
+                handoff,
+                "Install root is not a CSDK13 install; Export & stage uses the CSDK13 root from Setup.",
+                "ERROR",
+                alert=True,
+            )
         handoff.label(text="Paths inside the addon", icon="FILE")
         handoff.prop(settings, "vmdl_relative", text="vmdl path")
         handoff.prop(settings, "target_dmx_relative", text="DMX path")

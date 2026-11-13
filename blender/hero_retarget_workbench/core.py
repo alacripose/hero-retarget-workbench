@@ -92,6 +92,14 @@ def detect_environment(settings, module=None):
     )
 
 
+def is_csdk_install(path) -> bool:
+    """True when the folder is a CSDK13 install, not an older stage folder."""
+    root = Path(path)
+    return (root / "game" / "bin" / "win64" / "resourcecompiler.exe").is_file() or (
+        (root / "content" / "citadel_addons").is_dir() and (root / "game" / "citadel").is_dir()
+    )
+
+
 def env(settings):
     detected = detect_environment(settings)
     if detected.game_root:
