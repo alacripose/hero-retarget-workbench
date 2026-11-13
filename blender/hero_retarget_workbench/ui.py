@@ -16,7 +16,7 @@ from pathlib import Path
 
 import bpy
 from bpy.types import Panel
-from forge import stageflow
+from forge import paths, stageflow
 
 from . import core, ui_popit, workbench
 
@@ -256,6 +256,9 @@ class DMF_PT_setup(Panel):
         live = _section(layout, "Live game", "WORLD", _short(settings.build, 24) or "not detected")
         live.prop(settings, "deadlock_root", text="Install")
         live.prop(settings, "s2v_cli", text="S2V CLI")
+        gui_note = paths.s2v_gui_note(settings.s2v_cli)
+        if gui_note:
+            _hint(live, gui_note, "ERROR", alert=True, width=30)
         ui_popit.glyphs(live, ["dmf.detect_paths"], labels={"dmf.detect_paths": "Detect"})
 
         csdk = _section(layout, "CSDK13", "PACKAGE", "compiler")
