@@ -412,6 +412,8 @@ section. The compiled tree is installed at
 `Reduced_CSDK_13/content/citadel_addons/mayu_updated`. An agent-run retail
 launch on 2026-11-13 mounted the packed VPK and rendered the Mayu model with
 the dangling key/cloth moving in Sandbox; rear-view captures are in
-`artifacts/mayu-launch/`. The old material set still emits 50 inherited
-`g_tAltColor_Reveal` texture warnings, and the old reveal clip is absent;
-owner visual acceptance is still pending. See `TICKET-0009`.
+`artifacts/mayu-launch/`. The current run still emits 50
+`g_tAltColor_Reveal` texture warnings from the old source material paths; the
+old compiled addon was not run side by side, so the warning is not proven
+inherited. The old reveal clip is absent. Owner visual acceptance is still
+pending. See `TICKET-0009`.

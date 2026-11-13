@@ -124,9 +124,12 @@ no old model is being merged.
 - The material warning is recorded, not erased: 50
   `Texture g_tAltColor_Reveal doesn't exist` lines occur for the old
   `hair`/`body`/`head`/`lenses` vmats. The old source vmat carries the same
-  stale derived-texture path, and the base body/head/hair textures render in
-  the captures. The old `models/heroes_wip/doorman_v2/clips/ui_hero_reveal.vnmclip_c`
-  is also absent from the old addon; the client logs `ERROR_FILEOPEN` for it.
+  stale derived-texture path, while the old compiled VPK's body vmat references
+  `b554dcea` and that texture is present. The old compiled addon was not run
+  side by side, so the warning is not proven inherited; the base body/head/hair
+  textures render in the captures. The old
+  `models/heroes_wip/doorman_v2/clips/ui_hero_reveal.vnmclip_c` is also absent
+  from the old addon; the client logs `ERROR_FILEOPEN` for it.
 - Full witness: `artifacts/mayu-launch/launch-report.json`; script:
   `artifacts/mayu-launch/record_launch.py`. The row `command: launch` in the
   ledger carries the hashes and observed lines.
@@ -137,6 +140,7 @@ An agent-run launch and render observation is recorded above; the owner's visual
 acceptance is still separate. The current captures are rear views because the
 retail third-person camera stayed behind the hero. The compile and the control
 compile prove the `.vmdl_c` changed when `Softbody` was removed; they are not a
-render witness. The inherited alt-reveal texture warnings and missing old
+render witness. The current-run alt-reveal texture warnings and missing old
 reveal clip remain named material limitations, not migration failures claimed
-as clean.
+as clean; the old compiled addon was not run side by side to attribute the
+warnings.
