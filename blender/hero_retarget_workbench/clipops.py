@@ -1,12 +1,18 @@
-"""Clip import: bring an extraction's animation DMX files onto the hero rig.
+"""Clip import and write-back: animation DMX onto the hero rig, and back out.
 
 The queue is driven by a Blender timer, one file per step, so a folder of several
 hundred clips does not lock the interface and the progress line stays truthful.
 Each imported clip records the action PulseSrcOps created for it, which is what
-the prefix, preview and clear actions work from afterwards.
+the prefix, preview, export and clear actions work from afterwards.
+
+Writing a clip is one PulseSrcOps animation export per row: the armature is the
+only exportable, the action filter names that one action, and PulseSrcOps writes
+``<root>/anims/<action>.dmx``. The action, the export list and the scene's export
+settings are saved and put back, so an export never becomes the file's state.
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import bpy
@@ -15,8 +21,9 @@ from forge import clips as clipscan
 
 from . import core, proofing
 
-_QUEUE: list[str] = []
+_QUEUE: list[int] = []
 _TIMER = None
+_MODE = "import"
 _STEP_SECONDS = 0.05
 
 
@@ -98,25 +105,215 @@ def _tick():
     if index >= len(settings.clips):
         return _STEP_SECONDS
     entry = settings.clips[index]
+    exporting = _MODE == "export"
     try:
-        _import_one(settings, entry)
-        settings.clip_imported += 1
-        core.set_status(settings, f"Imported {entry.label}; {len(_QUEUE)} left", "BUSY")
+        if exporting:
+            written = write_action(settings, entry, write_folder(settings))
+            settings.clip_written += 1
+            core.set_status(
+                settings,
+                f"Wrote {written.name} ({entry.export_bytes:,} bytes); {len(_QUEUE)} left",
+                "BUSY",
+            )
+        else:
+            _import_one(settings, entry)
+            settings.clip_imported += 1
+            core.set_status(settings, f"Imported {entry.label}; {len(_QUEUE)} left", "BUSY")
     except Exception as error:
         entry.state = "FAILED"
-        entry.action = ""
+        if not exporting:
+            entry.action = ""
         settings.clip_note = str(error)
         core.set_status(settings, f"{entry.label}: {error}", "WARN")
     if not _QUEUE:
-        done = settings.clip_imported
         failed = sum(1 for row in settings.clips if row.state == "FAILED")
-        core.set_status(
-            settings,
-            f"Imported {done} clips as actions; {failed} failed",
-            "OK" if not failed else "WARN",
-        )
+        if exporting:
+            core.set_status(
+                settings,
+                f"Wrote {settings.clip_written} clips to {write_folder(settings)}; {failed} failed",
+                "OK" if not failed else "WARN",
+            )
+        else:
+            core.set_status(
+                settings,
+                f"Imported {settings.clip_imported} clips as actions; {failed} failed",
+                "OK" if not failed else "WARN",
+            )
         _stop()
     return _STEP_SECONDS
+
+
+def write_folder(settings) -> Path:
+    """The folder written clips go to; an empty field means ``<clip folder>/edited``."""
+    root = clipscan.export_folder(folder(settings), settings.clip_export_dir or None)
+    if root is None:
+        raise RuntimeError(
+            "clip-export-folder-missing: set the clip folder or a write folder first"
+        )
+    return Path(bpy.path.abspath(str(root)))
+
+
+def _snapshot(scene, armature) -> dict:
+    data = armature.animation_data
+    return {
+        "export_path": scene.vs.export_path,
+        "export_format": scene.vs.export_format,
+        "engine": scene.vs.engine,
+        "dmx_format": scene.vs.dmx_format,
+        "dmx_encoding": scene.vs.dmx_encoding,
+        "export_list": [
+            (row.name, row.ob_type, getattr(row, "icon", ""), row.obj, row.collection)
+            for row in scene.vs.export_list
+        ],
+        "action_selection": armature.data.vs.action_selection,
+        "action_filter": armature.vs.action_filter,
+        "subdir": armature.vs.subdir,
+        "vs_export": armature.vs.export,
+        "frame": scene.frame_current,
+        "action": data.action if data is not None else None,
+        "slot": data.action_slot if data is not None else None,
+    }
+
+
+def _restore(scene, armature, saved: dict) -> None:
+    for key in ("export_path", "export_format", "engine", "dmx_format", "dmx_encoding"):
+        setattr(scene.vs, key, saved[key])
+    scene.vs.export_list.clear()
+    for name, ob_type, icon, obj, collection in saved["export_list"]:
+        row = scene.vs.export_list.add()
+        row.name = name
+        row.ob_type = ob_type
+        if icon:
+            row.icon = icon
+        if obj is not None:
+            row.obj = obj
+        if collection is not None:
+            row.collection = collection
+    armature.data.vs.action_selection = saved["action_selection"]
+    armature.vs.action_filter = saved["action_filter"]
+    armature.vs.subdir = saved["subdir"]
+    armature.vs.export = saved["vs_export"]
+    data = armature.animation_data
+    if data is not None:
+        data.action = saved["action"]
+        if saved["action"] is not None and saved["slot"] is not None:
+            try:
+                data.action_slot = saved["slot"]
+            except (TypeError, ValueError):
+                pass
+    try:
+        scene.frame_set(saved["frame"])
+    except (TypeError, ValueError):
+        pass
+
+
+def _dmx_files(root: Path) -> dict[Path, int]:
+    if not root.is_dir():
+        return {}
+    found = {}
+    for path in root.rglob("*.dmx"):
+        try:
+            found[path] = path.stat().st_mtime_ns
+        except OSError:
+            continue
+    return found
+
+
+def write_action(settings, entry, destination: Path) -> Path:
+    """Write one imported action back to ``<destination>/anims/<label>.dmx``."""
+    armature = _armature(settings)
+    action = bpy.data.actions.get(entry.action) if entry.action else None
+    if action is None:
+        raise RuntimeError(
+            f"clip-not-imported: {entry.label} has no action; import it before writing it out"
+        )
+    scene = bpy.context.scene
+    if not hasattr(armature, "vs") or not hasattr(scene, "vs"):
+        raise RuntimeError("clip-export-needs-pulsesrcops: enable the PulseSrcOps extension")
+    target = clipscan.written_path(destination, entry.label)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    before = _dmx_files(target.parent)
+    saved = _snapshot(scene, armature)
+    try:
+        # An armature is an animation export only when it is the whole export and
+        # its action selection is not CURRENT; FILTERED_ACTIONS writes one file per
+        # action name the filter matches, which this narrows to exactly this one.
+        armature.data.vs.action_selection = "FILTERED_ACTIONS"
+        armature.vs.action_filter = clipscan.glob_escape(action.name)
+        armature.vs.subdir = "anims"
+        armature.vs.export = True
+        data = armature.animation_data or armature.animation_data_create()
+        data.action = action
+        if getattr(action, "slots", None):
+            data.action_slot = action.slots[0]
+        scene.vs.export_path = str(destination) + os.sep
+        scene.vs.export_format = "DMX"
+        scene.vs.engine = "SOURCE"
+        scene.vs.dmx_format = "22_modeldoc"
+        scene.vs.dmx_encoding = "3"
+        scene.vs.export_list.clear()
+        row = scene.vs.export_list.add()
+        row.name = armature.name
+        row.ob_type = "OBJECT"
+        row.icon = "ARMATURE"
+        row.obj = armature
+        core.select_only(bpy.context, [armature])
+        # PulseSrcOps rolls back an undo step in its finally block; debug_value > 1
+        # makes it skip that, the same guard the model export uses.
+        old_debug_value = bpy.app.debug_value
+        bpy.app.debug_value = max(2, old_debug_value)
+        try:
+            result = bpy.ops.export_scene.smd(object_name=armature.name)
+        finally:
+            bpy.app.debug_value = old_debug_value
+        if "FINISHED" not in result:
+            raise RuntimeError(f"clip-export-refused: PulseSrcOps did not finish {entry.label}")
+    finally:
+        fresh_scene = getattr(bpy.context, "scene", scene)
+        restored = bpy.data.objects.get(armature.name) or armature
+        _restore(fresh_scene, restored, saved)
+    after = _dmx_files(target.parent)
+    fresh = [path for path, stamp in after.items() if before.get(path) != stamp]
+    if not fresh:
+        raise RuntimeError(f"clip-export-empty: PulseSrcOps wrote no DMX for {entry.label}")
+    chosen = next((path for path in fresh if path.stem == action.name), None)
+    if chosen is None:
+        chosen = max(fresh, key=lambda path: path.stat().st_size)
+    if chosen != target:
+        # The file has to carry the clip's own name: that stem is what the
+        # animgraph and the vnmclip it replaces refer to.
+        if target.exists():
+            target.unlink()
+        chosen.replace(target)
+        chosen = target
+    if not chosen.is_file() or chosen.stat().st_size == 0:
+        raise RuntimeError(f"clip-export-empty: {chosen.name} is empty")
+    entry.exported = str(chosen)
+    entry.export_bytes = chosen.stat().st_size
+    entry.state = "WRITTEN"
+    return chosen
+
+
+def start_export(settings, only_index: int | None = None) -> int:
+    """Queue the imported clips that can be written out; returns how many were queued."""
+    global _QUEUE, _TIMER, _MODE
+    _armature(settings)
+    write_folder(settings)
+    if only_index is not None:
+        rows = [only_index]
+    else:
+        rows = [
+            index
+            for index, row in enumerate(settings.clips)
+            if row.action and row.state in ("IMPORTED", "WRITTEN", "FAILED")
+        ]
+    if not rows:
+        raise RuntimeError("clip-export-empty: import a clip before writing one out")
+    _QUEUE = list(rows)
+    _MODE = "export"
+    if _TIMER is None:
+        _TIMER = bpy.app.timers.register(_tick, first_interval=0.0, persistent=True)
+    return len(_QUEUE)
 
 
 def _settings():
@@ -175,8 +372,11 @@ def clear_imported(settings) -> int:
             bpy.data.actions.remove(action)
             removed += 1
         row.action = ""
+        row.exported = ""
+        row.export_bytes = 0
         row.state = "EDITABLE" if row.kind == "dmx" and not row.compiled else "OPAQUE"
     settings.clip_imported = 0
+    settings.clip_written = 0
     return removed
 
 
@@ -325,6 +525,42 @@ class DMF_OT_preview_clip(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_export_clips(Operator):
+    bl_idname = "dmf.export_clips"
+    bl_label = "Write All Clips"
+    bl_description = "Write every imported action back to an animation DMX, one file per timer step"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            queued = start_export(settings)
+        except Exception as error:
+            core.set_status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        core.set_status(settings, f"Writing {queued} clips to {write_folder(settings)}", "BUSY")
+        return {"FINISHED"}
+
+
+class DMF_OT_export_clip(Operator):
+    bl_idname = "dmf.export_clip"
+    bl_label = "Write Clip"
+    bl_description = "Write the selected clip's action back to an animation DMX"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        if not settings.clips:
+            self.report({"ERROR"}, "Scan a clip folder first")
+            return {"CANCELLED"}
+        try:
+            start_export(settings, only_index=settings.clip_index)
+        except Exception as error:
+            core.set_status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
 CLASSES = (
     DMF_OT_scan_clips,
     DMF_OT_import_clips,
@@ -333,6 +569,8 @@ CLASSES = (
     DMF_OT_prefix_clips,
     DMF_OT_clear_clips,
     DMF_OT_preview_clip,
+    DMF_OT_export_clips,
+    DMF_OT_export_clip,
 )
 
 

@@ -84,3 +84,9 @@ manual rule panel, not an opinion about hero skeletons. The lexicon is deleted.
 - Cloth chain / cloth mesh / cloth proxy remain unavailable as rule targets:
   the map has mapped bones, extras and ignored rows only, and the panel does not
   offer a target the addon cannot carry.
+
+## Closed by 0.5.0
+
+The write-back half this ticket left out is built and probed in `TICKET-0016`:
+an imported action can be written to `<folder>/anims/<clip>.dmx` and re-imports at
+the same length. The `vnmclip` compile remains out of scope there and here.

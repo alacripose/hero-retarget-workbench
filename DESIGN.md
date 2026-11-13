@@ -127,3 +127,16 @@ Rows read `elbow* -> arm_lower*`, `Sp_Hi_Mskirt* -> extra`, or
 `learned`), and each row has an on/off checkbox so a rule can be parked without
 being deleted. Pattern, target and state are ordinary native fields; Regex, Side
 and On are three toggles on one row.
+
+## 2026-11-13 — Animations: the write-back card (0.5.0)
+
+The Animations page keeps one card. Above the list: Scan / Import all / Stop.
+Below the list and the row detail: the row's own verbs (Import, Preview, Write),
+the prefix field, then a **Write back** micro-section with the folder field,
+Write all / Stop and the written count. The page's one message now states where a
+write lands — `<folder>/anims/<clip>.dmx`, the extraction's own clips untouched,
+the vnmclip untouched — instead of the old "export is not wired" line.
+
+The list row carries the state: `dmx` editable, a check for imported, an export
+arrow for written, an error for failed, a lock for the compiled files that are
+never parsed.

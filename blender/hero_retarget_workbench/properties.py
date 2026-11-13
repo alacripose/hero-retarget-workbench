@@ -167,12 +167,15 @@ class DMF_ClipRow(PropertyGroup):
     path: StringProperty(name="Path", subtype="FILE_PATH", default="")
     size: IntProperty(name="Bytes", default=0)
     action: StringProperty(name="Action", default="")
+    exported: StringProperty(name="Written", subtype="FILE_PATH", default="")
+    export_bytes: IntProperty(name="Written bytes", default=0)
     state: EnumProperty(
         name="State",
         items=[
             ("EDITABLE", "Editable", "A decompiled DMX that can be imported"),
             ("IMPORTED", "Imported", "Imported onto the hero rig as an action"),
-            ("FAILED", "Failed", "The import refused this file; the reason is in the status"),
+            ("WRITTEN", "Written", "The action was written back out as an animation DMX"),
+            ("FAILED", "Failed", "The import or write refused this file; the reason is in the status"),
             ("OPAQUE", "Opaque", "Compiled game data or a skeleton; listed, never parsed"),
         ],
         default="EDITABLE",
@@ -350,11 +353,21 @@ class DMF_Settings(PropertyGroup):
         ),
         subtype="DIR_PATH",
     )
+    clip_export_dir: StringProperty(
+        name="Write folder",
+        description=(
+            "Folder the written clips go under; blank writes to <clip folder>/edited, never over "
+            "the extraction itself"
+        ),
+        subtype="DIR_PATH",
+        default="",
+    )
     clips: CollectionProperty(type=DMF_ClipRow, description="Animation clips found in the clip folder")
     clip_index: IntProperty(name="Clip row", default=0)
     clip_prefix: StringProperty(name="Prefix", description="Prefix applied to imported action names", default="")
     clip_note: StringProperty(name="Clip note", default="")
     clip_imported: IntProperty(name="Imported clips", default=0)
+    clip_written: IntProperty(name="Written clips", default=0)
     bone_filter: EnumProperty(
         name="Show",
         description="Filter the bone map without changing what the solver reads",
