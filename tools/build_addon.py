@@ -26,6 +26,7 @@ DEFAULT_OUT = ROOT / "dist"
 REQUIRED = (
     "__init__.py",
     "core.py",
+    "hierarchy_view.py",
     "jobs.py",
     "operators.py",
     "parts.py",
@@ -46,6 +47,7 @@ REQUIRED = (
     "forge/names.py",
     "forge/paths.py",
     "forge/proof.py",
+    "forge/rigmap.py",
     "forge/stage.py",
     "forge/weights.py",
 )

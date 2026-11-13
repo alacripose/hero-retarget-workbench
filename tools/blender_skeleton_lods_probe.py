@@ -53,6 +53,54 @@ def _cube(name: str, x: float, collection, armature) -> bpy.types.Object:
     return obj
 
 
+class _Region:
+    x = 0
+    y = 0
+    width = 640
+    height = 900
+
+
+class _Context:
+    def __init__(self, scene):
+        self.scene = scene
+        self.region = _Region()
+
+
+def _bone_map_probe(settings, armature) -> None:
+    """The map must place bones where they sit in the rig and be clickable."""
+    from hero_retarget_workbench import hierarchy_view
+
+    settings.show_bone_map = True
+    assert hierarchy_view._HANDLER is not None, "the draw handler was not registered"
+    context = _Context(bpy.context.scene)
+    placed = hierarchy_view.placed_for(context, settings, context.region)
+    assert set(placed) == {bone.name for bone in armature.data.bones}, set(placed)
+    assert placed["head"].head[1] > placed["spine_0"].head[1] > placed["root_motion"].head[1], placed
+    x0, y0, width, height = hierarchy_view.card_rect(context.region)
+    for item in placed.values():
+        for point in (item.head, item.tail):
+            assert x0 <= point[0] <= x0 + width, (item.name, point, x0, width)
+            assert y0 <= point[1] <= y0 + height, (item.name, point, y0, height)
+
+    target = placed["neck_0_TWIST"].head
+    window_x = context.region.x + target[0] + 2.0
+    window_y = context.region.y + target[1] - 2.0
+    picked = hierarchy_view.hit_test(context, window_x, window_y, limit=8.0, region=context.region)
+    assert picked == "neck_0_TWIST", picked
+    print(f"BONE_MAP placed={len(placed)} picked={picked}")
+
+    try:
+        import gpu
+        import traceback
+
+        gpu.init()
+        hierarchy_view._draw(context)
+    except Exception:  # Drawing needs a GPU; the traceback names the failing call.
+        print("BONE_MAP draw_traceback\n" + traceback.format_exc())
+    hierarchy_view.draw(None, context)
+    print(f"BONE_MAP draw_error={settings.bone_map_error!r}")
+
+
 def _purge_probe(settings) -> None:
     """The export cleanup must remove what an export created and nothing else."""
     from hero_retarget_workbench import operators
@@ -152,6 +200,7 @@ def main() -> int:
     assert not [obj for obj in bpy.data.objects if obj.name.startswith("DMF LOD")]
     print("LODS cleared")
 
+    _bone_map_probe(settings, armature)
     _purge_probe(settings)
 
     assert hasattr(bpy.types, "DMF_UL_hierarchy")
