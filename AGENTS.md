@@ -463,3 +463,16 @@ and animations automatically …"* Contract: `TICKET-0016`. This supersedes the
   Receipt: `artifacts/receipts/clip-export.json`.
 - Still unproven: no game animgraph/`.vnmclip` compile was run from a written clip,
   and no clip from the owner's own extraction has been round-tripped yet.
+
+### Probe collision: an installed copy shadows `forge`
+
+A probe that needs PulseSrcOps cannot use `--factory-startup` (the extension is
+not enabled there). Running with the owner's preferences puts the previously
+installed addon's package folder on `sys.path`, so `import forge` resolved to
+`.../scripts/addons/hero_retarget_workbench/forge` (0.4.0, no `written_path`) and
+the probe failed against code that was not in this repo. `blender_clip_export_probe.py`
+therefore disables every installed module ending in `hero_retarget_workbench`,
+removes those `sys.path` entries, drops the `forge*` modules already loaded from
+them, and asserts `forge.clips.__file__` is under the repo before it claims a
+pass. Any future probe that enables PulseSrcOps must do the same or its evidence
+is about the installed zip.
