@@ -409,5 +409,9 @@ compiled `doorman.vmdl_c` is 5,470,101 bytes. A control compile with the
 the compiler retained the cloth data rather than ignoring the transplanted
 section. The compiled tree is installed at
 `Reduced_CSDK_13/game/citadel_addons/mayu_updated` and the source tree at
-`Reduced_CSDK_13/content/citadel_addons/mayu_updated`. Owner launch/render
-witness is still pending; see `TICKET-0009`.
+`Reduced_CSDK_13/content/citadel_addons/mayu_updated`. An agent-run retail
+launch on 2026-11-13 mounted the packed VPK and rendered the Mayu model with
+the dangling key/cloth moving in Sandbox; rear-view captures are in
+`artifacts/mayu-launch/`. The old material set still emits 50 inherited
+`g_tAltColor_Reveal` texture warnings, and the old reveal clip is absent;
+owner visual acceptance is still pending. See `TICKET-0009`.
