@@ -162,6 +162,25 @@ def main() -> int:
         "Sp_Hi_Mskirt0_B_01": "EXTRA",
     }, checks["skirt_states"]
 
+    # --- scan applies the rules, and keeps what the user chose ----------
+    rows["Sp_Hi_Mskirt0_B_00"].state = "IGNORED"
+    rows["Sp_Hi_Mskirt0_B_00"].target = ""
+    rows["elbow_L"].target = "arm_lower_L"
+    scanned_again = dmf.workbench.scan_bone_map(settings)
+    again = {entry.source: entry for entry in settings.bone_map}
+    checks["rescan_rows"] = scanned_again
+    checks["rescan_shoulder"] = (again["shoulder_L"].state, again["shoulder_L"].target)
+    checks["rescan_skirt_01"] = (again["Sp_Hi_Mskirt0_B_01"].state, again["Sp_Hi_Mskirt0_B_01"].note)
+    checks["rescan_skirt_00"] = (again["Sp_Hi_Mskirt0_B_00"].state, again["Sp_Hi_Mskirt0_B_00"].target)
+    checks["rescan_mirror"] = (again["elbow_R"].state, again["elbow_R"].target)
+    checks["rescan_pelvis"] = (again["pelvis"].state, again["pelvis"].target)
+    assert checks["rescan_shoulder"] == ("MAPPED", "arm_upper_L"), checks["rescan_shoulder"]
+    assert checks["rescan_skirt_01"][0] == "EXTRA", checks["rescan_skirt_01"]
+    assert checks["rescan_skirt_00"] == ("IGNORED", ""), checks["rescan_skirt_00"]
+    assert checks["rescan_mirror"] == ("MAPPED", "arm_lower_R"), checks["rescan_mirror"]
+    assert checks["rescan_pelvis"] == ("MAPPED", "pelvis"), checks["rescan_pelvis"]
+    rows = again
+
     # --- stance: the source is level, the hero is lowered ---------------
     checks["source_stance"] = dmf.poseview.stance(settings)
     saved = settings.custom_armature
@@ -252,4 +271,14 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    # Blender exits 0 when a --python script raises, unless the script says
+    # otherwise: a failed assertion has to fail the probe, not look like a pass.
+    try:
+        raise SystemExit(main())
+    except SystemExit:
+        raise
+    except Exception:
+        import traceback
+
+        traceback.print_exc()
+        raise SystemExit(1)

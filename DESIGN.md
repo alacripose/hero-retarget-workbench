@@ -140,3 +140,12 @@ the vnmclip untouched — instead of the old "export is not wired" line.
 The list row carries the state: `dmx` editable, a check for imported, an export
 arrow for written, an error for failed, a lock for the compiled files that are
 never parsed.
+
+## 2026-11-13 — Scan is the map's live preview (0.5.1)
+
+**Scan bone map** is the one press that shows what the solver would read: exact
+and normalized name matches, then the user's rules. It rebuilds only the map
+rows — no object, rest pose, weight or key is touched — and it keeps any row whose
+state or target differs from what the last scan or rule pass wrote there. The
+page says that in one line under the button, and the status line separates what
+the names answered from what the rules did (`12 mapped (4 by rules)`).

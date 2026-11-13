@@ -476,3 +476,30 @@ removes those `sys.path` entries, drops the `forge*` modules already loaded from
 them, and asserts `forge.clips.__file__` is under the repo before it claims a
 pass. Any future probe that enables PulseSrcOps must do the same or its evidence
 is about the installed zip.
+
+## 2026-11-13 — 0.5.1: Scan shows what the rules answer
+
+**Owner request, verbatim:** *"okay also when I'm using the auto bones mapping
+from the rules the skeleton mapping panel should update either when I press scan
+bone map non destructively so I can see that the bones are mapped"*
+
+- `workbench.scan_bone_map` now runs `rules.fill` after its exact/normalized
+  match, so one press of **Scan bone map** shows the map the solver would read:
+  name matches first, then every rule the user wrote. The status line separates
+  the two (`N mapped (M by rules)`).
+- The scan is non-destructive in the sense the owner asked for: it touches no
+  object, rest pose, weight or key, and it no longer throws away a row the user
+  answered. Every map row records what the last scan or rule pass wrote
+  (`scanned`, `scanned_state`); a row whose state or target differs from that is
+  the user's own decision, so it survives the rescan and `rules.fill` skips it.
+  `forge.bonerules.remembered` is the pure form of that rule.
+- A rule-filled row is marked as rule output, not as the user's: change the rule
+  and the next scan answers it again.
+- The Skeleton page says the behaviour in one line when rules exist; the probe
+  now asserts it: works on a real rig, not on the wording.
+- Evidence: `tools/blender_bone_rules_pose_probe.py` rescans after writing rules
+  and asserts `shoulder_L` MAPPED to `arm_upper_L` by rule, `Sp_Hi_Mskirt0_B_01`
+  EXTRA by prefix rule, the mirror row `elbow_R` MAPPED, `pelvis` by exact name,
+  and `Sp_Hi_Mskirt0_B_00` still IGNORED because that was the user's choice.
+  23 unit tests in `tests/test_bonerules.py`; the probe also failed loudly now —
+  a Blender `--python` script exits 0 on an exception unless it says otherwise.
