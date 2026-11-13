@@ -92,16 +92,20 @@ class DMF_UL_rules(UIList):
         pattern = item.source or "pattern"
         target = item.target or "no target"
         if item.regex:
-            row.label(text=_short(f"{pattern} -> {target}", 22), icon="DRIVER")
-            right = row.row(align=True)
-            right.alignment = "RIGHT"
-            right.label(text="regex")
-            return
-        stem = target.rsplit("_", 1)[0] if target.rsplit("_", 1)[-1] in ("L", "R") else target
-        row.label(text=_short(f"{pattern}* -> {stem}*", 22), icon="LINKED")
+            row.label(text=_short(f"{pattern} -> {target}", 21), icon="DRIVER")
+        elif pattern.strip().endswith("*"):
+            row.label(text=_short(f"{pattern} -> {target or 'extra'}", 21), icon="FILE_FONT")
+        else:
+            stem = target.rsplit("_", 1)[0] if target.rsplit("_", 1)[-1] in ("L", "R") else target
+            row.label(text=_short(f"{pattern}* -> {stem or '?'}*", 21), icon="LINKED")
         right = row.row(align=True)
         right.alignment = "RIGHT"
-        right.label(text="" if item.origin == "learned" else item.origin)
+        if item.state == "EXTRA":
+            right.label(text="extra")
+        elif item.state == "IGNORED":
+            right.label(text="ignore")
+        elif item.origin == "learned":
+            right.label(text="learned")
 
 
 class DMF_UL_clips(UIList):

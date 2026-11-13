@@ -1,9 +1,10 @@
-"""Rule learning for the bone map: one row teaches its mirror, and a button fills the rest.
+"""The mapping-rule panel's operators and the one rule a typed row teaches.
 
-``DMF_BoneEntry.target`` calls ``auto_fill`` when the user types a target, so
-mapping ``elbow_L`` to ``arm_lower_L`` instantly files the same rule and places
-``elbow_R`` on ``arm_lower_R``. Programmatic scans and fills run inside
-``suppressed()`` so they never cascade into each other.
+A rule is written by the user: a pattern, a target and the state the answered row
+gets. The only rule this addon adds on its own is the one implied by a row the
+user just typed — ``elbow_L`` to ``arm_lower_L`` — which is their own mapping, not
+a guess about the hero. ``suppressed()`` keeps programmatic batches from looking
+like that.
 """
 from __future__ import annotations
 
@@ -15,6 +16,12 @@ from forge import bonerules
 from . import core, proofing
 
 _DEPTH = 0  # nesting guard: an auto-fill must not start another auto-fill
+
+_STATE_LABELS = {
+    "MAPPED": "Mapped",
+    "EXTRA": "Extra",
+    "IGNORED": "Ignored",
+}
 
 
 @contextlib.contextmanager
@@ -48,33 +55,36 @@ def target_names(settings) -> list[str]:
     return [bone.name for bone in armature.data.bones]
 
 
+def rule_of(row) -> bonerules.Rule:
+    """A panel row as the pure rule the matcher reads."""
+    return bonerules.Rule(
+        source=row.source,
+        target=row.target,
+        regex=row.regex,
+        side_aware=row.side_aware,
+        state=row.state if row.state in bonerules.STATES else "MAPPED",
+        origin=row.origin,
+        enabled=row.enabled,
+        support=row.support,
+    )
+
+
 def panel_rules(settings) -> list[bonerules.Rule]:
-    """The rules stored in the file, plus the joint words the hero skeleton allows."""
-    rows = [
-        bonerules.Rule(
-            source=row.source,
-            target=row.target,
-            regex=row.regex,
-            side_aware=row.side_aware,
-            origin=row.origin,
-            enabled=row.enabled,
-            support=row.support,
-        )
-        for row in settings.bone_rules
-        if row.source and row.target
-    ]
-    return bonerules.ordered(rows + bonerules.builtin(target_names(settings)))
+    """Every enabled-or-not rule the user has in this file, in match order."""
+    return bonerules.ordered(
+        [rule_of(row) for row in settings.bone_rules if row.source and (row.target or row.state != "MAPPED")]
+    )
 
 
 def store(settings, rules: list[bonerules.Rule]) -> int:
     """Merge learned rules into the panel rows without touching a user's own row."""
     existing = {
-        (row.source.lower(), row.target.lower(), bool(row.regex)): row
+        (row.source.lower(), row.target.lower(), bool(row.regex), row.state): row
         for row in settings.bone_rules
     }
     with suppressed():
         for rule in rules:
-            key = (rule.source.lower(), rule.target.lower(), bool(rule.regex))
+            key = (rule.source.lower(), rule.target.lower(), bool(rule.regex), rule.state)
             row = existing.get(key)
             if row is None:
                 row = settings.bone_rules.add()
@@ -82,6 +92,7 @@ def store(settings, rules: list[bonerules.Rule]) -> int:
                 row.target = rule.target
                 row.regex = rule.regex
                 row.side_aware = rule.side_aware
+                row.state = rule.state
                 row.origin = rule.origin
                 row.support = rule.support
                 existing[key] = row
@@ -91,36 +102,41 @@ def store(settings, rules: list[bonerules.Rule]) -> int:
 
 
 def learn_from_map(settings) -> int:
-    """Learn from the rows that are already mapped."""
+    """Learn the side rules the mapped rows already imply."""
     learned = bonerules.learn(mapping(settings))
     store(settings, learned)
     return len(learned)
 
 
 def fill(settings) -> int:
-    """Place every unmatched row a rule can answer, and say nothing it cannot."""
-    rules = panel_rules(settings)
-    sources = [entry.source for entry in settings.bone_map if entry.source]
-    found = bonerules.suggest(rules, sources, target_names(settings), mapping(settings))
+    """Apply the rules to every row that has no target yet."""
+    found = bonerules.suggest(panel_rules(settings), [e.source for e in settings.bone_map if e.source], target_names(settings), mapping(settings))
     changed = 0
     with suppressed():
         for entry in settings.bone_map:
             hit = found.get(entry.source)
             if hit is None:
                 continue
-            entry.target = hit.target
-            entry.state = "MAPPED"
+            if hit.state == "EXTRA":
+                entry.state = "EXTRA"
+                entry.target = entry.source
+            elif hit.state == "IGNORED":
+                entry.state = "IGNORED"
+                entry.target = ""
+            else:
+                entry.state = "MAPPED"
+                entry.target = hit.target
             entry.note = f"rule {hit.label}"
             changed += 1
     return changed
 
 
 def auto_fill(settings, entry) -> int:
-    """File the rule a typed target implies and place its opposite-side row.
+    """File the rule the typed row implies and place its opposite-side row.
 
-    Called from the target field's update callback: the user sees ``elbow_R``
-    move the moment ``elbow_L`` is answered. Only the exact mirror row is
-    written here — broader filling stays an explicit action.
+    Called from the target field's update callback, so the user sees ``elbow_R``
+    answer the moment ``elbow_L`` is given a target. Only the exact mirror row is
+    written here; applying the rest of the rules stays an explicit action.
     """
     if is_suppressed():
         return 0
@@ -150,10 +166,48 @@ def auto_fill(settings, entry) -> int:
     return placed
 
 
+def rule_from_entry(settings, entry) -> object | None:
+    """Write a rule that reproduces the row the user just mapped.
+
+    A paired row becomes a side rule on its stem; a one-sided row becomes a
+    prefix rule ending in ``*``, which is the form the panel shows for it.
+    """
+    if entry is None or not entry.source:
+        return None
+    source_stem, source_side = bonerules.split_side(entry.source)
+    target_stem, target_side = bonerules.split_side(entry.target or "")
+    side_aware = bool(source_side and target_side and source_side == target_side)
+    source = source_stem if side_aware else f"{entry.source}*"
+    rule = bonerules.Rule(
+        source=source,
+        target=entry.target or "",
+        side_aware=side_aware,
+        state=entry.state if entry.state in bonerules.STATES else "MAPPED",
+        origin="row",
+        support=1,
+    )
+    store(settings, [rule])
+    settings.bone_rule_index = max(0, len(settings.bone_rules) - 1)
+    return rule
+
+
+def preview(settings, row) -> list[str]:
+    """Unanswered rows the selected rule would catch right now."""
+    rule = rule_of(row)
+    if not rule.source:
+        return []
+    existing = mapping(settings)
+    return [
+        entry.source
+        for entry in settings.bone_map
+        if entry.source and not existing.get(entry.source) and bonerules.matches(rule, entry.source)
+    ]
+
+
 class DMF_OT_learn_rules(Operator):
     bl_idname = "dmf.learn_rules"
-    bl_label = "Learn Rules"
-    bl_description = "Turn the rows already mapped into side rules that answer their mirrors"
+    bl_label = "Learn From Mapped Rows"
+    bl_description = "Write the side rule each mapped left/right row already implies"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -162,17 +216,18 @@ class DMF_OT_learn_rules(Operator):
             core.set_status(settings, "Rules need the hero skeleton's bone names", "WARN")
             return {"CANCELLED"}
         count = learn_from_map(settings)
-        if count:
-            core.set_status(settings, f"{count} rules learned from the mapped rows", "OK")
-        else:
-            core.set_status(settings, "No paired row yet; map one left/right bone first", "WARN")
+        core.set_status(
+            settings,
+            f"{count} rules learned from the mapped rows" if count else "No paired row yet; map a left/right bone first",
+            "OK" if count else "WARN",
+        )
         return {"FINISHED"}
 
 
 class DMF_OT_apply_rules(Operator):
     bl_idname = "dmf.apply_rules"
-    bl_label = "Fill From Rules"
-    bl_description = "Give every unmatched row the target a rule names; never overwrite a mapped row"
+    bl_label = "Apply Rules"
+    bl_description = "Apply every rule to the rows that have no target; a mapped row is never overwritten"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -186,30 +241,52 @@ class DMF_OT_apply_rules(Operator):
             self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
         proofing.bump_tick(settings)
+        left = sum(1 for row in settings.bone_map if row.state == "UNMATCHED")
         if changed:
-            left = sum(1 for row in settings.bone_map if row.state == "UNMATCHED")
-            core.set_status(settings, f"Rules filled {changed} rows; {left} still need a decision", "OK" if not left else "WARN")
+            core.set_status(settings, f"Rules answered {changed} rows; {left} still need a decision" if left else f"Rules answered {changed} rows; every row is answered", "OK" if not left else "WARN")
         else:
-            core.set_status(settings, "No rule answered an unmatched row", "WARN")
+            core.set_status(settings, "No rule answered an unanswered row", "WARN")
         return {"FINISHED"}
 
 
 class DMF_OT_add_rule(Operator):
     bl_idname = "dmf.add_rule"
-    bl_label = "Add Regex Rule"
-    bl_description = "Add a pattern rule of your own; groups such as \\1 can be used in the target"
+    bl_label = "Add Rule"
+    bl_description = "Add an empty rule row: a pattern, a target, and the row state it sets"
 
     def execute(self, context):
         settings = context.scene.dmf
         row = settings.bone_rules.add()
         row.source = ""
         row.target = ""
-        row.regex = True
-        row.side_aware = False
-        row.origin = "regex"
+        row.regex = False
+        row.side_aware = True
+        row.state = "MAPPED"
+        row.origin = "user"
         row.enabled = True
+        row.support = 0
         settings.bone_rule_index = len(settings.bone_rules) - 1
-        core.set_status(settings, "New rule: pattern matches a source name, target may use \\1", "INFO")
+        core.set_status(settings, "New rule: type a pattern such as Sp_Hi_* and its target", "INFO")
+        return {"FINISHED"}
+
+
+class DMF_OT_rule_from_row(Operator):
+    bl_idname = "dmf.rule_from_row"
+    bl_label = "Rule From Row"
+    bl_description = "Write a rule that reproduces the selected bone-map row"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        if not settings.bone_map:
+            self.report({"ERROR"}, "Choose a bone-map row first")
+            return {"CANCELLED"}
+        index = max(0, min(settings.bone_map_index, len(settings.bone_map) - 1))
+        entry = settings.bone_map[index]
+        rule = rule_from_entry(settings, entry)
+        if rule is None:
+            self.report({"ERROR"}, "The row has no source name")
+            return {"CANCELLED"}
+        core.set_status(settings, f"Rule {rule.source} → {rule.target or rule.state} written from {entry.source}", "OK")
         return {"FINISHED"}
 
 
@@ -231,7 +308,7 @@ class DMF_OT_remove_rule(Operator):
 class DMF_OT_clear_rules(Operator):
     bl_idname = "dmf.clear_rules"
     bl_label = "Clear Rules"
-    bl_description = "Forget every learned and hand-written rule; the map itself is untouched"
+    bl_description = "Remove every rule; the bone map itself is untouched"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -245,6 +322,7 @@ CLASSES = (
     DMF_OT_learn_rules,
     DMF_OT_apply_rules,
     DMF_OT_add_rule,
+    DMF_OT_rule_from_row,
     DMF_OT_remove_rule,
     DMF_OT_clear_rules,
 )

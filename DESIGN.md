@@ -112,3 +112,18 @@ opened, and DMX export is not wired into this page.
 Status wording follows the same rule as the rest of the surface: one short
 sentence naming what happened and what is left, and an ellipsis rather than a cut
 word when the bubble runs past its lines.
+
+## 2026-11-13 — Mapping rules page (supersedes the rule list inside Skeleton)
+
+The rule UI is its own page, not an extra section under Skeleton: `Mapping rules`
+opens with a Rules card carrying the count, a four-glyph row (add, rule from row,
+apply, learn), the selected rule's editor, the number of unanswered bone-map rows
+the rule currently catches, one sentence naming the pattern form it uses, and the
+rule list under that. The editor sits above the list because a sidebar that must
+be scrolled to reach the fields is how a rule panel becomes a list nobody edits.
+
+Rows read `elbow* -> arm_lower*`, `Sp_Hi_Mskirt* -> extra`, or
+`^Sp_(.*)_B$ -> cloth_` with the state on the right (`extra`, `ignore`,
+`learned`), and each row has an on/off checkbox so a rule can be parked without
+being deleted. Pattern, target and state are ordinary native fields; Regex, Side
+and On are three toggles on one row.

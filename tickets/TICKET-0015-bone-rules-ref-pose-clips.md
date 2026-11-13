@@ -68,3 +68,19 @@ Authority record: `logs/authority/2026-11-13-bone-rules-ref-pose-clips.jsonl`.
   learned `elbow* -> arm_lower*` row and the REF POSE section with its Show
   toggle. Render: `artifacts/ui-pass/sidebar.png`, crop
   `artifacts/ui-pass/skeleton-new.png`.
+
+## Correction (0.4.1) — the rules are written by the user
+
+The first cut shipped a joint-word lexicon that guessed hero-specific mappings.
+That was wrong: this ticket's point 2 and the owner's correction ask for a
+manual rule panel, not an opinion about hero skeletons. The lexicon is deleted.
+
+- A rule is a user row: pattern, target, state (`Mapped` / `Extra` / `Ignored`).
+- Pattern forms: side stem (`elbow`), prefix (`Sp_Hi_Mskirt*`), regex (`Regex`
+  on, `` groups). A prefix rule may deliberately send many rows to one target.
+- Typing a target adds only the rule that row implies, plus the exact mirror row.
+- `DMF_PT_rules` is the Popit page for this: card, four glyphs, editor above the
+  list, live "unanswered rows match" count, one sentence naming the form.
+- Cloth chain / cloth mesh / cloth proxy remain unavailable as rule targets:
+  the map has mapped bones, extras and ignored rows only, and the panel does not
+  offer a target the addon cannot carry.

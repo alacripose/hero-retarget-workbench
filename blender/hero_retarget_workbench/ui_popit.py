@@ -95,6 +95,22 @@ _GLYPHS = {
     "dmf.pick_bone_map": "MOUSE_LMB",
     "dmf.select_hierarchy_bone": "RESTRICT_SELECT_OFF",
     "dmf.update_old_addon": "FILE_REFRESH",
+    "dmf.add_rule": "ADD",
+    "dmf.rule_from_row": "DUPLICATE",
+    "dmf.apply_rules": "ARROW_LEFTRIGHT",
+    "dmf.learn_rules": "FILE_REFRESH",
+    "dmf.remove_rule": "REMOVE",
+    "dmf.clear_rules": "TRASH",
+    "dmf.apply_model_name": "SORTALPHA",
+    "dmf.pose_preview": "PLAY",
+    "dmf.pose_clear": "LOOP_BACK",
+    "dmf.scan_clips": "FILE_REFRESH",
+    "dmf.import_clip": "IMPORT",
+    "dmf.import_clips": "IMPORT",
+    "dmf.cancel_clips": "CANCEL",
+    "dmf.prefix_clips": "SORTALPHA",
+    "dmf.clear_clips": "TRASH",
+    "dmf.preview_clip": "PLAY",
 }
 
 

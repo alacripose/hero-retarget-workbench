@@ -1,13 +1,19 @@
-"""Pattern rules for bone mapping: one row teaches the rest.
+"""Mapping rules the user writes, plus the one kept from a typed row.
 
-A hand-made row ``elbow_L -> arm_lower_L`` also answers ``elbow_R ->
-arm_lower_R`` because the rule remembers the target's side token and swaps it to
-match the source. A regex rule covers the names that share no side token.
+A rule is one line: a source pattern, a target, and what state a row it answers
+gets (mapped, extra or ignored). Three pattern forms, chosen by how the pattern
+is written rather than by a hidden setting:
 
-Rules only ever *suggest*: a suggestion is offered for a row that has no target,
-the target must already exist in the hero skeleton, and a target another row
-already uses is never proposed twice. ``forge.names.match`` still never guesses
-a nearest bone, and nothing mapped is overwritten.
+``elbow``      a side stem: ``elbow_L`` and ``elbow_R`` both answer it, and the
+               source's own side token is written into the target, so
+               ``elbow -> arm_lower_L`` also places ``arm_lower_R``.
+``Sp_Hi_*``    a prefix: every source name starting with that text.
+``^Sp_(.*)_B$``a regular expression when **Regex** is on; groups such as ``\\1``
+               can be used in the target.
+
+Nothing here knows a hero skeleton, a joint name or a cloth convention. A rule
+only ever proposes a target that already exists in the hero skeleton, only for a
+row with no target, and never a target another row already uses.
 """
 from __future__ import annotations
 
@@ -33,6 +39,8 @@ SIDE_TOKENS: tuple[tuple[str, str], ...] = (
     ("-r", "R"),
     (" r", "R"),
 )
+
+STATES: tuple[str, ...] = ("MAPPED", "EXTRA", "IGNORED")
 
 
 def split_side(name: str) -> tuple[str, str]:
@@ -86,146 +94,111 @@ def mirror(name: str) -> str:
 
 @dataclass(frozen=True)
 class Rule:
-    """One pattern. ``source`` is a stem for a side rule, a regex otherwise."""
+    """One user rule: how to match a source name, and what to do with the row."""
 
     source: str
     target: str
     regex: bool = False
-    side_aware: bool = False
-    origin: str = "learned"
+    side_aware: bool = True
+    state: str = "MAPPED"
+    origin: str = "user"
     enabled: bool = True
     support: int = 1
 
     @property
-    def key(self) -> tuple[str, str, bool]:
-        return (self.source.lower(), self.target.lower(), self.regex)
+    def kind(self) -> str:
+        if self.regex:
+            return "regex"
+        if self.source.strip().endswith("*"):
+            return "prefix"
+        return "side"
+
+    @property
+    def key(self) -> tuple[str, str, bool, str]:
+        return (self.source.lower(), self.target.lower(), self.regex, self.state)
 
 
 @dataclass(frozen=True)
 class Suggestion:
-    """A target a rule proposes for one source name, and the rule that did it."""
+    """What one rule proposes for one source row."""
 
     target: str
+    state: str
     rule: Rule
     label: str
 
 
 def label(rule: Rule) -> str:
-    """Short rule caption for a panel row or a note."""
-    if rule.regex:
+    """Short caption for a panel row or a note."""
+    kind = rule.kind
+    if kind == "regex":
+        return f"{rule.source} → {rule.target}"
+    if kind == "prefix":
         return f"{rule.source} → {rule.target}"
     stem, _side = split_side(rule.target)
     return f"{rule.source}_{{L,R}} → {stem}_{{L,R}}"
 
 
-def learn(mapping: dict[str, str]) -> list[Rule]:
-    """Side rules implied by mapping rows, strongest first.
+def describe(rule: Rule) -> str:
+    """One sentence naming what the rule matches, for the panel hint."""
+    if rule.regex:
+        return "Regex: matched against the whole name; \\1 and friends come from its groups."
+    if rule.kind == "prefix":
+        return "Prefix: matches every source name starting with that text."
+    return "Side rule: matches the stem and writes the source's side token into the target."
 
-    Only pairs where both names carry the same side learn a rule: a row that
-    crosses sides (``elbow_L -> arm_lower_R``) is a deliberate exception, not a
-    pattern, and a row with no side token teaches nothing general.
+
+def learn(mapping: dict[str, str]) -> list[Rule]:
+    """The side rule implied by a typed row, if it has one.
+
+    Only a pair whose source and target carry the same side teaches anything: a
+    deliberate cross-side exception is not a pattern, and a row with no side
+    token is one specific name, not a rule.
     """
-    counts: dict[tuple[str, str], tuple[str, int]] = {}
+    rules: dict[tuple[str, str], Rule] = {}
     for source, target in (mapping or {}).items():
         source_stem, source_side = split_side(source or "")
         target_stem, target_side = split_side(target or "")
-        if not (source_stem and target_stem):
+        if not source_stem or not target_stem:
             continue
-        if source_side and target_side and source_side == target_side:
-            key = (source_stem.lower(), target_stem.lower())
-            seen_target, count = counts.get(key, (target, 0))
-            counts[key] = (seen_target, count + 1)
-        else:
+        if not (source_side and target_side and source_side == target_side):
             continue
-    rules = [
-        Rule(
-            source=source,
-            target=seen_target,
+        key = (source_stem.lower(), target_stem.lower())
+        if key in rules:
+            previous = rules[key]
+            rules[key] = Rule(
+                source=previous.source,
+                target=previous.target,
+                side_aware=True,
+                state=previous.state,
+                origin="learned",
+                support=previous.support + 1,
+            )
+            continue
+        rules[key] = Rule(
+            source=source_stem,
+            target=target,
             side_aware=True,
+            state="MAPPED",
             origin="learned",
-            support=count,
+            support=1,
         )
-        for (source, _target), (seen_target, count) in counts.items()
-    ]
-    return ordered(rules)
+    return ordered(list(rules.values()))
 
 
 def ordered(rules: list[Rule]) -> list[Rule]:
-    """Regex rules first, then the best-supported and most specific side rules."""
+    """Regex rules first, then prefixes, then side stems; best-supported first."""
+    rank = {"regex": 0, "prefix": 1, "side": 2}
     return sorted(
         rules,
-        key=lambda rule: (
-            not rule.regex,
-            -rule.support,
-            -len(rule.source),
-            rule.source.lower(),
-        ),
+        key=lambda rule: (rank[rule.kind], -rule.support, -len(rule.source), rule.source.lower()),
     )
 
 
-def _letters(value: str) -> str:
-    return "".join(sorted(re.sub(r"[^a-z0-9]", "", (value or "").lower())))
-
-
-# Words modelers use for the same joint. A group only becomes a rule when the
-# hero skeleton actually has a stem that spells the canonical word, so this
-# never invents a target.
-SYNONYMS: tuple[tuple[str, ...], ...] = (
-    ("elbow", "forearm", "lowerarm", "lower_arm", "lower arm", "arm_lower"),
-    ("upperarm", "upper_arm", "upper arm", "shoulder", "deltoid", "arm_upper"),
-    ("hand", "wrist", "palm"),
-    ("thigh", "upperleg", "upper_leg", "upper leg", "femur", "leg_upper"),
-    ("shin", "calf", "lowerleg", "lower_leg", "lower leg", "leg_lower"),
-    ("foot", "ankle"),
-    ("toe", "ball", "toes"),
-    ("spine", "chest", "torso", "abdomen"),
-    ("neck", "throat"),
-    ("head", "skull"),
-    ("pelvis", "hips", "hip"),
-    ("clavicle", "collarbone", "shoulderblade"),
-    ("tail",),
-    ("jaw",),
-    ("eye", "eyes"),
-)
-
-
-def builtin(targets: list[str]) -> list[Rule]:
-    """Rules that map a common joint word onto a hero bone that exists.
-
-    Only the stems the hero skeleton really has are used, so a hero without a
-    tail never produces a tail rule.
-    """
-    stems: dict[str, str] = {}
-    for name in targets or []:
-        stem, side = split_side(name)
-        if stem:
-            stems.setdefault(_letters(stem), name if side else stem)
-    rules: list[Rule] = []
-    for group in SYNONYMS:
-        target_name = None
-        for word in group:
-            found = stems.get(_letters(word))
-            if found:
-                target_name = found
-                break
-        if target_name is None:
-            continue
-        for word in group:
-            if _letters(word) == _letters(split_side(target_name)[0]):
-                continue
-            rules.append(
-                Rule(
-                    source=word,
-                    target=target_name,
-                    side_aware=True,
-                    origin="builtin",
-                    support=0,
-                )
-            )
-    return ordered(rules)
-
-
 def _candidate(rule: Rule, source: str) -> str | None:
+    """The target name a rule gives this source, before the hero skeleton is checked."""
+    if not rule.source:
+        return None
     if rule.regex:
         try:
             if re.fullmatch(rule.source, source, flags=re.IGNORECASE) is None:
@@ -233,6 +206,11 @@ def _candidate(rule: Rule, source: str) -> str | None:
             return re.sub(rule.source, rule.target, source, count=1, flags=re.IGNORECASE)
         except re.error:
             return None
+    if rule.kind == "prefix":
+        text = rule.source[:-1]
+        if not source.lower().startswith(text.lower()):
+            return None
+        return rule.target
     stem, side = split_side(source)
     if stem.lower() != rule.source.lower():
         return None
@@ -243,16 +221,21 @@ def _candidate(rule: Rule, source: str) -> str | None:
     return rule.target
 
 
+def matches(rule: Rule, source: str) -> bool:
+    """Whether this rule answers this source name at all (target ignored)."""
+    return _candidate(rule, source) is not None
+
+
 def suggest(
     rules: list[Rule],
     sources: list[str],
     targets: list[str],
     existing: dict[str, str] | None = None,
 ) -> dict[str, Suggestion]:
-    """Targets for the sources that have none, one rule each, no shared target.
+    """One rule per unanswered source, never sharing a target with another row.
 
-    ``existing`` is the current map; a row that already has a target is left
-    alone and its target is not offered to another row.
+    ``EXTRA`` and ``IGNORED`` rows do not consume a hero bone, so they never take
+    a target out of the pool; only mapped rows do.
     """
     existing = existing or {}
     by_lower = {name.lower(): name for name in targets or []}
@@ -267,10 +250,25 @@ def suggest(
             candidate = _candidate(rule, source)
             if candidate is None:
                 continue
-            target = by_lower.get(candidate.lower())
-            if target is None or target.lower() in taken:
-                continue
-            found[source] = Suggestion(target=target, rule=rule, label=label(rule))
-            taken.add(target.lower())
+            if rule.state == "MAPPED":
+                target = by_lower.get(candidate.lower())
+                if target is None:
+                    continue
+                # A side rule names one hero bone per side, so it must not take a
+                # bone another row already holds. A prefix or regex rule is a
+                # deliberate many-to-one statement (a whole skirt chain onto one
+                # bone), so it is allowed to share.
+                if rule.kind == "side":
+                    if target.lower() in taken:
+                        continue
+                    taken.add(target.lower())
+            else:
+                target = source
+            found[source] = Suggestion(
+                target=target,
+                state=rule.state,
+                rule=rule,
+                label=label(rule),
+            )
             break
     return found

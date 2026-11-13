@@ -16,9 +16,9 @@ from pathlib import Path
 
 import bpy
 from bpy.types import Panel
-from forge import paths, stageflow
+from forge import bonerules, paths, stageflow
 
-from . import core, ui_popit, workbench
+from . import core, rules, ui_popit, workbench
 
 
 _STATUS_ICONS = {
@@ -478,6 +478,81 @@ class DMF_PT_parts_materials(Panel):
         actions.operator("dmf.clear_part_material", text="Clear selected slot", icon="REMOVE")
 
 
+class DMF_PT_rules(Panel):
+    bl_label = "Mapping rules"
+    bl_idname = "DMF_PT_rules"
+    bl_parent_id = "DMF_PT_main"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+
+    def draw(self, context):
+        settings = context.scene.dmf
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+
+        box = ui_popit.title(
+            layout,
+            "Rules",
+            f"{len(settings.bone_rules)}" if settings.bone_rules else "none",
+            "DRIVER",
+        )
+        ui_popit.glyphs(
+            box,
+            ["dmf.add_rule", "dmf.rule_from_row", "dmf.apply_rules", "dmf.learn_rules"],
+            labels={
+                "dmf.add_rule": "Add",
+                "dmf.rule_from_row": "From row",
+                "dmf.apply_rules": "Apply",
+                "dmf.learn_rules": "Learn",
+            },
+        )
+
+        if not settings.bone_rules:
+            _hint(
+                box,
+                "Add a rule by hand, or write one from the selected bone-map row.",
+                "QUESTION",
+                width=30,
+            )
+            return
+
+        # The editor sits above the list: a sidebar that has to be scrolled to
+        # reach the fields is how a rule panel becomes a list nobody edits.
+        index = max(0, min(settings.bone_rule_index, len(settings.bone_rules) - 1))
+        rule = settings.bone_rules[index]
+        ui_popit.micro(box, "Rule", "DRIVER")
+        edit = box.column(align=True)
+        edit.prop(rule, "source", text="Pattern")
+        edit.prop(rule, "target", text="Target")
+        edit.prop(rule, "state", text="Sets row")
+        flags = box.row(align=True)
+        flags.prop(rule, "regex", text="Regex")
+        flags.prop(rule, "side_aware", text="Side")
+        flags.prop(rule, "enabled", text="On")
+        caught = rules.preview(settings, rule)
+        if caught:
+            box.label(text=f"{len(caught)} unanswered rows match", icon="CHECKMARK")
+        else:
+            _hint(box, "No unanswered row matches this pattern yet.", "INFO", width=30)
+        _hint(box, bonerules.describe(rules.rule_of(rule)), "INFO", width=32)
+
+        row = box.row()
+        row.template_list(
+            "DMF_UL_bone_rules",
+            "",
+            settings,
+            "bone_rules",
+            settings,
+            "bone_rule_index",
+            rows=3,
+        )
+        side = row.column(align=True)
+        side.operator("dmf.remove_rule", text="", icon="REMOVE")
+        side.operator("dmf.clear_rules", text="", icon="TRASH")
+
+
 class DMF_PT_animations(Panel):
     bl_label = "Animations"
     bl_idname = "DMF_PT_animations"
@@ -594,46 +669,6 @@ class DMF_PT_skeleton(Panel):
         top = layout.row(align=True)
         top.operator("dmf.scan_bones", text="Scan bone map", icon="FILE_REFRESH")
         top.prop(settings, "bone_filter", text="")
-
-        rules_box = _section(
-            layout,
-            "Auto rules",
-            "DRIVER",
-            f"{len(settings.bone_rules)} saved" if settings.bone_rules else "none yet",
-        )
-        ui_popit.glyphs(
-            rules_box,
-            ["dmf.learn_rules", "dmf.apply_rules", "dmf.add_rule"],
-            labels={"dmf.learn_rules": "Learn", "dmf.apply_rules": "Fill", "dmf.add_rule": "Regex"},
-        )
-        if settings.bone_rules:
-            list_row = rules_box.row()
-            list_row.template_list(
-                "DMF_UL_bone_rules",
-                "",
-                settings,
-                "bone_rules",
-                settings,
-                "bone_rule_index",
-                rows=2,
-            )
-            side = list_row.column(align=True)
-            side.operator("dmf.remove_rule", text="", icon="REMOVE")
-            side.operator("dmf.clear_rules", text="", icon="TRASH")
-            rule_index = max(0, min(settings.bone_rule_index, len(settings.bone_rules) - 1))
-            rule = settings.bone_rules[rule_index]
-            if rule.regex:
-                edit = rules_box.column(align=True)
-                edit.prop(rule, "source", text="Pattern")
-                edit.prop(rule, "target", text="Replace")
-                edit.prop(rule, "enabled", text="On")
-        else:
-            _hint(
-                rules_box,
-                "Mapping one side answers the other: elbow_L to arm_lower_L places elbow_R.",
-                "INFO",
-                width=30,
-            )
 
         pose = _section(layout, "Ref pose", "ARMATURE_DATA", settings.pose_stance or "not read")
         controls = pose.row(align=True)
@@ -961,6 +996,7 @@ CLASSES = (
     DMF_PT_parts_materials,
     DMF_PT_skeleton,
     DMF_PT_skeleton_bones,
+    DMF_PT_rules,
     DMF_PT_animations,
     DMF_PT_compare,
     DMF_PT_weights,
