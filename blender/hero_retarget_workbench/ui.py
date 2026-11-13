@@ -201,15 +201,28 @@ class DMF_PT_setup(Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        tools = _section(layout, "Tool paths", "PREFERENCES", "saved in this file")
-        tools.prop(settings, "deadlock_root", text="Deadlock install")
-        tools.prop(settings, "s2v_cli", text="Source 2 Viewer CLI")
-        tools.prop(settings, "csdk_root", text="CSDK13")
-        actions = tools.row(align=True)
+        live = _section(layout, "Live game", "WORLD", _short(settings.build, 24) or "not detected")
+        live.prop(settings, "deadlock_root", text="Deadlock install")
+        live.prop(settings, "s2v_cli", text="Source 2 Viewer CLI")
+        actions = live.row(align=True)
         actions.operator("dmf.detect_paths", text="Detect installed", icon="FILE_REFRESH")
         _hint(
-            tools,
-            "Choose Source2Viewer-CLI.exe, not the Source2Viewer.exe GUI. These values are saved in this .blend; use File > Defaults > Save Startup File to make them the default for new files.",
+            live,
+            "Use Source2Viewer-CLI.exe, not the GUI. Saved in this .blend; File > Defaults > Save Startup File makes it the default for new files.",
+            "INFO",
+            width=32,
+        )
+
+        csdk = _section(layout, "CSDK13", "PACKAGE", "compiler")
+        csdk.prop(settings, "csdk_root", text="Install")
+        folder = core.csdk_addon_folder(settings)
+        if folder is not None:
+            csdk.label(text=_tail(str(folder), 50), icon="FILE_FOLDER")
+        else:
+            _hint(csdk, "Set the folder that contains game/bin/win64/resourcecompiler.exe.", "QUESTION", width=32)
+        _hint(
+            csdk,
+            "Export & stage writes content/citadel_addons/<addon>; compile writes game/citadel_addons/<addon>.",
             "INFO",
             width=32,
         )
@@ -218,7 +231,7 @@ class DMF_PT_setup(Panel):
         workspace.prop(settings, "project_root", text="Folder")
         _hint(
             workspace,
-            "Blank uses Blender's user data folder when the addon is installed from a zip.",
+            "Extractions, proofs and logs. Blank uses Blender's user data folder for a zip install.",
             "INFO",
             width=32,
         )
@@ -597,7 +610,7 @@ class DMF_PT_weights(Panel):
 
 
 class DMF_PT_handoff(Panel):
-    bl_label = "Compiler Handoff"
+    bl_label = "CSDK Addon"
     bl_idname = "DMF_PT_handoff"
     bl_parent_id = "DMF_PT_main"
     bl_space_type = "VIEW_3D"
@@ -610,50 +623,68 @@ class DMF_PT_handoff(Panel):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
-        handoff = _section(layout, "CSDK addon", "PACKAGE", "installed" if settings.stage_dir else "not installed")
+        root = core.csdk_addon_root(settings)
+        folder = core.csdk_addon_folder(settings)
+        staged = folder is not None and (folder / "stage.json").is_file()
+        handoff = _section(layout, "Addon", "PACKAGE", "staged" if staged else "not staged")
         if settings.body_dmx and not settings.vmdl:
             _hint(handoff, "No S2V vmdl is set. Choose it below if the extraction did not write one.", "STATUS_WARNING", alert=True)
-        handoff.prop(settings, "addon_name", text="Addon")
-        _path_row(handoff, settings, "stage_dir", "Install root (blank = CSDK13)")
+        handoff.prop(settings, "addon_name", text="Name")
+        _path_row(handoff, settings, "stage_dir", "Install root")
         configured = Path(bpy.path.abspath(settings.stage_dir)) if settings.stage_dir else None
-        install = settings.csdk_root if settings.csdk_root else ""
-        install_root = (
-            configured
-            if configured is not None and core.is_csdk_install(configured)
-            else (Path(bpy.path.abspath(install)) if install else None)
-        )
-        if install_root is not None:
-            handoff.label(
-                text=_tail(f"{install_root}\\content\\citadel_addons\\{settings.addon_name}"),
-                icon="FILE_FOLDER",
-            )
-        if configured is not None and install_root is not None and configured != install_root:
+        if configured is not None and root is not None and configured != root:
             _hint(
                 handoff,
-                "Install root is not a CSDK13 install; Export & stage uses the CSDK13 root from Setup.",
+                "Install root is not a CSDK13 install; the Setup CSDK13 root is used instead.",
                 "ERROR",
                 alert=True,
             )
-        handoff.label(text="Paths inside the addon", icon="FILE")
-        handoff.prop(settings, "vmdl_relative", text="vmdl path")
-        handoff.prop(settings, "target_dmx_relative", text="DMX path")
+        if folder is not None:
+            handoff.label(text=_tail(str(folder), 50), icon="FILE_FOLDER")
+            handoff.label(
+                text="stage.json present" if staged else "stage.json missing",
+                icon="CHECKMARK" if staged else "QUESTION",
+            )
+        else:
+            _hint(handoff, "No addon folder yet: set CSDK13 in Setup and an addon name.", "QUESTION", width=32)
+        handoff.label(text="Content paths", icon="FILE")
+        handoff.prop(settings, "vmdl_relative", text="vmdl")
+        handoff.prop(settings, "target_dmx_relative", text="DMX")
         handoff.prop(settings, "generate_lods", text="Generate LODs")
         lod = handoff.column(align=True)
         lod.enabled = settings.generate_lods
-        lod.prop(settings, "lod_count", text="LOD count (0 = hero)")
-        lod.prop(settings, "lod_decimate", text="Decimate per LOD")
-        _hint(
-            handoff,
-            f"Export & stage writes content/citadel_addons/{settings.addon_name or '<addon>'} in the CSDK, ready to "
-            f"open in modeldoc; compile runs there and leaves game/citadel_addons/{settings.addon_name or '<addon>'}. "
-            "The S2V vmdl is copied unchanged.",
-            "LOCKED",
-        )
+        lod.prop(settings, "lod_count", text="Count (0 = hero)")
+        lod.prop(settings, "lod_decimate", text="Decimate %")
+        compiled = False
+        if root is not None and folder is not None and settings.vmdl_relative.strip():
+            compiled = (
+                root
+                / "game"
+                / "citadel_addons"
+                / settings.addon_name
+                / Path(settings.vmdl_relative).with_suffix(".vmdl_c")
+            ).is_file()
+        if folder is not None:
+            handoff.label(
+                text="compiled .vmdl_c present" if compiled else "no compiled .vmdl_c yet",
+                icon="CHECKMARK" if compiled else "QUESTION",
+            )
         _primary(handoff, "dmf.export_stage", "Export & stage", "EXPORT", enabled=not settings.job_running)
-        _primary(handoff, "dmf.compile", "Compile with CSDK13", "PLAY", enabled=not settings.job_running)
+        _primary(handoff, "dmf.compile", "Compile", "PLAY", enabled=not settings.job_running)
+        _hint(handoff, "Compile runs resourcecompiler on the installed addon; the staged vmdl is never rewritten.", "LOCKED", width=32)
 
 
-CLASSES = (DMF_PT_main, DMF_PT_setup, DMF_PT_source, DMF_PT_update, DMF_PT_parts, DMF_PT_compare, DMF_PT_skeleton, DMF_PT_weights, DMF_PT_handoff)
+CLASSES = (
+    DMF_PT_main,
+    DMF_PT_setup,
+    DMF_PT_source,
+    DMF_PT_parts,
+    DMF_PT_skeleton,
+    DMF_PT_compare,
+    DMF_PT_weights,
+    DMF_PT_handoff,
+    DMF_PT_update,
+)
 
 
 def register() -> None:

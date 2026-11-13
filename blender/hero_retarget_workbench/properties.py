@@ -359,7 +359,14 @@ class DMF_Settings(PropertyGroup):
         max=90.0,
         precision=1,
     )
-    addon_name: StringProperty(name="Addon name", default="my_hero_port")
+    addon_name: StringProperty(
+        name="Addon name",
+        description=(
+            "CSDK13 addon folder name. Staged to content/citadel_addons/<name>, "
+            "compiled to game/citadel_addons/<name>"
+        ),
+        default="my_hero_port",
+    )
     old_vpk: StringProperty(
         name="Old addon VPK",
         description="A compiled addon VPK or an extracted addon content folder to migrate onto the current live hero",
@@ -408,8 +415,8 @@ class DMF_Settings(PropertyGroup):
     stage_dir: StringProperty(
         name="Install root",
         description=(
-            "Root holding content/ and game/. Blank installs the addon into the CSDK13 root at "
-            "content/citadel_addons/<addon> so it can be opened in the CSDK itself"
+            "Optional CSDK13 install override. Used only when it contains "
+            "game/bin/win64/resourcecompiler.exe; blank uses the CSDK13 root from Setup"
         ),
         subtype="DIR_PATH",
     )

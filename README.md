@@ -154,11 +154,12 @@ it publishes anything.
     `models/**/materials/*.vmat` tree and the texture images those materials
     reference. Staging preserves relative paths and copies only material
     assets, not notes, JSON, model clips, or arbitrary files.
-12. **Export & Stage** — exports a Source 2 DMX and copies the selected vmdl,
-    every extracted model clip, the replacement DMX, and the selected material
-    tree into a CSDK13 handoff. The vmdl hash is recorded and checked after
-    staging. `stage.json` records material and texture counts separately.
-13. **Compile with CSDK13** — runs `resourcecompiler` in a background thread.
+12. **Export & stage** (CSDK Addon panel) — joins the collection and exports a
+    Source 2 DMX on the main thread, because PulseSrcOps is an operator, then
+    copies the vmdl, model clips, the replacement DMX and the material tree into
+    `content/citadel_addons/<addon>` in a **background job**. The vmdl hash is
+    checked after staging; `stage.json` records material and texture counts.
+13. **Compile** — runs `resourcecompiler` in a background thread.
     Export & stage installs the addon at `content/citadel_addons/<addon>` in
     the CSDK13 root named by **Install root** (blank uses the CSDK13 root from
     Setup), so the addon can be opened in the CSDK itself. Compile then runs

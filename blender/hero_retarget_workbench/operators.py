@@ -864,20 +864,10 @@ class DMF_OT_export_stage(Operator):
                 if not custom_root.is_dir():
                     raise RuntimeError(f"The model materials root is missing: {custom_root}")
                 custom_materials = module["stage"].material_files(custom_root)
-            detected = core.detect_environment(settings, module)
-            configured = Path(bpy.path.abspath(settings.stage_dir)) if settings.stage_dir else None
-            if configured is not None and core.is_csdk_install(configured):
-                destination = configured
-            elif detected.csdk_root is not None:
-                # An Install root that is not a CSDK13 install (an older stage
-                # folder saved in this .blend) would put the addon where the
-                # compiler and modeldoc never look. Install into the CSDK root.
-                destination = detected.csdk_root
-            elif configured is not None:
-                destination = configured
-            else:
+            destination = core.csdk_addon_root(settings)
+            if destination is None:
                 raise RuntimeError(
-                    "CSDK13 root is not set; choose it in Setup so Export & stage can install "
+                    "No CSDK13 install root. Set CSDK13 in Setup so Export & stage can install "
                     f"{settings.addon_name} under content/citadel_addons"
                 )
             request = module["stage"].StageRequest(
@@ -893,24 +883,49 @@ class DMF_OT_export_stage(Operator):
                 custom_materials=custom_materials,
                 custom_lods=exported.lods,
             )
-            staged = module["stage"].stage(request)
-            module["stage"].verify(staged)
-            settings.stage_dir = str(destination)
-            settings.exported_dmx = str(exported.primary)
-            _status(
-                settings,
-                f"Staged {settings.addon_name} into {staged.root}: {part_count} parts joined, "
-                f"{len(staged.custom_lods)} LODs, {custom_slots} custom slots, "
-                f"{staged.material_count} material files ({staged.material_texture_count} textures), "
-                f"{staged.custom_material_count} custom; vmdl unchanged ({staged.vmdl_blake3[:10]})",
-                "OK",
-            )
+            # The DMX export above must stay on the main thread because it calls
+            # PulseSrcOps operators. Copying the addon tree and hashing every
+            # staged file do not touch Blender, so they run in the background job
+            # instead of freezing the viewport.
+            def work(progress):
+                progress(0.1, "copying the addon tree")
+                staged = module["stage"].stage(request)
+                progress(0.9, "hashing the staged files")
+                module["stage"].verify(staged)
+                return staged
+
+            def done(staged):
+                try:
+                    scene = core.fresh_scene(scene_name)
+                    current = scene.dmf if scene is not None else settings
+                    current.stage_dir = str(destination)
+                    current.exported_dmx = str(staged.custom_dmx)
+                    _status(
+                        current,
+                        f"Staged {current.addon_name} into {staged.root}: {part_count} parts joined, "
+                        f"{len(staged.custom_lods)} LODs, {custom_slots} custom slots, "
+                        f"{staged.material_count} material files ({staged.material_texture_count} textures), "
+                        f"{staged.custom_material_count} custom; vmdl unchanged ({staged.vmdl_blake3[:10]})",
+                        "OK",
+                    )
+                finally:
+                    shutil.rmtree(export_dir, ignore_errors=True)
+
+            def failed(error):
+                try:
+                    _status(settings, str(error), "ERROR")
+                finally:
+                    shutil.rmtree(export_dir, ignore_errors=True)
+
+            started = jobs.start(settings, "Staging the CSDK addon", work, done, failed)
+            if started:
+                raise RuntimeError(started)
+            _status(settings, f"DMX exported; staging {settings.addon_name} in the background", "BUSY")
         except Exception as error:
+            shutil.rmtree(export_dir, ignore_errors=True)
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
-        finally:
-            shutil.rmtree(export_dir, ignore_errors=True)
         return {"FINISHED"}
 
 
@@ -921,9 +936,9 @@ class DMF_OT_compile(Operator):
 
     def execute(self, context):
         settings = context.scene.dmf
-        stage_dir = Path(bpy.path.abspath(settings.stage_dir)) if settings.stage_dir else None
+        stage_dir = core.csdk_addon_root(settings)
         if stage_dir is None:
-            self.report({"ERROR"}, "Stage the model first")
+            self.report({"ERROR"}, "Set the CSDK13 root in Setup, then stage the model")
             return {"CANCELLED"}
         if settings.job_running or jobs.is_running():
             self.report({"ERROR"}, "A background job is already running")
@@ -946,7 +961,7 @@ class DMF_OT_compile(Operator):
                     installed = result.game_addon or result.content_addon
                     _status(
                         settings,
-                        f"CSDK13 compiled {len(result.compiled_files)} files into {installed}; staged vmdl unchanged",
+                        f"Compiled {len(result.compiled_files)} files into {installed}; staged vmdl unchanged",
                         "OK",
                     )
 
