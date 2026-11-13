@@ -608,10 +608,171 @@ def _join_export_parts(context, settings, collection, source_parts, armature):
     ):
         modifier = joined.modifiers.new(name="DMF export armature", type="ARMATURE")
         modifier.object = armature
-    collection.objects.link(armature)
+    if collection.objects.get(armature.name) is None:
+        collection.objects.link(armature)
     if hasattr(armature, "vs"):
         armature.vs.export = True
     return joined, armature, [joined.name]
+
+
+def _purge_export_leftovers(
+    scene_name: str | None,
+    collection_name: str,
+    objects_before: set[str],
+    collections_before: set[str],
+) -> list[str]:
+    """Remove the collections and objects one export created.
+
+    PulseSrcOps copies every exportable object, armature included, into a
+    ``<scope>_lodN`` collection for each generated level. Left behind they show
+    up in the Outliner and the next export copies them too, which is the lag.
+    This unlinks the export's own collections and objects; the datablocks are
+    only dropped by the orphan purge, never by deleting something the scene
+    still references.
+    """
+    removed: list[str] = []
+    for collection in list(bpy.data.collections):
+        if collection.name in collections_before:
+            continue
+        if not collection.name.startswith(collection_name):
+            continue
+        for obj in list(collection.objects):
+            collection.objects.unlink(obj)
+        removed.append(collection.name)
+        try:
+            bpy.data.collections.remove(collection)
+        except Exception:  # A dangling depsgraph reference must not kill the export.
+            pass
+    for obj in list(bpy.data.objects):
+        if obj.name in objects_before:
+            continue
+        for owner in list(obj.users_collection):
+            owner.objects.unlink(obj)
+        removed.append(obj.name)
+    try:
+        bpy.data.orphans_purge(do_local_ids=True, do_linked_ids=False, do_recursive=False)
+    except Exception:
+        pass
+    return removed
+
+
+def _lod_collection(settings):
+    """The persistent collection the built LOD meshes live in."""
+    name = f"DMF LODs {(settings.addon_name or '').strip() or 'model'}"
+    collection = bpy.data.collections.get(name)
+    if collection is None:
+        collection = bpy.data.collections.new(name)
+    scene = bpy.context.scene
+    if scene is not None and scene.collection.children.get(collection.name) is None:
+        scene.collection.children.link(collection)
+    return collection
+
+
+def clear_lods(settings) -> int:
+    """Delete the built LOD meshes and forget the rows."""
+    removed = 0
+    for row in list(settings.lod_levels):
+        obj = row.object
+        if obj is None or bpy.data.objects.get(obj.name) is None:
+            continue
+        for owner in list(obj.users_collection):
+            owner.objects.unlink(obj)
+        bpy.data.objects.remove(obj, do_unlink=True)
+        removed += 1
+    settings.lod_levels.clear()
+    settings.lod_index = 0
+    settings.lod_tick = -1
+    return removed
+
+
+def build_lods(context, settings) -> list[tuple[int, int]]:
+    """Build the LOD meshes once and keep them in the file.
+
+    Each level is joined from the same export scope, decimated, and left bound
+    to the hero armature. Export then reuses these meshes, so it neither
+    decimates nor copies the armature per level.
+    """
+    source_parts = parts.export_meshes(settings)
+    if not source_parts:
+        raise RuntimeError("Choose a custom collection with at least one mesh before building LODs")
+    armature = settings.target_armature
+    if armature is None:
+        raise RuntimeError("Choose the hero skeleton before building LODs")
+    count = settings.lod_count or 3
+    collection = _lod_collection(settings)
+    clear_lods(settings)
+    temp = bpy.data.collections.new("DMF LOD build")
+    context.scene.collection.children.link(temp)
+    armature_export = bool(getattr(getattr(armature, "vs", None), "export", False))
+    built: list[tuple[int, int]] = []
+    try:
+        for level in range(1, count + 1):
+            joined, _, _ = _join_export_parts(context, settings, temp, source_parts, armature)
+            ratio = max(0.05, 1.0 - (float(settings.lod_decimate) / 100.0) * level)
+            modifier = joined.modifiers.new(name="DMF LOD decimate", type="DECIMATE")
+            modifier.decimate_type = "COLLAPSE"
+            modifier.ratio = ratio
+            core.select_only(context, [joined])
+            bpy.ops.object.modifier_apply(modifier=modifier.name)
+            joined.name = f"DMF LOD {level}"
+            for owner in list(joined.users_collection):
+                owner.objects.unlink(joined)
+            collection.objects.link(joined)
+            row = settings.lod_levels.add()
+            row.object = joined
+            row.level = level
+            row.vertices = len(joined.data.vertices)
+            built.append((level, row.vertices))
+    finally:
+        for obj in list(temp.objects):
+            temp.objects.unlink(obj)
+        try:
+            bpy.data.collections.remove(temp)
+        except Exception:
+            pass
+        try:
+            bpy.data.orphans_purge(do_local_ids=True, do_linked_ids=False, do_recursive=False)
+        except Exception:
+            pass
+        if hasattr(armature, "vs"):
+            armature.vs.export = armature_export
+    settings.lod_tick = settings.axis_tick
+    return built
+
+
+class DMF_OT_build_lods(Operator):
+    bl_idname = "dmf.build_lods"
+    bl_label = "Build LODs"
+    bl_description = (
+        "Join, decimate and keep the LOD meshes in this file, bound to the hero rig, "
+        "so export reuses them instead of regenerating them"
+    )
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            built = build_lods(context, settings)
+            settings.live_lods = True
+            detail = ", ".join(f"L{level} {vertices:,}v" for level, vertices in built)
+            _status(settings, f"Built {len(built)} LODs: {detail}; export reuses them until the model changes", "OK")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
+class DMF_OT_clear_lods(Operator):
+    bl_idname = "dmf.clear_lods"
+    bl_label = "Clear LODs"
+    bl_description = "Delete the built LOD meshes and let export generate them again"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        removed = clear_lods(settings)
+        settings.live_lods = False
+        _status(settings, f"Removed {removed} built LOD meshes; export generates LODs again", "INFO")
+        return {"FINISHED"}
 
 
 class DMF_OT_export_stage(Operator):
@@ -627,8 +788,12 @@ class DMF_OT_export_stage(Operator):
         destination: Path,
         lod_count: int,
         lod_decimate: float,
+        live_lods: list[bpy.types.Object] | None = None,
     ) -> ExportedModel:
         scene = context.scene
+        live_lods = list(live_lods or [])
+        objects_before = {obj.name for obj in bpy.data.objects}
+        collections_before = {other.name for other in bpy.data.collections}
         scene_name = scene.name
         if not hasattr(scene, "vs"):
             raise RuntimeError("PulseSrcOps is required for DMX export; enable it in Blender")
@@ -672,7 +837,7 @@ class DMF_OT_export_stage(Operator):
             joined, armature, temporary_names = _join_export_parts(
                 context, settings, collection, source_parts, armature
             )
-            joined.vs.generate_lods = lod_count > 0
+            joined.vs.generate_lods = lod_count > 0 and not live_lods
             joined.vs.lod_count = max(1, lod_count)
             joined.vs.decimate_factor = float(lod_decimate)
             scene.vs.material_paths.clear()
@@ -690,6 +855,19 @@ class DMF_OT_export_stage(Operator):
             joined.vs.export = True
             if armature is not None:
                 armature.vs.export = True
+            # Built LODs are reused as they are. Each level is copied into the
+            # export scope under the DMX stem PulseSrcOps writes from, sharing
+            # the built mesh data, so no armature copy and no decimation runs
+            # here.
+            for order, source_lod in enumerate(live_lods, 1):
+                duplicate = source_lod.copy()
+                duplicate.name = f"{target_stem}_lod{order}"
+                duplicate.parent = None
+                duplicate.matrix_world = source_lod.matrix_world.copy()
+                collection.objects.link(duplicate)
+                if hasattr(duplicate, "vs"):
+                    duplicate.vs.export = True
+                    duplicate.vs.generate_lods = False
             # A dedicated collection makes PulseSrcOps export exactly this mesh
             # and its armature, instead of every selected object's collection.
             scene.vs.export_list.clear()
@@ -779,21 +957,9 @@ class DMF_OT_export_stage(Operator):
                     restored_object = bpy.data.objects.get(object_name)
                     if restored_object is not None and hasattr(restored_object, "vs"):
                         restored_object.vs.export = export_flag
-            fresh_collection = bpy.data.collections.get(collection_name)
-            if fresh_collection is not None:
-                # PulseSrcOps generates temporary LOD armatures and then rolls
-                # back an undo step. Deleting those datablocks here can leave a
-                # dangling depsgraph reference and crash Blender. Unlinking the
-                # temporary collection is enough; unsaved orphans are dropped
-                # when the user saves the .blend.
-                for obj in list(fresh_collection.objects):
-                    fresh_collection.objects.unlink(obj)
-                if fresh_scene is not None:
-                    try:
-                        fresh_scene.collection.children.unlink(fresh_collection)
-                    except Exception:
-                        pass
-                bpy.data.collections.remove(fresh_collection)
+            _purge_export_leftovers(
+                scene_name, collection_name, objects_before, collections_before
+            )
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -833,6 +999,15 @@ class DMF_OT_export_stage(Operator):
                     # Auto mode keeps the deepest generated level non-empty even
                     # when a hero has more than the usual three LOD slots.
                     lod_decimate = min(lod_decimate, 100.0 / (lod_count + 1))
+            live_lods: list[bpy.types.Object] = []
+            if settings.live_lods:
+                live_lods = [row.object for row in settings.lod_levels if row.object is not None]
+                if not live_lods:
+                    raise RuntimeError(
+                        "Use built LODs is on but none are built. Press Build LODs in CSDK Addon, "
+                        "or turn it off so PulseSrcOps generates them."
+                    )
+                lod_count = len(live_lods)
             exported = self._export(
                 context,
                 settings,
@@ -840,6 +1015,7 @@ class DMF_OT_export_stage(Operator):
                 export_dir,
                 lod_count,
                 lod_decimate,
+                live_lods=live_lods,
             )
             fresh_scene = core.fresh_scene(scene_name)
             if fresh_scene is None:
@@ -1149,6 +1325,8 @@ CLASSES = (
     DMF_OT_clear_part_material,
     DMF_OT_fit,
     DMF_OT_retarget,
+    DMF_OT_build_lods,
+    DMF_OT_clear_lods,
     DMF_OT_export_stage,
     DMF_OT_compile,
     DMF_OT_pick_old_vpk,

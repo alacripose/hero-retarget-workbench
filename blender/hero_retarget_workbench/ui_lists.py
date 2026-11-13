@@ -37,6 +37,25 @@ class DMF_UL_bone_map(UIList):
             row.label(text="", icon="INFO")
 
 
+class DMF_UL_hierarchy(UIList):
+    bl_idname = "DMF_UL_hierarchy"
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        for _ in range(min(item.depth, 10)):
+            row.label(text="", icon="BLANK1")
+        row.label(
+            text=_short(item.name, 26) or "bone",
+            icon="BONE_DATA" if item.children else "DOT",
+        )
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        if item.parent:
+            right.label(text=f"< {_short(item.parent, 14)}", icon="BLANK1")
+        else:
+            right.label(text="root", icon="BLANK1")
+
+
 class DMF_UL_parts(UIList):
     bl_idname = "DMF_UL_parts"
 
@@ -64,7 +83,7 @@ class DMF_UL_materials(UIList):
         right.label(text=f"[{item.slot_index}]")
 
 
-CLASSES = (DMF_UL_bone_map, DMF_UL_parts, DMF_UL_materials)
+CLASSES = (DMF_UL_bone_map, DMF_UL_hierarchy, DMF_UL_parts, DMF_UL_materials)
 
 
 def register() -> None:

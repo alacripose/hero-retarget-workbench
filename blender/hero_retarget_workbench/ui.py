@@ -12,7 +12,7 @@ from pathlib import Path
 import bpy
 from bpy.types import Panel
 
-from . import core
+from . import core, workbench
 
 
 _STATUS_ICONS = {
@@ -525,6 +525,37 @@ class DMF_PT_skeleton(Panel):
         plus.direction = 1
         _hint(layout, "Rest alignment changes the bind pose; rebind if the mesh already has weights.", "INFO")
 
+        layout.separator()
+        tree = _section(layout, "Bone hierarchy", "OUTLINER_OB_ARMATURE", f"{len(settings.hierarchy)} bones")
+        if settings.target_armature is None:
+            _hint(tree, "Import the hero skeleton to read its bone tree.", "QUESTION", width=32)
+        elif not settings.hierarchy:
+            tree.operator("dmf.refresh_hierarchy", text="Read hierarchy", icon="FILE_REFRESH")
+            _hint(tree, "The tree is read from the rig; it never re-parents a bone.", "INFO", width=32)
+        else:
+            actions = tree.row(align=True)
+            actions.operator("dmf.refresh_hierarchy", text="Refresh", icon="FILE_REFRESH")
+            actions.operator("dmf.select_hierarchy_bone", text="Select bone", icon="RESTRICT_SELECT_OFF")
+            tree.template_list(
+                "DMF_UL_hierarchy",
+                "hierarchy",
+                settings,
+                "hierarchy",
+                settings,
+                "hierarchy_index",
+                rows=10,
+            )
+            index = max(0, min(settings.hierarchy_index, len(settings.hierarchy) - 1))
+            chosen = settings.hierarchy[index]
+            summary = tree.row(align=True)
+            summary.label(text=_short(chosen.name, 24), icon="BONE_DATA")
+            right = summary.row(align=True)
+            right.alignment = "RIGHT"
+            right.label(text=f"{chosen.children} children" if chosen.children else "leaf")
+            chain = workbench.bone_chain(settings, chosen.name)
+            if chain:
+                _hint(tree, "Chain: " + " <- ".join(reversed(chain)), "FILE_PARENT", width=34)
+
 
 class DMF_PT_weights(Panel):
     bl_label = "Weights & Proof"
@@ -650,11 +681,44 @@ class DMF_PT_handoff(Panel):
         handoff.label(text="Content paths", icon="FILE")
         handoff.prop(settings, "vmdl_relative", text="vmdl")
         handoff.prop(settings, "target_dmx_relative", text="DMX")
-        handoff.prop(settings, "generate_lods", text="Generate LODs")
+        handoff.prop(settings, "generate_lods", text="Replace LOD slots")
         lod = handoff.column(align=True)
         lod.enabled = settings.generate_lods
         lod.prop(settings, "lod_count", text="Count (0 = hero)")
         lod.prop(settings, "lod_decimate", text="Decimate %")
+
+        built = [row for row in settings.lod_levels if row.object is not None]
+        lod_box = _section(layout, "LOD meshes", "MOD_DECIM", f"{len(built)} built")
+        lod_box.prop(settings, "live_lods", text="Use built LODs")
+        actions = lod_box.row(align=True)
+        actions.operator(
+            "dmf.build_lods",
+            text="Rebuild LODs" if built else "Build LODs",
+            icon="FILE_REFRESH",
+        )
+        actions.operator("dmf.clear_lods", text="Clear", icon="TRASH")
+        if built:
+            for row in built:
+                line = lod_box.row(align=True)
+                line.label(text=f"L{row.level}", icon="MESH_DATA")
+                right = line.row(align=True)
+                right.alignment = "RIGHT"
+                right.label(text=f"{row.vertices:,}v  {_short(row.object.name, 20)}")
+            if settings.lod_tick != settings.axis_tick:
+                _hint(
+                    lod_box,
+                    "Weights or fit changed since these were built. Rebuild so the LODs match the model.",
+                    "STATUS_WARNING",
+                    alert=True,
+                    width=32,
+                )
+        else:
+            _hint(
+                lod_box,
+                "Built LODs are exported as they are: no per-level decimation and no armature copies at export.",
+                "INFO",
+                width=32,
+            )
         compiled = False
         if root is not None and folder is not None and settings.vmdl_relative.strip():
             compiled = (

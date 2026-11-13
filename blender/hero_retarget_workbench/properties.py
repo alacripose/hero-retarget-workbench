@@ -69,6 +69,24 @@ class DMF_MaterialRow(PropertyGroup):
     label: StringProperty(name="Label", default="")
 
 
+class DMF_LodLevel(PropertyGroup):
+    object: PointerProperty(
+        name="LOD mesh",
+        description="Persistent decimated mesh exported as this level",
+        type=Object,
+        poll=lambda self, obj: obj.type == "MESH",
+    )
+    level: IntProperty(name="Level", default=1, min=1)
+    vertices: IntProperty(name="Vertices", default=0)
+
+
+class DMF_HierarchyRow(PropertyGroup):
+    name: StringProperty(name="Bone", default="")
+    parent: StringProperty(name="Parent", default="")
+    depth: IntProperty(name="Depth", default=0, min=0)
+    children: IntProperty(name="Children", default=0, min=0)
+
+
 class DMF_Settings(PropertyGroup):
     project_root: StringProperty(
         name="Workspace folder",
@@ -359,6 +377,29 @@ class DMF_Settings(PropertyGroup):
         max=90.0,
         precision=1,
     )
+    live_lods: BoolProperty(
+        name="Use built LODs",
+        description=(
+            "Export the LOD meshes built in this file instead of asking PulseSrcOps to "
+            "generate them, so export does not copy the armature per level"
+        ),
+        default=False,
+    )
+    lod_levels: CollectionProperty(
+        type=DMF_LodLevel,
+        description="LOD meshes built from the export scope and reused by every export",
+    )
+    lod_index: IntProperty(name="LOD row", default=0)
+    lod_tick: IntProperty(
+        name="LOD tick",
+        description="Work tick the LOD meshes were built at; a later edit makes them stale",
+        default=-1,
+    )
+    hierarchy: CollectionProperty(
+        type=DMF_HierarchyRow,
+        description="Bone hierarchy of the hero skeleton, drawn depth first",
+    )
+    hierarchy_index: IntProperty(name="Bone row", default=0)
     addon_name: StringProperty(
         name="Addon name",
         description=(
@@ -437,7 +478,15 @@ class DMF_Settings(PropertyGroup):
     exported_dmx: StringProperty(name="Exported DMX", subtype="FILE_PATH", default="")
 
 
-CLASSES = (DMF_BoneEntry, DMF_ProofCheck, DMF_Part, DMF_MaterialRow, DMF_Settings)
+CLASSES = (
+    DMF_BoneEntry,
+    DMF_ProofCheck,
+    DMF_Part,
+    DMF_MaterialRow,
+    DMF_LodLevel,
+    DMF_HierarchyRow,
+    DMF_Settings,
+)
 
 
 def register() -> None:
