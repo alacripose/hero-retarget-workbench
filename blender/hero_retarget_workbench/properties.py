@@ -365,6 +365,11 @@ class DMF_Settings(PropertyGroup):
         description="A compiled addon VPK or an extracted addon content folder to migrate onto the current live hero",
         subtype="FILE_PATH",
     )
+    update_old_vmdl: StringProperty(
+        name="Old model vmdl",
+        description="Optional old vmdl when the old package has more than one; path may be relative to the old package",
+        subtype="FILE_PATH",
+    )
     update_output: StringProperty(
         name="Update output",
         description="Stage folder for the migrated addon; blank uses <workspace>/updates",
@@ -387,7 +392,7 @@ class DMF_Settings(PropertyGroup):
     )
     update_preserve_cloth: BoolProperty(
         name="Preserve cloth/physics",
-        description="Transplant the old Softbody and PhysicsJointList sections exactly; do not rebuild cloth chains or joints",
+        description="Transplant every old cloth/physics section exactly; section names are discovered from the old model, not hard-coded",
         default=True,
     )
     update_preserve_materials: BoolProperty(

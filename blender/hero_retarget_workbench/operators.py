@@ -964,6 +964,21 @@ class DMF_OT_pick_old_vpk(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_pick_old_vmdl(Operator):
+    bl_idname = "dmf.pick_old_vmdl"
+    bl_label = "Choose old vmdl"
+    bl_description = "Select the old model when the old addon contains more than one vmdl"
+    filepath: StringProperty(subtype="FILE_PATH")
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {"RUNNING_MODAL"}
+
+    def execute(self, context):
+        context.scene.dmf.update_old_vmdl = str(Path(bpy.path.abspath(self.filepath)))
+        return {"FINISHED"}
+
+
 class DMF_OT_update_old_addon(Operator):
     bl_idname = "dmf.update_old_addon"
     bl_label = "Import & update old addon"
@@ -993,8 +1008,9 @@ class DMF_OT_update_old_addon(Operator):
                 else core.project_root(settings) / "updates"
             )
             addon = settings.update_addon_name.strip() or f"{Path(settings.old_vpk).stem}_updated"
-            sections = ("Softbody", "PhysicsJointList") if settings.update_preserve_cloth else ()
+            sections = None if settings.update_preserve_cloth else ()
             old_path = Path(bpy.path.abspath(settings.old_vpk))
+            old_vmdl = Path(bpy.path.abspath(settings.update_old_vmdl)) if settings.update_old_vmdl else None
             hero_slug = settings.hero_slug
             model_policy = settings.update_model_policy
             preserve_materials = settings.update_preserve_materials
@@ -1013,6 +1029,7 @@ class DMF_OT_update_old_addon(Operator):
                     output,
                     addon,
                     hero=hero,
+                    old_vmdl=old_vmdl,
                     preserve_model=model_policy,
                     preserve_materials=preserve_materials,
                     sections=sections,
@@ -1105,6 +1122,7 @@ CLASSES = (
     DMF_OT_export_stage,
     DMF_OT_compile,
     DMF_OT_pick_old_vpk,
+    DMF_OT_pick_old_vmdl,
     DMF_OT_update_old_addon,
     DMF_OT_pick_vmdl,
 )

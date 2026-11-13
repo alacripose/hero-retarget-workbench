@@ -102,6 +102,22 @@ def sections(text: str) -> dict[str, Section]:
     return found
 
 
+def cloth_physics_sections(text: str) -> list[str]:
+    """Return old-model sections that carry cloth or physics nodes.
+
+    The names are discovered from the old model rather than hard-coded for one
+    addon. Source 2 modeldocs use ``Softbody`` and ``PhysicsJointList`` today,
+    but older mods can carry other cloth/joint class names; the same exact-block
+    transplant is valid for any matching top-level section.
+    """
+    markers = ("softbody", "cloth", "physicsjoint")
+    return [
+        name
+        for name in sections(text)
+        if any(marker in name.lower() for marker in markers)
+    ]
+
+
 def section_hash(value: str) -> str:
     return sha256(value.encode("utf-8")).hexdigest()
 

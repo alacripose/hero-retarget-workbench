@@ -365,10 +365,12 @@ and this warning is in the LOD decimation/export path.
 The **Update old addon** subpanel accepts an old addon VPK or extracted content
 folder. It extracts the old package with Source 2 Viewer (a folder is used in
 place), extracts the selected live hero, and uses the live model as the base.
-The old `Softbody` and `PhysicsJointList` sections are transplanted exactly, so
-`ClothChain`, `ClothChainHinge`, cloth clusters and `PhysicsJointConical` joints
-survive without being rebuilt. The `Update old addon` panel reports the section
-hashes and cloth-chain counts; the output `stage.json` records them too.
+The old cloth/physics sections are discovered from the old model by class name
+and transplanted exactly, so whatever the old mod uses (for example `Softbody`,
+`ClothChain`, `ClothChainHinge`, `PhysicsJointConical`, or another cloth/joint
+section) survives without being rebuilt. The `Update old addon` panel reports
+the section hashes and cloth-chain counts; the output `stage.json` records them
+too.
 
 The old model is kept under the default **Preserve custom only** policy when its
 render-mesh paths or DMX bytes differ from the live model. Choose **Always old**
@@ -389,16 +391,23 @@ python tools/project.py update-addon \
 ```
 
 Use `--new-extraction` and `--new-vmdl` to reuse an existing live S2V extraction
-instead of extracting the hero again. `--no-materials` keeps only the live
-materials; `--preserve-section` adds another top-level old modeldoc section by
-name. The migration is the one deliberate vmdl-writing path: it copies the old
-sections verbatim and records their old/output SHA-256 hashes. It does not add a
-KV3 parser or reconstruct cloth from inferred fields.
+instead of extracting the hero again. `--old-vmdl` selects one old model when a
+package contains several; it may be an absolute path or a path relative to the
+old package. `--no-materials` keeps only the live materials; `--preserve-section`
+overrides the automatic cloth/physics section discovery with explicit names. The
+migration is the one deliberate vmdl-writing path: it copies the old sections
+verbatim and records their old/output SHA-256 hashes. It does not add a KV3
+parser or reconstruct cloth from inferred fields.
 
 Real Mayu migration on 2026-11-13: the old source addon produced a 343 MB stage
 with 2 cloth chains, 9 hinges, 18 physics joints, 23 old model files, 111 old
-material assets and 89 textures; the old `Softbody` and `PhysicsJointList`
-hashes matched their output hashes. The current reduced CSDK has no
-`resourcecompiler.exe`, so the compile attempt failed before compiling anything
-(`resourcecompiler-missing` / `modeldoc_utils` in the live-game compiler). That
-is recorded as a limitation, not a compile claim; see `TICKET-0009`.
+material assets and 89 textures; the old cloth/physics hashes matched their
+output hashes. After the owner restored CSDK13, the real compiler returned 0:
+1 compiled, 0 failed, 42 compiled files, 21 reduced-CSDK material warnings. The
+compiled `doorman.vmdl_c` is 5,470,101 bytes. A control compile with the
+`Softbody` block removed produced a different 5,459,202-byte `.vmdl_c`, proving
+the compiler retained the cloth data rather than ignoring the transplanted
+section. The compiled tree is installed at
+`Reduced_CSDK_13/game/citadel_addons/mayu_updated` and the source tree at
+`Reduced_CSDK_13/content/citadel_addons/mayu_updated`. Owner launch/render
+witness is still pending; see `TICKET-0009`.

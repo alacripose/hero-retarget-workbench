@@ -22,7 +22,8 @@ from .paths import Environment
 from .stage import is_texture_asset, material_files
 
 
-DEFAULT_SECTIONS = ("Softbody", "PhysicsJointList")
+# Section names are discovered from each old model. ``Softbody`` and
+# ``PhysicsJointList`` are current examples, not a closed list.
 
 
 class MigrationError(ValueError):
@@ -139,7 +140,10 @@ def section_files(text: str, section: str, suffixes: tuple[str, ...]) -> list[st
     if block is None:
         return []
     result: list[str] = []
-    for match in re.finditer(r'\b(?:filename|source_filename|output_vsnap)\s*=\s*"([^"]+)"', block.text):
+    # Different modeldoc writers use different keys for the same path
+    # (filename, source_filename, output_vsnap, or a newer key). Match the
+    # quoted path by suffix instead of pinning the migration to one writer.
+    for match in re.finditer(r'"([^"]+\.[A-Za-z0-9_]+)"', block.text):
         value = match.group(1).replace("\\", "/")
         if value.lower().endswith(suffixes):
             result.append(_safe_relative(value))
@@ -218,7 +222,7 @@ def migrate_trees(
     vmdl_relative: str | None = None,
     preserve_model: str = "auto",
     preserve_materials: bool = True,
-    sections: tuple[str, ...] | list[str] = DEFAULT_SECTIONS,
+    sections: tuple[str, ...] | list[str] | None = None,
     force: bool = False,
     old_package: Path | None = None,
 ) -> MigrationResult:
@@ -264,7 +268,11 @@ def migrate_trees(
         if missing:
             raise MigrationError(f"old-model-missing: {', '.join(missing[:8])}")
 
-    requested = list(dict.fromkeys(sections))
+    requested = list(
+        dict.fromkeys(
+            modeldoc.cloth_physics_sections(old_text) if sections is None else sections
+        )
+    )
     if keep_model:
         if old_render != new_render:
             requested.append("RenderMeshList")
@@ -365,9 +373,10 @@ def update_from_package(
     hero: Hero | None = None,
     new_extraction: Path | None = None,
     new_vmdl: Path | None = None,
+    old_vmdl: Path | None = None,
     preserve_model: str = "auto",
     preserve_materials: bool = True,
-    sections: tuple[str, ...] | list[str] = DEFAULT_SECTIONS,
+    sections: tuple[str, ...] | list[str] | None = None,
     force: bool = False,
     timeout: int = 1800,
 ) -> MigrationResult:
@@ -406,7 +415,13 @@ def update_from_package(
             preferred = new_vmdl_path.relative_to(new_root).as_posix()
         except ValueError:
             preferred = None
-    old_vmdl_path = find_vmdl(old_root, preferred)
+    if old_vmdl is None:
+        old_vmdl_path = find_vmdl(old_root, preferred)
+    else:
+        candidate = Path(old_vmdl)
+        old_vmdl_path = (candidate if candidate.is_absolute() else old_root / candidate).resolve()
+        if not old_vmdl_path.is_file():
+            raise MigrationError(f"old-vmdl-missing: {old_vmdl_path}")
     return migrate_trees(
         old_root=old_root,
         old_vmdl=old_vmdl_path,
