@@ -114,8 +114,8 @@ def main() -> int:
             raise RuntimeError(f"core imported the stale forge module: {bundled['paths'].__name__}")
 
         panels = len(dmf.ui.CLASSES)
-        if panels != 9:
-            raise RuntimeError(f"expected 9 panel classes, found {panels}")
+        if panels != 14:
+            raise RuntimeError(f"expected 14 panel classes, found {panels}")
         # Every operator the package defines has to reach dmf.*, and every
         # registered one has to come from a CLASSES tuple. A count constant here
         # only records how many existed the day it was typed.

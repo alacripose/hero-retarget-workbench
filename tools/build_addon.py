@@ -34,6 +34,7 @@ REQUIRED = (
     "proofing.py",
     "ui.py",
     "ui_lists.py",
+    "ui_popit.py",
     "weights.py",
     "workbench.py",
     "_vendor/blake3/__init__.py",
@@ -48,6 +49,7 @@ REQUIRED = (
     "forge/paths.py",
     "forge/proof.py",
     "forge/rigmap.py",
+    "forge/stageflow.py",
     "forge/stage.py",
     "forge/weights.py",
 )
