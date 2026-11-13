@@ -1,6 +1,6 @@
 # TICKET-0009 — Old addon VPK import and live hero-model update
 
-**Status:** implemented; real Mayu migration, unit tests, and addon zip probe pass; compile is blocked by the current CSDK compiler install.
+**Status:** implemented; real Mayu migration, CSDK13 compile, unit tests, addon zip probe, and compiled addon installation pass; owner launch/render witness pending.
 **Owner:** ala
 **Authority:** `logs/authority/2026-11-13-old-vpk-update.jsonl`
 **Opened:** 2026-11-13
@@ -16,13 +16,17 @@ The owner's message, verbatim:
 1. Accept an old compiled addon VPK or an already-extracted addon content directory.
 2. Extract a VPK through Source 2 Viewer CLI; a directory is used in place. The
    old modeldoc is found by the current live model's relative path when that
-   path exists, and ambiguity is refused by name.
+   path exists. An explicit `--old-vmdl` / **Old model vmdl** selection handles
+   packages with several models; ambiguity is refused by name rather than
+   guessed.
 3. Use the current live hero extraction as the base. The old addon must not
    replace the live extraction wholesale.
-4. Transplant the old `Softbody` and `PhysicsJointList` top-level sections
-   exactly. The section text, including nested `ClothChain`, `ClothChainHinge`,
-   clusters, shapes and `PhysicsJointConical` joints, is copied byte-for-byte
-   into the new modeldoc. No cloth chain or joint is inferred or rebuilt.
+4. Discover the old model's cloth/physics top-level sections by class marker
+   (`softbody`, `cloth`, `physicsjoint`) and transplant their text exactly. The
+   current `Softbody`/`PhysicsJointList` names are examples, not a closed list;
+   nested `ClothChain`, `ClothChainHinge`, clusters, shapes and
+   `PhysicsJointConical` joints are copied byte-for-byte. No cloth chain or
+   joint is inferred or rebuilt.
 5. Preserve an old custom render model by comparing its `RenderMeshList` paths
    and DMX bytes with the live extraction. The default `auto` policy keeps the
    old model only when it differs; `old` always keeps it and `live` always uses
@@ -63,10 +67,11 @@ no old model is being merged.
 
 ## Evidence
 
-- `tests/test_modeldoc.py` and `tests/test_migrate.py`: 12 tests pass. They cover
-  exact section insertion/replacement/absence, duplicate-section refusal,
-  custom DMX preservation, live-model policy with cloth retained, old material
-  overlay, missing-model refusal, output collision, and the merged manifest.
+- `tests/test_modeldoc.py` and `tests/test_migrate.py`: 15 tests pass. They cover
+  exact section insertion/replacement/absence, arbitrary cloth/joint section
+  discovery, explicit old-vmdl selection, duplicate-section refusal, custom DMX
+  preservation, live-model policy with cloth retained, old material overlay,
+  missing-model refusal, output collision, and the merged manifest.
 - Real Mayu source addon:
   `C:\Users\ala\Downloads\Reduced_CSDK_13\content\citadel_addons\mayu`.
   Live extraction:
@@ -95,14 +100,19 @@ no old model is being merged.
 - `tools/blender_zip_probe.py`: 9 panels, 43 operators, 50 icons, old-addon
   update operator registered, `.blend` path persistence and namespace isolation
   pass. Report: `artifacts/receipts/hero-retarget-workbench-zip-update.json`.
-- Compile attempt: `logs/mayu-update-compile.log` and a `compile` ledger row
-  with `result: fail`. The live-game `resourcecompiler.exe` starts but cannot
-  load `modeldoc_utils`; the reduced CSDK no longer has its compiler binary.
-  This is not compile evidence and no `.vmdl_c` is claimed.
+- Restored-CSDK compile: `logs/update-addon-compile.log` and the `compile`
+  ledger row with `result: pass`. `resourcecompiler` returned 0 with **1
+  compiled, 0 failed, 42 compiled files, 21 warnings**; `doorman.vmdl_c` is
+  5,470,101 bytes. A control compile with the `Softbody` block removed is a
+  different 5,459,202-byte file, proving the compiler retained the transplanted
+  cloth data. The compiled tree is installed at
+  `Reduced_CSDK_13/game/citadel_addons/mayu_updated` (42 files, 158 MB); the
+  source stage is `Reduced_CSDK_13/content/citadel_addons/mayu_updated`
+  (688 files, 343 MB).
 
 ## Remaining witness
 
-Restore a complete CSDK13 compiler install, run
-`python tools/project.py update-addon ... --compile` (or compile the stage from
-the workbench), and check the compiled `.vmdl_c`. The owner must launch the
-addon in Deadlock to witness the cloth chains, old materials and models.
+The owner must launch the installed `mayu_updated` addon in Deadlock and witness
+the cloth chains, old materials and models. The compile and the control compile
+prove the `.vmdl_c` changed when `Softbody` was removed; they are not a render
+witness.

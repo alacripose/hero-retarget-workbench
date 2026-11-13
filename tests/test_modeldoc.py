@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from forge.modeldoc import ModeldocError, merge, sections
+from forge.modeldoc import ModeldocError, cloth_physics_sections, merge, sections
 
 
 HEADER = """<!-- modeldoc fixture -->
@@ -79,6 +79,14 @@ class ModeldocSectionTests(unittest.TestCase):
         result = merge(new, old, ["Softbody"])
         self.assertEqual(result.actions["Softbody"]["action"], "absent")
         self.assertNotIn("Softbody", sections(result.text))
+
+    def test_discovers_cloth_and_physics_by_class_marker(self):
+        text = document(
+            block("BoneMarkupList", "\t\t\t\tchildren = [  ]\n"),
+            block("ClothRig", "\t\t\t\tchildren = [  ]\n"),
+            block("PhysicsJointBall", "\t\t\t\tchildren = [  ]\n"),
+        )
+        self.assertEqual(cloth_physics_sections(text), ["ClothRig", "PhysicsJointBall"])
 
     def test_invalid_section_name_is_refused(self):
         old = document(block("BoneMarkupList", "\t\t\t\tchildren = [  ]\n"))

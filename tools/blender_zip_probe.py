@@ -116,8 +116,8 @@ def main() -> int:
             raise RuntimeError(f"expected 9 panel classes, found {panels}")
         if workbench != 24:
             raise RuntimeError(f"expected 24 workbench operators, found {workbench}")
-        if operators != 43:
-            raise RuntimeError(f"expected 43 operator classes in total, found {operators}")
+        if operators != 44:
+            raise RuntimeError(f"expected 44 operator classes in total, found {operators}")
         valid_icons = {
             item.identifier
             for item in bpy.types.UILayout.bl_rna.functions["label"].parameters["icon"].enum_items
@@ -133,6 +133,8 @@ def main() -> int:
             raise RuntimeError("path detection operator was not registered")
         if not hasattr(bpy.ops.dmf, "update_old_addon"):
             raise RuntimeError("old addon update operator was not registered")
+        if not hasattr(bpy.ops.dmf, "pick_old_vmdl"):
+            raise RuntimeError("old vmdl picker was not registered")
 
         expected_paths = {
             "deadlock_root": str(temp / "Deadlock"),

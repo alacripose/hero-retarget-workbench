@@ -30,7 +30,7 @@ if str(ROOT) not in sys.path:
 from forge.axis import PRESETS, AxisTransform  # noqa: E402
 from forge.compile import CompileError, compile_stage, compile_vmdl  # noqa: E402
 from forge.live import LiveError, extract, inventory, list_heroes  # noqa: E402
-from forge.migrate import DEFAULT_SECTIONS, MigrationError, update_from_package  # noqa: E402
+from forge.migrate import MigrationError, update_from_package  # noqa: E402
 from forge.paths import detect  # noqa: E402
 from forge.stage import MaterialCopy, StageError, StageRequest, digest, material_files, stage, verify  # noqa: E402
 
@@ -154,7 +154,7 @@ def write_status(checks: list[tuple[str, bool, str]]) -> None:
             "- CSDK13: resourcecompiler invocation through a temporary build mirror; no persistent source copy.",
             "- Proof identity: BLAKE3; SHA-256 remains as legacy stage evidence.",
             "- CSDK13 compile: temporary build addon; compiled `_c` files copied to the stage, then the CSDK mirror is removed.",
-            "- Old addon migration: old VPK/folder import, exact `Softbody`/`PhysicsJointList` transplant, custom model/material preservation, and live-model update.",
+            "- Old addon migration: general old VPK/folder import, automatic cloth/physics section discovery and exact transplant, optional explicit old vmdl selection, custom model/material preservation, and live-model update.",
             "",
             "## Observed evidence",
             "",
@@ -410,7 +410,7 @@ def cmd_update_addon(args: argparse.Namespace) -> int:
         print("update-addon-failed: --hero or --new-extraction is required", file=sys.stderr)
         return 2
     addon = args.addon.strip() or f"{source.stem}_updated"
-    sections = tuple(args.preserve_section or DEFAULT_SECTIONS)
+    sections = tuple(args.preserve_section) if args.preserve_section else None
     try:
         result = update_from_package(
             env,
@@ -420,6 +420,7 @@ def cmd_update_addon(args: argparse.Namespace) -> int:
             hero=hero,
             new_extraction=Path(args.new_extraction) if args.new_extraction else None,
             new_vmdl=Path(args.new_vmdl) if args.new_vmdl else None,
+            old_vmdl=Path(args.old_vmdl) if args.old_vmdl else None,
             preserve_model=args.model,
             preserve_materials=not args.no_materials,
             sections=sections,
@@ -616,12 +617,13 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--addon", default="", help="new addon folder name; defaults to <source>_updated")
     p.add_argument("--new-extraction", default="", help="existing live S2V extraction root")
     p.add_argument("--new-vmdl", default="", help="live vmdl inside --new-extraction")
+    p.add_argument("--old-vmdl", default="", help="old vmdl path, or a path relative to the old package; use when the package has multiple vmdls")
     p.add_argument("--model", choices=("auto", "old", "live"), default="auto")
     p.add_argument(
         "--preserve-section",
         action="append",
         default=[],
-        help="extra top-level modeldoc section to transplant; defaults to Softbody and PhysicsJointList",
+        help="extra top-level modeldoc section to transplant; by default every old cloth/physics section is discovered",
     )
     p.add_argument("--no-materials", action="store_true", help="do not overlay the old material assets")
     p.add_argument("--force", action="store_true", help="replace an existing output addon folder")

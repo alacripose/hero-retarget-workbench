@@ -257,5 +257,16 @@ carried by copying the old file alone.
   with their relative paths preserved. The old model is kept by the `auto`
   policy only when its render paths or DMX bytes differ from the live model.
 - A compile is never claimed from this feature until a real CSDK13
-  `resourcecompiler` run returns and produces a `.vmdl_c`; the current reduced
-  CSDK install has no compiler binary, so the recorded compile is a failure.
+  `resourcecompiler` run returns and produces a `.vmdl_c`.
+
+**2026-11-13 — CSDK restored; general migration correction.** The owner
+restored the reduced CSDK13 compiler and corrected the framing: this is a
+general old-mod update feature, not a Mayu/Doorman-specific path. The old model
+is selected by the live relative path when unambiguous, otherwise by the
+explicit `--old-vmdl` / **Old model vmdl** field; ambiguity is refused rather
+than guessed. Cloth/physics sections are discovered from the old model by class
+marker (`softbody`, `cloth`, `physicsjoint`), not limited to the current
+`Softbody`/`PhysicsJointList` names. The restored compile returned 0 with 1
+compiled file, 42 compiled outputs and 21 reduced-CSDK material warnings;
+`mayu_updated` is installed in the CSDK game/content addon roots. This
+supersedes the prior sentence that the current CSDK had no compiler binary.

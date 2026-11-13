@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from forge.migrate import MigrationError, migrate_trees
+from forge.migrate import MigrationError, migrate_trees, update_from_package
 from forge.modeldoc import sections
 
 
@@ -161,6 +161,35 @@ class MigrationTests(unittest.TestCase):
         with self.assertRaises(MigrationError) as raised:
             migrate_trees(**self.request())
         self.assertIn("output-exists", str(raised.exception))
+
+    def test_arbitrary_old_cloth_section_is_discovered_and_transplanted(self):
+        (self.old / "models/test/hero.vmdl").write_text(
+            document(block("ClothRig", SOFTBODY)),
+            encoding="utf-8",
+        )
+        result = migrate_trees(**self.request())
+        self.assertIn("ClothRig", result.sections)
+        self.assertEqual(result.sections["ClothRig"]["action"], "inserted")
+        self.assertIn("_class = \"ClothChain\"", result.vmdl.read_text(encoding="utf-8"))
+
+    def test_explicit_old_vmdl_selects_among_multiple_vmdls(self):
+        alternate = self.old / "models/test/alternate.vmdl"
+        alternate.write_text(
+            document(block("Softbody", SOFTBODY)),
+            encoding="utf-8",
+        )
+        output = self.root / "explicit-out"
+        result = update_from_package(
+            None,
+            self.old,
+            output,
+            "explicit_hero",
+            new_extraction=self.new,
+            new_vmdl=self.new / "models/test/hero.vmdl",
+            old_vmdl=alternate,
+        )
+        self.assertEqual(result.old_vmdl, alternate.resolve())
+        self.assertIn("_class = \"ClothChain\"", result.vmdl.read_text(encoding="utf-8"))
 
     def test_output_vmdl_contains_the_old_sections_and_new_sections(self):
         result = migrate_trees(**self.request())

@@ -286,6 +286,8 @@ class DMF_PT_update(Panel):
         box = _section(layout, "Old addon migration", "FILE_REFRESH", settings.update_addon_name or "not set")
         _path_row(box, settings, "old_vpk", "Old VPK / folder")
         box.operator("dmf.pick_old_vpk", text="Choose old addon", icon="FILEBROWSER")
+        _path_row(box, settings, "update_old_vmdl", "Old model vmdl (optional)")
+        box.operator("dmf.pick_old_vmdl", text="Choose old vmdl", icon="FILEBROWSER")
         _path_row(box, settings, "update_output", "Output stage")
         box.prop(settings, "update_addon_name", text="Updated addon")
         box.prop(settings, "update_model_policy", text="Old model")
@@ -295,7 +297,7 @@ class DMF_PT_update(Panel):
         options.prop(settings, "update_replace_output", text="Replace output folder")
         _hint(
             box,
-            "Reads the old VPK through S2V, extracts the selected live hero, and transplants the old Softbody and PhysicsJointList sections exactly. The old model and material assets overlay the live extraction.",
+            "Reads the old VPK/folder through S2V, extracts the selected live hero, and transplants every old cloth/physics section exactly. The old model and material assets overlay the live extraction; choose an old vmdl explicitly when the package has more than one.",
             "INFO",
             width=32,
         )
