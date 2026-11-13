@@ -600,12 +600,12 @@ class DMF_PT_handoff(Panel):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
-        handoff = _section(layout, "Stage", "PACKAGE", "staged" if settings.stage_dir else "not staged")
+        handoff = _section(layout, "CSDK addon", "PACKAGE", "installed" if settings.stage_dir else "not installed")
         if settings.body_dmx and not settings.vmdl:
             _hint(handoff, "No S2V vmdl is set. Choose it below if the extraction did not write one.", "STATUS_WARNING", alert=True)
         handoff.prop(settings, "addon_name", text="Addon")
         _path_row(handoff, settings, "stage_dir", "Install root (blank = CSDK13)")
-        handoff.label(text="Inside the content tree", icon="FILE")
+        handoff.label(text="Paths inside the addon", icon="FILE")
         handoff.prop(settings, "vmdl_relative", text="vmdl path")
         handoff.prop(settings, "target_dmx_relative", text="DMX path")
         handoff.prop(settings, "generate_lods", text="Generate LODs")
@@ -615,8 +615,9 @@ class DMF_PT_handoff(Panel):
         lod.prop(settings, "lod_decimate", text="Decimate per LOD")
         _hint(
             handoff,
-            f"Stage writes content/citadel_addons/{settings.addon_name or '<addon>'} in the CSDK; compile writes "
-            f"game/citadel_addons/{settings.addon_name or '<addon>'}. The S2V vmdl is copied unchanged.",
+            f"Export & stage writes content/citadel_addons/{settings.addon_name or '<addon>'} in the CSDK, ready to "
+            f"open in modeldoc; compile runs there and leaves game/citadel_addons/{settings.addon_name or '<addon>'}. "
+            "The S2V vmdl is copied unchanged.",
             "LOCKED",
         )
         _primary(handoff, "dmf.export_stage", "Export & stage", "EXPORT", enabled=not settings.job_running)

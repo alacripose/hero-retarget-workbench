@@ -72,7 +72,7 @@ class DMF_MaterialRow(PropertyGroup):
 class DMF_Settings(PropertyGroup):
     project_root: StringProperty(
         name="Workspace folder",
-        description="Where this addon keeps extractions, proofs, logs and the compiler handoff when it is not bundled",
+        description="Where this addon keeps extractions, proofs and logs when it is not bundled; the addon install itself goes into the CSDK13 root",
         subtype="DIR_PATH",
     )
     deadlock_root: StringProperty(
@@ -100,7 +100,7 @@ class DMF_Settings(PropertyGroup):
     )
     vmdl: StringProperty(
         name="Hero vmdl",
-        description="The S2V-extracted vmdl. Staging copies it unchanged to the compiler handoff",
+        description="The S2V-extracted vmdl. Staging copies it unchanged into the CSDK13 addon",
         subtype="FILE_PATH",
     )
     vmdl_relative: StringProperty(

@@ -617,7 +617,7 @@ def _join_export_parts(context, settings, collection, source_parts, armature):
 class DMF_OT_export_stage(Operator):
     bl_idname = "dmf.export_stage"
     bl_label = "Export & Stage"
-    bl_description = "Join every mesh in the custom collection, export it as one DMX, then copy the unchanged S2V vmdl and its materials into a CSDK13 handoff"
+    bl_description = "Join every mesh in the custom collection, export it as one DMX, then install the addon at content/citadel_addons/<addon> in the CSDK13 root with the unchanged S2V vmdl and its materials"
 
     def _export(
         self,
@@ -911,7 +911,7 @@ class DMF_OT_export_stage(Operator):
 class DMF_OT_compile(Operator):
     bl_idname = "dmf.compile"
     bl_label = "Compile with CSDK13"
-    bl_description = "Run resourcecompiler on the staged, unchanged vmdl without blocking the viewport"
+    bl_description = "Run resourcecompiler in place on the installed addon and leave the compiled files in game/citadel_addons/<addon>, without blocking the viewport"
 
     def execute(self, context):
         settings = context.scene.dmf

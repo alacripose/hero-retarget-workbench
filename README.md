@@ -94,14 +94,14 @@ newer Deadlock build or a different drive updates the fields in their own file.
 and every version tag. It runs the unit tests, builds the addon zip, and uploads
 the zip as a workflow artifact on Windows with Python 3.13.
 
-A tag such as `v0.2.6` also runs the release job after the test job. The job
+A tag such as `v0.2.7` also runs the release job after the test job. The job
 checks that the zip version matches the tag, then creates or updates the release
 with `hero_retarget_workbench-<version>.zip` attached. A rerun replaces the asset
 rather than leaving the release without a zip.
 
 ```bash
-git tag v0.2.6
-git push origin v0.2.6
+git tag v0.2.7
+git push origin v0.2.7
 ```
 
 The tag must match `bl_info["version"]`. The workflow rejects a mismatch before
@@ -174,7 +174,7 @@ it publishes anything.
 ```bash
 python tools/build_addon.py
 blender -b --factory-startup --python tools/blender_workbench_probe.py -- --report artifacts/receipts/hero-retarget-workbench-workbench.json
-blender -b --factory-startup --python tools/blender_zip_probe.py -- --zip dist/hero_retarget_workbench-0.2.6.zip --report artifacts/receipts/hero-retarget-workbench-zip.json
+blender -b --factory-startup --python tools/blender_zip_probe.py -- --zip dist/hero_retarget_workbench-0.2.7.zip --report artifacts/receipts/hero-retarget-workbench-zip.json
 python tools/project.py doctor
 python tools/project.py heroes
 python tools/project.py extract --hero haze --out artifacts/extractions/haze
