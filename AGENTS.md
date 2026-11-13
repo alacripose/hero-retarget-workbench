@@ -227,5 +227,35 @@ option) and reduced-CSDK door-material warnings. The compiled `doorman.vmdl_c`
 is 4,820,622 bytes and contains `Body`, `Head`, `Lenses`, `hair` and
 `de_mods_2`; `doorman_head` and `doorman_hair` are absent. The installed addon
 is under `Reduced_CSDK_13\content\citadel_addons\thicc_mayu_v3` and
-`...\game\citadel_addons\thicc_mayu_v3`. The CSDK modeldoc crash remains a
-separate investigation and no `.vnmskel` is bundled.
+`...\game\citadel_addons\thicc_mayu_v3`. The CSDK modeldoc crash remains a separate investigation and no `.vnmskel` is bundled.
+
+## 2026-11-13 — old addon migration is the deliberate vmdl-write exception
+
+**Owner request:** *"okay I need a new feature for it that allows importing an old
+vpk and updating it's hero model to the version that the game's updated files use,
+while still preserving cloth chain/cloth physics nodes and the materials and
+models in the hero retarget workbench"*. Authority:
+`logs/authority/2026-11-13-old-vpk-update.jsonl`; contract: `TICKET-0009`.
+
+This supersedes the sentence "The S2V-extracted `.vmdl` is opaque. Copy it
+byte-for-byte. Do not parse, rewrite, regenerate, or derive metadata from it"
+**for the old-addon migration only**. The live model is still the base and is
+still copied byte-for-byte by every non-migration path. The migration deliberately
+writes a new merged vmdl because the old addon's cloth/physics nodes cannot be
+carried by copying the old file alone.
+
+- `forge/modeldoc.py` is a top-level section scanner/merger. It reads the old
+  `Softbody` and `PhysicsJointList` block text and writes those exact bytes into
+  the new modeldoc. It is not a KV3 parser and the `no KV3 parser` scan still
+  passes.
+- `forge/migrate.py` is the only module allowed to write a vmdl from this tree;
+  the gate scan excludes that named file and the exception is recorded here.
+- The migration refuses a missing old model or section and records section
+  hashes and cloth-chain/hinge counts in `stage.json`. It does not infer cloth,
+  joints, materials, or meshes.
+- The old custom render meshes and material assets overlay the live extraction
+  with their relative paths preserved. The old model is kept by the `auto`
+  policy only when its render paths or DMX bytes differ from the live model.
+- A compile is never claimed from this feature until a real CSDK13
+  `resourcecompiler` run returns and produces a `.vmdl_c`; the current reduced
+  CSDK install has no compiler binary, so the recorded compile is a failure.

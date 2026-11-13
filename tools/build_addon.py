@@ -41,6 +41,8 @@ REQUIRED = (
     "forge/compile.py",
     "forge/hashes.py",
     "forge/live.py",
+    "forge/migrate.py",
+    "forge/modeldoc.py",
     "forge/names.py",
     "forge/paths.py",
     "forge/proof.py",

@@ -949,6 +949,121 @@ class DMF_OT_compile(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_pick_old_vpk(Operator):
+    bl_idname = "dmf.pick_old_vpk"
+    bl_label = "Choose old addon"
+    bl_description = "Select an old addon VPK or an extracted addon folder; the live hero is read separately"
+    filepath: StringProperty(subtype="FILE_PATH")
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {"RUNNING_MODAL"}
+
+    def execute(self, context):
+        context.scene.dmf.old_vpk = str(Path(bpy.path.abspath(self.filepath)))
+        return {"FINISHED"}
+
+
+class DMF_OT_update_old_addon(Operator):
+    bl_idname = "dmf.update_old_addon"
+    bl_label = "Import & update old addon"
+    bl_description = "Extract an old addon, update its hero model to the live game's vmdl, and preserve its cloth/physics and custom assets"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        if settings.hero_slug in ("", "NONE"):
+            self.report({"ERROR"}, "Choose and detect a live hero first")
+            return {"CANCELLED"}
+        if not settings.old_vpk:
+            self.report({"ERROR"}, "Choose the old VPK or addon folder")
+            return {"CANCELLED"}
+        if settings.job_running or jobs.is_running():
+            self.report({"ERROR"}, "A background job is already running")
+            return {"CANCELLED"}
+        try:
+            module = core.core(settings)
+            env = core.detect_environment(settings, module)
+            if env.game_root is None:
+                raise RuntimeError("The live Deadlock install was not found; set it in Setup")
+            if env.s2v is None:
+                raise RuntimeError("Source 2 Viewer CLI was not found; set it in Setup")
+            output = (
+                Path(bpy.path.abspath(settings.update_output))
+                if settings.update_output
+                else core.project_root(settings) / "updates"
+            )
+            addon = settings.update_addon_name.strip() or f"{Path(settings.old_vpk).stem}_updated"
+            sections = ("Softbody", "PhysicsJointList") if settings.update_preserve_cloth else ()
+            old_path = Path(bpy.path.abspath(settings.old_vpk))
+            hero_slug = settings.hero_slug
+            model_policy = settings.update_model_policy
+            preserve_materials = settings.update_preserve_materials
+            replace_output = settings.update_replace_output
+
+            def work(progress):
+                progress(0.05, "reading live hero roster")
+                heroes = module["live"].list_heroes(env)
+                hero = next((item for item in heroes if item.slug == hero_slug), None)
+                if hero is None:
+                    raise RuntimeError(f"Live hero {hero_slug} is no longer in the roster")
+                progress(0.2, "extracting old addon and live hero")
+                result = module["migrate"].update_from_package(
+                    env,
+                    old_path,
+                    output,
+                    addon,
+                    hero=hero,
+                    preserve_model=model_policy,
+                    preserve_materials=preserve_materials,
+                    sections=sections,
+                    force=replace_output,
+                )
+                progress(0.95, "migration manifest written")
+                return result
+
+            def done(result):
+                settings.stage_dir = str(result.output)
+                settings.extraction_dir = str(result.new_root)
+                settings.vmdl = str(result.vmdl)
+                settings.vmdl_relative = result.vmdl.relative_to(result.root).as_posix()
+                settings.addon_name = addon
+                settings.old_vpk = str(old_path)
+                settings.update_output = str(output)
+                settings.update_addon_name = addon
+                settings.custom_materials_dir = str(result.old_root)
+                settings.materials_dir = str(result.new_root)
+                if result.new_model_files:
+                    settings.target_dmx_relative = result.new_model_files[0]
+                    body = result.new_root / result.new_model_files[0]
+                    settings.body_dmx = str(body) if body.is_file() else ""
+                if result.model_files:
+                    candidates = [result.old_root / relative for relative in result.model_files]
+                    candidates = [path for path in candidates if path.is_file()]
+                    if candidates:
+                        settings.custom_model = str(max(candidates, key=lambda path: path.stat().st_size))
+                metadata = json.loads(result.manifest.read_text(encoding="utf-8"))
+                cloth = f"; {metadata.get('cloth_chains', 0)} cloth chains, {metadata.get('cloth_hinges', 0)} hinges"
+                _status(
+                    settings,
+                    f"Updated {addon} from {old_path.name}; {'old' if result.preserved_model else 'live'} model, "
+                    f"{result.material_count} old material assets{cloth}; compile from the Handoff panel",
+                    "OK",
+                )
+
+            def failed(error):
+                _status(settings, str(error), "ERROR")
+
+            message = jobs.start(settings, "Updating old addon", work, done, failed)
+            if message:
+                raise RuntimeError(message)
+            _status(settings, "Reading the old addon and live hero off the main thread", "BUSY")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
 class DMF_OT_pick_vmdl(Operator):
     bl_idname = "dmf.pick_vmdl"
     bl_label = "Choose vmdl"
@@ -989,6 +1104,8 @@ CLASSES = (
     DMF_OT_retarget,
     DMF_OT_export_stage,
     DMF_OT_compile,
+    DMF_OT_pick_old_vpk,
+    DMF_OT_update_old_addon,
     DMF_OT_pick_vmdl,
 )
 

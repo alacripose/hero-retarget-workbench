@@ -112,12 +112,12 @@ def main() -> int:
         panels = len(dmf.ui.CLASSES)
         workbench = len(dmf.workbench.CLASSES)
         operators = len(dmf.operators.CLASSES) + workbench
-        if panels != 8:
-            raise RuntimeError(f"expected 8 panel classes, found {panels}")
+        if panels != 9:
+            raise RuntimeError(f"expected 9 panel classes, found {panels}")
         if workbench != 24:
             raise RuntimeError(f"expected 24 workbench operators, found {workbench}")
-        if operators != 41:
-            raise RuntimeError(f"expected 41 operator classes in total, found {operators}")
+        if operators != 43:
+            raise RuntimeError(f"expected 43 operator classes in total, found {operators}")
         valid_icons = {
             item.identifier
             for item in bpy.types.UILayout.bl_rna.functions["label"].parameters["icon"].enum_items
@@ -131,6 +131,8 @@ def main() -> int:
             raise RuntimeError("proof operator was not registered")
         if not hasattr(bpy.ops.dmf, "detect_paths"):
             raise RuntimeError("path detection operator was not registered")
+        if not hasattr(bpy.ops.dmf, "update_old_addon"):
+            raise RuntimeError("old addon update operator was not registered")
 
         expected_paths = {
             "deadlock_root": str(temp / "Deadlock"),

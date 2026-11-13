@@ -360,6 +360,46 @@ class DMF_Settings(PropertyGroup):
         precision=1,
     )
     addon_name: StringProperty(name="Addon name", default="my_hero_port")
+    old_vpk: StringProperty(
+        name="Old addon VPK",
+        description="A compiled addon VPK or an extracted addon content folder to migrate onto the current live hero",
+        subtype="FILE_PATH",
+    )
+    update_output: StringProperty(
+        name="Update output",
+        description="Stage folder for the migrated addon; blank uses <workspace>/updates",
+        subtype="DIR_PATH",
+    )
+    update_addon_name: StringProperty(
+        name="Updated addon",
+        description="Folder name for the migrated addon; blank derives it from the old package",
+        default="",
+    )
+    update_model_policy: EnumProperty(
+        name="Old model",
+        description="Keep the old addon render meshes when they differ from the live hero, always keep them, or use the live meshes",
+        items=[
+            ("auto", "Preserve custom only", "Keep old meshes when their files differ from the live hero"),
+            ("old", "Always old", "Always keep the old render meshes"),
+            ("live", "Always live", "Use the live hero render meshes and leave old mesh files out"),
+        ],
+        default="auto",
+    )
+    update_preserve_cloth: BoolProperty(
+        name="Preserve cloth/physics",
+        description="Transplant the old Softbody and PhysicsJointList sections exactly; do not rebuild cloth chains or joints",
+        default=True,
+    )
+    update_preserve_materials: BoolProperty(
+        name="Preserve old materials",
+        description="Overlay the old addon's vmat and texture assets onto the live extraction",
+        default=True,
+    )
+    update_replace_output: BoolProperty(
+        name="Replace output",
+        description="Replace the addon folder if the update output already exists",
+        default=False,
+    )
     stage_dir: StringProperty(
         name="Stage folder",
         description="The compiler handoff folder. Staging copies the vmdl and materials here",
