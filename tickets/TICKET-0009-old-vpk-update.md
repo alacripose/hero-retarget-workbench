@@ -1,6 +1,6 @@
 # TICKET-0009 — Old addon VPK import and live hero-model update
 
-**Status:** implemented; real Mayu migration, CSDK13 compile, unit tests, addon zip probe, and compiled addon installation pass; owner launch/render witness pending.
+**Status:** implemented; real Mayu migration, CSDK13 compile, unit tests, addon zip probe, compiled addon installation, and an agent-run retail launch witness pass; owner visual acceptance pending.
 **Owner:** ala
 **Authority:** `logs/authority/2026-11-13-old-vpk-update.jsonl`
 **Opened:** 2026-11-13
@@ -109,10 +109,34 @@ no old model is being merged.
   `Reduced_CSDK_13/game/citadel_addons/mayu_updated` (42 files, 158 MB); the
   source stage is `Reduced_CSDK_13/content/citadel_addons/mayu_updated`
   (688 files, 343 MB).
+- Retail launch witness (agent-run, 2026-11-13): packed the compiled tree as
+  `artifacts/mayu-launch/mayu_updated.vpk` (165,051,918 bytes, SHA-256
+  `f64fd09e79c2cedbd77dad075184658c899520c9ca6b66f710d002dd32073b2c`) and
+  installed it as `game/citadel/addons/pak01.vpk`; the retail client's
+  filesystem log mounts that path as `(vpk)`. The client log records
+  `Loaded hero 45/hero_doorman` and `VMDL Camera Pose Success` for
+  `models/heroes_wip/doorman_v2/doorman.vmdl`. In Sandbox the Mayu custom model
+  replaced the Doorman body; the screenshots are `desktop-13.png` and the
+  `move-1..3.png` walk sequence under `artifacts/mayu-launch/`. The dangling
+  key/cloth remained attached and moved with the character; the source has two
+  `ClothChain` entries (`gun_key_center`, `key_pivot`), 9 hinges and 18 physics
+  joints.
+- The material warning is recorded, not erased: 50
+  `Texture g_tAltColor_Reveal doesn't exist` lines occur for the old
+  `hair`/`body`/`head`/`lenses` vmats. The old source vmat carries the same
+  stale derived-texture path, and the base body/head/hair textures render in
+  the captures. The old `models/heroes_wip/doorman_v2/clips/ui_hero_reveal.vnmclip_c`
+  is also absent from the old addon; the client logs `ERROR_FILEOPEN` for it.
+- Full witness: `artifacts/mayu-launch/launch-report.json`; script:
+  `artifacts/mayu-launch/record_launch.py`. The row `command: launch` in the
+  ledger carries the hashes and observed lines.
 
 ## Remaining witness
 
-The owner must launch the installed `mayu_updated` addon in Deadlock and witness
-the cloth chains, old materials and models. The compile and the control compile
-prove the `.vmdl_c` changed when `Softbody` was removed; they are not a render
-witness.
+An agent-run launch and render observation is recorded above; the owner's visual
+acceptance is still separate. The current captures are rear views because the
+retail third-person camera stayed behind the hero. The compile and the control
+compile prove the `.vmdl_c` changed when `Softbody` was removed; they are not a
+render witness. The inherited alt-reveal texture warnings and missing old
+reveal clip remain named material limitations, not migration failures claimed
+as clean.

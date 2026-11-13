@@ -270,3 +270,11 @@ marker (`softbody`, `cloth`, `physicsjoint`), not limited to the current
 compiled file, 42 compiled outputs and 21 reduced-CSDK material warnings;
 `mayu_updated` is installed in the CSDK game/content addon roots. This
 supersedes the prior sentence that the current CSDK had no compiler binary.
+
+## 2026-11-13 — mayu_updated retail launch witness
+
+**Owner request, verbatim:** *"Launch the installed mayu_updated addon in Deadlock and verify the cloth chains, old materials, and models in-game."* Recorded in `logs/authority/2026-11-13-mayu-launch-witness.jsonl`.
+
+The compiled addon was packed to `artifacts/mayu-launch/mayu_updated.vpk` and installed as `game/citadel/addons/pak01.vpk`; the retail filesystem log mounts that path as `(vpk)`. The client log records `Loaded hero 45/hero_doorman` and the Doorman vmdl camera-pose load. Sandbox rendered the Mayu body, and the `move-1..3.png` sequence shows the dangling key/cloth moving with the character. The witness is agent-run and the captures are rear views; the owner's visual acceptance is separate.
+
+The old material set emits 50 `g_tAltColor_Reveal` missing-texture warnings and the old `ui_hero_reveal.vnmclip_c` is absent. Both are old-content limitations recorded beside the render, not a clean material claim. Evidence: `artifacts/mayu-launch/launch-report.json` and the `command: launch` ledger row.
