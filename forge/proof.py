@@ -18,12 +18,32 @@ PROOF_CONTRACT = (
     "dmf.retarget.proof: artifact, artifact_digest, claim, origin, evidence, "
     "tick_span, world_digest, presenter, ticket, checks"
 )
-PROOF_SCHEMA = "dmf.retarget.proof/" + blake3_hex(PROOF_CONTRACT.encode("utf-8"))[:32]
 WEIGHTS_CONTRACT = (
     "dmf.retarget.weights: schema, mesh, armature, mode, mapping, extras, "
     "options, vertices"
 )
-WEIGHTS_SCHEMA = "dmf.retarget.weights/" + blake3_hex(WEIGHTS_CONTRACT.encode("utf-8"))[:32]
+
+
+def _proof_schema() -> str:
+    """Hash-pinned schema, computed on first use, not at import.
+
+    Computing it here would import the vendored blake3 .pyd as soon as proof is
+    imported during add-on enable, which locks the file and makes Blender refuse
+    an in-place reinstall.
+    """
+    return "dmf.retarget.proof/" + blake3_hex(PROOF_CONTRACT.encode("utf-8"))[:32]
+
+
+def _weights_schema() -> str:
+    return "dmf.retarget.weights/" + blake3_hex(WEIGHTS_CONTRACT.encode("utf-8"))[:32]
+
+
+def __getattr__(name: str):
+    if name == "PROOF_SCHEMA":
+        return _proof_schema()
+    if name == "WEIGHTS_SCHEMA":
+        return _weights_schema()
+    raise AttributeError(name)
 
 TOKEN_PASS = "pass"
 TOKEN_FAIL = "fail"
@@ -68,7 +88,7 @@ class Proof:
     presenter: str
     ticket: str
     checks: tuple[Check, ...] = field(default_factory=tuple)
-    schema: str = PROOF_SCHEMA
+    schema: str = field(default_factory=_proof_schema)
 
     def as_dict(self) -> dict[str, object]:
         return {
@@ -105,7 +125,7 @@ class Proof:
             presenter=str(value.get("presenter", "")),
             ticket=str(value.get("ticket", "")),
             checks=checks,
-            schema=str(value.get("schema", PROOF_SCHEMA)),
+            schema=str(value.get("schema", _proof_schema())),
         )
 
 
@@ -171,7 +191,7 @@ def weights_payload(
     vertices: Iterable[Mapping[str, object]],
 ) -> dict[str, object]:
     return {
-        "schema": WEIGHTS_SCHEMA,
+        "schema": _weights_schema(),
         "mesh": mesh,
         "armature": armature,
         "mode": mode,
@@ -235,7 +255,7 @@ def admit(
     required_checks: Iterable[str] | None = None,
 ) -> Admission:
     refusals: list[Refusal] = []
-    if proof.schema != PROOF_SCHEMA:
+    if proof.schema != _proof_schema():
         refusals.append(Refusal(TOKEN_REFUSED, f"{proof.artifact}: schema is {proof.schema!r}"))
     if proof.origin not in ("executed", "read-back"):
         refusals.append(

@@ -46,9 +46,7 @@ def main() -> int:
             # loaded blake3 .pyd, so Blender answers CANCELLED and leaves the
             # files alone. That is a file-lock limit, not a registration bug:
             # what must hold is that the module still enables and registers.
-            installed_ok = installed == {"FINISHED"} or (
-                allow_locked and round_name == "second-install"
-            )
+            installed_ok = installed == {"FINISHED"}
             _check(
                 round_name,
                 installed_ok and enabled == {"FINISHED"},

@@ -213,6 +213,12 @@ def surface_error() -> str:
 
 def _surface(layout) -> None:
     """The way out of the sidebar: open the page surface this build has."""
+    module = sys.modules.get(__package__ or "")
+    version = ".".join(
+        str(part) for part in getattr(module, "bl_info", {}).get("version", ())
+    )
+    if version:
+        layout.label(text=f"Hero Retarget Workbench {version}", icon="INFO")
     error = surface_error()
     if surface_name() == "editor":
         layout.operator("dmf.open_workbench", text="Open the Workbench editor", icon="WINDOW")

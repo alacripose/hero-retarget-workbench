@@ -289,6 +289,31 @@ sidebar in the custom view with nothing in it"*.
 Not checked: a real mouse click on a tab; the switch was observed by opening the
 space with the Setup tab active.
 
+## 0.8.11 — an install now actually replaces the add-on
+
+**Owner report, verbatim:** *"in your tests and probes it worked but i installed
+it and it's not the tabs"*.
+
+Blender was installing over an enabled copy and answering `CANCELLED` with a
+`PermissionError` on `_vendor/blake3/blake3.cp313-win_amd64.pyd`. The files stayed
+old, so the running add-on was not 0.8.10 at all; the probes were testing the zip,
+the owner's session was testing the previous version.
+
+- `blake3` is imported on first hash, not at `forge.hashes` import.
+- `forge.proof` no longer computes `PROOF_SCHEMA`/`WEIGHTS_SCHEMA` at import
+  (hash-pinned contracts); they are computed on first use, with module
+  `__getattr__` preserving the constant names.
+- Reinstall probe now requires the second install to be `FINISHED`, not tolerated
+  as locked: 4/4, 52 panels, 0 registration errors. Receipt
+  `artifacts/receipts/reinstall-0.8.11.json`.
+- The sidebar shows `Hero Retarget Workbench <version>` so the running build is
+  visible without reading preferences.
+- Zip 0.8.11 install probe 9/9; gate green; 114 unittest tests.
+
+To cross from an older build once: fully quit Blender with the add-on disabled
+(or delete its folder while Blender is closed), then install 0.8.11 and enable.
+From 0.8.11 on, installing over an enabled copy replaces the files.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
