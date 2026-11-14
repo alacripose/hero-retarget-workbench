@@ -87,10 +87,9 @@ def _header_draw(self, context) -> None:
     except (AttributeError, TypeError, RuntimeError):
         # A build without the template still gets the page box and the status.
         pass
-    layout.label(text="Workbench", icon="ARMATURE_DATA")
-    # Page buttons in the header: the page panels fill the WINDOW region, and the
-    # sidebar is not opened at all, so no strip of empty sidebar sits between the
-    # content and the tab buttons.
+    # The title is the page menu: the enum property draws as a dropdown showing
+    # the current page. The icon buttons stay beside it for one-click switching.
+    layout.prop(settings, "props_page", text="", icon="ARMATURE_DATA")
     pages = layout.row(align=True)
     for page in ui_props.PAGES:
         try:
@@ -112,8 +111,6 @@ def _header_draw(self, context) -> None:
     )
     if version:
         layout.label(text=f"v{version}")
-    # The page is chosen by the sidebar's own page tabs; a second selector here
-    # would fight the tab that is currently selected.
     layout.separator_spacer()
     _status_line(layout, settings)
 
