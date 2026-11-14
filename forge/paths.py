@@ -225,6 +225,53 @@ def _is_gui(path: Path) -> bool:
     return path.name.lower() in {name.lower() for name in S2V_GUI_NAMES}
 
 
+def _tool_search_roots() -> list[Path]:
+    """Standard user folders a downloaded tool is unpacked into.
+
+    These are Windows' own folder names, not a machine's path: the addon never
+    points at one user's folder. The search is bounded and only runs when no
+    saved or PATH path resolved, which is the case after a viewer is moved.
+    """
+    roots: list[Path] = []
+    for name in ("Downloads", "Desktop"):
+        candidate = Path.home() / name
+        try:
+            if candidate.is_dir():
+                roots.append(candidate)
+        except OSError:
+            continue
+    return roots
+
+
+def _find_named(
+    base: Path,
+    names: tuple[str, ...],
+    *,
+    max_depth: int = 3,
+) -> Path | None:
+    """First matching file under a bounded walk, pruned and deterministic."""
+    if not base.is_dir():
+        return None
+    skip = {".git", "node_modules", "__pycache__", "$recycle.bin", "system volume information"}
+    base_depth = len(base.parts)
+    try:
+        for current, folders, files in os.walk(base):
+            depth = len(Path(current).parts) - base_depth
+            if depth >= max_depth:
+                folders[:] = []
+            else:
+                folders[:] = sorted(
+                    folder for folder in folders if folder.lower() not in skip
+                )
+            lowered = {name.lower() for name in names}
+            for name in sorted(files):
+                if name.lower() in lowered:
+                    return Path(current) / name
+    except OSError:
+        return None
+    return None
+
+
 def find_s2v(
     explicit: str | Path | None = None,
     *,
@@ -273,6 +320,12 @@ def find_s2v(
             )
             if candidate is not None:
                 return candidate
+    # A release zip is normally unpacked into Downloads; after the saved path is
+    # moved this is the difference between "missing" and finding the CLI again.
+    for root in _tool_search_roots():
+        found = _find_named(root, S2V_CLI_NAMES, max_depth=3)
+        if found is not None:
+            return found
     return None
 
 
@@ -302,6 +355,20 @@ def find_csdk(explicit: str | Path | None = None) -> tuple[Path | None, Path | N
     configured = explicit if explicit is not None else os.environ.get("CSDK13_ROOT")
     if configured is not None and str(configured).strip():
         return _csdk_candidate(configured) or (None, None, None)
+    # A reduced CSDK is normally unpacked into Downloads as one folder. The
+    # search is one level deep and only accepts a tree with the compiler, so it
+    # cannot mistake another game install for a tools host.
+    for root in _tool_search_roots():
+        try:
+            candidates = [root, *sorted(root.iterdir())]
+        except OSError:
+            continue
+        for candidate in candidates:
+            if not candidate.is_dir():
+                continue
+            result = _csdk_candidate(candidate)
+            if result is not None:
+                return result
     return None, None, None
 
 
@@ -356,12 +423,26 @@ def detect(
         env.gameinfo = env.game_dir / "citadel" / "gameinfo.gi"
         env.build, env.version_date = read_build(env.game_dir)
     env.s2v = find_s2v(s2v_cli, roots=tool_roots)
+    if env.s2v is None and s2v_cli is not None and str(s2v_cli).strip():
+        # A saved CLI file can be moved by a later download. Only a missing
+        # CLI-shaped pick falls back; a folder or a deliberately wrong pick
+        # stays a refusal, so detection does not overrule the user silently.
+        picked = Path(str(s2v_cli)).expanduser()
+        if (
+            picked.name.lower() in {name.lower() for name in S2V_CLI_NAMES}
+            and not picked.exists()
+        ):
+            env.s2v = find_s2v(None, roots=tool_roots)
     # find_s2v also reads S2V_CLI itself; the message below has to know that value
     # too, or a headless run reports a bare "not found" for a path it was given.
     if s2v_cli is None:
         s2v_cli = os.environ.get("S2V_CLI")
     env.blender = find_blender(blender_exe)
     env.csdk_root, env.resourcecompiler, env.csdk_gameinfo = find_csdk(csdk_root)
+    if env.csdk_root is None and csdk_root is not None and str(csdk_root).strip():
+        picked = Path(str(csdk_root)).expanduser()
+        if "csdk" in picked.name.lower() and not picked.exists():
+            env.csdk_root, env.resourcecompiler, env.csdk_gameinfo = find_csdk(None)
     for name, path, configured in (
         ("live game", env.game_root, deadlock_root),
         ("Source 2 Viewer", env.s2v, s2v_cli),

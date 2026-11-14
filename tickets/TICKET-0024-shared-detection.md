@@ -48,21 +48,33 @@ Three separate faults made a detected install look missing on other pages.
   configured tools folder, the workspace `tools` folder, and `tools/s2v`;
   Steam's `common/Source2Viewer` folders are also checked. A scene path is
   resolved with `bpy.path.abspath` before it reaches `paths.find_s2v`.
+- **0.8.25 moved-tool fallback.** A saved CLI path whose file no longer exists
+  falls back to a bounded search of the standard `Downloads` and `Desktop`
+  folders (depth 3, pruned) and Steam common. A saved CSDK folder whose name
+  contains `csdk` and no longer exists falls back to one level of the same
+  folders, accepting only a tree with `resourcecompiler.exe`. A path that exists
+  but is the wrong kind (a GUI-only folder, a deliberately different pick) is
+  still refused, not overruled. The detection status says "CLI found elsewhere"
+  when the saved path was replaced.
 
 ## Non-goals
 
-- Searching the user's Documents/Downloads for a viewer. There is no installer
-  location for Source 2 Viewer that can be assumed, and the project rule against
-  personal path defaults stands.
+- Searching arbitrary user folders. Only `Downloads` and `Desktop` are read,
+  only at depth 3 for the viewer and one level for a CSDK folder, and only when
+  a saved path has gone missing. No vendor folder name or absolute user path is
+  in the source; `test_source_has_no_personal_or_drive_letter_defaults` keeps it
+  that way.
 - Picking a CSDK for the user when several exist. The Setup field remains the
-  authority; env `CSDK13_ROOT` is the headless fallback.
+  authority; env `CSDK13_ROOT` is the headless fallback. The fallback only runs
+  for a saved CSDK path that is gone.
 - Changing which page owns the detection buttons.
 
 ## Evidence
 
-- `tests/test_paths.py` 12 tests: appmanifest rename, common-folder scan without
-  a manifest, tools-root viewer discovery, explicit path precedence, GUI-only
-  refusal, and the source scan that forbids personal defaults.
+- `tests/test_paths.py` 14 tests: appmanifest rename, common-folder scan without
+  a manifest, tools-root viewer discovery, moved-CLI fallback, unpacked CSDK
+  discovery, explicit path precedence, GUI-only refusal, and the source scan that
+  forbids baked personal paths.
 - Installed-zip probe 13/13, including `path-edit-clears-stale-failure`
   (failed job fields set, a path edited, state/log/progress empty).
 - `artifacts/receipts/source-0.8.23.png` shows the Source page with no stale
@@ -71,7 +83,11 @@ Three separate faults made a detected install look missing on other pages.
 
 ## Not checked
 
-- A real click of `Detect live heroes` against a live S2V path in this session;
-  the machine's previously documented `openlock_modern/tools/s2v` folder is now
-  empty and the CLI lives elsewhere, so the probe uses a fresh profile.
-- CSDK auto-detection; it remains an explicit path.
+- A real click of `Detect live heroes` against the live game in a Blender
+  session with the new zip. The saved scene was read to confirm the stale path:
+  its `s2v_cli` pointed at `openlock_modern/tools/s2v/Source2Viewer-CLI.exe`,
+  which no longer exists. `forge.paths.detect` on this machine now resolves
+  `Downloads/cli-windows-x64/Source2Viewer-CLI.exe` and `Downloads/Reduced_CSDK_13`
+  with no problems; that is the detection layer, not a live hero-table run.
+- The Downloads/Desktop search on a machine where both folders are enormous;
+  the walk is bounded and pruned, but no timing was recorded.

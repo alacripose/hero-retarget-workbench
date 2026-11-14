@@ -82,6 +82,7 @@ class DMF_OT_detect_paths(Operator):
             # install must not throw away the viewer, which is how a partly
             # detected file used to look undetected on every other page.
             swapped = False
+            moved = False
             if env.game_root is not None:
                 settings.deadlock_root = str(env.game_root)
                 settings.build = f"{env.build} {env.version_date}".strip()
@@ -93,6 +94,9 @@ class DMF_OT_detect_paths(Operator):
                 swapped = bool(
                     chosen_s2v
                     and Path(chosen_s2v).name.lower() != env.s2v.name.lower()
+                )
+                moved = bool(
+                    chosen_s2v and Path(chosen_s2v).resolve() != env.s2v.resolve()
                 )
             if env.csdk_root is not None:
                 settings.csdk_root = str(env.csdk_root)
@@ -107,7 +111,7 @@ class DMF_OT_detect_paths(Operator):
                 )
                 if value is None
             ]
-            note = " · CLI beside the pick" if swapped else ""
+            note = " · CLI beside the pick" if swapped else (" · CLI found elsewhere" if moved else "")
             if env.game_root is not None:
                 # Detection just proved the current state; the last job's card
                 # is history and must not keep saying the tool is missing.
