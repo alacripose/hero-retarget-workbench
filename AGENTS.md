@@ -1,3 +1,27 @@
+## 2026-11-14 — 0.8.3: navigation-bar and reinstall collisions
+
+**Owner request, verbatim:** *"dude the buttons are supposed to be in the
+navigation bar? the black area next to the view that expands out? and now there
+are install errors that you just missed??? these are collissions to be recorded"*.
+
+- **The nav bar cannot host add-on drawing for a custom space.**
+  `Space.draw_handler_add` on `DMF_ST_workbench` answers
+  `TypeError: unknown space type 'DMF_ST_workbench'`; Python's draw handlers only
+  know native space types, and a custom space cannot register a panel in
+  `NAVIGATION_BAR`. Real nav-bar buttons require a Blender C change (custom space
+  types in the draw-handler lookup plus a nav-bar region). Recorded in
+  `artifacts/receipts/navbar-probe.json`; the companion pages area remains the
+  closest non-patched surface.
+- **Reinstall crash fixed.** `register()` now releases any `DMF_*` class left in
+  `bpy.types` before registering; an install over an enabled copy no longer dies
+  on `already registered as a subclass 'DMF_BoneEntry'`.
+- **Windows lock recorded.** `addon_install` over an enabled copy returns
+  `CANCELLED` because the loaded `_vendor/blake3/blake3.cp313-win_amd64.pyd`
+  cannot be overwritten; the module still enables afterwards. A restart or
+  disable-before-install replaces those bytes.
+- Evidence: `tools/blender_reinstall_probe.py`, 4/4 on PR 165087 (second install
+  `CANCELLED`, enable `FINISHED`, 41 panels, 0 errors).
+
 ## 2026-11-14 — 0.8.1: the page strip is its own column in the Workbench view
 
 **Owner correction, verbatim:** *"Not the n panelkt sidebar … the fucking black

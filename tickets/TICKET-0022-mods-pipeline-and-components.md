@@ -138,6 +138,37 @@ build (no release asset). Both files are `unittest.TestCase` classes with
 `pytest.raises`, so the workflow's own command collects them: 114 tests pass
 under `unittest discover`, 191 under `pytest`.
 
+## 0.8.3 — navigation-bar and reinstall collisions
+
+**Owner request, verbatim:** *"dude the buttons are supposed to be in the navigation
+bar? the black area next to the view that expands out? and now there are install
+errors that you just missed??? these are collissions to be recorded"*.
+
+- **Navigation bar: blocked by Blender, recorded.** `Space.draw_handler_add` on
+  `DMF_ST_workbench` answers `TypeError: unknown space type 'DMF_ST_workbench'`.
+  Python can draw into a `NAVIGATION_BAR` region only for native space types, so
+  page buttons cannot be placed in the Workbench editor's nav bar from an
+  add-on. A real nav-bar strip needs a Blender C change: registering custom
+  space types in the draw-handler lookup and giving them a nav-bar region. The
+  narrow `DMF_ST_workbench_pages` area from 0.8.1 remains the closest surface
+  that exists without patching Blender. Probe:
+  `artifacts/receipts/navbar-probe.json` (draws 0, the TypeError, no handler).
+- **Reinstall: duplicate registration fixed.** Installing a zip while a copy is
+  enabled re-enables the module in the same process and left the old classes
+  registered, so `register()` died on `register_class(...): already registered as
+  a subclass 'DMF_BoneEntry'`. `register()` now releases any `DMF_*` class still
+  in `bpy.types` before registering the new module.
+- **Windows file lock, recorded.** `addon_install` over an enabled copy cannot
+  overwrite the loaded `_vendor/blake3/blake3.cp313-win_amd64.pyd`; Blender
+  answers `CANCELLED` and leaves the old files. The add-on still enables and
+  registers afterwards (41 panels, no errors). Replacing those bytes needs a
+  Blender restart or disabling the add-on before Install; it is not a
+  registration failure.
+- Evidence: `tools/blender_reinstall_probe.py` on PR 165087, 4/4:
+  first install `FINISHED`, second install `CANCELLED` but enable `FINISHED`,
+  41 page panels, 0 register errors; receipt
+  `artifacts/receipts/reinstall-0.8.3.json`.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
