@@ -262,6 +262,33 @@ layout preference.
 
 Not checked: a click on a page button.
 
+## 0.8.10 — the pages are the right-edge tab strip
+
+**Owner report, verbatim:** *"in the custom view there is a single tab called
+workbench not the fucking n sidepanel"*, *"why are pages their own view if
+there's been a vertical tab available this whole fucking time like on the far
+right where the buttons could be? and there's still a dedicated goddamn left
+sidebar in the custom view with nothing in it"*.
+
+- The single `Pages` panel is gone. Each page is now its own sidebar category
+  (`DMF_PT_space_tab_setup` … `DMF_PT_space_tab_components`), so the vertical
+  strip at the right edge of the custom view lists Setup, Source, Parts, Cloth,
+  Skeleton, Rules, Animations, Compare, Weights, Handoff, Mods, Components as
+  tabs.
+- Selecting a tab switches the Workbench page. The signal is that tab's panel
+  drawing; the switch runs from a timer with a scene lookup that works without
+  `bpy.context.scene`. A direct assignment from inside draw did not stick.
+- The header page dropdown is removed: it fought the selected tab.
+- The empty TOOLS strip on the left of the custom view is closed with
+  `show_region_toolbar = False` (and the footer), alongside opening the sidebar.
+- Evidence: direct-view probe (no operator) reports `page: SETUP` after selecting
+  the Setup tab, and `artifacts/receipts/direct-view.png` shows the Setup page
+  (LIVE GAME, CSDK13, WORKSPACE, Update old addon, Tools & clients) with the
+  page tabs on the right edge and no Pages panel. Zip 0.8.10 install probe 9/9.
+
+Not checked: a real mouse click on a tab; the switch was observed by opening the
+space with the Setup tab active.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
