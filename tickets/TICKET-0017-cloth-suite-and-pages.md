@@ -1,6 +1,6 @@
 # TICKET-0017 — the cloth suite, and one page per view
 
-Status: implemented in 0.6.0
+Status: implemented in 0.6.0, tab opened by default in 0.6.1
 Authority: `logs/authority/2026-11-14-cloth-suite.jsonl`
 
 ## Owner request (verbatim)

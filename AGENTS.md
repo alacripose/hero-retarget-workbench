@@ -47,6 +47,9 @@ Authority: `logs/authority/2026-11-14-cloth-suite.jsonl`; contract:
   window — registration and page switching are proven, the drawing is not; no
   cloth simulation was run on the imported meshes; cloth nodes and the modeldoc
   are unchanged.
+- 0.6.1 removes the `DEFAULT_CLOSED` the tab inherited from the sidebar habit, so
+  the page selector is open the first time the Scene tab is seen instead of
+  waiting to be clicked.
 
 # AGENTS.md
 
