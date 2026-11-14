@@ -23,6 +23,9 @@ _DEPTH = 0  # nesting guard: an auto-fill must not start another auto-fill
 # main thread may be held, so the viewport keeps drawing while hundreds of rows
 # are answered; the plan is computed once, up front.
 _CHUNK = 150
+# ``timer`` is the handle Blender returns; it is None in background mode even when
+# the callback was accepted, so ``pending`` is the state that answers questions.
+_REQUEST: dict[str, object] = {"timer": None, "pending": False}
 _FILL: dict[str, object] = {
     "settings": None,
     "plan": {},
@@ -82,6 +85,7 @@ def rule_of(row) -> bonerules.Rule:
         origin=row.origin,
         enabled=row.enabled,
         support=row.support,
+        delta=int(getattr(row, "delta", 0) or 0),
     )
 
 
@@ -95,12 +99,18 @@ def panel_rules(settings) -> list[bonerules.Rule]:
 def store(settings, rules: list[bonerules.Rule]) -> int:
     """Merge learned rules into the panel rows without touching a user's own row."""
     existing = {
-        (row.source.lower(), row.target.lower(), bool(row.regex), row.state): row
+        (row.source.lower(), row.target.lower(), bool(row.regex), row.state, int(row.delta)): row
         for row in settings.bone_rules
     }
     with suppressed():
         for rule in rules:
-            key = (rule.source.lower(), rule.target.lower(), bool(rule.regex), rule.state)
+            key = (
+                rule.source.lower(),
+                rule.target.lower(),
+                bool(rule.regex),
+                rule.state,
+                int(rule.delta),
+            )
             row = existing.get(key)
             if row is None:
                 row = settings.bone_rules.add()
@@ -111,6 +121,7 @@ def store(settings, rules: list[bonerules.Rule]) -> int:
                 row.state = rule.state
                 row.origin = rule.origin
                 row.support = rule.support
+                row.delta = int(rule.delta)
                 existing[key] = row
             else:
                 row.support = max(int(row.support), int(rule.support))
@@ -285,8 +296,53 @@ def cancel_fill(settings=None, quiet: bool = False) -> None:
     _finish_fill(_FILL.get("settings") if settings is None else settings, cancelled=not quiet)
 
 
+def request_fill(settings, delay: float = 0.25) -> None:
+    """Apply rule edits to the map once the user stops typing.
+
+    A rule's fields all fire on every edit; tying the fill to each one would plan
+    the whole map per keystroke. One timer, restarted on each edit, runs the fill
+    after a short quiet period instead.
+    """
+    if is_suppressed() or settings is None:
+        return
+    _cancel_request()
+    if not settings.bone_map:
+        return
+
+    def _run():
+        _REQUEST["timer"] = None
+        _REQUEST["pending"] = False
+        scene = getattr(bpy.context, "scene", None)
+        live = getattr(scene, "dmf", None) if scene is not None else None
+        if live is not None:
+            try:
+                start_fill(live)
+            except Exception:
+                pass
+        return None
+
+    _REQUEST["pending"] = True
+    _REQUEST["timer"] = bpy.app.timers.register(_run, first_interval=delay, persistent=False)
+
+
+def pending_fill() -> bool:
+    return bool(_REQUEST.get("pending"))
+
+
+def _cancel_request() -> None:
+    timer = _REQUEST.get("timer")
+    if timer is not None:
+        try:
+            bpy.app.timers.unregister(timer)
+        except ValueError:
+            pass
+    _REQUEST["timer"] = None
+    _REQUEST["pending"] = False
+
+
 def flush_fill(settings) -> dict:
     """Run a scheduled fill to completion now — headless probes and tests."""
+    _cancel_request()
     if _FILL.get("settings") is not settings or (not _FILL.get("plan") and _FILL.get("timer") is None):
         start_fill(settings)
     while _FILL.get("plan"):
@@ -509,6 +565,7 @@ CLASSES = (
 
 
 def register() -> None:
+    _cancel_request()
     import bpy
 
     for cls in CLASSES:

@@ -42,6 +42,58 @@ SIDE_TOKENS: tuple[tuple[str, str], ...] = (
 )
 
 STATES: tuple[str, ...] = ("MAPPED", "EXTRA", "IGNORED")
+NUMBER = "#"  # the one numeric run in a series rule's pattern
+
+
+def tokens(name: str) -> list[str]:
+    """The words of a bone name, lowercased, with separators dropped."""
+    return [word for word in re.split(r"[_.\-\s]+", (name or "").lower()) if word]
+
+
+def template(name: str) -> tuple[str, int, int] | None:
+    """``Index_01_L`` -> ``("Index_#_L", 1, 2)``: pattern, value, digit width.
+
+    ``None`` when the name carries no number, or more than one, because one
+    example can only place one number against one number.
+    """
+    numbers = re.findall(r"\d+", name or "")
+    if len(numbers) != 1:
+        return None
+    return re.sub(r"\d+", NUMBER, name, count=1), int(numbers[0]), len(numbers[0])
+
+
+def series(source: str, target: str) -> Rule | None:
+    """A number-shifted rule from one example pair, or ``None`` when they differ more.
+
+    ``Index_01_L -> finger_index_0_L`` gives ``Index_#_L -> finger_index_#_L`` with
+    a shift of ``-1``: the words line up in the same order, the target may add a
+    leading word, and the two numbers differ by a constant. That is what a finger
+    chain is, and it is why one typed row answers the rest of the chain without
+    the user writing a regular expression.
+    """
+    src = template(source)
+    tgt = template(target)
+    if src is None or tgt is None:
+        return None
+    src_pattern, src_value, _src_width = src
+    tgt_pattern, tgt_value, _tgt_width = tgt
+    src_tokens = tokens(src_pattern)
+    tgt_tokens = tokens(tgt_pattern)
+    if not src_tokens or len(tgt_tokens) < len(src_tokens):
+        return None
+    extra = len(tgt_tokens) - len(src_tokens)
+    if tgt_tokens[extra:] != src_tokens:
+        return None
+    if extra and not all(word.isalpha() for word in tgt_tokens[:extra]):
+        return None
+    return Rule(
+        source=src_pattern,
+        target=tgt_pattern,
+        delta=tgt_value - src_value,
+        origin="learned",
+        side_aware=False,
+        state="MAPPED",
+    )
 
 
 def split_side(name: str) -> tuple[str, str]:
@@ -105,18 +157,21 @@ class Rule:
     origin: str = "user"
     enabled: bool = True
     support: int = 1
+    delta: int = 0
 
     @property
     def kind(self) -> str:
         if self.regex:
             return "regex"
+        if NUMBER in self.source:
+            return "series"
         if self.source.strip().endswith("*"):
             return "prefix"
         return "side"
 
     @property
-    def key(self) -> tuple[str, str, bool, str]:
-        return (self.source.lower(), self.target.lower(), self.regex, self.state)
+    def key(self) -> tuple[str, str, bool, str, int]:
+        return (self.source.lower(), self.target.lower(), self.regex, self.state, self.delta)
 
 
 @dataclass(frozen=True)
@@ -132,10 +187,10 @@ class Suggestion:
 def label(rule: Rule) -> str:
     """Short caption for a panel row or a note."""
     kind = rule.kind
-    if kind == "regex":
+    if kind in ("regex", "prefix"):
         return f"{rule.source} → {rule.target}"
-    if kind == "prefix":
-        return f"{rule.source} → {rule.target}"
+    if kind == "series":
+        return f"{rule.source} → {rule.target} (number {rule.delta:+d})"
     stem, _side = split_side(rule.target)
     return f"{rule.source}_{{L,R}} → {stem}_{{L,R}}"
 
@@ -144,20 +199,43 @@ def describe(rule: Rule) -> str:
     """One sentence naming what the rule matches, for the panel hint."""
     if rule.regex:
         return "Regex: matched against the whole name; \\1 and friends come from its groups."
+    if rule.kind == "series":
+        return (
+            f"Series: the same words, and the source's number becomes the target's "
+            f"number {rule.delta:+d}. # stands for that number."
+        )
     if rule.kind == "prefix":
         return "Prefix: matches every source name starting with that text."
     return "Side rule: matches the stem and writes the source's side token into the target."
 
 
 def learn(mapping: dict[str, str]) -> list[Rule]:
-    """The side rule implied by a typed row, if it has one.
+    """The rule a typed row implies: a numbered series first, then a side stem.
 
-    Only a pair whose source and target carry the same side teaches anything: a
-    deliberate cross-side exception is not a pattern, and a row with no side
-    token is one specific name, not a rule.
+    A numbered pair teaches the number shift before anything else, because that is
+    the only form that answers a whole chain (a finger or a skirt segment) from one
+    row. A pair whose names carry the same side but no numbers teaches a side stem;
+    a deliberate cross-side or structurally unrelated pair teaches nothing.
     """
-    rules: dict[tuple[str, str], Rule] = {}
+    found: dict[tuple, Rule] = {}
     for source, target in (mapping or {}).items():
+        numbered = series(source or "", target or "")
+        if numbered is not None:
+            previous = found.get(numbered.key)
+            found[numbered.key] = (
+                numbered
+                if previous is None
+                else Rule(
+                    source=numbered.source,
+                    target=numbered.target,
+                    delta=numbered.delta,
+                    side_aware=numbered.side_aware,
+                    state=numbered.state,
+                    origin="learned",
+                    support=previous.support + 1,
+                )
+            )
+            continue
         source_stem, source_side = split_side(source or "")
         target_stem, target_side = split_side(target or "")
         if not source_stem or not target_stem:
@@ -165,9 +243,9 @@ def learn(mapping: dict[str, str]) -> list[Rule]:
         if not (source_side and target_side and source_side == target_side):
             continue
         key = (source_stem.lower(), target_stem.lower())
-        if key in rules:
-            previous = rules[key]
-            rules[key] = Rule(
+        if key in found:
+            previous = found[key]
+            found[key] = Rule(
                 source=previous.source,
                 target=previous.target,
                 side_aware=True,
@@ -176,7 +254,7 @@ def learn(mapping: dict[str, str]) -> list[Rule]:
                 support=previous.support + 1,
             )
             continue
-        rules[key] = Rule(
+        found[key] = Rule(
             source=source_stem,
             target=target,
             side_aware=True,
@@ -184,16 +262,25 @@ def learn(mapping: dict[str, str]) -> list[Rule]:
             origin="learned",
             support=1,
         )
-    return ordered(list(rules.values()))
+    return ordered(list(found.values()))
 
 
 def ordered(rules: list[Rule]) -> list[Rule]:
-    """Regex rules first, then prefixes, then side stems; best-supported first."""
-    rank = {"regex": 0, "prefix": 1, "side": 2}
+    """Regex, then series, then prefixes, then side stems; best-supported first."""
+    rank = {"regex": 0, "series": 1, "prefix": 2, "side": 3}
     return sorted(
         rules,
         key=lambda rule: (rank[rule.kind], -rule.support, -len(rule.source), rule.source.lower()),
     )
+
+
+@lru_cache(maxsize=256)
+def _series_pattern(template: str):
+    """The pattern a series rule matches with: its ``#`` becomes one number."""
+    parts = (template or "").split(NUMBER)
+    if len(parts) != 2:
+        return None
+    return re.compile(re.escape(parts[0]) + r"(\d+)" + re.escape(parts[1]), re.IGNORECASE)
 
 
 @lru_cache(maxsize=256)
@@ -216,6 +303,17 @@ def _candidate(rule: Rule, source: str) -> str | None:
         if pattern is None or pattern.fullmatch(source) is None:
             return None
         return pattern.sub(rule.target, source, count=1)
+    if rule.kind == "series":
+        pattern = _series_pattern(rule.source)
+        if pattern is None:
+            return None
+        found = pattern.fullmatch(source)
+        if found is None:
+            return None
+        value = int(found.group(1)) + rule.delta
+        if value < 0:
+            return None
+        return rule.target.replace(NUMBER, str(value), 1)
     if rule.kind == "prefix":
         text = rule.source[:-1]
         if not source.lower().startswith(text.lower()):

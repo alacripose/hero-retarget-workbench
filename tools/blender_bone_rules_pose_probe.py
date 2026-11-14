@@ -221,6 +221,67 @@ def main() -> int:
     ]
     assert sorted(checks["lists_filter"]) == sorted(lists), checks["lists_filter"]
 
+    # --- editing a rule applies it to the map, no extra press --------
+    # The owner's case: a prefix rule with a real target and Sets row = Mapped.
+    skirt_rule.state = "MAPPED"
+    skirt_rule.target = "pelvis"
+    checks["rule_edit_pending"] = dmf.rules.pending_fill()
+    dmf.rules.flush_fill(settings)
+    after_edit = {entry.source: entry for entry in settings.bone_map}
+    checks["rule_edit_skirt_01"] = (
+        after_edit["Sp_Hi_Mskirt0_B_01"].state,
+        after_edit["Sp_Hi_Mskirt0_B_01"].target,
+    )
+    checks["rule_edit_skirt_00"] = (
+        after_edit["Sp_Hi_Mskirt0_B_00"].state,
+        after_edit["Sp_Hi_Mskirt0_B_00"].target,
+    )
+    assert checks["rule_edit_pending"], "a rule edit must schedule the fill"
+    assert checks["rule_edit_skirt_01"] == ("MAPPED", "pelvis"), checks["rule_edit_skirt_01"]
+    assert checks["rule_edit_skirt_00"] == ("IGNORED", ""), checks["rule_edit_skirt_00"]
+
+    # --- one finger row teaches the whole numbered chain ---------------
+    finger_source = armature(
+        "finger_rig",
+        [("pelvis", (0.0, 0.0, 1.0), (0.0, 0.0, 1.1), None)]
+        + [
+            (f"Index_{index:02d}_L", (0.0, 0.0, 0.5), (0.0, 0.05, 0.5), "pelvis")
+            for index in (1, 2, 3, 4)
+        ]
+        + [("Middle_01_L", (0.0, 0.0, 0.5), (0.05, 0.0, 0.5), "pelvis")],
+    )
+    finger_hero = armature(
+        "finger_hero",
+        [("pelvis", (0.0, 0.0, 1.0), (0.0, 0.0, 1.1), None)]
+        + [
+            (f"finger_index_{index}_L", (0.0, 0.0, 0.5), (0.0, 0.05, 0.5), "pelvis")
+            for index in (0, 1, 2)
+        ],
+    )
+    settings.custom_armature = finger_source
+    settings.target_armature = finger_hero
+    dmf.workbench.scan_bone_map(settings)
+    finger = {entry.source: entry for entry in settings.bone_map}
+    finger["Index_01_L"].state = "MAPPED"
+    finger["Index_01_L"].target = "finger_index_0_L"
+    checks["finger_rules"] = [
+        f"{rule.source}->{rule.target} ({rule.delta:+d})"
+        for rule in settings.bone_rules
+        if "#" in rule.source
+    ]
+    dmf.rules.flush_fill(settings)
+    finger = {entry.source: entry for entry in settings.bone_map}
+    checks["finger_02"] = (finger["Index_02_L"].state, finger["Index_02_L"].target)
+    checks["finger_03"] = (finger["Index_03_L"].state, finger["Index_03_L"].target)
+    checks["finger_04"] = (finger["Index_04_L"].state, finger["Index_04_L"].target)
+    checks["finger_middle"] = (finger["Middle_01_L"].state, finger["Middle_01_L"].target)
+    assert checks["finger_02"] == ("MAPPED", "finger_index_1_L"), checks["finger_02"]
+    assert checks["finger_03"] == ("MAPPED", "finger_index_2_L"), checks["finger_03"]
+    assert checks["finger_04"] == ("UNMATCHED", ""), checks["finger_04"]
+    assert checks["finger_middle"] == ("UNMATCHED", ""), checks["finger_middle"]
+    settings.custom_armature = source
+    settings.target_armature = hero
+
     # --- a wide rig is answered in bounded chunks, not one long hold --
     wide = 250
     wide_source = armature(
