@@ -1075,3 +1075,28 @@ minions and troopers and npcs ... tail previews are too large"*.
   `4d76274e...4ffd4`, BLAKE3 `460f0767...7b9`). Not checked: clicking a new
   Source variant, extracting an NPC, the tail grid at several panel widths, or a
   tail in-game.
+
+## 2026-11-14 — 0.12.1: Components read the model's render list
+
+**Owner report, verbatim:** *"components tab doesn;t detect components of things
+if they're not heroes, might be one of those cases where the older versions
+expected specfic functions per page which need to be updated with the expanded
+scope"*.
+
+- `forge.components.inventory` used to require a hero-style word in the filename
+  (`gun`, `hat`, `head`, …). A non-hero model's parts are `unnamed_1`,
+  `ratking_minion` and similar, so the page reported zero assets even when the
+  vmdl listed several render meshes. The scan now reads the model's vmdl
+  `RenderMeshFile` list through `forge.modeldoc`; LODs are excluded and the
+  primary body is left unselected. Filename words remain only as a fallback when
+  no readable vmdl exists.
+- The operator follows the imported body's extraction and vmdl instead of only
+  `settings.extraction_dir`. A stale Shiv field no longer hides a midboss or
+  Familiar WIP body. `stage` records `primary` and refuses to register the body
+  as a body-group choice.
+- `tools/blender_components_probe.py` is the persistent page probe: 9/9 on the
+  real midboss and Familiar WIP extractions, including the stale-source case.
+- Evidence: gate green; pytest 248; components probe 9/9; installed zip 10/10.
+  Built `dist/hero_retarget_workbench-0.12.1.zip` (62 files, 424,371 bytes, sha256
+  `a8c88865...255c1`, BLAKE3 `eb1f8248...ef27`). Not checked: staging or
+  compiling a non-hero component, or clicking the page in a running Blender.

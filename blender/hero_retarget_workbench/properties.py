@@ -397,7 +397,7 @@ class DMF_ClientRow(PropertyGroup):
 
 
 class DMF_ComponentRow(PropertyGroup):
-    """One cosmetic-shaped asset in the current hero extraction."""
+    """One render-mesh asset in the current model extraction."""
 
     name: StringProperty(name="File", default="")
     relative: StringProperty(name="Relative path", default="")
@@ -604,7 +604,7 @@ class DMF_Settings(PropertyGroup):
     tools_note: StringProperty(name="Tools note", default="")
 
     # Components page: cosmetic-shaped assets and their staging target.
-    components: CollectionProperty(type=DMF_ComponentRow, description="Component assets found in the hero extraction")
+    components: CollectionProperty(type=DMF_ComponentRow, description="Component assets found in the current model extraction")
     component_index: IntProperty(name="Component row", default=0)
     component_addon: StringProperty(name="Component addon", description="Addon folder the component files are staged under", default="")
     component_note: StringProperty(name="Components note", default="")
