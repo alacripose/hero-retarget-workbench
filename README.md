@@ -72,10 +72,17 @@ For development from this checkout, add `blender/` as a script directory instead
 the addon then uses the checkout's `forge/` package and writes under the checkout.
 
 The workbench is in **3D Viewport → Sidebar → Deadlock** and, one page at a time,
-in **Properties → Scene → Hero Retarget Workbench**. The properties tab
-shows a page selector — Setup, Source, Parts, Cloth, Skeleton, Rules, Animations,
-Compare, Weights, Handoff — and each page draws the same panel as the sidebar, so
-the two surfaces never disagree.
+in a surface with a page selector: Setup, Source, Parts, Cloth, Skeleton, Rules,
+Animations, Compare, Weights, Handoff. Each page draws the same panel as the
+sidebar, so the two never disagree.
+
+Which surface that is depends on the build. Blender can only register an add-on
+editor type on builds with the custom-space patch (PR 165087); there the add-on
+adds **Hero Retarget Workbench** to the editor-type menu and `dmf.open_workbench`
+switches the current area to it. Every other build, including the stock daily,
+gets the same pages in **Properties → Scene → Hero Retarget Workbench** and the
+same operator switches an area to that instead. On a PR 165087 build, use the
+patch build from <https://builder.blender.org/download/patch/PR165087>.
 
 ### Set the tool paths once
 
@@ -101,9 +108,18 @@ to the hero skeleton. **Cloth → Hero parts** re-runs that import for a file ad
 to the folder later; **Cloth → Chains** groups the skeleton's numbered bones into
 chains (`coat_0..coat_3`, `sleeve_L`, `hair_01`), with segments and first bone.
 
-Cloth constraint nodes and their modeldoc sections are not authored here. The
-page imports the meshes and names the chains a simulation hangs from; it says so
-in the panel rather than implying the other half exists.
+**Build cloth on this chain** turns a chain into Blender data: one vertex group
+per chain bone on the hero mesh that is skinned to it (existing weights kept,
+missing groups created empty), a `DMF_pin_<chain>` pin group from the chain root's
+vertices, an ordered `DMF <chain> chain` armature in a `DMF Cloth` collection, and
+a cloth modifier on the mesh with that pin group, after the armature modifier so
+the cloth hangs from the posed mesh. On Shiv, `coat` builds on `shiv_jacket4`
+with 4 bone groups and 932 pinned vertices; `hair` builds on `shiv_hair3` with 434.
+
+Cloth constraint nodes and their modeldoc sections are not authored here: the
+page imports the meshes, names the chains, and builds Blender cloth from the
+imported skinning. It says that in the panel rather than implying the other half
+exists.
 
 ## Continuous integration and releases
 

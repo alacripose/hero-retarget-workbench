@@ -179,12 +179,16 @@ class DMF_UL_cloth_chains(UIList):
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row(align=True)
+        icon = "MOD_CLOTH" if clothscan.is_cloth(item.name) else "BONE_DATA"
+        built = item.target_mesh is not None
         row.label(
             text=_short(item.name, 24) or "chain",
-            icon="MOD_CLOTH" if clothscan.is_cloth(item.name) else "BONE_DATA",
+            icon="CHECKMARK" if built else icon,
         )
         right = row.row(align=True)
         right.alignment = "RIGHT"
+        if built:
+            right.label(text="cloth")
         right.label(text=f"{item.count}")
 
 

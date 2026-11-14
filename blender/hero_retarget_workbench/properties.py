@@ -115,6 +115,19 @@ class DMF_ClothChain(PropertyGroup):
     count: IntProperty(name="Segments", default=0)
     root: StringProperty(name="First bone", default="")
     bones: StringProperty(name="Bones", default="")
+    target_mesh: PointerProperty(
+        name="Cloth mesh",
+        description="The imported hero mesh this chain was built on",
+        type=Object,
+        poll=lambda self, obj: obj.type == "MESH",
+    )
+    chain_object: PointerProperty(
+        name="Chain",
+        description="The ordered bone chain built for this run",
+        type=Object,
+    )
+    pin_group: StringProperty(name="Pin group", default="")
+    cloth_modifier: StringProperty(name="Cloth modifier", default="")
 
 
 class DMF_MaterialRow(PropertyGroup):

@@ -148,6 +148,7 @@ def main() -> int:
                 dmf.poseview.CLASSES,
                 dmf.clipops.CLASSES,
                 dmf.cloth_ops.CLASSES,
+                dmf.ui_space.CLASSES,
             )
             for cls in group
             if isinstance(cls, type) and issubclass(cls, bpy.types.Operator)
@@ -168,6 +169,7 @@ def main() -> int:
                 dmf.poseview,
                 dmf.clipops,
                 dmf.cloth_ops,
+                dmf.ui_space,
             )
             for name in dir(module)
             if name.startswith("DMF_OT_")

@@ -543,6 +543,27 @@ class DMF_PT_cloth(Panel):
             box.label(text=f"{chain.count} bones, from {chain.root}", icon="BONE_DATA")
             if chain.bones:
                 _hint(box, chain.bones, "ARMATURE_DATA", width=34)
+            action = box.row(align=True)
+            action.operator(
+                "dmf.build_chain_cloth",
+                text="Build cloth on this chain",
+                icon="MOD_CLOTH",
+            )
+            action.operator("dmf.build_all_cloth", text="", icon="MOD_PHYSICS")
+            if chain.target_mesh is not None:
+                box.label(
+                    text=f"{chain.target_mesh.name}: {chain.pin_group}, {chain.cloth_modifier}",
+                    icon="CHECKMARK",
+                )
+            else:
+                _hint(
+                    box,
+                    "Build writes one vertex group per chain bone on the hero mesh skinned to "
+                    "this chain, a pin group from the chain root, the ordered bone chain, and a "
+                    "cloth modifier that keeps those vertices pinned.",
+                    "INFO",
+                    width=34,
+                )
         _hint(
             box,
             "Cloth constraint nodes live in the modeldoc. This page imports the meshes and shows "

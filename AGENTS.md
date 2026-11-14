@@ -51,6 +51,53 @@ Authority: `logs/authority/2026-11-14-cloth-suite.jsonl`; contract:
   the page selector is open the first time the Scene tab is seen instead of
   waiting to be clicked.
 
+## 2026-11-14 — 0.7.0: chain to cloth, and the Workbench as its own editor
+
+**Owner request, verbatim:** *"we're on 5.4 so we can actually have our own editor
+types please"*, then *"I've updated my build of blender daily see if it changes
+anything"*. Authority: `logs/authority/2026-11-14-own-editor-type.jsonl`;
+contract: `TICKET-0018`.
+
+- **The stock build still cannot.** A Space subclass on the 2026-11-13 daily
+  raises `ValueError: … Space does not support registration`, and
+  `Panel.bl_space_type` has no `CUSTOM`. Custom editor types are **PR 165087**
+  (WIP); its official patch build does accept them. Updating the daily did not
+  change that, so the answer to the owner's question is no for the stock build.
+- **The addon now picks its surface at registration.** `ui_space.register()`
+  builds `DMF_ST_workbench` (header + pages, `bl_space_type='CUSTOM'`) and
+  returns False on a build without the feature; `__init__` then registers
+  `ui_props` in the Properties editor. `SURFACE` names which happened, and
+  `dmf.open_workbench` switches an area to it. The area mechanism on PR builds is
+  `area.type = 'CUSTOM'` then `area.ui_type = <space idname>`; `area.type` alone
+  rejects the idname.
+- **One page set, two homes.** Every page panel is still a subclass of the
+  sidebar panel and inherits its draw body. Runtime-built classes are published
+  in their module (`ui_props.materialize`), because Blender resolves a registered
+  panel to its Python class by module and name; without that the editor draws
+  "struct with no Python class".
+- **A chain is now Blender data, not a list.** `dmf.build_chain_cloth` picks the
+  hero mesh actually skinned to the chain, ensures a vertex group per chain bone
+  (existing weights kept, missing groups created empty, nothing invented), makes
+  `DMF_pin_<chain>` from the chain root's vertices, builds `DMF <chain> chain` as
+  an ordered, parented bone chain in `DMF Cloth`, and puts `DMF Cloth <chain>` on
+  the mesh with the armature modifier first and the pin group set. The Cloth page
+  runs it; the row shows the mesh, pin group and modifier.
+- Evidence: `tools/blender_cloth_probe.py` on the real Shiv extraction, 22/22 on
+  both the PR patch build (`surface: editor`) and the stock daily
+  (`surface: properties`). `coat` on `shiv_jacket4`: four
+  groups (932/713/739/1463 weighted vertices), 932 pinned, order
+  `ARMATURE, CLOTH`, `DMF coat chain` with `coat_0..coat_3`; `hair` on
+  `shiv_hair3` with 434 pinned. `tools/blender_pages_gui_probe.py` opens a real
+  window, switches the area to the surface and draws every page: 17/17 with 0
+  exceptions on both builds; receipts `artifacts/receipts/pages-pr.json` and
+  `pages.json`, screenshots `editor-pr.png` and `workbench-properties.png`.
+- Not checked: no cloth bake was run and no game compile of a cloth model; the
+  own editor exists only on a PR 165087 build, which is experimental and makes
+  `cgmatter_nodes` throw on every depsgraph update in this profile, and redraw
+  logs `unable to get Python class for RNA struct 'DMF_PT_<panel>'` for sidebar
+  panels while the custom space draws — both surfaces still render in the
+  screenshots.
+
 # AGENTS.md
 
 This repository is the Hero Retarget Workbench. The owner is `ala`. The work is a
