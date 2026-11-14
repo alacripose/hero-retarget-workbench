@@ -222,6 +222,12 @@ def _dmx_files(root: Path) -> dict[Path, int]:
 def write_action(settings, entry, destination: Path) -> Path:
     """Write one imported action back to ``<destination>/anims/<label>.dmx``."""
     armature = _armature(settings)
+    from . import ikops
+
+    if ikops.has_constraints(armature):
+        raise RuntimeError(
+            "clip-export-unbaked-ik: bake the IK action before writing it; the constraints are not in a DMX"
+        )
     action = bpy.data.actions.get(entry.action) if entry.action else None
     if action is None:
         raise RuntimeError(
