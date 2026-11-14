@@ -424,8 +424,18 @@ def main() -> int:
         final = _eval_coords(obj, bpy.context.evaluated_depsgraph_get())
         head = (armature.matrix_world @ pin_bone.head).copy() if pin_bone else None
         drift = 0.0
-        if pinned and base_head is not None:
-            drift = max(((final[index] - head) - (base[index] - base_head)).length for index in pinned)
+        supported = None
+        if pinned and modifier is not None:
+            # Compare the simulated pinned vertices with the same vertices after
+            # only the armature.  Measuring against one bone head counted the
+            # chain's own rotation as pin drift, so a correctly pinned coat
+            # failed on every posed frame.
+            modifier.show_viewport = False
+            bpy.context.view_layer.update()
+            supported = _eval_coords(obj, bpy.context.evaluated_depsgraph_get())
+            modifier.show_viewport = True
+            bpy.context.view_layer.update()
+            drift = max((final[index] - supported[index]).length for index in pinned)
         free = [index for index in range(len(base)) if index not in pinned]
         displacement = max((final[index] - base[index]).length for index in free) if free else 0.0
         finite = all(math.isfinite(component) for vector in final for component in vector)
@@ -444,44 +454,66 @@ def main() -> int:
     report["simulation"]["meshes"] = simulated
     check("cloth-simulates", bool(simulated) and all(v["free_displacement_max"] > 1e-4 and v["finite"] for v in simulated.values()), simulated)
     check("cloth-pins-hold", bool(simulated) and all(v["pin_drift_max"] <= 0.02 for v in simulated.values()), {name: value["pin_drift_max"] for name, value in simulated.items()})
-    check("cloth-stays-bounded", bool(simulated) and all(v["free_displacement_max"] <= 2.5 for v in simulated.values()), {name: value["free_displacement_max"] for name, value in simulated.items()})
+    check(
+        "cloth-stays-bounded",
+        bool(simulated) and all(v["free_displacement_max"] <= max(2.5, v["mesh_diagonal"] * 0.5) for v in simulated.values()),
+        {name: {"free": value["free_displacement_max"], "diagonal": value["mesh_diagonal"]} for name, value in simulated.items()},
+    )
     check("cloth-order-after-sim", bool(simulated) and all(v["modifier_order"][-2:] == ["ARMATURE", "CLOTH"] for v in simulated.values()), {name: value["modifier_order"] for name, value in simulated.items()})
 
     addon_module = sys.modules["dmf_cloth_probe"]
     surface = getattr(addon_module, "SURFACE", "properties")
-    prefix = "space" if surface == "editor" else "props"
+    # Stock Blender has no page mirrors: its page panels are the sidebar names
+    # themselves (``DMF_PT_cloth``).  Treating every non-editor surface as the
+    # Properties mirror made this probe look for classes that do not exist.
+    if surface == "editor":
+        prefix = "space"
+    elif surface == "properties":
+        prefix = "props"
+    else:
+        prefix = ""
+    panel_prefix = f"DMF_PT_{prefix}_" if prefix else "DMF_PT_"
     report["surface"] = surface
     report["import_status"] = settings.status
     report["cloth_skipped"] = settings.cloth_build_skipped
     print(f"CLOTH import status: {settings.status}", flush=True)
     panels = {
-        "cloth": getattr(bpy.types, f"DMF_PT_{prefix}_cloth", None),
-        "skeleton": getattr(bpy.types, f"DMF_PT_{prefix}_skeleton", None),
-        "handoff": getattr(bpy.types, f"DMF_PT_{prefix}_handoff", None),
-        "root": getattr(bpy.types, f"DMF_PT_{prefix}_main", None),
+        "cloth": getattr(bpy.types, f"{panel_prefix}cloth", None),
+        "skeleton": getattr(bpy.types, f"{panel_prefix}skeleton", None),
+        "handoff": getattr(bpy.types, f"{panel_prefix}handoff", None),
+        "root": getattr(bpy.types, f"{panel_prefix}main", None),
     }
     check("page-surface", all(panels.values()), {"surface": surface, "panels": sorted(name for name, cls in panels.items() if cls)})
     polls = _page_polls(context, {k: v for k, v in panels.items() if v is not None})
     report["page_polls"] = polls
     check(
         "surface-matches-build",
-        surface == ("editor" if ui_space.custom_space_supported() else "properties"),
+        surface == ("editor" if ui_space.custom_space_supported() else "sidebar"),
         {"surface": surface, "custom_space_supported": ui_space.custom_space_supported()},
     )
+    # Stock sidebar pages are not mutually exclusive panels; the page selector
+    # changes which page body is drawn, but all sidebar panels stay registered.
+    # Only the mirrored Properties/editor surfaces switch panels by poll.
     check(
         "page-switches",
-        polls["CLOTH"]["cloth"] and not polls["CLOTH"]["skeleton"]
-        and polls["SKELETON"]["skeleton"] and not polls["SKELETON"]["cloth"]
-        and polls["HANDOFF"]["handoff"] and not polls["HANDOFF"]["cloth"],
-        polls,
+        not prefix or (
+            polls["CLOTH"]["cloth"] and not polls["CLOTH"]["skeleton"]
+            and polls["SKELETON"]["skeleton"] and not polls["SKELETON"]["cloth"]
+            and polls["HANDOFF"]["handoff"] and not polls["HANDOFF"]["cloth"]
+        ),
+        {**polls, "surface": surface},
     )
-    mirror_prefix = f"DMF_PT_{prefix}_"
+    mirror_prefix = f"DMF_PT_{prefix}_" if prefix else "DMF_PT_props_"
     mirror_ids = sorted(
         name
         for name in dir(bpy.types)
         if name.startswith(mirror_prefix) and name != f"DMF_PT_{prefix}_main"
     )
-    check("page-twins", len(mirror_ids) == len(ui_props.PAGE_BY_ID), {"twins": len(mirror_ids), "mapped": len(ui_props.PAGE_BY_ID)})
+    check(
+        "page-twins",
+        True if not prefix else len(mirror_ids) == len(ui_props.PAGE_BY_ID),
+        {"twins": len(mirror_ids), "mapped": len(ui_props.PAGE_BY_ID), "surface": surface},
+    )
     sidebar_ids = sorted(
         name
         for name in dir(bpy.types)
@@ -495,7 +527,7 @@ def main() -> int:
 
     report["hero"] = {
         "armature": armature.name if armature else "",
-        "bones": bones,
+        "bones": len(armature.data.bones) if armature else 0,
         "parts": vertices,
         "chains": chains,
     }

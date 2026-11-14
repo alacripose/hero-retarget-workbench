@@ -23,12 +23,7 @@ def _short(value: str, limit: int = 34) -> str:
 
 
 def _section(layout, title: str, icon: str, detail: str = ""):
-    box = layout.box()
-    row = box.row()
-    row.label(text=title, icon=icon)
-    if detail:
-        row.label(text=_short(detail, 26))
-    return box
+    return ui_popit.title(layout, title, _short(detail, 26) if detail else "", icon)
 
 
 def _hint(layout, text: str, icon: str = "INFO") -> None:

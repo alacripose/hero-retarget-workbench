@@ -972,3 +972,60 @@ older models on my drive"*. Authority:
   tail load 18 channels paired on `DMF Tail tail`; `blender_tail_ui_probe` 6/6
   with a real draw pass. Not checked: a tail hero outside the three local
   extractions, a real tile click, an in-game tail render, an older non-DMX model.
+
+## 2026-11-14 — 0.11.0: every live hero's tail, and a probe lane that can fail
+
+**Owner correction, verbatim:** *"the tail scanner is wrong again part of the ui
+pass and gate checker and probe fixes for one needs to be about making sure shit
+doesn't block the main thread if possible and for two the scanner got a tail from
+gen_man and hornet who don't have tails in the live release game but it didn;t get
+the tails from other heroes who do have tails. It got familiar but you blindseded
+me because you only tested on familiar and not every hero"*, then *"why would I
+want it to only scan decompiled heroes when the built in source page detects all
+the heroes"*.
+
+- **The live roster is the source of the tail scan.** `forge.live.extract_tail_skeletons`
+  asks S2V for `models/heroes_/*.vnmskel_c` (59 skeleton DMXs on build 6861), not
+  a full hero extraction. The pass found 31 real tail chains across Viper, Familiar,
+  Tengu, Vindicta's crow, Nano's cat, Abrams, Baba's pigeon, the bookworm dragon,
+  Fencer, Inferno, Ratking's minions/rat and the werewolf. Heroes outside the three
+  local folders are covered; a VPK change refreshes the cache stamp.
+- **Token-aware names, not substring matching.** `forge.tails.is_tail_bone` accepts
+  `tail`, `tailA`, `owl_tail`, `cat_tail` and numbered chains, and rejects
+  `a_hair_braid`, `ponytail`, `coattail`, `cloak_tail`, `brow_detail`, cuff/detail
+  and `weapon_target_tail`. The old `"tail" in name` test is why Gen Man/Hornet
+  produced tiles; `dmx_bone_names` now reads quoted name-table tokens instead of
+  whole structural runs.
+- **The scan does not run S2V on the main thread.** `tailops.start_discover`
+  returns immediately, starts `jobs` for the skeleton extraction, and schedules
+  the name read/import on a timer. A cached roster scans without a subprocess.
+- **The gate has a probe lane.** `tools/probe_lane.py` declares cloth, pages,
+  tail-ui, tail-live and installed-zip probes; `gate` prints PASS/FAIL/SKIP, writes
+  probe results into `ledger/gate-state.json`, fails on a fresh failing receipt,
+  and reports pass→fail as a ratchet regression. Missing Blender/extractions is
+  SKIP, never a silent PASS. `--probes all|default|off`, `--blender`,
+  `--extractions` and `--probe-timeout` are explicit.
+- **Probe fixes found by the lane.** The cloth probe measured pin drift against one
+  bone head (chain rotation looked like drift) and assumed Properties mirrors on
+  the stock sidebar; it now compares pinned vertices with an armature-only
+  evaluation and treats sidebar panel polls as non-switching. Its page prefix,
+  surface expectation and a stale `bones` report variable were corrected. The pages
+  probe now opens the sidebar (`show_region_ui`) and hosts its draw panel in the UI
+  region, so it actually executes 20/20 draws.
+- **One teardown exception is not a failed probe.** Blender profiles can throw in
+  an unrelated add-on's `unregister` after the probe has written a clean receipt
+  (`SimpleBake` on this machine). `run_probe` accepts a fresh passing receipt even
+  when the process exits nonzero, while a missing/failing receipt still fails.
+- **UI pass:** Tails shows every option (the 16-tile cap is gone), names the live
+  count, disables scan while a job runs, and keeps one bubble. Source 2 IK, Bone
+  map, Weights and the Mods/Tools/Components section headers use the shared Popit
+  title/glyph/micro grammar.
+- **Evidence:** `python tools/project.py gate --blender ... --extractions ...`
+  passes unit tests, compileall, both source scans, BLAKE3 and all five probes
+  (`probe-cloth.json`, `probe-pages.json`, `probe-tail-ui.json`, `tail-live.json`,
+  `probe-zip.json`). `blender_tail_live_probe` 19/19 (59 skeletons, 31 chains,
+  no Hornet/Artist/Magician/Wraith/McGinnis/detail/braid/coattail/ponytail).
+  `blender_cloth_probe` 25/25 with pin drift 0.0. `blender_pages_gui_probe` 20/20
+  draws. Built zip and installed-zip probe are recorded below.
+- Not checked: a real click on a live-roster tile, a game patch refresh, a tail
+  in-game, or a hero whose skeleton is absent from `vnmskel_c`.

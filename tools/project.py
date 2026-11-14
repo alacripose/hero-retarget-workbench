@@ -35,6 +35,11 @@ from forge.oldmods import inventory as oldmod_inventory  # noqa: E402
 from forge.paths import detect  # noqa: E402
 from forge.stage import MaterialCopy, StageError, StageRequest, digest, material_files, stage, verify  # noqa: E402
 
+try:
+    from tools.probe_lane import Check, run_lane
+except ModuleNotFoundError:  # running as a script puts ROOT, not ROOT/tools, on path
+    from probe_lane import Check, run_lane  # type: ignore[no-redef]
+
 LEDGER = ROOT / "ledger" / "ledger.jsonl"
 GATE_STATE = ROOT / "ledger" / "gate-state.json"
 STATUS = ROOT / "STATUS.md"
@@ -63,22 +68,32 @@ def read_ledger() -> list[dict]:
     return rows
 
 
-def gate_checks() -> list[tuple[str, bool, str]]:
-    checks: list[tuple[str, bool, str]] = []
+def _check(name: str, ok: bool, detail: str = "") -> Check:
+    return Check(name, "pass" if ok else "fail", detail)
+
+
+def gate_checks(
+    *,
+    probes: str = "default",
+    blender: str = "",
+    extractions: str = "",
+    probe_timeout: int | None = None,
+) -> list[Check]:
+    checks: list[Check] = []
     tests = subprocess.run(
         [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"],
         cwd=ROOT,
         capture_output=True,
         text=True,
     )
-    checks.append(("unit tests", tests.returncode == 0, (tests.stdout + tests.stderr).strip()[-4000:]))
+    checks.append(_check("unit tests", tests.returncode == 0, (tests.stdout + tests.stderr).strip()[-4000:]))
     compiled = subprocess.run(
         [sys.executable, "-m", "compileall", "-q", "forge", "blender", "tools", "tests"],
         cwd=ROOT,
         capture_output=True,
         text=True,
     )
-    checks.append(("python compileall", compiled.returncode == 0, (compiled.stdout + compiled.stderr).strip()[-2000:]))
+    checks.append(_check("python compileall", compiled.returncode == 0, (compiled.stdout + compiled.stderr).strip()[-2000:]))
     forbidden = subprocess.run(
         ["rg", "-n", "-i", r"kv3|keyvalues3|kv3-parser", "forge", "blender", "tests", "--glob", "!__pycache__/**"],
         cwd=ROOT,
@@ -87,7 +102,7 @@ def gate_checks() -> list[tuple[str, bool, str]]:
     )
     # The gate's own negative control names the forbidden parser; the source
     # scan deliberately excludes tools/project.py so the control can exist.
-    checks.append((
+    checks.append(_check(
         "no KV3 parser in source",
         forbidden.returncode in (1, 2) or not forbidden.stdout.strip(),
         forbidden.stdout[-2000:],
@@ -107,7 +122,7 @@ def gate_checks() -> list[tuple[str, bool, str]]:
         capture_output=True,
         text=True,
     )
-    checks.append((
+    checks.append(_check(
         "no vmdl writes in forge",
         boundary.returncode in (1, 2) or not boundary.stdout.strip(),
         boundary.stdout[-2000:],
@@ -118,17 +133,25 @@ def gate_checks() -> list[tuple[str, bool, str]]:
         capture_output=True,
         text=True,
     )
-    checks.append((
+    checks.append(_check(
         "blake3 dependency",
         dependency.returncode == 0
         and dependency.stdout.strip()
         == "3ae7d805f6789a6402acb70ad4096a85a56bf6804eaf25c0493ac697548d30b5",
         (dependency.stdout + dependency.stderr).strip()[-2000:],
     ))
+    checks.extend(
+        run_lane(
+            blender=blender,
+            extractions=extractions,
+            mode=probes,
+            timeout=probe_timeout,
+        )
+    )
     return checks
 
 
-def write_status(checks: list[tuple[str, bool, str]]) -> None:
+def write_status(checks: list[Check]) -> None:
     rows = read_ledger()
     compile_rows = [row for row in rows if row.get("command") == "compile"]
     last_compile = compile_rows[-1] if compile_rows else None
@@ -142,8 +165,12 @@ def write_status(checks: list[tuple[str, bool, str]]) -> None:
         "## Gate",
         "",
     ]
-    for name, ok, detail in checks:
-        lines.append(f"- [{'x' if ok else ' '}] {name}" + (f" — {detail.splitlines()[-1]}" if not ok and detail else ""))
+    for check in checks:
+        mark = "x" if check.status == "pass" else " "
+        suffix = ""
+        if check.status != "pass" and check.detail:
+            suffix = f" — {check.status}: {check.detail.splitlines()[-1]}"
+        lines.append(f"- [{mark}] {check.name}{suffix}")
     lines.extend(
         [
             "",
@@ -582,18 +609,26 @@ def cmd_mods(args: argparse.Namespace) -> int:
 
 
 def cmd_gate(args: argparse.Namespace) -> int:
-    checks = gate_checks()
+    checks = gate_checks(
+        probes=getattr(args, "probes", "default"),
+        blender=getattr(args, "blender", ""),
+        extractions=getattr(args, "extractions", ""),
+        probe_timeout=getattr(args, "probe_timeout", None),
+    )
     previous = {}
     if GATE_STATE.is_file():
         previous = json.loads(GATE_STATE.read_text(encoding="utf-8"))
     regressions = [
-        name for name, ok, _ in checks if previous.get(name) == "pass" and not ok
+        check.name for check in checks if previous.get(check.name) == "pass" and check.status == "fail"
     ]
-    state = {name: "pass" if ok else "fail" for name, ok, _ in checks}
+    stale = [
+        check.name for check in checks if previous.get(check.name) == "pass" and check.status in ("skip", "warn")
+    ]
+    state = {check.name: check.status for check in checks}
     GATE_STATE.parent.mkdir(parents=True, exist_ok=True)
     GATE_STATE.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
     write_status(checks)
-    failed = [name for name, ok, _ in checks if not ok]
+    failed = [check.name for check in checks if check.status == "fail"]
     append_ledger(
         {
             "at": utc(),
@@ -603,13 +638,15 @@ def cmd_gate(args: argparse.Namespace) -> int:
             "regressions": regressions,
         }
     )
-    for name, ok, detail in checks:
-        print(f"[{'PASS' if ok else 'FAIL'}] {name}")
-        if not ok and detail:
-            print(detail)
+    for check in checks:
+        print(f"[{check.status.upper()}] {check.name}")
+        if check.status != "pass" and check.detail:
+            print(check.detail)
     if regressions:
         print(f"ratchet-regression: {', '.join(regressions)}", file=sys.stderr)
         return 2
+    if stale:
+        print(f"probe-lane-unchecked: {', '.join(stale)}", file=sys.stderr)
     return 0 if not failed else 1
 
 
@@ -618,7 +655,7 @@ def cmd_status(args: argparse.Namespace) -> int:
         print("no gate state; run gate first", file=sys.stderr)
         return 2
     state = json.loads(GATE_STATE.read_text(encoding="utf-8"))
-    checks = [(name, value == "pass", "") for name, value in state.items()]
+    checks = [Check(name, value if isinstance(value, str) else "pass" if value else "fail") for name, value in state.items()]
     write_status(checks)
     print(STATUS)
     return 0
@@ -742,7 +779,21 @@ def main(argv: list[str] | None = None) -> int:
     )
     p.set_defaults(func=cmd_mods)
 
-    sub.add_parser("gate", help="run tests and structural gates").set_defaults(func=cmd_gate)
+    p = sub.add_parser("gate", help="run tests, structural gates and the Blender probe lane")
+    p.add_argument(
+        "--probes",
+        choices=("default", "all", "off"),
+        default="default",
+        help="Blender probes to run; missing Blender or extractions are reported as SKIP",
+    )
+    p.add_argument("--blender", default="", help="Blender executable; defaults to BLENDER or PATH")
+    p.add_argument(
+        "--extractions",
+        default="",
+        help="folder holding shiv/ and familiar/ extractions; defaults to DMF_EXTRACTIONS",
+    )
+    p.add_argument("--probe-timeout", type=int, default=None, help="per-probe timeout in seconds")
+    p.set_defaults(func=cmd_gate)
     sub.add_parser("status", help="regenerate STATUS.md").set_defaults(func=cmd_status)
     sub.add_parser("selftest", help="prove the gate rejects a parser").set_defaults(func=cmd_selftest)
 

@@ -26,8 +26,11 @@ def test_normalized_and_numbered_names_pair_without_inventing():
 
 
 def test_only_tail_channels_are_listed():
-    rows = tails.candidates(["pelvis", "spine_01", "hair_01", "ponytail"], ["ponytail"])
-    assert [row.source for row in rows] == ["hair_01", "ponytail"]
+    rows = tails.candidates(
+        ["pelvis", "spine_01", "brow_detail_L", "coattail_0_L", "tail_0"],
+        ["tail_0"],
+    )
+    assert [row.source for row in rows] == ["tail_0"]
 
 
 def test_mapping_ignores_unanswered_rows():
@@ -39,7 +42,7 @@ def test_clip_header_scan_finds_tail_bones_without_opening_the_dmx(tmp_path):
     path = tmp_path / "aim_idle.dmx"
     path.write_bytes(
         b"<!-- dmx encoding binary 9 format model 22 -->\0"
-        b"DmeJoint\0tail_0\0tail_1\0tail_end\0weapon_target_tail\0pelvis\0"
+        b'"DmeJoint"\0"tail_0"\0"tail_1"\0"tail_end"\0"weapon_target_tail"\0"pelvis"\0'
     )
     assert tails.dmx_bone_names(path) == ["tail_0", "tail_1", "tail_end"]
 
@@ -74,9 +77,22 @@ class TailClipScanTests(unittest.TestCase):
             target = Path(folder) / "aim_idle.dmx"
             target.write_bytes(
                 b"<!-- dmx encoding binary 9 format model 22 -->\0"
-                b"DmeJoint\0tail_0\0tail_1\0tail_end\0weapon_target_tail\0pelvis\0"
+                b'"DmeJoint"\0"tail_0"\0"tail_1"\0"tail_end"\0"weapon_target_tail"\0"pelvis"\0'
             )
             self.assertEqual(tails.dmx_bone_names(target), ["tail_0", "tail_1", "tail_end"])
+
+    def test_clothing_and_face_details_are_not_tails(self):
+        for name in (
+            "brow_inner_detail_1_L",
+            "a_hair_braid_0",
+            "ponytail_0",
+            "coattail_0_L",
+            "cloak_tail_0_R",
+            "weapon_target_tail",
+        ):
+            self.assertFalse(tails.is_tail_bone(name), name)
+        for name in ("tail_0", "owl_tail_0", "cat_tail", "tailA_0_R", "pidge_tail_0"):
+            self.assertTrue(tails.is_tail_bone(name), name)
 
     def test_tail_chains(self):
         found = {
