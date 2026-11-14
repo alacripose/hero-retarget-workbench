@@ -42,6 +42,7 @@ def arguments() -> argparse.Namespace:
     argv = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
     parser = argparse.ArgumentParser()
     parser.add_argument("--extraction", default=str(DEFAULT_EXTRACTION))
+    parser.add_argument("--live-cache", default=str(REPO / "artifacts" / "tail-skeletons"))
     parser.add_argument("--report", default=str(REPO / "artifacts" / "receipts" / "tail-ui.json"))
     parser.add_argument("--screenshot", default=str(REPO / "artifacts" / "receipts" / "tail-ui.png"))
     return parser.parse_args(argv)
@@ -153,6 +154,24 @@ def main() -> int:
     ])
     loaded = tailops.load_option(settings, 0)
     check("tail-load", settings.tail_armature is not None and settings.tail_bones, loaded)
+    live_cache = Path(args.live_cache)
+    if live_cache.is_dir():
+        from forge import live
+
+        live_files = live.tail_skeleton_files(live_cache)
+        live_count = tailops.discover(settings, live_files=live_files)
+        live_rows = [index for index, option in enumerate(settings.tail_options) if option.source == "LIVE"]
+        check("live-options", bool(live_rows), {"count": live_count, "live": len(live_rows)})
+        viper = next(
+            (index for index, option in enumerate(settings.tail_options) if "viper" in option.label.lower()),
+            live_rows[0] if live_rows else -1,
+        )
+        live_loaded = tailops.load_option(settings, viper)
+        check(
+            "live-tail-load",
+            settings.tail_armature is not None and bool(settings.tail_armature.data.bones),
+            live_loaded,
+        )
     ui = sys.modules["dmf_tail_ui_probe.ui"]
 
     def host_draw(self, context):
