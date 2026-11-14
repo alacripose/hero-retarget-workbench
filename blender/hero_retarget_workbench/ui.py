@@ -526,6 +526,20 @@ class DMF_PT_cloth(Panel):
                 width=32,
             )
 
+        built_rows = [row for row in settings.cloth_chains if row.target_mesh is not None]
+        if built_rows:
+            parts: dict[str, list] = {}
+            for row in built_rows:
+                parts.setdefault(row.target_mesh.name, []).append(row)
+            ui_popit.micro(box, "Cloth parts", "MOD_CLOTH")
+            for mesh_name, rows in parts.items():
+                chains = ", ".join(row.name for row in rows)
+                box.label(text=f"{mesh_name}: {chains}", icon="MESH_DATA")
+                pins = ", ".join(f"{row.pin_group} {row.pin_count}" for row in rows)
+                box.label(text=f"{rows[0].cloth_modifier} | {pins}", icon="GROUP_VERTEX")
+        if settings.cloth_build_skipped:
+            _hint(box, settings.cloth_build_skipped, "ERROR", width=34)
+
         if settings.cloth_chains:
             ui_popit.micro(box, "Bone chains", "MOD_CLOTH")
             row = box.row(align=True)

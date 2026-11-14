@@ -707,3 +707,35 @@ wins.
   `Index_04_L` and `Middle_01_L` unmatched because the hero has no such bones.
 - Not checked: the Series wording and the `Number` field in a running Blender; the
   GUI probe still cannot scroll the sidebar.
+
+## 2026-11-14 — 0.7.1: importing a hero builds its cloth
+
+**Owner request:** close the loop on the original symptom — a fresh Shiv import
+must bring the hair and jacket in cloth-capable, not just present. Authority:
+`logs/authority/2026-11-14-import-builds-cloth.jsonl`; contract: `TICKET-0019`.
+
+- **The gap was the import, not the files.** 0.6.x imported every part and
+  scanned the chains but never ran the chain-to-cloth build; 0.7.1 calls
+  `cloth_ops.build_import_cloth` at the end of `dmf.import_hero`. A build failure
+  warns instead of aborting the import, and the reason each chain was skipped
+  lives in `settings.cloth_build_skipped` and on the Cloth page.
+- **Blender has one cloth per object.** `modifiers.new(name, "CLOTH")` returns
+  `None` for a second Cloth on the same mesh. A mesh therefore keeps one
+  simulation named after its main chain (`DMF Cloth coat`, `DMF Cloth hair`), and
+  every other chain on it keeps its pin group and bone chain and folds its pinned
+  vertices into that shared pin group. This is the shape of the API, not a
+  shortcut; the README says so.
+- **Body-only chains are not simulated.** `collar_L`/`collar_R` weights are on
+  `shiv_body`; building there would put cloth on all 35k body vertices, so those
+  chains are reported as skipped with the reason.
+- **Two probes had been hiding the state.** Both re-ran `scan_chains` after the
+  import, clearing the rows it had built, and the cloth probe's per-chain loop
+  reused `bones`, clobbering the hero bone count in the receipt. Both now read the
+  post-import state and scan their own log for addon tracebacks.
+- Evidence: cloth probe 21/21 on the stock daily and PR 165087; pages probe 17/17
+  with 0 exceptions on both; `shiv_jacket4` 3,880 vertices / `coat` 932 pinned /
+  `sleeve_L` 388 / `sleeve_R` 176, `shiv_hair3` 2,068 / `hair` 434 /
+  `collar_back` 436, modifier order ARMATURE then CLOTH everywhere. Screenshot
+  `artifacts/receipts/cloth-page-editor.png` shows the Cloth parts list.
+- Not checked: no simulation frame was stepped, and the stock Properties shot
+  still has native panels above the page.

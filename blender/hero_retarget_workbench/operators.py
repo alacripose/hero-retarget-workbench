@@ -285,10 +285,17 @@ class DMF_OT_import_hero(Operator):
         settings.hero_parts.clear()
         cloth_ops.record_part(settings, mesh)
         companion = {"imported": [], "skipped": []}
+        cloth = {"built": [], "skipped": []}
         try:
             companion = cloth_ops.import_companions(context, settings)
             cloth_ops.scan_chains(settings)
+            # A hero import is not finished while the jacket and hair are only
+            # meshes: the cloth chains are built here, on the mesh each is
+            # skinned to, so the import ends cloth-capable.
+            cloth = cloth_ops.build_import_cloth(settings)
+            settings.cloth_build_skipped = "; ".join(cloth.get("skipped", []))
         except Exception as error:
+            settings.cloth_build_skipped = str(error)
             _status(settings, f"Hero body imported; companion parts failed: {error}", "WARN")
         parts.scan_materials(settings)
         if settings.extraction_dir:
@@ -303,9 +310,13 @@ class DMF_OT_import_hero(Operator):
         skipped = companion.get("skipped") or []
         detail = f", plus {', '.join(imported)}" if imported else ""
         misses = f"; {len(skipped)} part file(s) skipped" if skipped else ""
+        built_chains = [entry["chain"] for entry in cloth.get("built", [])]
+        cloth_note = (
+            f"; cloth on {', '.join(built_chains)}" if built_chains else "; no cloth chain built"
+        )
         _status(
             settings,
-            f"Hero ready: {len(arm.data.bones)} bones, {len(mesh.data.vertices):,} vertices{detail}{misses}",
+            f"Hero ready: {len(arm.data.bones)} bones, {len(mesh.data.vertices):,} vertices{detail}{cloth_note}{misses}",
             "OK" if not skipped else "WARN",
         )
         return {"FINISHED"}
