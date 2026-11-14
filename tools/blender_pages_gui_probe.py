@@ -213,6 +213,16 @@ def main() -> int:
         {"surface": surface, "supported": ui_space.custom_space_supported()},
     )
 
+    root = getattr(bpy.types, f"DMF_PT_{'space' if surface == 'editor' else 'props'}_main", None)
+    _check(
+        "surface-open-control",
+        hasattr(bpy.ops.dmf, "open_workbench") and root is not None,
+        {
+            "operator": hasattr(bpy.ops.dmf, "open_workbench"),
+            "root": getattr(root, "bl_idname", ""),
+        },
+    )
+
     settings = bpy.context.scene.dmf
     settings.body_dmx = str(body_dmx)
     bpy.ops.object.select_all(action="DESELECT")
@@ -339,15 +349,6 @@ def main() -> int:
                 settings.cloth_index = index
                 break
         bpy.context.view_layer.update()
-        if area is not None:
-            # Give the page the whole window for the shot; native Properties
-            # panels otherwise push the cloth list out of view.
-            try:
-                with bpy.context.temp_override(window=window, area=area):
-                    bpy.ops.screen.screen_full_area(use_hide_panels=False)
-                RESULT["maximized"] = True
-            except Exception as error:
-                RESULT["maximize_error"] = f"{type(error).__name__}: {error}"
         Path(args.screenshot).parent.mkdir(parents=True, exist_ok=True)
         RESULT["summary"] = f"{surface} surface, {len(draws)} page draws, {len(errors)} exceptions"
         try:

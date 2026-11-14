@@ -11,6 +11,7 @@ and the exact refusal that blocks the handoff.
 """
 from __future__ import annotations
 
+import sys
 import textwrap
 from pathlib import Path
 
@@ -198,6 +199,30 @@ def _primary(layout, operator: str, text: str, icon: str, enabled: bool = True) 
     row.operator(operator, text=text, icon=icon)
 
 
+def surface_name() -> str:
+    """Which page surface register() produced; the addon module owns the value."""
+    module = sys.modules.get(__package__ or "")
+    return str(getattr(module, "SURFACE", "unregistered")) if module else "unregistered"
+
+
+def surface_error() -> str:
+    """Why the editor surface was declined, when this build could have had one."""
+    module = sys.modules.get(__package__ or "")
+    return str(getattr(module, "EDITOR_ERROR", "")) if module else ""
+
+
+def _surface(layout) -> None:
+    """The way out of the sidebar: open the page surface this build has."""
+    if surface_name() == "editor":
+        layout.operator("dmf.open_workbench", text="Open the Workbench editor", icon="WINDOW")
+        return
+    layout.operator("dmf.open_workbench", text="Open the Workbench page", icon="PROPERTIES")
+    layout.label(
+        text="This Blender build cannot register editor types; the pages are in Properties > Scene",
+        icon="INFO",
+    )
+
+
 def _job(layout, settings) -> None:
     if not settings.job_running:
         return
@@ -240,6 +265,7 @@ class DMF_PT_main(Panel):
             max_lines=4 if settings.status_kind == "ERROR" else 3,
         )
         _job(layout, settings)
+        _surface(layout)
 
 
 class DMF_PT_setup(Panel):

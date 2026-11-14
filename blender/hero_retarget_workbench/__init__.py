@@ -19,7 +19,7 @@ if (_PACKAGE / "_vendor").is_dir() and str(_PACKAGE / "_vendor") not in sys.path
 bl_info = {
     "name": "Hero Retarget Workbench",
     "author": "ala",
-    "version": (0, 7, 1),
+    "version": (0, 7, 2),
     "blender": (5, 4, 0),
     "location": "View3D > Sidebar > Deadlock; Properties > Scene > Hero Retarget Workbench",
     "description": "Fit and retarget a custom model onto a live Deadlock hero, then install the unchanged S2V vmdl as a CSDK13 addon",
@@ -30,6 +30,8 @@ bl_info = {
 # Blender can register an add-on space type, "properties" otherwise. Probes and
 # the panel read this instead of assuming one build's capability.
 SURFACE = "unregistered"
+# Empty unless this Blender could register an editor and the registration failed.
+EDITOR_ERROR = ""
 
 from . import (  # noqa: E402
     clipops,
@@ -50,7 +52,7 @@ from . import (  # noqa: E402
 
 
 def register() -> None:
-    global SURFACE
+    global SURFACE, EDITOR_ERROR
     properties.register()
     hierarchy_view.register()
     workbench.register()
@@ -66,14 +68,17 @@ def register() -> None:
     # one, and the Properties editor tab when it cannot. Same panels either way.
     if ui_space.register():
         SURFACE = "editor"
+        EDITOR_ERROR = ""
     else:
         ui_props.register()
         SURFACE = "properties"
+        EDITOR_ERROR = ui_space.EDITOR_ERROR
 
 
 def unregister() -> None:
-    global SURFACE
+    global SURFACE, EDITOR_ERROR
     SURFACE = "unregistered"
+    EDITOR_ERROR = ""
     ui_props.unregister()
     ui_space.unregister()
     ui_space.unregister_operators()
