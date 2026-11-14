@@ -44,11 +44,33 @@ def supports(values) -> bool:
 
 
 def custom_space_supported() -> bool:
+    """Whether this build can host an add-on space type.
+
+    The panel enum is the cheap answer, but a build that accepts a Space
+    subclass may not list ``CUSTOM`` there until a space exists. Registering a
+    throwaway space is the real test, and keeps a working PR build from being
+    mistaken for stock and losing its editor (the 0.8.3 regression).
+    """
     try:
         items = bpy.types.Panel.bl_rna.properties["bl_space_type"].enum_items
+        if supports(item.identifier for item in items):
+            return True
+    except Exception:
+        pass
+    probe = type(
+        "DMF_ST_capability_probe",
+        (Space,),
+        {
+            "bl_idname": "DMF_ST_capability_probe",
+            "bl_label": "Workbench capability probe",
+        },
+    )
+    try:
+        bpy.utils.register_class(probe)
+        bpy.utils.unregister_class(probe)
+        return True
     except Exception:
         return False
-    return supports(item.identifier for item in items)
 
 
 def _status_line(layout, settings) -> None:
@@ -100,10 +122,8 @@ def _pages_header_draw(self, context) -> None:
     self.layout.label(text="Pages", icon="WINDOW")
 
 
-def editor_classes() -> list[type]:
-    """The editor and its pages, or an empty list when the build cannot."""
-    if not custom_space_supported():
-        return []
+def editor_space_classes() -> list[type]:
+    """The editor, its header and root: without these there is no view."""
     space = type(
         SPACE_IDNAME,
         (Space,),
@@ -142,6 +162,13 @@ def editor_classes() -> list[type]:
             "draw": _root_draw,
         },
     )
+    for cls in (space, header, root):
+        ui_props.materialize(cls)
+    return [space, header, root]
+
+
+def pages_space_classes() -> list[type]:
+    """The optional companion strip. Losing it must not lose the editor."""
     pages_space = type(
         PAGES_SPACE_IDNAME,
         (Space,),
@@ -180,9 +207,13 @@ def editor_classes() -> list[type]:
             "draw": _pages_draw,
         },
     )
-    for cls in (space, header, root, pages_space, pages_header, pages_panel):
+    for cls in (pages_space, pages_header, pages_panel):
         ui_props.materialize(cls)
-    mirrors = [
+    return [pages_space, pages_header, pages_panel]
+
+
+def page_mirror_classes() -> list[type]:
+    return [
         ui_props.mirror(
             panel,
             ui_props.PAGE_BY_ID[panel.bl_idname],
@@ -193,25 +224,48 @@ def editor_classes() -> list[type]:
         )
         for panel in ui_props.page_panels()
     ]
-    return [space, header, root, pages_space, pages_header, pages_panel, *mirrors]
+
+
+def editor_classes() -> list[type]:
+    """Every class the editor would like, or [] when the build cannot host it."""
+    if not custom_space_supported():
+        return []
+    return [*editor_space_classes(), *pages_space_classes(), *page_mirror_classes()]
+
+
+def _register_each(classes: list[type]) -> list[str]:
+    """Register what this build accepts and keep the reasons for the rest."""
+    failures: list[str] = []
+    for cls in classes:
+        try:
+            bpy.utils.register_class(cls)
+            _REGISTERED.append(cls)
+        except Exception as error:
+            failures.append(f"{cls.__name__}: {type(error).__name__}: {error}")
+    return failures
 
 
 def register() -> bool:
-    """Register the editor surface; False means the caller must fall back."""
+    """Register the editor surface; False means the caller must fall back.
+
+    The editor, header and root are required. Page mirrors and the companion
+    strip are best effort: a build that refuses one panel must still get its
+    view. 0.8.3 registered all classes as one block and lost the whole editor
+    when the strip's space/header registration failed on the owner's build.
+    """
     global EDITOR_ERROR
-    classes = editor_classes()
-    if not classes:
+    if not custom_space_supported():
         return False
-    try:
-        for cls in classes:
-            bpy.utils.register_class(cls)
-            _REGISTERED.append(cls)
-    except Exception as error:
-        EDITOR_ERROR = f"{type(error).__name__}: {error}"
+    failures = _register_each(editor_space_classes())
+    if failures:
+        EDITOR_ERROR = "; ".join(failures)
         print(f"DMF editor surface declined: {EDITOR_ERROR}", flush=True)
         unregister()
         return False
-    EDITOR_ERROR = ""
+    optional = _register_each([*pages_space_classes(), *page_mirror_classes()])
+    EDITOR_ERROR = ("; ".join(optional) if optional else "")
+    if optional:
+        print(f"DMF editor optional classes skipped: {EDITOR_ERROR}", flush=True)
     return True
 
 
@@ -225,6 +279,11 @@ def _open_editor(context, area) -> bool:
     screen = context.screen
     if screen is None:
         return False
+    if PAGES_PANEL_IDNAME not in dir(bpy.types):
+        # The strip was refused by this build; the editor itself still opens.
+        area.type = "CUSTOM"
+        area.ui_type = SPACE_IDNAME
+        return True
     existing = [
         candidate
         for candidate in screen.areas
@@ -283,7 +342,7 @@ class DMF_OT_open_workbench(Operator):
         if area is None:
             self.report({"ERROR"}, "Run this from an area, not the status bar")
             return {"CANCELLED"}
-        if _REGISTERED and custom_space_supported():
+        if _REGISTERED:
             if _open_editor(context, area):
                 core.set_status(context.scene.dmf, "", "INFO")
                 return {"FINISHED"}

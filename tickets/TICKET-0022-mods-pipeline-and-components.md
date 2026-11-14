@@ -169,6 +169,42 @@ errors that you just missed??? these are collissions to be recorded"*.
   41 page panels, 0 register errors; receipt
   `artifacts/receipts/reinstall-0.8.3.json`.
 
+## 0.8.4 — the editor registers first, and says why when it does not
+
+**Owner report, verbatim:** *"ana again, now the 8.3 versionhas no fucking view on
+the experimental blender branch that allows custom views, stop regressing the
+code"*.
+
+0.8.3 registered the whole editor as one block: space, header, root, page
+mirrors, and the companion pages space. One refused optional class (the pages
+space or any single mirror) made `register()` unregister everything and fall
+back to the sidebar — a view that worked on 0.7.2 disappeared when the strip was
+added.
+
+- `register()` now registers the required editor classes first and keeps them;
+  page mirrors and the pages strip are registered one at a time and a refusal is
+  recorded in `EDITOR_ERROR` without taking the view away.
+- `custom_space_supported()` no longer trusts only the `Panel.bl_space_type`
+  enum: if `CUSTOM` is absent it registers and unregisters a throwaway Space to
+  ask the build directly, so a PR build that does not list the enum is not
+  mistaken for stock.
+- `dmf.open_workbench` only splits for the strip when `DMF_PT_space_pages`
+  actually registered; otherwise it opens the single editor area.
+- Every enable prints `DMF surface=... error=...` and writes
+  `<user config>/dmf/surface.json` with surface, error, version, addon file,
+  Blender version and whether each space registered. The sidebar no longer says
+  "pages are in Properties > Scene" — that surface is gone — and it shows the
+  editor error when there is one.
+- Evidence: zip 0.8.4 on PR 165087, 9/9 with both spaces; reinstall probe 4/4;
+  `surface.json` in the isolated profile reads `surface: editor, error: "",
+  space_registered: true, pages_registered: true`. Receipts
+  `artifacts/receipts/zip-install-0.8.4.json`,
+  `artifacts/receipts/reinstall-0.8.4.json`.
+
+Not checked: the owner's own profile. If it still reports `surface: sidebar`,
+`<BLENDER_USER_CONFIG>/dmf/surface.json` now names the failing class instead of
+silently dropping the view.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and

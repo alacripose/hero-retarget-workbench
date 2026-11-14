@@ -1,3 +1,26 @@
+## 2026-11-14 — 0.8.4: the editor registers first, the strip cannot take it down
+
+**Owner report, verbatim:** *"ana again, now the 8.3 versionhas no fucking view on
+the experimental blender branch that allows custom views, stop regressing the
+code"*.
+
+- 0.8.3 registered space, header, root, page mirrors and the companion pages
+  space in one block; one refused optional class unregistered everything and
+  fell back to the sidebar. That is why a PR build lost the view it had in
+  0.7.2.
+- The required editor classes now register first and stay; mirrors and the pages
+  space are best effort, with refusals kept in `EDITOR_ERROR`.
+- `custom_space_supported()` probes Space registration when the panel enum lacks
+  `CUSTOM`, so a PR build that does not list the enum is not treated as stock.
+- `dmf.open_workbench` splits only when `DMF_PT_space_pages` registered; else it
+  opens the single editor area.
+- Every enable prints `DMF surface=... error=...` and writes
+  `<user config>/dmf/surface.json`; the sidebar shows the editor error instead of
+  the removed Properties > Scene story.
+- Evidence: 0.8.4 zip 9/9 on PR 165087 with both spaces; reinstall probe 4/4;
+  surface.json editor/true/true. If the owner's profile still says sidebar, that
+  file names the refused class.
+
 ## 2026-11-14 — 0.8.3: navigation-bar and reinstall collisions
 
 **Owner request, verbatim:** *"dude the buttons are supposed to be in the
