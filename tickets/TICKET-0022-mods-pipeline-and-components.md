@@ -493,6 +493,21 @@ can fill the area, and the page buttons moved to the header.
 Not checked: a real click on a header page button — the probe sets `props_page`
 through the same enum property the buttons write.
 
+## 0.8.20 — the page menu is the title, the icon buttons stay
+
+**Owner request, verbatim:** *"could you add a dropdown menu in place of the
+workbench title for the different pages"*, then *"don't remove the icons they're
+fine just replace the title with the droppdown"*.
+
+- The header's first control is now `prop(settings, "props_page")`: the current
+  page's name as a dropdown, where the static `Workbench` label used to be.
+- The row of page icon buttons is unchanged beside it, followed by the version
+  and the status line.
+- Evidence: gate green; `zip-install-0.8.20.json` 12/12; `pages-0.8.20.png`
+  shows `Cloth` as the dropdown, the icon row, and `v0.8.20`.
+
+Not checked: opening the dropdown with a real mouse click.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
