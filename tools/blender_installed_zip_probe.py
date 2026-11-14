@@ -117,7 +117,9 @@ def main() -> int:
         ]
         report["ui_types"] = ui_types
         if expected == "editor":
-            report["pages_strip"] = PAGES_PANEL_IDNAME in dir(bpy.types)
+            report["pages_strip"] = any(
+                name.startswith("DMF_PT_space_tab_") for name in dir(bpy.types)
+            )
             space = area.spaces.active
             check(
                 "open-workbench",

@@ -88,7 +88,8 @@ def _header_draw(self, context) -> None:
         # A build without the template still gets the page box and the status.
         pass
     layout.label(text="Workbench", icon="ARMATURE_DATA")
-    layout.prop(settings, "props_page", text="")
+    # The page is chosen by the sidebar's own page tabs; a second selector here
+    # would fight the tab that is currently selected.
     layout.separator_spacer()
     _status_line(layout, settings)
 
@@ -167,34 +168,93 @@ def editor_space_classes() -> list[type]:
     return [space, header, root]
 
 
-def pages_space_classes() -> list[type]:
-    """The page panel in the Workbench's own expandable sidebar (UI region).
+_PENDING_PAGE = {"page": ""}
 
-    A custom space has a real UI region - the black strip that expands out - and
-    it accepts an add-on panel there. That is where the pages belong; 0.8.1-0.8.4
-    split a second area beside the editor instead, which is the regression the
-    owner called out.
+
+def _active_settings():
+    """Scene settings from a timer, where ``bpy.context.scene`` can be None."""
+    scene = getattr(bpy.context, "scene", None)
+    if scene is None:
+        window = getattr(bpy.context, "window", None)
+        if window is None and bpy.context.window_manager.windows:
+            window = bpy.context.window_manager.windows[0]
+        scene = getattr(window, "scene", None)
+    return getattr(scene, "dmf", None)
+
+
+def _select_page(page: str):
+    _PENDING_PAGE["page"] = ""
+    settings = _active_settings()
+    if settings is not None and settings.props_page != page:
+        settings.props_page = page
+        for window in bpy.context.window_manager.windows:
+            if window:
+                for area in window.screen.areas:
+                    if area.type == "CUSTOM" and area.ui_type == SPACE_IDNAME:
+                        area.tag_redraw()
+    return None
+
+
+def _tab_draw(self, context, page: str) -> None:
+    """A page tab: selecting the category switches the Workbench page.
+
+    The tab strip at the right edge of a sidebar is built from categories, not
+    from a list inside one panel. One category per page is the only way an
+    add-on can put the pages themselves in that strip; the switch is scheduled
+    from a timer because the selection arrives during draw.
     """
-    pages_panel = type(
-        PAGES_PANEL_IDNAME,
-        (Panel,),
-        {
-            "bl_idname": PAGES_PANEL_IDNAME,
-            "bl_label": "Pages",
-            "bl_category": "Workbench",
-            "bl_space_type": "CUSTOM",
-            "bl_space_idname": SPACE_IDNAME,
-            "bl_region_type": "UI",
-            "bl_options": set(),
-            "poll": classmethod(
-                lambda cls, context: getattr(getattr(context, "scene", None), "dmf", None)
-                is not None
-            ),
-            "draw": _pages_draw,
-        },
-    )
-    ui_props.materialize(pages_panel)
-    return [pages_panel]
+    settings = context.scene.dmf
+    if settings.props_page != page and _PENDING_PAGE["page"] != page:
+        # The selected category's panel is the only signal an add-on gets that
+        # its tab was chosen. A timer does the write: assigning from inside a
+        # draw does not stick, and a timer context often has no bpy.context.scene.
+        _PENDING_PAGE["page"] = page
+        bpy.app.timers.register(lambda: _select_page(page), first_interval=0.01)
+
+
+def _tab_draw_for(page: str):
+    """A two-argument draw closure; Blender rejects a default page argument."""
+
+    def draw(self, context) -> None:
+        _tab_draw(self, context, page)
+
+    return draw
+
+
+def pages_space_classes() -> list[type]:
+    """One sidebar tab per Workbench page, in the sidebar's own tab strip.
+
+    The custom space has a real UI region whose category tabs are the vertical
+    strip on its right edge. A single "Pages" panel listed the pages inside the
+    strip instead of being the strip; the owner asked for the pages themselves
+    to be the tabs.
+    """
+    classes: list[type] = []
+    for page in ui_props.PAGES:
+        label = page.replace("_", " ").title()
+        idname = f"DMF_PT_space_tab_{page.lower()}"
+        cls = type(
+            idname,
+            (Panel,),
+            {
+                "bl_idname": idname,
+                "bl_label": label,
+                "bl_category": label,
+                "bl_space_type": "CUSTOM",
+                "bl_space_idname": SPACE_IDNAME,
+                "bl_region_type": "UI",
+                "bl_options": set(),
+                "poll": classmethod(
+                    lambda cls, context: getattr(
+                        getattr(context, "scene", None), "dmf", None
+                    )
+                    is not None
+                ),
+                "draw": _tab_draw_for(page),
+            },
+        )
+        classes.append(ui_props.materialize(cls))
+    return classes
 
 
 def page_mirror_classes() -> list[type]:
@@ -282,8 +342,19 @@ def _ensure_sidebar() -> float:
             if area.type != "CUSTOM" or area.ui_type != SPACE_IDNAME:
                 continue
             space = area.spaces.active
+            opened = False
             if hasattr(space, "show_region_ui") and not space.show_region_ui:
                 space.show_region_ui = True
+                opened = True
+            # The custom space creates an empty TOOLS strip on the left that has
+            # no panels; close it so the view does not carry a blank sidebar.
+            if hasattr(space, "show_region_toolbar") and space.show_region_toolbar:
+                space.show_region_toolbar = False
+                opened = True
+            if hasattr(space, "show_region_footer") and space.show_region_footer:
+                space.show_region_footer = False
+                opened = True
+            if opened:
                 area.tag_redraw()
     return 1.0
 
