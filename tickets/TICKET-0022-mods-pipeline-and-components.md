@@ -362,6 +362,32 @@ being tabs and the workbench"*.
 
 Not checked: a real mouse click on a tab; the category was set through the API.
 
+## 0.8.14 — the sidebar keeps the width the owner gave it
+
+**Owner correction, verbatim:** *"I resize the workbench to fit the width of the
+window up to the tabs, but when I switch tabs it resets … the limitation is your
+own to note as a collision, not a missing blender feature"*.
+
+0.8.13 said the UI region was a fixed 280 px. That was wrong. The sidebar width is
+per-area layout state the owner can drag, and it is smaller on a smaller view; the
+default is 280 on a fresh area. The reset was ours: `_ensure_sidebar` ran every
+second and set `show_region_ui = True` whenever it read false, which reopened a
+collapsed or narrowed sidebar at the default width — including right after a tab
+switch redraw.
+
+- The timer now handles each area exactly once (`_SEEN_AREAS` by
+  `area.as_pointer()`); it opens the sidebar and closes the empty TOOLS/FOOTER
+  regions on first sight, then only reads `active_panel_category`.
+- A deliberate collapse or drag is left alone. `dmf.open_workbench` forgets the
+  area so opening it again still opens the sidebar.
+- Evidence: gate green; `artifacts/receipts/zip-install-0.8.14.json` 10/10 with
+  Cloth→CLOTH and Setup→SETUP; `pages-0.8.14.png` shows the fresh-open default
+  width, which is what a just-created area has before a drag.
+
+Not checked: an actual mouse drag of the sidebar edge — `Region.width` is
+read-only to Python, so the persistence is proven by the timer no longer writing
+the flag, not by simulating a drag.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
