@@ -64,7 +64,7 @@ class DMF_PT_setup_tools(Panel):
 
         csdk = _section(
             layout,
-            "CSDK & clients",
+            "Clients & installs",
             "PACKAGE",
             Path(settings.csdk_root).name if settings.csdk_root else "choose one",
         )
@@ -84,13 +84,22 @@ class DMF_PT_setup_tools(Panel):
                 "clients",
                 settings,
                 "client_index",
-                rows=3,
+                rows=5,
             )
             use = csdk.row(align=True)
             use.alignment = "RIGHT"
             use.operator("dmf.use_client", text="Use this client", icon="CHECKMARK")
         else:
-            _hint(csdk, "Find clients, or install a downloaded Reduced CSDK zip.", "QUESTION")
+            _hint(
+                csdk,
+                "Find clients reads game and tools installs on every Steam library and the standard preview folders.",
+                "QUESTION",
+            )
+            _hint(
+                csdk,
+                "A compiler host builds the handoff; a game with Citadel VPKs is a backport target.",
+                "INFO",
+            )
 
 
 class DMF_PT_mods(Panel):

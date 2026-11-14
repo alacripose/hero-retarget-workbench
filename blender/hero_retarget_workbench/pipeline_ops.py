@@ -60,6 +60,13 @@ def _client_label(root: Path) -> str:
 
 
 def refresh_clients(settings, module) -> list[Path]:
+    """Every game and tools install, read from the trees themselves.
+
+    The old list only looked beside the current CSDK, so a CSDK13 hid the live
+    game, an older game tree, CSDK10 and a CS2 tools build. ``forge.installs``
+    reads Steam's libraries and the standard preview/tools placements on every
+    drive, then classifies each tree by its own gameinfo and binaries.
+    """
     roots = []
     if settings.clients_folder:
         roots.append(_abspath(settings.clients_folder))
@@ -67,15 +74,22 @@ def refresh_clients(settings, module) -> list[Path]:
         roots.append(_workspace(settings) / "clients")
     if settings.csdk_root:
         roots.append(_abspath(settings.csdk_root).parent)
-    found = module["provision"].find_clients(*roots)
+    rows = module["installs"].discover(*roots)
     active = str(_abspath(settings.csdk_root)).lower() if settings.csdk_root else ""
+    target = str(_abspath(settings.mod_target_client)).lower() if settings.mod_target_client else ""
     settings.clients.clear()
-    for root in found:
+    found: list[Path] = []
+    for install in rows:
         row = settings.clients.add()
-        row.path = str(root)
-        row.label = root.name
-        row.build = _client_label(root)
-        row.active = str(root).lower() == active
+        row.path = str(install.root)
+        row.label = install.label
+        row.build = install.build
+        row.kind = install.kind
+        row.engine = install.engine
+        row.can_compile = install.can_compile
+        row.can_backport = install.can_backport
+        row.active = str(install.root).lower() in (active, target)
+        found.append(install.root)
     return found
 
 
@@ -427,13 +441,19 @@ class DMF_OT_install_csdk(Operator):
 class DMF_OT_refresh_clients(Operator):
     bl_idname = "dmf.refresh_clients"
     bl_label = "Find clients"
-    bl_description = "Find CSDK-style installs in the clients folder and beside the current CSDK"
+    bl_description = "Find every game and tools install in Steam libraries and the standard preview folders"
 
     def execute(self, context):
         settings = _settings(context)
         module = core.core(settings)
         found = refresh_clients(settings, module)
-        core.set_status(settings, f"Found {len(found)} client installs", "OK")
+        compile_count = sum(1 for row in settings.clients if row.can_compile)
+        target_count = sum(1 for row in settings.clients if row.can_backport)
+        core.set_status(
+            settings,
+            f"Found {len(found)} installs: {compile_count} with a compiler, {target_count} backport targets",
+            "OK",
+        )
         return {"FINISHED"}
 
 
@@ -474,11 +494,23 @@ class DMF_OT_use_client(Operator):
             return {"CANCELLED"}
         index = min(max(settings.client_index, 0), len(settings.clients) - 1)
         row = settings.clients[index]
-        settings.csdk_root = row.path
-        settings.mod_target_client = row.path
+        used = []
+        if row.can_compile:
+            settings.csdk_root = row.path
+            used.append("compiler")
+        if row.can_backport:
+            settings.mod_target_client = row.path
+            used.append("backport target")
+        if not used:
+            core.set_status(
+                settings,
+                f"{row.label} is neither a compiler host nor has Citadel VPKs",
+                "WARN",
+            )
+            return {"CANCELLED"}
         for item in settings.clients:
             item.active = item.path == row.path
-        core.set_status(settings, f"Active client: {row.label}", "OK")
+        core.set_status(settings, f"Using {row.label} for {' and '.join(used)}", "OK")
         return {"FINISHED"}
 
 

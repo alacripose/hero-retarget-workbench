@@ -191,11 +191,10 @@ class PathConfigurationTests(unittest.TestCase):
         self.assertEqual(root, tools)
         self.assertEqual(found, compiler)
 
-    def test_source_has_no_personal_or_drive_letter_defaults(self):
+    def test_source_has_no_personal_or_absolute_user_defaults(self):
         source = Path(paths.__file__).read_text(encoding="utf-8")
         self.assertNotIn("openlock_modern", source)
         self.assertNotIn("Reduced_CSDK_13", source)
-        self.assertNotIn("for letter in", source)
         self.assertNotIn("C:\\\\Users\\\\ala", source)
 
 

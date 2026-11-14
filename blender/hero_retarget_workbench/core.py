@@ -74,10 +74,10 @@ def core(settings):
         # Import the addon's own bundle. A previously enabled addon can leave a
         # top-level ``forge`` module in sys.modules; reusing it would mix the old
         # path contract with this addon's Setup fields.
-        from .forge import backport, compile, components, live, migrate, oldmods, paths, provision, stage
+        from .forge import backport, compile, components, installs, live, migrate, oldmods, paths, provision, stage
     else:
         _import_root(settings)
-        from forge import backport, compile, components, live, migrate, oldmods, paths, provision, stage
+        from forge import backport, compile, components, installs, live, migrate, oldmods, paths, provision, stage
 
     return {
         "compile": compile,
@@ -86,6 +86,7 @@ def core(settings):
         "paths": paths,
         "stage": stage,
         "oldmods": oldmods,
+        "installs": installs,
         "provision": provision,
         "backport": backport,
         "components": components,
