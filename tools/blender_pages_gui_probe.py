@@ -203,17 +203,21 @@ def main() -> int:
     ui_props = sys.modules["dmf_pages_probe.ui_props"]
     ui_space = sys.modules["dmf_pages_probe.ui_space"]
     cloth_ops = sys.modules["dmf_pages_probe.cloth_ops"]
-    surface = getattr(addon, "SURFACE", "properties")
+    surface = getattr(addon, "SURFACE", "sidebar")
     RESULT["surface"] = surface
     RESULT["blender"] = bpy.app.version_string
     RESULT["custom_space_supported"] = ui_space.custom_space_supported()
     _check(
         "surface-match",
-        surface == ("editor" if ui_space.custom_space_supported() else "properties"),
+        surface == ("editor" if ui_space.custom_space_supported() else "sidebar"),
         {"surface": surface, "supported": ui_space.custom_space_supported()},
     )
 
-    root = getattr(bpy.types, f"DMF_PT_{'space' if surface == 'editor' else 'props'}_main", None)
+    root = getattr(
+        bpy.types,
+        "DMF_PT_space_main" if surface == "editor" else "DMF_PT_main",
+        None,
+    )
     _check(
         "surface-open-control",
         hasattr(bpy.ops.dmf, "open_workbench") and root is not None,
@@ -288,8 +292,8 @@ def main() -> int:
         attributes["bl_space_type"] = "CUSTOM"
         attributes["bl_space_idname"] = ui_space.SPACE_IDNAME
     else:
-        attributes["bl_space_type"] = "PROPERTIES"
-        attributes["bl_context"] = "scene"
+        attributes["bl_space_type"] = "VIEW_3D"
+        attributes["bl_region_type"] = "UI"
     bpy.utils.register_class(type("PROBE_PT_pages", (bpy.types.Panel,), attributes))
 
     window, area = _any_area()

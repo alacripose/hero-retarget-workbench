@@ -95,6 +95,39 @@ Authority: `logs/authority/2026-11-14-mods-pipeline-components.jsonl`
   CSDK13 `resourcecompiler` returned 0 with 1 compiled file and produced
   `kelvin.vmdl_c` (3,824,366 bytes). Log `logs/component-compile.log`.
 
+## 0.8.1 correction — the black page strip belongs to the Workbench's own view
+
+0.8.0 put the page rail inside the Properties editor's Workbench tab and left it
+in the Scene column when the build could not register the editor. On the owner's
+screen the rail overlapped the native tabs, consumed the narrow column's height,
+and pushed the page body below the fold: worse than the old Properties tab it
+replaced.
+
+0.8.1 removes that surface entirely:
+
+- the Properties editor never registers a Workbench page again, and
+  `dmf.open_workbench` no longer falls back to it;
+- the Workbench editor opens with a narrow companion area split off to its left,
+  `DMF_ST_workbench_pages`, whose only panel is the page strip: one small icon
+  button per page, the current page depressed, `Cloth` highlighted in the probe
+  screenshot. The strip gets its own real black column, the way the Properties
+  editor's tab strip does, instead of being drawn inside the page body;
+- the split aims at ~46 px (clamped 2–30% of the area) so it is neither a 15 px
+  sliver in the Properties column nor a 130 px void in a maximised viewport;
+- on builds without custom space types the operator opens the 3D viewport
+  sidebar (N) and says so in the status line instead of degrading into Properties.
+
+Verified: zip 0.8.1 installs 9/9 on PR 165087 with both `DMF_ST_workbench` and
+`DMF_ST_workbench_pages` present after `dmf.open_workbench`, and 9/9 on the stock
+daily with surface `sidebar`, area `VIEW_3D` and `show_region_ui` open. The pages
+probe passes 20/20 page draws with 0 exceptions on the editor surface. Screenshot
+`artifacts/receipts/pages-0.8.1.png`, strip crop
+`artifacts/receipts/pages-0.8.1-strip-crop.png`.
+
+Not checked: the strip's click behaviour was not driven by a real mouse click in
+this pass (the icons are standard `prop_enum` buttons); the page mirrors still
+have no scrolling in the narrow companion area.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and

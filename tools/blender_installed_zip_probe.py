@@ -28,6 +28,7 @@ import bpy
 REPO = Path(__file__).resolve().parents[1]
 MODULE = "hero_retarget_workbench"
 SPACE_IDNAME = "DMF_ST_workbench"
+PAGES_SPACE_IDNAME = "DMF_ST_workbench_pages"
 HEADER_IDNAME = "DMF_HT_workbench"
 
 
@@ -36,7 +37,7 @@ def _arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--zip", required=True)
     parser.add_argument("--report", required=True)
-    parser.add_argument("--expect", choices=("editor", "properties"), default="")
+    parser.add_argument("--expect", choices=("editor", "sidebar"), default="")
     parser.add_argument("--screenshot", default="")
     return parser.parse_args(argv)
 
@@ -76,7 +77,7 @@ def main() -> int:
 
     panels = sorted(name for name in dir(bpy.types) if name.startswith("DMF_PT_"))
     spaces = [name for name in dir(bpy.types) if name == SPACE_IDNAME]
-    expected = args.expect or ("editor" if spaces else "properties")
+    expected = args.expect or ("editor" if spaces else "sidebar")
     report["expect"] = expected
     report["space_registered"] = bool(spaces)
     report["header_registered"] = HEADER_IDNAME in dir(bpy.types)
@@ -109,20 +110,33 @@ def main() -> int:
         report["area_before"] = before
         report["area_type"] = str(area.type)
         report["area_ui_type"] = str(getattr(area, "ui_type", ""))
+        ui_types = [
+            str(getattr(candidate, "ui_type", ""))
+            for candidate in bpy.context.screen.areas
+            if candidate.type == "CUSTOM"
+        ]
+        report["ui_types"] = ui_types
         if expected == "editor":
             check(
                 "open-workbench",
-                switched == {"FINISHED"} and report["area_ui_type"] == SPACE_IDNAME,
-                {"result": str(switched), "type": report["area_type"], "ui_type": report["area_ui_type"]},
+                switched == {"FINISHED"}
+                and SPACE_IDNAME in ui_types
+                and PAGES_SPACE_IDNAME in ui_types,
+                {"result": str(switched), "type": report["area_type"], "ui_types": ui_types},
             )
+            report["pages_strip"] = PAGES_SPACE_IDNAME in ui_types
         else:
             space = area.spaces.active
             check(
                 "open-workbench",
                 switched == {"FINISHED"}
-                and report["area_type"] == "PROPERTIES"
-                and getattr(space, "context", "SCENE") == "SCENE",
-                {"result": str(switched), "type": report["area_type"], "context": getattr(space, "context", "")},
+                and report["area_type"] == "VIEW_3D"
+                and bool(getattr(space, "show_region_ui", False)),
+                {
+                    "result": str(switched),
+                    "type": report["area_type"],
+                    "sidebar": bool(getattr(space, "show_region_ui", False)),
+                },
             )
         if args.screenshot:
             for _ in range(3):

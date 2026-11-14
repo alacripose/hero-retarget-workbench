@@ -19,16 +19,16 @@ if (_PACKAGE / "_vendor").is_dir() and str(_PACKAGE / "_vendor") not in sys.path
 bl_info = {
     "name": "Hero Retarget Workbench",
     "author": "ala",
-    "version": (0, 8, 0),
+    "version": (0, 8, 1),
     "blender": (5, 4, 0),
-    "location": "View3D > Sidebar > Deadlock; Properties > Scene > Hero Retarget Workbench",
+    "location": "Workbench editor (PR 165087 builds); View3D > Sidebar > Deadlock elsewhere",
     "description": "Fit and retarget a custom model onto a live Deadlock hero, then install the unchanged S2V vmdl as a CSDK13 addon",
     "category": "Import-Export",
 }
 
 # Which surface the page panels went to after register(): "editor" when this
-# Blender can register an add-on space type, "properties" otherwise. Probes and
-# the panel read this instead of assuming one build's capability.
+# Blender can register an add-on space type, "sidebar" otherwise. Probes and the
+# panel read this instead of assuming one build's capability.
 SURFACE = "unregistered"
 # Empty unless this Blender could register an editor and the registration failed.
 EDITOR_ERROR = ""
@@ -69,13 +69,13 @@ def register() -> None:
     pipeline_ops.register()
     ui_space.register_operators()
     # The page surface is the add-on's own editor when this Blender can register
-    # one, and the Properties editor tab when it cannot. Same panels either way.
+    # one. Released builds can only host the sidebar, and the add-on says so:
+    # 0.8.0's Properties fallback squeezed the pages into the Scene tab.
     if ui_space.register():
         SURFACE = "editor"
         EDITOR_ERROR = ""
     else:
-        ui_props.register()
-        SURFACE = "properties"
+        SURFACE = "sidebar"
         EDITOR_ERROR = ui_space.EDITOR_ERROR
 
 
