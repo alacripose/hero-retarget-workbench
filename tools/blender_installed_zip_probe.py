@@ -201,6 +201,61 @@ def main() -> int:
                 and switched_pages.get("Setup") == "SETUP",
                 switched_pages,
             )
+
+            # A second page writer made a tab click flicker in 0.8.14. The tab
+            # panels must draw without changing the page.
+            page_before_draw = bpy.context.scene.dmf.props_page
+            draw_results = {}
+            for name in ("DMF_PT_space_tab_cloth", "DMF_PT_space_tab_setup"):
+                tab_class = getattr(bpy.types, name, None)
+                if tab_class is None:
+                    draw_results[name] = "missing"
+                    continue
+                try:
+                    tab_class.draw(tab_class, bpy.context)
+                    draw_results[name] = "ok"
+                except Exception as error:
+                    draw_results[name] = f"{type(error).__name__}: {error}"
+            report["tab_draws"] = draw_results
+            check(
+                "tab-draw-is-read-only",
+                bpy.context.scene.dmf.props_page == page_before_draw
+                and all(value == "ok" for value in draw_results.values()),
+                {
+                    "before": page_before_draw,
+                    "after": bpy.context.scene.dmf.props_page,
+                    "draws": draw_results,
+                },
+            )
+
+            # Re-reading the same category must not change the page or re-assert
+            # sidebar flags; that is what reset a dragged width.
+            stable_page = bpy.context.scene.dmf.props_page
+            stable_width = ui_region.width if ui_region is not None else 0
+            for _ in range(3):
+                if space_module is not None:
+                    space_module._ensure_sidebar()
+            report["stable"] = {
+                "page": bpy.context.scene.dmf.props_page,
+                "width": ui_region.width if ui_region is not None else 0,
+            }
+            check(
+                "page-and-width-stable",
+                bpy.context.scene.dmf.props_page == stable_page
+                and report["stable"]["width"] == stable_width,
+                report["stable"],
+            )
+            space.show_region_ui = False
+            if space_module is not None:
+                space_module._ensure_sidebar()
+            check(
+                "respects-collapse",
+                space.show_region_ui is False,
+                "show_region_ui re-asserted"
+                if space.show_region_ui
+                else "left collapsed",
+            )
+            space.show_region_ui = True
         if args.screenshot:
             for _ in range(3):
                 bpy.context.view_layer.update()

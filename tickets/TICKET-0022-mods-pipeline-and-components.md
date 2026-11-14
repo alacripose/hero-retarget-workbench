@@ -359,6 +359,8 @@ being tabs and the workbench"*.
   Setup→SETUP, screenshots, and exits.
 - Evidence: `artifacts/receipts/pages-0.8.13.png` (tabs, no page box, Cloth page,
   `Workbench v0.8.13`), `zip-install-0.8.13.json` 10/10.
+- **Correction (0.8.14):** the fixed-280 claim was withdrawn. 280 is the default
+  width of a fresh area; the sidebar is draggable, and our timer reset it.
 
 Not checked: a real mouse click on a tab; the category was set through the API.
 
@@ -404,11 +406,18 @@ back at its default width.
   category in `_ensure_sidebar` is the only page writer.
 - Like 0.8.14, the timer touches `show_region_ui`, the toolbar and the footer
   once per area, so a dragged width is never re-asserted.
-- Evidence: gate green; `zip-install-0.8.15.json` 10/10 with Cloth→CLOTH and
-  Setup→SETUP; `pages-0.8.15.png`.
+- Evidence: gate green; `zip-install-0.8.15.json` 13/13. The probe now keeps the
+  regressions that made 0.8.14 flicker as named checks: `tab-draw-is-read-only`
+  (each tab panel's `draw` leaves the page alone), `page-and-width-stable`
+  (re-reading a category three times changes neither page nor region width), and
+  `respects-collapse` (a collapsed sidebar is not reopened).
+- The two ad-hoc probes written while chasing this (`probe_regions.py`,
+  `probe_ui_width.py`) are deleted; their measurements live in this probe and the
+  ticket, so the next change starts from a durable tool instead of a new script.
 
 Not checked: a real mouse click on a tab in a resized window — the probe sets the
-category through the API because it cannot drag a region edge.
+category through the API because it cannot drag a region edge, and that gap is
+why the flicker reached the owner.
 
 ## Not checked
 
