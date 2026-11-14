@@ -80,6 +80,45 @@ class PathConfigurationTests(unittest.TestCase):
     def test_a_directory_may_be_chosen_for_the_viewer(self):
         self.assertEqual(paths.find_s2v(self.s2v.parent), self.s2v)
 
+    def test_steam_appmanifest_finds_a_renamed_install(self) -> None:
+        library = self.root / "library"
+        renamed = library / "steamapps" / "common" / "Citadel Playtest"
+        (renamed / "game" / "citadel").mkdir(parents=True)
+        (renamed / "game" / "citadel" / "gameinfo.gi").write_text("gameinfo", encoding="utf-8")
+        (renamed / "game" / "citadel" / "pak01_dir.vpk").write_text("vpk", encoding="utf-8")
+        (library / "steamapps" / "appmanifest_1422450.acf").write_text(
+            '"AppState"\n{\n\t"installdir"\t\t"Citadel Playtest"\n}\n', encoding="utf-8"
+        )
+
+        root, game_dir, problems = paths.find_game(roots=[library])
+
+        self.assertEqual(root, renamed)
+        self.assertEqual(game_dir, renamed / "game")
+        self.assertEqual(problems, [])
+
+    def test_steam_common_scan_finds_the_game_without_a_manifest(self) -> None:
+        library = self.root / "library"
+        renamed = library / "steamapps" / "common" / "Some Other Folder"
+        (renamed / "game" / "citadel").mkdir(parents=True)
+        (renamed / "game" / "citadel" / "gameinfo.gi").write_text("gameinfo", encoding="utf-8")
+        (renamed / "game" / "citadel" / "pak01_dir.vpk").write_text("vpk", encoding="utf-8")
+
+        root, _game_dir, _problems = paths.find_game(roots=[library])
+
+        self.assertEqual(root, renamed)
+
+    def test_tool_root_finds_the_viewer_the_addon_installed(self) -> None:
+        workspace = self.root / "workspace"
+        cli = workspace / "tools" / "s2v" / "Source2Viewer-CLI.exe"
+        cli.parent.mkdir(parents=True)
+        cli.write_bytes(b"cli")
+
+        with patch.dict(os.environ, {"S2V_CLI": "", "PATH": ""}, clear=False):
+            self.assertEqual(paths.find_s2v(roots=[workspace]), cli)
+            self.assertEqual(
+                paths.detect(deadlock_root=self.game, tool_roots=[workspace]).s2v, cli
+            )
+
     def test_a_gui_path_resolves_to_the_cli_beside_it(self):
         gui = self.s2v.with_name("Source2Viewer.exe")
         gui.write_bytes(b"gui")

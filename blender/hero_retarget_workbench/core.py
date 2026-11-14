@@ -93,12 +93,28 @@ def core(settings):
 
 
 def detect_environment(settings, module=None):
-    """Detect with the user's scene paths ahead of environment and Steam fallbacks."""
+    """Detect with the user's scene paths ahead of environment and Steam fallbacks.
+
+    Scene paths are Blender paths: ``//tools`` is relative to the saved .blend,
+    and a raw Path() would look for a literal ``//`` folder. They are resolved
+    here once, so every page and every operator sees the same file.
+    """
     module = module or core(settings)
+    tool_roots = []
+    try:
+        workspace = workspace_root()
+        tool_roots.extend([workspace / "tools", workspace])
+    except Exception:
+        pass
+    if settings.tools_folder:
+        tool_roots.append(Path(bpy.path.abspath(settings.tools_folder)))
+    if settings.project_root:
+        tool_roots.append(Path(bpy.path.abspath(settings.project_root)) / "tools")
     return module["paths"].detect(
-        deadlock_root=settings.deadlock_root or None,
-        s2v_cli=settings.s2v_cli or None,
-        csdk_root=settings.csdk_root or None,
+        deadlock_root=bpy.path.abspath(settings.deadlock_root) if settings.deadlock_root else None,
+        s2v_cli=bpy.path.abspath(settings.s2v_cli) if settings.s2v_cli else None,
+        csdk_root=bpy.path.abspath(settings.csdk_root) if settings.csdk_root else None,
+        tool_roots=tool_roots,
     )
 
 

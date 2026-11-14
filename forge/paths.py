@@ -152,6 +152,25 @@ class Environment:
         ]
 
 
+def _steam_manifest_install(library: Path, appid: str = "1422450") -> Path | None:
+    """The install folder Steam records for an app, even when it was renamed.
+
+    Steam writes ``appmanifest_<appid>.acf`` beside the game and keeps the
+    folder name in ``installdir``. Reading it finds a library where the folder
+    is not literally ``Deadlock``, which the fixed leaf below cannot.
+    """
+    record = library / "steamapps" / f"appmanifest_{appid}.acf"
+    try:
+        text = record.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    match = re.search(r'"installdir"\s+"([^"]+)"', text)
+    if not match:
+        return None
+    candidate = library / "steamapps" / "common" / match.group(1).replace("\\\\", "\\")
+    return candidate if _game_candidate(candidate) else None
+
+
 def find_game(
     roots: list[Path] | None = None,
     *,
@@ -166,18 +185,34 @@ def find_game(
         problems.append(f"configured Deadlock install is not a Deadlock folder: {configured}")
         return None, None, problems
 
+    libraries = roots or steam_libraries()
     candidates: list[Path] = []
-    for root in roots or steam_libraries():
+    for root in libraries:
         candidates.extend(
             [
                 root / "steamapps" / "common" / "Deadlock",
                 root / "steamapps" / "common" / "deadlock",
             ]
         )
+        manifest = _steam_manifest_install(root)
+        if manifest is not None:
+            candidates.append(manifest)
     for candidate in candidates:
         result = _game_candidate(candidate)
         if result:
             return result[0], result[1], problems
+    # Steam's manifest can be absent in a copied library; one bounded level of
+    # `steamapps/common` finds a Deadlock tree under another folder name.
+    for root in libraries:
+        common = root / "steamapps" / "common"
+        try:
+            entries = sorted(common.iterdir())
+        except OSError:
+            continue
+        for candidate in entries:
+            result = _game_candidate(candidate)
+            if result:
+                return result[0], result[1], problems
     problems.append("Deadlock game/citadel/gameinfo.gi and pak01_dir.vpk were not found")
     return None, None, problems
 
@@ -190,7 +225,11 @@ def _is_gui(path: Path) -> bool:
     return path.name.lower() in {name.lower() for name in S2V_GUI_NAMES}
 
 
-def find_s2v(explicit: str | Path | None = None) -> Path | None:
+def find_s2v(
+    explicit: str | Path | None = None,
+    *,
+    roots: list[Path] | None = None,
+) -> Path | None:
     """The Source 2 Viewer CLI, from the chosen path or beside it.
 
     The GUI binary cannot run the extraction commands this addon sends, so it is
@@ -215,6 +254,25 @@ def find_s2v(explicit: str | Path | None = None) -> Path | None:
         found = shutil.which(name)
         if found:
             return Path(found)
+    # The addon's own tools folder (where Download & install puts the CLI), and
+    # any tool root the caller names, so a saved workspace finds its viewer.
+    for root in roots or []:
+        base = Path(root).expanduser()
+        for candidate in (
+            _file_candidate(base, S2V_CLI_NAMES),
+            _file_candidate(base / "tools", S2V_CLI_NAMES),
+            _file_candidate(base / "tools" / "s2v", S2V_CLI_NAMES),
+        ):
+            if candidate is not None:
+                return candidate
+    # A viewer shipped beside a Steam library is found without a personal path.
+    for library in steam_libraries():
+        for folder in ("Source2Viewer", "Source2ViewerCLI", "source2viewer"):
+            candidate = _file_candidate(
+                library / "steamapps" / "common" / folder, S2V_CLI_NAMES
+            )
+            if candidate is not None:
+                return candidate
     return None
 
 
@@ -289,6 +347,7 @@ def detect(
     s2v_cli: str | Path | None = None,
     csdk_root: str | Path | None = None,
     blender_exe: str | Path | None = None,
+    tool_roots: list[Path] | None = None,
 ) -> Environment:
     env = Environment()
     env.game_root, env.game_dir, env.problems = find_game(explicit=deadlock_root)
@@ -296,7 +355,7 @@ def detect(
         env.vpk = env.game_dir / "citadel" / "pak01_dir.vpk"
         env.gameinfo = env.game_dir / "citadel" / "gameinfo.gi"
         env.build, env.version_date = read_build(env.game_dir)
-    env.s2v = find_s2v(s2v_cli)
+    env.s2v = find_s2v(s2v_cli, roots=tool_roots)
     # find_s2v also reads S2V_CLI itself; the message below has to know that value
     # too, or a headless run reports a bare "not found" for a path it was given.
     if s2v_cli is None:

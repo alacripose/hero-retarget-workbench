@@ -93,6 +93,21 @@ class BackgroundJob:
         return None
 
 
+def clear_feedback(settings) -> None:
+    """Drop the last job's card once its failure can no longer be true.
+
+    A running job owns the fields; a finished one is history. Detection and a
+    path edit call this so every page stops repeating an old failure.
+    """
+    if getattr(settings, "job_running", False):
+        return
+    settings.job_state = ""
+    settings.job_log = ""
+    settings.job_message = ""
+    settings.job_progress = 0.0
+    settings.job_label = ""
+
+
 def active() -> BackgroundJob | None:
     return _ACTIVE
 
