@@ -20,7 +20,7 @@ import subprocess
 import sys
 import tempfile
 import time
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +31,7 @@ from forge.axis import PRESETS, AxisTransform  # noqa: E402
 from forge.compile import CompileError, compile_stage, compile_vmdl  # noqa: E402
 from forge.live import LiveError, extract, inventory, list_heroes  # noqa: E402
 from forge.migrate import MigrationError, update_from_package  # noqa: E402
+from forge.oldmods import inventory as oldmod_inventory  # noqa: E402
 from forge.paths import detect  # noqa: E402
 from forge.stage import MaterialCopy, StageError, StageRequest, digest, material_files, stage, verify  # noqa: E402
 
@@ -370,6 +371,25 @@ def cmd_compile(args: argparse.Namespace) -> int:
     if result.output:
         print(f"output {result.output}")
     warnings = len(re.findall(r"RESOURCE COMPILE WARNING:", result.stdout + result.stderr))
+    if args.report:
+        report = Path(args.report)
+        data = json.loads(report.read_text(encoding="utf-8")) if report.is_file() else {"ports": []}
+        matched = False
+        for entry in data.get("ports", []):
+            if entry.get("addon") != (args.addon or ""):
+                continue
+            matched = True
+            entry["compile"] = {
+                "returncode": result.returncode,
+                "compiled_files": [str(path) for path in result.compiled_files],
+                "output": str(result.output) if result.output else "",
+                "warnings": warnings,
+                "log": str(result.log),
+                "errors": re.findall(r"RESOURCE COMPILE ERROR: (.+)", result.stdout + result.stderr)[:12],
+            }
+        if matched:
+            report.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+            print(f"receipt {report}")
     append_ledger(
         {
             "at": utc(),
@@ -438,6 +458,33 @@ def cmd_update_addon(args: argparse.Namespace) -> int:
         print(f"section {name} {action['action']} old={action.get('old_sha256','')[:12]} out={action.get('output_sha256','')[:12]}")
     manifest = json.loads(result.manifest.read_text(encoding="utf-8"))
     print(f"cloth_chains {manifest.get('cloth_chains', 0)} cloth_hinges {manifest.get('cloth_hinges', 0)}")
+    if args.report:
+        report = Path(args.report)
+        existing = json.loads(report.read_text(encoding="utf-8")) if report.is_file() else {"ports": []}
+        entry = {
+            "ported_at": utc(),
+            "source": str(source),
+            "addon": addon,
+            "output": str(result.root),
+            "vmdl_sha256": manifest.get("vmdl_sha256", ""),
+            "old_package": manifest.get("old_package", ""),
+            "old_vmdl": manifest.get("old_vmdl", ""),
+            "old_vmdl_sha256": manifest.get("old_vmdl_sha256", ""),
+            "new_vmdl": manifest.get("new_vmdl", ""),
+            "preserved_model": result.preserved_model,
+            "model_files": len(result.model_files),
+            "materials": result.material_count,
+            "material_textures": result.material_texture_count,
+            "sections": result.sections,
+            "cloth_chains": manifest.get("cloth_chains", 0),
+            "cloth_hinges": manifest.get("cloth_hinges", 0),
+            "missing_sections": manifest.get("missing_sections", []),
+        }
+        ports = [item for item in existing.get("ports", []) if item.get("addon") != addon]
+        ports.append(entry)
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text(json.dumps({"ports": ports}, indent=2) + "\n", encoding="utf-8")
+        print(f"receipt {report}")
     append_ledger(
         {
             "at": utc(),
@@ -487,6 +534,50 @@ def cmd_update_addon(args: argparse.Namespace) -> int:
         if compiled.returncode != 0:
             print((compiled.stdout + "\n" + compiled.stderr)[-4000:], file=sys.stderr)
             return compiled.returncode
+    return 0
+
+
+def cmd_mods(args: argparse.Namespace) -> int:
+    try:
+        since = date.fromisoformat(args.since) if args.since else None
+        until = date.fromisoformat(args.until) if args.until else None
+    except ValueError as error:
+        print(f"mods-failed: {error}", file=sys.stderr)
+        return 2
+    result = oldmod_inventory(
+        [Path(root).expanduser() for root in args.root],
+        since=since,
+        until=until,
+        max_depth=args.depth,
+    )
+    for mod in result.mods:
+        cloth = ",".join(mod.cloth_sections) or "none"
+        hero = mod.hero or "unknown"
+        print(f"{mod.modified}  {mod.kind:5}  {hero:22}  {cloth:26}  {mod.bytes:>10}  {mod.path}")
+    counts = result.counts()
+    print(
+        f"packages={counts['packages']} addons={counts['addons']} vpks={counts['vpks']} "
+        f"with_cloth={counts['with_cloth_sections']} skipped_game_paks={counts['skipped_game_paks']}"
+    )
+    for name, count in result.cloth_types().items():
+        print(f"cloth-type {name} {count}")
+    for failure in result.skipped_unreadable:
+        print(f"skipped {failure}", file=sys.stderr)
+    path = result.save(Path(args.report))
+    print(f"receipt {path}")
+    append_ledger(
+        {
+            "at": utc(),
+            "command": "mods",
+            "result": "pass",
+            "roots": result.roots,
+            "since": result.since,
+            "until": result.until,
+            "counts": counts,
+            "cloth_types": result.cloth_types(),
+            "receipt": str(path),
+        }
+    )
     return 0
 
 
@@ -628,6 +719,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--no-materials", action="store_true", help="do not overlay the old material assets")
     p.add_argument("--force", action="store_true", help="replace an existing output addon folder")
     p.add_argument("--compile", action="store_true", help="compile the migrated stage with CSDK13")
+    p.add_argument("--report", default="", help="append this migration to a port-evidence receipt")
     p.set_defaults(func=cmd_update_addon)
 
     p = sub.add_parser("compile", help="invoke CSDK13 resourcecompiler")
@@ -635,7 +727,20 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--stage", default="", help="stage root containing content/citadel_addons/<addon>")
     p.add_argument("--addon", default="", help="addon folder name for --stage")
     p.add_argument("--log", default=str(ROOT / "logs" / "compile.log"))
+    p.add_argument("--report", default="", help="record this compile on a port-evidence receipt")
     p.set_defaults(func=cmd_compile)
+
+    p = sub.add_parser("mods", help="inventory older VPKs and unpacked addons on disk")
+    p.add_argument("--root", action="append", required=True, help="folder to scan; repeat for several drives")
+    p.add_argument("--since", default="2024-01-01", help="only packages modified on/after this date")
+    p.add_argument("--until", default="", help="only packages modified on/before this date")
+    p.add_argument("--depth", type=int, default=7, help="directory depth limit per root")
+    p.add_argument(
+        "--report",
+        default=str(ROOT / "artifacts" / "receipts" / "old-mods.json"),
+        help="receipt path for the scanned corpus",
+    )
+    p.set_defaults(func=cmd_mods)
 
     sub.add_parser("gate", help="run tests and structural gates").set_defaults(func=cmd_gate)
     sub.add_parser("status", help="regenerate STATUS.md").set_defaults(func=cmd_status)

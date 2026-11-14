@@ -72,7 +72,7 @@ def _root_draw(self, context) -> None:
     layout = self.layout
     layout.use_property_split = False
     layout.use_property_decorate = False
-    ui_props.draw_page_selector(layout, settings)
+    ui_props.draw_page_rail(layout, settings)
     _status_line(layout, settings)
 
 

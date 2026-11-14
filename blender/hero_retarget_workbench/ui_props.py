@@ -20,7 +20,7 @@ import sys
 import bpy
 from bpy.types import Panel
 
-from . import ui
+from . import ui, ui_mods
 
 
 def materialize(cls):
@@ -56,6 +56,9 @@ PAGE_BY_ID = {
     "DMF_PT_weights_manual": "WEIGHTS",
     "DMF_PT_handoff": "HANDOFF",
     "DMF_PT_handoff_paths": "HANDOFF",
+    "DMF_PT_setup_tools": "SETUP",
+    "DMF_PT_mods": "MODS",
+    "DMF_PT_components": "COMPONENTS",
 }
 
 PAGES = (
@@ -69,7 +72,42 @@ PAGES = (
     "COMPARE",
     "WEIGHTS",
     "HANDOFF",
+    "MODS",
+    "COMPONENTS",
 )
+
+# Small icon buttons, the way the Properties editor's own tabs read, instead of a
+# text grid. The dropdown stays for discoverability and for keyboard users.
+PAGE_ICONS = {
+    "SETUP": "SETTINGS",
+    "SOURCE": "IMPORT",
+    "PARTS": "MESH_DATA",
+    "CLOTH": "MOD_CLOTH",
+    "SKELETON": "ARMATURE_DATA",
+    "RULES": "FILTER",
+    "ANIMATIONS": "ACTION",
+    "COMPARE": "SPLIT_VERTICAL",
+    "WEIGHTS": "MOD_VERTEX_WEIGHT",
+    "HANDOFF": "EXPORT",
+    "MODS": "PACKAGE",
+    "COMPONENTS": "MODIFIER",
+}
+
+
+def draw_page_rail(layout, settings) -> None:
+    """The page strip: one small icon button per page, stacked on the left.
+
+    The Properties editor puts its tabs in a narrow column against the left edge
+    of the area; an add-on cannot register that region for its own space, so this
+    is the same control (icon-only, one page at a time, selected page depressed)
+    drawn as the first thing in the page area.
+    """
+    rail = layout.column(align=True)
+    for page in PAGES:
+        row = rail.row(align=True)
+        row.alignment = "LEFT"
+        row.prop_enum(settings, "props_page", page, text="", icon=PAGE_ICONS.get(page, "DOT"))
+    layout.separator(factor=0.4)
 
 
 def status_icon(settings) -> str:
@@ -78,13 +116,11 @@ def status_icon(settings) -> str:
 
 
 def draw_page_selector(layout, settings) -> None:
-    """The page row every surface draws: one page at a time, same enum."""
+    """The header row: the page enum for quick jumping and the icon rail below."""
     header = layout.row(align=True)
     header.label(text="Page", icon="WINDOW")
     header.prop(settings, "props_page", text="")
-    grid = layout.grid_flow(columns=2, even_columns=True, even_rows=True, align=True)
-    for page in PAGES:
-        grid.prop_enum(settings, "props_page", page)
+    draw_page_rail(layout, settings)
 
 
 def current_page(context) -> str:
@@ -170,9 +206,7 @@ class DMF_PT_props_main(Panel):
         header = layout.row(align=True)
         header.label(text="Page", icon="WINDOW")
         header.prop(settings, "props_page", text="")
-        grid = layout.grid_flow(columns=2, even_columns=True, even_rows=True, align=True)
-        for page in PAGES:
-            grid.prop_enum(settings, "props_page", page)
+        draw_page_rail(layout, settings)
         editor = ui.surface_name() == "editor"
         layout.operator(
             "dmf.open_workbench",
@@ -197,7 +231,7 @@ def page_panels() -> list[type[Panel]]:
     """Every sidebar panel that belongs to a page, in registration order."""
     return [
         panel
-        for panel in ui.CLASSES
+        for panel in (*ui.CLASSES, *ui_mods.CLASSES)
         if isinstance(panel, type)
         and issubclass(panel, Panel)
         and panel.bl_idname in PAGE_BY_ID

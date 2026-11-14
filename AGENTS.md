@@ -1,3 +1,48 @@
+## 2026-11-14 — 0.8.0: the page rail, the mods pipeline, tool setup, and components as body groups
+
+**Owner request, verbatim:** *"if you could tweak the ui a little bit to be a
+little closer to the properties panel where the pages buttons are the small
+buttons in the black area on the left of the view … add a dedicated section for
+the mods … update mods or old game paks to the latest version or even potentially
+backporting mods into older versions … a ui for adding directories for scanning
+… the setup page should also contain options to download and install the things
+automatically … managing custom client installs … stage hero components from the
+files/live game …"*, then *"the modeldoc can support multiple rendermesh files as
+seperate dmx files just like the game already does, but it needs to be able to
+gracefull handle the bodygroups features"*, and *"do not interrupt the work to
+only focus on oneslice"*. Authority:
+`logs/authority/2026-11-14-mods-pipeline-components.jsonl`; contract:
+`TICKET-0022`.
+
+- **The page strip is an icon rail, not a text grid.** `ui_props.draw_page_rail`
+  draws small icon-only page buttons stacked against the left edge of the page
+  area on both surfaces. A panel cannot register in the custom space's
+  `NAVIGATION_BAR` ("Region not found in space type"), so the Properties tab
+  strip cannot be reproduced as a region; this is the closest the API allows.
+- **Mods page.** Scan folders (add/remove, per-root counts, date window), a
+  background scan over `forge/oldmods.py`, a package list, **Update to latest**,
+  and **Backport to client (experimental)**. Backport (`forge/backport.py`) reads
+  the mod's own vmdl path from an older client's pak with `-f <path> -d` and runs
+  the same section transplant against it; it is gated by an explicit toggle.
+- **Setup installs and manages tools.** `forge/provision.py` resolves the latest
+  Source 2 Viewer CLI asset from the GitHub API and extracts it; installs a
+  downloaded Reduced CSDK zip only after finding `game/bin/win64/resourcecompiler.exe`;
+  finds CSDK-style clients. The CSDK page is opened, not scraped, because its
+  Drive/Mega links are not direct downloads.
+- **Components are RenderMeshFile entries with body groups.** `forge/modeldoc.py`
+  reads and writes `RenderMeshFile`, `BodyGroup` and `BodyGroupChoice`; a
+  duplicate mesh name is refused unless replacement is explicit, an existing
+  group gets the next numbered choice, and a missing group or `BodyGroupList` is
+  created. `forge/migrate.add_component_mesh` is the only vmdl writer for this.
+- Evidence: 191 tests, gate green; zip 0.8.0 (54 files, 373,292 bytes) installs
+  9/9 on PR 165087 and 9/9 on the stock daily with 40 page panels; pages probe
+  20/20 with 0 exceptions; three live Kelvin gun DMXs became RenderMeshFiles plus
+  body group `weapon`, and CSDK13 compiled `kelvin.vmdl_c` (returncode 0,
+  3,824,366 bytes). Screenshot `artifacts/receipts/workbench-surface.png`.
+- Not checked: no real backport run; no live S2V download; the Mods/Components
+  pages were drawn but not clicked through; the component body group was not
+  observed switching in game.
+
 - Not checked: the Series wording and the `Number` field in a running Blender; the
   GUI probe still cannot scroll the sidebar.
 

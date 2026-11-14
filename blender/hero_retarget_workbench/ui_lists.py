@@ -258,8 +258,77 @@ class DMF_UL_clips(UIList):
             right.label(text="", icon="EXPORT")
 
 
+class DMF_UL_mods(UIList):
+    bl_idname = "DMF_UL_mods"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(
+            self,
+            [
+                f"{row.addon} {row.hero} {row.kind} {row.modified} {row.sections} {row.note} {row.path}"
+                for row in rows
+            ],
+        )
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        row.label(
+            text=_short(item.addon or "package", 20),
+            icon="PACKAGE" if item.kind == "vpk" else "FILE_FOLDER",
+        )
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=_short(item.hero or "unknown", 14))
+        if item.sections:
+            right.label(text="", icon="MOD_CLOTH")
+        right.label(text=item.modified)
+
+
+class DMF_UL_clients(UIList):
+    bl_idname = "DMF_UL_clients"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [f"{row.label} {row.build} {row.path}" for row in rows])
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        row.label(text=_short(item.label or "client", 18), icon="CHECKMARK" if item.active else "PACKAGE")
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        if item.build:
+            right.label(text=_short(item.build, 16))
+
+
+class DMF_UL_components(UIList):
+    bl_idname = "DMF_UL_components"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [f"{row.name} {row.relative} {row.kind} {row.bytes}" for row in rows])
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        row.prop(
+            item,
+            "selected",
+            text="",
+            emboss=False,
+            icon="CHECKBOX_HLT" if item.selected else "CHECKBOX_DEHLT",
+        )
+        row.label(text=_short(item.name, 26), icon="MESH_DATA" if item.kind == "dmx" else "FILE")
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=item.kind)
+        right.label(text=f"{item.bytes // 1024}k")
+
+
 CLASSES = (
     DMF_UL_bone_map,
+    DMF_UL_mods,
+    DMF_UL_clients,
+    DMF_UL_components,
     DMF_UL_hierarchy,
     DMF_UL_parts,
     DMF_UL_materials,
