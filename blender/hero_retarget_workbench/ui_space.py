@@ -31,6 +31,7 @@ ROOT_IDNAME = "DMF_PT_space_main"
 PAGES_SPACE_IDNAME = "DMF_ST_workbench_pages"
 PAGES_HEADER_IDNAME = "DMF_HT_workbench_pages"
 PAGES_PANEL_IDNAME = "DMF_PT_space_pages"
+_PAGE_BY_LABEL = {page.replace("_", " ").title(): page for page in ui_props.PAGES}
 PREFIX = "space"
 _REGISTERED: list[type] = []
 # Why register() declined, when this build could have hosted the editor. The
@@ -251,7 +252,10 @@ def pages_space_classes() -> list[type]:
                 "bl_space_type": "CUSTOM",
                 "bl_space_idname": SPACE_IDNAME,
                 "bl_region_type": "UI",
-                "bl_options": set(),
+                # Header hidden: the category tab above is the only visible
+                # control. Without this each tab also draws an empty panel box
+                # named after the page beside the strip.
+                "bl_options": {"HIDE_HEADER"},
                 "poll": classmethod(
                     lambda cls, context: getattr(
                         getattr(context, "scene", None), "dmf", None
@@ -362,6 +366,22 @@ def _ensure_sidebar() -> float:
             if hasattr(space, "show_region_footer") and space.show_region_footer:
                 space.show_region_footer = False
                 opened = True
+            # The selected sidebar category is readable from the UI region. It is
+            # the reliable tab signal: a hidden-header tab panel may not be drawn
+            # at all, and a write from inside draw does not persist.
+            ui_region = next(
+                (region for region in area.regions if region.type == "UI"), None
+            )
+            category = getattr(ui_region, "active_panel_category", "") if ui_region else ""
+            page = _PAGE_BY_LABEL.get(category)
+            if page:
+                scene = getattr(bpy.context, "scene", None) or (
+                    bpy.context.window.scene if bpy.context.window else None
+                )
+                settings = getattr(scene, "dmf", None)
+                if settings is not None and settings.props_page != page:
+                    settings.props_page = page
+                    opened = True
             if opened:
                 area.tag_redraw()
     return 1.0
