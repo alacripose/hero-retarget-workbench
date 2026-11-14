@@ -104,6 +104,9 @@ def main() -> int:
     area = max(candidates, key=lambda candidate: candidate.width, default=None)
     report["area_found"] = area is not None
     if area is not None:
+        # Start the page away from Setup: the selected tab must draw and switch
+        # it back, which is the only signal an add-on panel gets for its tab.
+        bpy.context.scene.dmf.props_page = "CLOTH"
         before = str(area.type)
         with bpy.context.temp_override(window=window, area=area):
             switched = bpy.ops.dmf.open_workbench()
@@ -147,6 +150,56 @@ def main() -> int:
                     "type": report["area_type"],
                     "sidebar": bool(getattr(space, "show_region_ui", False)),
                 },
+            )
+        if expected == "editor":
+            # Force real panel draws without waiting on the event loop.
+            with bpy.context.temp_override(window=window, area=area):
+                bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=3)
+            ui_region = next(
+                (region for region in area.regions if region.type == "UI"), None
+            )
+            report["active_category"] = getattr(
+                ui_region, "active_panel_category", ""
+            )
+            space_module = getattr(sys.modules.get(MODULE), "ui_space", None)
+            switched_pages = {}
+            if ui_region is not None and space_module is not None:
+                for category in ("Cloth", "Setup"):
+                    try:
+                        ui_region.active_panel_category = category
+                    except (AttributeError, TypeError):
+                        continue
+                    space_module._ensure_sidebar()
+                    switched_pages[category] = bpy.context.scene.dmf.props_page
+            report["category_switches"] = switched_pages
+            report["tab_switched_page"] = bpy.context.scene.dmf.props_page
+            # Leave it on a page with content and redraw before the screenshot.
+            if ui_region is not None:
+                ui_region.active_panel_category = "Cloth"
+                if space_module is not None:
+                    space_module._ensure_sidebar()
+                with bpy.context.temp_override(window=window, area=area):
+                    bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=3)
+            report["regions"] = [
+                {
+                    "type": region.type,
+                    "x": region.x,
+                    "y": region.y,
+                    "width": region.width,
+                    "height": region.height,
+                }
+                for region in area.regions
+            ]
+            report["space_region_flags"] = {
+                name: getattr(space, name, None)
+                for name in dir(space)
+                if "show_region" in name
+            }
+            check(
+                "tab-switch",
+                switched_pages.get("Cloth") == "CLOTH"
+                and switched_pages.get("Setup") == "SETUP",
+                switched_pages,
             )
         if args.screenshot:
             for _ in range(3):
