@@ -156,20 +156,34 @@ Names are token-aware and classify real tails, not hair or clothing:
 `pigeon_tail` remain. This is the fix for Gen Man/Hornet tiles that were never
 tails and for the live heroes the first extracted-folder scan never reached.
 
-Each discovered chain is a tile with a generated preview of its rest shape. Select
-a tile to load that skeleton as the tail rig and pair the hero channels; the same
-page then lists every source bone, its target, and the blend weight. Loading a tile
-before the hero is imported is allowed: the preview is available immediately and
-the channel map waits for the hero. The pairing is still experimental local-space
-transfer, and the page says so.
+Each discovered chain is a tile with a generated preview of its rest shape, in a
+three-column grid of small previews rather than two stretched panes. Select a tile
+to load that skeleton as the tail rig, then press **Pair hero tail bones**. The
+page keeps the selected source visible and has two named writes: **Write selected
+clip to tail** uses the **Source clip** picker, and **Write every <hero> clip to
+tail** only includes clips tagged with the current hero. Loading a tile before the
+hero is imported is allowed: the preview is available immediately and the channel
+map waits for the hero. The pairing is still experimental local-space transfer,
+and the page says so.
+
+### One clip list per hero
+
+Importing a hero clears the previous hero's clip rows and rescans the folders
+beside the new body. Each row records its `source_hero`, so the clip panel and the
+tail all-write cannot mix Shiv and Werewolf actions. The AnimGraph selector shows
+the graph chosen, not its complement.
 
 ### Importing heroes with names S2V did not standardise
 
-The body is chosen by a body token (`body`, `body8`, `bodyN`, `body_lodN`), not by
-file size. Familiar's head is larger than its body and the old fallback opened the
-head; the importer now repairs that choice from the hero folder. Head, eyes,
-glasses, weapons and other real parts are companions, while UI, closed-eye,
-no-shirt, no-sim and proxy variants are not imported as separate copies.
+The body is chosen by a body token (`body`, `body8`, `bodyN`, `body_lodN`,
+`model`, `hull`), not by file size. Familiar's head is larger than its body and
+the old fallback opened the head; the importer now repairs that choice from the
+hero folder. Clips, animation and anims folders are excluded from the body
+fallback. Head, eyes, glasses, weapons and other real parts are companions, while
+UI, closed-eye, no-shirt, no-sim and proxy variants are not imported as separate
+copies. Companion imports restore the body's bind pose, action and NLA state;
+Drifter's leftover sampled pose was what made its evaluated body look wider and
+rotated while its mesh data was upright.
 
 ## Continuous integration and releases
 
@@ -317,9 +331,11 @@ materials, so their paths win.
 
 ## Observed evidence
 
-- Live build 6861; 67 hero entries read from S2V's decompiled `heroes.vdata`;
-  63 resolve to a body model. The list is not a staging-only or hand-maintained
-  roster.
+- Live build 6861; the roster is augmented from `heroes.vdata` and the VPK model
+  listing, yielding 108 character entries after duplicate paths and props are
+  removed. The picker includes Werewolf Transform, Familiar WIP and its base,
+  Calico/Nano, Ratking minions, troopers, bosses and NPCs; it is not a
+  staging-only or hand-maintained roster.
 - WIP `heroes_wip` extraction: Abrams/Atlas emitted a 476,026-byte vmdl and 534
   DMX files.
 - S2V extracted Haze into 458 DMX clips, 197 `.vnmclip` files, and a 269,939-byte

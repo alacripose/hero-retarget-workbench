@@ -1029,3 +1029,49 @@ the heroes"*.
   draws. Built zip and installed-zip probe are recorded below.
 - Not checked: a real click on a live-roster tile, a game patch refresh, a tail
   in-game, or a hero whose skeleton is absent from `vnmskel_c`.
+
+## 2026-11-14 — 0.12.0: clips belong to one hero, and the model list is complete
+
+**Owner report, verbatim:** *"the animations pane makes it hard to understand how
+to merge tails from models, so I just accidentally added werewolfs animations
+into the clps panel where shiv's animations are after loading werewolfs model, so
+the map channels and blend all buttons are ambiguous ... some heroes like drifter
+for example import at a lagrer size and rotated weirdly, and the hero scanner
+should be expanded ... werewolf transform ... two nanos, familiar wip ...
+minions and troopers and npcs ... tail previews are too large"*.
+
+- **Clips are scoped to the body.** `clipops.roots` no longer appends every saved
+  candidate: the body/model/vmdl identify the current hero, and a stale extraction
+  is only read when the body is inside it. Every successful hero import clears the
+  old rows, rescans, tags each row `source_hero`, and clears the old tail pairing.
+  The AnimGraph filter was inverted (`row.ag != wanted`); it now shows the graph
+  the owner selected.
+- **Tail writes name their source.** The Tails page has a selected-source card, a
+  **Source clip** enum, a three-column small-tile grid (icon scale 2.2), **Pair
+  hero tail bones**, **Write selected clip to tail**, and **Write every &lt;hero&gt; clip
+  to tail**. The all-write filters `source_hero`, so a Werewolf clip cannot be
+  written while Shiv is current. `dmf.blend_tail` no longer reads the list
+  selection implicitly; it resolves the named row.
+- **The live scanner lists character models, not just hero table entries.**
+  `live.list_heroes` augments `heroes.vdata` from `models/heroes_wip`,
+  `models/heroes_staging` and `models/npc`. It keeps transform bodies
+  (`werewolf_transform`), WIP/V2 bodies (`familiar_wip`, `nano_v2`), Ratking
+  minions, troopers, bosses, neutrals and NPCs; it excludes guns, FX, break
+  pieces, particles and props. Exact duplicate paths are collapsed. Titles say
+  `Familiar · WIP`, `Familiar · Base`, `Calico · Nano`, `Werewolf · Transform`.
+- **Body repair understands `model` and `hull`.** `looks_like_body` accepts
+  `drifter_model`/`werewolf_hull`; `_body_score` rejects clips, animation and anims
+  folders so a large clip cannot win the fallback.
+- **The Drifter size/rotation bug was a leftover pose.** Its mesh data is
+  28.84 x 83.71 x 108.86 units, but companion import left all 128 pose bones
+  sampled and the evaluated body was 90 x 75 x 60. `import_hero` now resets the
+  bind pose; `import_companions` snapshots pose/action/NLA state, restores it after
+  every candidate, deletes failed-candidate actions, and resets the bind pose after
+  the loop. The operator probe reports 28.84 x 83.71 x 108.86, 128 bones, 0 moved
+  pose bones, 218 Drifter clips, no Shiv row and 0 stale tail rows.
+- **Evidence:** gate green; pytest 245; compileall; pages 20/20; tail UI 8/8 with
+  40 options; tail live 20/20; cloth 23/23; installed zip 10/10. Built
+  `dist/hero_retarget_workbench-0.12.0.zip` (62 files, 422,501 bytes, sha256
+  `4d76274e...4ffd4`, BLAKE3 `460f0767...7b9`). Not checked: clicking a new
+  Source variant, extracting an NPC, the tail grid at several panel widths, or a
+  tail in-game.

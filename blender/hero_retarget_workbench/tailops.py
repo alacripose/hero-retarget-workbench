@@ -21,7 +21,7 @@ from mathutils import Matrix
 from forge import live, tails as tailscan
 from forge import tailimage
 
-from . import core, jobs, source2
+from . import clipops, core, jobs, source2
 
 
 def _rigs(settings):
@@ -463,6 +463,29 @@ def preview(settings) -> None:
             pass
 
 
+def source_row(settings):
+    """The clip the Tails page will write, never an implicit list selection."""
+    imported = [row for row in settings.clips if row.action and row.state in ("IMPORTED", "WRITTEN")]
+    value = getattr(settings, "tail_clip", "NONE")
+    if value not in ("", "NONE"):
+        try:
+            index = int(value)
+        except (TypeError, ValueError):
+            index = -1
+        if 0 <= index < len(settings.clips):
+            row = settings.clips[index]
+            if row.action:
+                return row
+    if len(imported) == 1:
+        target = imported[0]
+        for index, row in enumerate(settings.clips):
+            if row.path == target.path and row.action == target.action:
+                settings.tail_clip = str(index)
+                break
+        return target
+    return None
+
+
 def _pairs(settings) -> list[tuple[str, str]]:
     hero, tail = _rigs(settings)
     rows = []
@@ -634,13 +657,15 @@ class DMF_OT_scan_tail(Operator):
 
 class DMF_OT_blend_tail(Operator):
     bl_idname = "dmf.blend_tail"
-    bl_label = "Blend Tail"
-    bl_description = "Write the selected hero clip's tail channels onto the tail armature (experimental)"
+    bl_label = "Write Selected Clip Tail"
+    bl_description = "Write the source clip named on the Tails page onto the tail armature (experimental)"
 
     def execute(self, context):
         settings = context.scene.dmf
-        row = settings.clips[settings.clip_index] if settings.clips else None
         try:
+            row = source_row(settings)
+            if row is None:
+                raise RuntimeError("tail-no-source: choose Source clip on the Tails page")
             result = blend(settings, row)
         except Exception as error:
             core.set_status(settings, str(error), "ERROR")
@@ -653,14 +678,20 @@ class DMF_OT_blend_tail(Operator):
 
 class DMF_OT_blend_tail_all(Operator):
     bl_idname = "dmf.blend_tail_all"
-    bl_label = "Blend All Tails"
-    bl_description = "Write every imported hero clip's tail channels onto the tail armature (experimental)"
+    bl_label = "Write This Hero's Clip Tails"
+    bl_description = "Write every imported clip from the current hero onto the tail armature; other heroes' clips are ignored (experimental)"
 
     def execute(self, context):
         settings = context.scene.dmf
-        rows = [row for row in settings.clips if row.action and row.state in ("IMPORTED", "WRITTEN")]
+        hero = clipops.hero_source(settings)
+        rows = [
+            row for row in settings.clips
+            if row.action
+            and row.state in ("IMPORTED", "WRITTEN")
+            and (not hero or row.source_hero == hero)
+        ]
         if not rows:
-            core.set_status(settings, "Import a clip before blending tails", "WARN")
+            core.set_status(settings, f"No imported clips for {hero or 'this hero'}; scan and import them first", "WARN")
             return {"CANCELLED"}
         failed = 0
         written = 0

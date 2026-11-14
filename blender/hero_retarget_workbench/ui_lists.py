@@ -241,10 +241,10 @@ class DMF_UL_clips(UIList):
             self,
             [
                 f"{row.label} {row.name} {row.kind} {'compiled' if row.compiled else ''} "
-                f"{row.ag} {row.state} {row.action}"
+                f"{row.ag} {row.state} {row.action} {row.source_hero}"
                 for row in rows
             ],
-            restrict=None if wanted == "ALL" else [row.ag != wanted for row in rows],
+            restrict=None if wanted == "ALL" else [row.ag == wanted for row in rows],
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):

@@ -16,7 +16,7 @@ from bpy.types import Operator
 
 from forge import live, naming
 
-from . import cloth_ops, core, jobs, parts, properties, proofing, source2, weights
+from . import clipops, cloth_ops, core, jobs, parts, properties, proofing, source2, weights
 
 
 def _status(settings, message: str, kind: str = "INFO") -> None:
@@ -66,6 +66,21 @@ def _pick_imported(before: set[str]) -> tuple[bpy.types.Object | None, bpy.types
     mesh = max(meshes, key=lambda obj: len(obj.data.vertices)) if meshes else None
     arm = max(arms, key=lambda obj: len(obj.data.bones)) if arms else None
     return mesh, arm
+
+
+def _reset_hero_pose(armature) -> None:
+    """Put a freshly imported body in its bind pose.
+
+    PulseSrcOps leaves the sampled pose on the bones even when the body DMX has
+    no action.  Drifter then evaluates several metres wide and visibly rotated,
+    while its mesh data is still upright.  The skeleton's rest pose is the pose
+    an imported hero is meant to start in.
+    """
+    if armature is None:
+        return
+    for bone in armature.pose.bones:
+        bone.matrix_basis.identity()
+    bpy.context.view_layer.update()
 
 
 class DMF_OT_detect_paths(Operator):
@@ -176,7 +191,7 @@ class DMF_OT_detect(Operator):
                 settings.s2v_cli = str(env.s2v) if env.s2v else settings.s2v_cli
                 settings.csdk_root = str(env.csdk_root) if env.csdk_root else settings.csdk_root
                 settings.project_root = str(root)
-                _status(settings, f"{len(heroes)} heroes · build {settings.build}", "OK")
+                _status(settings, f"{len(heroes)} live models · build {settings.build}", "OK")
 
             def failed(error):
                 _status(settings, str(error), "ERROR")
@@ -310,6 +325,7 @@ class DMF_OT_import_hero(Operator):
             _status(settings, "PulseSrcOps found no armature or mesh in the DMX", "ERROR")
             self.report({"ERROR"}, "The DMX did not contain both a hero armature and a body mesh")
             return {"CANCELLED"}
+        _reset_hero_pose(arm)
         settings.target_armature = arm
         settings.target_body = mesh
         settings.material_source = mesh
@@ -329,6 +345,26 @@ class DMF_OT_import_hero(Operator):
             settings.cloth_build_skipped = str(error)
             _status(settings, f"Hero body imported; companion parts failed: {error}", "WARN")
         parts.scan_materials(settings)
+        # A hero import starts a new clip list.  Reusing the previous hero's rows
+        # is how Werewolf clips appeared in Shiv's panel, and it also made the
+        # tail writer operate on actions from the wrong body.
+        settings.clips.clear()
+        try:
+            counts = clipops.scan(settings)
+            settings.clip_auto_note = (
+                f"{len(settings.clips)} clips for {path.parent.name}; "
+                f"AG1 {counts.get('ag1', 0)}, AG2 {counts.get('ag2', 0)}"
+            )
+            settings.clip_note = ""
+        except Exception as error:
+            settings.clips.clear()
+            settings.clip_auto_note = f"No clips loaded for {path.parent.name}: {error}"
+        # The old tail pairing names the previous skeleton's bones.  Keep the
+        # discovered sources, but make the new hero pair its own tail.
+        settings.tail_bones.clear()
+        settings.tail_note = (
+            f"{path.parent.name} imported; pair its tail bones to the chosen tail rig"
+        )
         if settings.extraction_dir:
             settings.target_dmx_relative = _logical_relative(
                 path,

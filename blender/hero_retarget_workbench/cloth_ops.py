@@ -14,6 +14,7 @@ import bpy
 import traceback
 from bpy.types import Operator
 from forge import cloth as clothscan
+from mathutils import Matrix
 
 from . import core, source2
 
@@ -55,6 +56,15 @@ def import_companions(context, settings) -> dict:
     imported: list[str] = []
     skipped: list[str] = []
     known = {clothscan.part_name(obj.name) for obj in hero_parts(settings)}
+    # A companion DMX can carry an animation.  Its action is not the body's
+    # action, but PulseSrcOps also leaves the sampled pose on the bones, which
+    # makes Drifter look crouched and rotated after import.  Keep the body's
+    # pose and put every bone back after each candidate.
+    pose_basis = (
+        {bone.name: bone.matrix_basis.copy() for bone in armature.pose.bones}
+        if armature is not None
+        else {}
+    )
     for entry in files:
         if entry.stem == body_stem:
             continue
@@ -62,6 +72,13 @@ def import_companions(context, settings) -> dict:
             skipped.append(f"{entry.stem} (already imported)")
             continue
         before = {obj.name for obj in context.scene.objects}
+        before_actions = {action.name for action in bpy.data.actions}
+        scene = context.scene
+        data = armature.animation_data if armature is not None else None
+        old_action = data.action if data is not None else None
+        old_slot = getattr(data, "action_slot", None) if data is not None else None
+        old_tracks = {track.name for track in data.nla_tracks} if data is not None else set()
+        old_frame = scene.frame_current
         if armature is not None:
             core.select_only(context, [armature])
         try:
@@ -69,17 +86,49 @@ def import_companions(context, settings) -> dict:
         except Exception as error:  # one bad file must not lose the rest
             skipped.append(f"{entry.stem} ({error})")
             continue
+        finally:
+            # ``weapon_stand_idle`` and similar clip names can satisfy the part
+            # word test.  Importing one poses the hero even though it produces
+            # no mesh; put the body back in its pre-import pose every time.
+            if data is not None:
+                for track in list(data.nla_tracks):
+                    if track.name not in old_tracks:
+                        data.nla_tracks.remove(track)
+                data.action = old_action
+                if old_slot is not None:
+                    try:
+                        data.action_slot = old_slot
+                    except (TypeError, ValueError):
+                        pass
+            if armature is not None:
+                for bone in armature.pose.bones:
+                    saved = pose_basis.get(bone.name)
+                    bone.matrix_basis = saved.copy() if saved is not None else Matrix.Identity(4)
+                bpy.context.view_layer.update()
+            try:
+                scene.frame_set(old_frame)
+            except (TypeError, ValueError):
+                pass
         created = [
             obj
             for obj in context.scene.objects
             if obj.name not in before and obj.type == "MESH"
         ]
         if not created:
+            for action in [action for action in bpy.data.actions if action.name not in before_actions]:
+                bpy.data.actions.remove(action)
             skipped.append(f"{entry.stem} (no mesh in the file)")
             continue
         for obj in created:
             record_part(settings, obj)
         imported.append(entry.stem)
+    if armature is not None:
+        # Removing a failed candidate's action can make Blender evaluate a stale
+        # action slot once more; the last word on the body has to be its bind pose.
+        for bone in armature.pose.bones:
+            saved = pose_basis.get(bone.name)
+            bone.matrix_basis = saved.copy() if saved is not None else Matrix.Identity(4)
+        bpy.context.view_layer.update()
     return {"imported": imported, "skipped": skipped, "candidates": [entry.stem for entry in files]}
 
 
