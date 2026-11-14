@@ -48,15 +48,20 @@ def roots(settings) -> list[Path]:
         return [chosen]
     candidates: list[Path] = []
     body = Path(bpy.path.abspath(settings.body_dmx)) if settings.body_dmx else None
-    for value in (settings.body_dmx, settings.hero_model_path, settings.vmdl):
-        if not value:
-            continue
-        path = Path(bpy.path.abspath(value))
-        candidates.append(path if path.is_dir() else path.parent)
-    if settings.extraction_dir:
-        extraction = Path(bpy.path.abspath(settings.extraction_dir))
-        if body is None or extraction in body.parents:
-            candidates.append(extraction)
+    if body is not None:
+        # The body is the authority.  A clip panel for Werewolf must not keep
+        # reading a Shiv vmdl or extraction left in the scene fields.
+        candidates.append(body.parent)
+        if settings.extraction_dir:
+            extraction = Path(bpy.path.abspath(settings.extraction_dir))
+            if extraction in body.parents:
+                candidates.append(extraction)
+    else:
+        for value in (settings.extraction_dir, settings.hero_model_path, settings.vmdl):
+            if not value:
+                continue
+            path = Path(bpy.path.abspath(value))
+            candidates.append(path if path.is_dir() else path.parent)
     found: list[Path] = []
     seen: set[str] = set()
     for candidate in candidates:
