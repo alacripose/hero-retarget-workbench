@@ -514,20 +514,47 @@ class DMF_OT_use_client(Operator):
         return {"FINISHED"}
 
 
+def _component_source(settings) -> tuple[Path | None, Path | None]:
+    """The extraction and model vmdl the Components page should read.
+
+    The body DMX is the authority on a non-hero import.  A model chosen from
+    the expanded roster can live under a different extraction than the one the
+    page last remembered, and the vmdl beside that body is the model whose
+    render list names its components.  Fall back to the extraction fields for
+    a hand-picked folder with no imported body.
+    """
+    body = _abspath(settings.body_dmx) if settings.body_dmx else None
+    root = _abspath(settings.extraction_dir) if settings.extraction_dir else None
+    if body is not None and body.is_file():
+        if root is None or not root.is_dir() or root.resolve() not in body.resolve().parents:
+            root = next(
+                (parent.parent for parent in body.parents if parent.name.lower() == "models"),
+                body.parent,
+            )
+    vmdl = _abspath(settings.vmdl) if settings.vmdl else None
+    if vmdl is not None and (not vmdl.is_file() or (root and root.resolve() not in vmdl.resolve().parents)):
+        vmdl = None
+    if vmdl is None and body is not None and body.is_file():
+        vmdl = next(iter(sorted(body.parent.glob("*.vmdl"))), None)
+    if vmdl is None and root is not None and root.is_dir():
+        vmdl = next(iter(sorted(root.rglob("*.vmdl"))), None)
+    return root, vmdl
+
+
 class DMF_OT_scan_components(Operator):
     bl_idname = "dmf.scan_components"
     bl_label = "Find components"
-    bl_description = "Find gun, hat, head, hair and attachment assets in the current hero extraction"
+    bl_description = "Find the current model's render-mesh components, hero or non-hero"
 
     def execute(self, context):
         settings = _settings(context)
         module = core.core(settings)
-        root = _abspath(settings.extraction_dir) if settings.extraction_dir else None
+        root, vmdl = _component_source(settings)
         if root is None or not root.is_dir():
-            self.report({"ERROR"}, "Extract a hero first; its folder holds the component meshes")
+            self.report({"ERROR"}, "Extract a model first; its folder holds the component meshes")
             return {"CANCELLED"}
         try:
-            found = module["components"].inventory(root)
+            found = module["components"].inventory(root, vmdl=vmdl)
         except Exception as error:
             self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
@@ -539,11 +566,20 @@ class DMF_OT_scan_components(Operator):
             row.path = str(item.path)
             row.kind = item.kind
             row.bytes = item.bytes
-            row.selected = item.kind == "dmx"
-        settings.component_note = f"{len(found)} component files in {root.name}"
+            row.selected = item.kind == "dmx" and not getattr(item, "primary", False)
+        model = vmdl.stem if vmdl is not None else root.name
+        meshes = sum(1 for item in found if item.kind == "dmx")
+        components = sum(
+            1 for item in found if item.kind == "dmx" and not getattr(item, "primary", False)
+        )
+        settings.component_note = (
+            f"{model}: {components} components, {meshes} render meshes"
+            if components
+            else f"{model}: {meshes} render mesh{'es' if meshes != 1 else ''}, no separate components"
+        )
         if not settings.component_addon:
             settings.component_addon = settings.addon_name
-        core.set_status(settings, settings.component_note, "OK")
+        core.set_status(settings, settings.component_note, "OK" if components else "WARN")
         return {"FINISHED"}
 
 

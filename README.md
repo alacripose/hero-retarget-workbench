@@ -173,6 +173,17 @@ beside the new body. Each row records its `source_hero`, so the clip panel and t
 tail all-write cannot mix Shiv and Werewolf actions. The AnimGraph selector shows
 the graph chosen, not its complement.
 
+### Components: the model's render list, not its filename
+
+**Components → Find components** reads the current model's vmdl
+`RenderMeshFile` list, so it works the same for a hero, an NPC, a minion or a
+WIP body. The primary body and every LOD are left out of the component list; the
+remaining render meshes are listed with their relative paths. This is what finds
+a non-hero model whose parts are named `unnamed_1` or `ratking_minion` instead of
+`gun` or `hat`. If the model has no readable vmdl, the old filename-word scan is
+still used as a fallback. The page follows the imported body's vmdl even when the
+saved extraction field still names the previous hero.
+
 ### Importing heroes with names S2V did not standardise
 
 The body is chosen by a body token (`body`, `body8`, `bodyN`, `body_lodN`,

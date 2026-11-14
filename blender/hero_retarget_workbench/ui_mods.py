@@ -185,7 +185,8 @@ class DMF_PT_components(Panel):
         layout = self.layout
 
         ui_popit.job(layout, settings)
-        source = _section(layout, "Live components", "MESH_DATA", Path(settings.extraction_dir).name if settings.extraction_dir else "no extraction")
+        model = Path(settings.vmdl).stem if settings.vmdl else (Path(settings.extraction_dir).name if settings.extraction_dir else "no model")
+        source = _section(layout, "Live components", "MESH_DATA", model)
         source.operator("dmf.scan_components", text="Find components", icon="VIEWZOOM")
         if settings.components:
             head = source.split(factor=settings.list_name_width, align=True)
@@ -206,7 +207,7 @@ class DMF_PT_components(Panel):
             for row in settings.components:
                 _ = row
         else:
-            _hint(source, "Extract a hero first; its guns, hats and attachments are listed here.", "QUESTION")
+            _hint(source, "Extract a model first; its vmdl render meshes are listed here, hero or not.", "QUESTION")
 
         target = _section(layout, "Stage beside a mod", "MODIFIER", settings.component_slot or "no body group")
         target.prop(settings, "component_addon", text="Addon")
@@ -217,7 +218,7 @@ class DMF_PT_components(Panel):
         target.prop(settings, "component_slot", text="Body group")
         _hint(
             target,
-            "Each staged DMX becomes a RenderMeshFile and a BodyGroupChoice; the existing body stays.",
+            "Each selected component DMX becomes a RenderMeshFile and a BodyGroupChoice; the existing body stays.",
             "INFO",
         )
         target.operator("dmf.stage_components", text="Stage selected", icon="IMPORT")
