@@ -141,6 +141,24 @@ def mirror_id(panel_idname: str) -> str:
     return "DMF_PT_props_" + panel_idname[len("DMF_PT_"):]
 
 
+def _inherited_poll(panel):
+    """The panel's own poll, or None when it has none."""
+    inherited = panel.__dict__.get("poll")
+    if inherited is None:
+        return classmethod(lambda cls, context: True)
+
+    def poll(cls, context):
+        if inherited is None:
+            return True
+        function = getattr(inherited, "__func__", inherited)
+        try:
+            return bool(function(cls, context))
+        except TypeError:
+            return bool(function(context))
+
+    return classmethod(poll)
+
+
 def _page_poll(panel, page: str):
     inherited = panel.__dict__.get("poll")
 
@@ -165,6 +183,8 @@ def mirror(
     prefix: str = "props",
     space_idname: str = "",
     root_idname: str = ROOT,
+    region_type: str = "WINDOW",
+    category: str = "",
 ) -> type[Panel]:
     """A twin of ``panel`` in another space, visible only on ``page``.
 
@@ -182,10 +202,14 @@ def mirror(
     attributes = {
         "bl_idname": idname,
         "bl_space_type": space_type,
-        "bl_region_type": "WINDOW",
+        "bl_region_type": region_type,
         "bl_options": set(),
-        "poll": _page_poll(panel, page),
+        # In a category tab the sidebar already shows only that page's panels,
+        # so the page poll would be a second, conflicting filter.
+        "poll": _page_poll(panel, page) if not category else _inherited_poll(panel),
     }
+    if category:
+        attributes["bl_category"] = category
     # An empty root means the page panel is top-level, the way Properties draws
     # its own panels. It must still be written: a subclass inherits the sidebar
     # panel's bl_parent_id otherwise, and that parent does not exist in the

@@ -419,6 +419,32 @@ Not checked: a real mouse click on a tab in a resized window — the probe sets 
 category through the API because it cannot drag a region edge, and that gap is
 why the flicker reached the owner.
 
+## 0.8.16 — the pages are the custom view's own N sidebar, like the UV editor
+
+**Owner direction, verbatim:** *"each custom view can have it's own n panel
+sidebar from the tabs like the uv editor window does"*.
+
+Until 0.8.15 the page panels were WINDOW-region mirrors and the sidebar held one
+empty tab panel per page. That is why a wide strip sat between the content and the
+tab strip: the content was outside the sidebar, so the sidebar was only tabs.
+
+- Every page panel now registers in the custom space's `UI` region with the page
+  name as its `bl_category`. The tab is the page: selecting it shows that page's
+  panels inside the sidebar, exactly as an N sidebar category works. No page
+  property, no tab draw, no category timer, no second writer.
+- The WINDOW-region root `DMF_PT_space_main` is no longer registered in the
+  custom space; it would leave an empty panel box in the main region. It stays
+  defined for the Properties surface.
+- The sidebar opens once per area and keeps whatever width the owner drags.
+- Evidence: gate green; `zip-install-0.8.16.json` 12/12 — all twelve page panels
+  report `region: UI` with the matching category, the root is absent, categories
+  are selectable, and a collapsed sidebar stays collapsed;
+  `pages-0.8.16.png` shows the Cloth page inside the sidebar beside its tabs.
+
+Not checked: a real mouse click on a tab — the probe selects the category through
+`active_panel_category`; the panels are registered per category, so the click and
+the API take the same path.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
