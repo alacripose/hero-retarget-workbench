@@ -44,6 +44,12 @@ def _arguments() -> argparse.Namespace:
     parser.add_argument("--report", required=True)
     parser.add_argument("--expect", choices=("editor", "sidebar"), default="")
     parser.add_argument("--screenshot", default="")
+    parser.add_argument("--page", default="", help="page to show before the screenshot")
+    parser.add_argument(
+        "--demo-job",
+        action="store_true",
+        help="draw a representative running job so the bar and log are visible",
+    )
     return parser.parse_args(argv)
 
 
@@ -184,6 +190,20 @@ def main() -> int:
                 space.show_region_ui is False,
                 "opened" if space.show_region_ui else "closed",
             )
+            if args.page:
+                bpy.context.scene.dmf.props_page = args.page
+            if args.demo_job:
+                settings = bpy.context.scene.dmf
+                settings.job_running = True
+                settings.job_state = "RUNNING"
+                settings.job_label = "Scanning old mods"
+                settings.job_message = "citadel_addons: 14 found"
+                settings.job_progress = 0.42
+                settings.job_log = (
+                    "Scanning old mods: starting\n"
+                    "scanning 3 folders\n"
+                    "citadel_addons: 14 found"
+                )
             with bpy.context.temp_override(window=window, area=area):
                 bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=3)
         else:
@@ -213,6 +233,7 @@ def main() -> int:
             for name in dir(space)
             if "show_region" in name
         }
+        report["page"] = str(bpy.context.scene.dmf.props_page)
         if args.screenshot:
             for _ in range(3):
                 bpy.context.view_layer.update()

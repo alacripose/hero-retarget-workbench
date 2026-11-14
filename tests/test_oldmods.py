@@ -153,6 +153,24 @@ class OldModsTests(unittest.TestCase):
             result.cloth_types(), {"PhysicsJointList": 1, "Softbody": 1}
         )
 
+    def test_inventory_reports_progress_for_a_scan(self) -> None:
+        addons = self.tmp_path / "content" / "citadel_addons"
+        model = addons / "old" / "models" / "heroes_staging" / "haze" / "haze.vmdl"
+        model.parent.mkdir(parents=True)
+        model.write_text(MODELDOC, encoding="utf-8")
+        events: list[tuple[float, str]] = []
+
+        result = inventory(
+            [self.tmp_path], progress=lambda fraction, message: events.append((fraction, message))
+        )
+
+        self.assertTrue(result.mods)
+        self.assertTrue(events, "a scan with a button must report progress")
+        fractions = [fraction for fraction, _message in events]
+        self.assertEqual(fractions, sorted(fractions))
+        self.assertTrue(all(0.0 <= fraction <= 1.0 for fraction in fractions))
+        self.assertTrue(all(message.strip() for _fraction, message in events))
+
     def test_inventory_respects_date_window(self) -> None:
         addons = self.tmp_path / "content" / "citadel_addons"
         model = addons / "old" / "models" / "heroes_staging" / "haze" / "haze.vmdl"

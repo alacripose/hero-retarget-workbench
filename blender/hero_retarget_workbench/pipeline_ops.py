@@ -143,10 +143,17 @@ class DMF_OT_scan_mods(Operator):
         )
 
         def work(progress):
-            progress(0.05, f"scanning {len(roots)} folders")
-            result = module["oldmods"].inventory(roots, since=since, until=until)
-            progress(0.9, "writing the corpus receipt")
+            progress(0.02, f"scanning {len(roots)} folders")
+
+            def walked(fraction, message):
+                progress(0.02 + 0.93 * float(fraction), message)
+
+            result = module["oldmods"].inventory(
+                roots, since=since, until=until, progress=walked
+            )
+            progress(0.96, f"writing {report.name}")
             result.save(report)
+            progress(1.0, f"{result.counts()['packages']} packages")
             return result
 
         def done(result):

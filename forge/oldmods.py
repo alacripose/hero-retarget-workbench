@@ -360,19 +360,37 @@ def inventory(
     since: date | None = None,
     until: date | None = None,
     max_depth: int = 7,
+    progress=None,
 ) -> Inventory:
-    """Scan roots for VPKs and unpacked citadel addons."""
+    """Scan roots for VPKs and unpacked citadel addons.
+
+    ``progress`` is an optional ``(fraction, message)`` callback. The scan can
+    walk tens of thousands of directories, and a button with no moving state
+    reads as a button that did nothing.
+    """
     mods: list[ModRecord] = []
     seen: set[str] = set()
     skipped_game_paks = 0
     skipped_unreadable: list[str] = []
     resolved_roots = [Path(root).expanduser().resolve() for root in roots]
+    total_roots = max(1, len(resolved_roots))
 
-    for root in resolved_roots:
+    for root_index, root in enumerate(resolved_roots):
+        base = root_index / total_roots
+        span = 1.0 / total_roots
+        if progress is not None:
+            progress(base + span * 0.01, f"scanning {root.name or root}")
         if not root.exists():
             skipped_unreadable.append(f"root-missing: {root}")
             continue
-        for current, _depth in _walk_dirs(root, max_depth):
+        walked = list(_walk_dirs(root, max_depth))
+        step = max(1, len(walked) // 100)
+        for index, (current, _depth) in enumerate(walked):
+            if progress is not None and index % step == 0:
+                progress(
+                    base + span * (0.05 + 0.9 * index / max(1, len(walked))),
+                    f"{current.name}: {len(mods)} found",
+                )
             lower = current.name.lower()
             if lower == "citadel_addons":
                 for child in sorted(current.iterdir()):

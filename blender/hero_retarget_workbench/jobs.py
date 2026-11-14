@@ -37,6 +37,9 @@ class BackgroundJob:
         self.settings.job_message = "starting"
         self.settings.job_progress = 0.0
         self.settings.job_cancellable = False
+        self.settings.job_state = "RUNNING"
+        self.settings.job_log = f"{label}: starting"
+        self._logged = "starting"
         self._thread.start()
         self._timer = bpy.app.timers.register(self._tick, first_interval=0.1, persistent=True)
 
@@ -63,17 +66,29 @@ class BackgroundJob:
             progress = self._progress
             message = self._message
         self.settings.job_progress = max(self.settings.job_progress, progress)
-        if message:
+        if message and message != self._logged:
             self.settings.job_message = message
+            self._logged = message
+            lines = self.settings.job_log.splitlines()[-11:]
+            self.settings.job_log = "\n".join([*lines, message])
         if not self._finished.is_set():
             return 0.1
         self.settings.job_running = False
         self.settings.job_progress = 1.0
-        self.settings.job_message = ""
         _ACTIVE = None
         if self._error is not None:
+            self.settings.job_state = "FAILED"
+            self.settings.job_message = str(self._error)
+            self.settings.job_log = (
+                self.settings.job_log + f"\nfailed: {self._error}"
+            )
             self.on_error(self._error)
         else:
+            self.settings.job_state = "DONE"
+            self.settings.job_message = "done"
+            final = f"{self.label}: done"
+            lines = self.settings.job_log.splitlines()[-11:]
+            self.settings.job_log = "\n".join([*lines, final])
             self.on_done(self._result)
         return None
 
