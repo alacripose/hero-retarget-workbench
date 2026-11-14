@@ -232,6 +232,36 @@ beside the editor instead.
   (the entries are standard `prop_enum` buttons); the sidebar is the UI region's
   normal collapse/expand, not a custom animation.
 
+## 0.8.9 — the page panel comes back when the space is chosen from the editor menu
+
+**Owner report, verbatim:** *"screenshot A: custom view works fine after pressing
+open workspace button (0.8.5) but in the custom view that opens from the thing
+that lets you choose what view it's on it only shows the fucking buttons to switch
+the damn page … you broke the working custom view"*.
+
+0.8.7 removed the `DMF_PT_space_main` root and made page mirrors top-level with an
+empty `bl_parent_id`. A subclass inherits the sidebar panel's old parent id, and
+an empty parent id draws nothing in a custom space, so the editor opened from the
+editor-type menu showed only the Pages sidebar. That was a regression, not a
+layout preference.
+
+- The root container is registered again and page mirrors are parented to it;
+  `dmf.open_workbench` and choosing the space from the editor-type menu now draw
+  the same page panel.
+- The page list stays in the space's `UI` region (the expandable sidebar), not in
+  the WINDOW area: probe geometry is `UI x=1296 width=280`, `WINDOW x=2
+  width=1294`, and `DMF_PT_space_pages.bl_region_type == 'UI'`.
+- `show_region_ui` is now opened by a timer, not inside a panel draw; setting it
+  during draw re-laid the area mid-frame.
+- Evidence: `artifacts/probes/probe_direct_view.py` opens the space by id with no
+  operator (the editor-type path), reports `root_registered: true`,
+  `pages_registered: true`, sidebar true, and the screenshot
+  `artifacts/receipts/direct-view.png` shows the Cloth page panel beside the
+  Pages sidebar. Zip 0.8.9 install probe 9/9; wide screenshot
+  `artifacts/receipts/pages-0.8.9.png`.
+
+Not checked: a click on a page button.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and

@@ -183,10 +183,14 @@ def mirror(
         "bl_idname": idname,
         "bl_space_type": space_type,
         "bl_region_type": "WINDOW",
-        "bl_parent_id": parent,
         "bl_options": set(),
         "poll": _page_poll(panel, page),
     }
+    # An empty root means the page panel is top-level, the way Properties draws
+    # its own panels. It must still be written: a subclass inherits the sidebar
+    # panel's bl_parent_id otherwise, and that parent does not exist in the
+    # custom space, so the page silently draws nothing.
+    attributes["bl_parent_id"] = parent
     if space_type == "PROPERTIES":
         attributes["bl_context"] = "scene"
     if space_idname:
