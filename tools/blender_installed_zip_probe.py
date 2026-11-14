@@ -152,7 +152,7 @@ def main() -> int:
                 "open-workbench",
                 switched == {"FINISHED"}
                 and SPACE_IDNAME in ui_types
-                and bool(getattr(space, "show_region_ui", False)),
+                and not bool(getattr(space, "show_region_ui", True)),
                 {
                     "result": str(switched),
                     "type": report["area_type"],
@@ -161,13 +161,11 @@ def main() -> int:
                 },
             )
             check(
-                "pages-in-sidebar",
+                "pages-fill-the-window",
                 bool(pages)
                 and all(
-                    entry
-                    and entry["region"] == "UI"
-                    and entry["category"] == label
-                    for label, entry in pages.items()
+                    entry and entry["region"] == "WINDOW"
+                    for entry in pages.values()
                 ),
                 pages,
             )
@@ -178,42 +176,14 @@ def main() -> int:
             )
             with bpy.context.temp_override(window=window, area=area):
                 bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=3)
-            ui_region = next(
-                (region for region in area.regions if region.type == "UI"), None
-            )
-            report["active_category"] = getattr(ui_region, "active_panel_category", "")
-            categories: list[str] = []
-            if ui_region is not None:
-                for label in labels.values():
-                    try:
-                        ui_region.active_panel_category = label
-                        categories.append(str(ui_region.active_panel_category))
-                    except (AttributeError, TypeError) as error:
-                        categories.append(f"{type(error).__name__}: {error}")
-            report["categories"] = categories
-            check(
-                "categories-selectable",
-                bool(categories) and categories == list(labels.values()),
-                categories,
-            )
             space_module = getattr(sys.modules.get(MODULE), "ui_space", None)
-            # The operator forgets the area so the next opening opens the
-            # sidebar; let the timer see it once before testing a collapse.
-            if space_module is not None:
-                space_module._ensure_sidebar()
-            space.show_region_ui = False
             if space_module is not None:
                 space_module._ensure_sidebar()
             check(
-                "respects-collapse",
+                "sidebar-stays-closed",
                 space.show_region_ui is False,
-                "re-asserted"
-                if space.show_region_ui
-                else "left collapsed",
+                "opened" if space.show_region_ui else "closed",
             )
-            space.show_region_ui = True
-            if ui_region is not None:
-                ui_region.active_panel_category = labels.get("CLOTH", "Cloth")
             with bpy.context.temp_override(window=window, area=area):
                 bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=3)
         else:

@@ -466,6 +466,33 @@ views"*.
   build leaves `_STALE_ATTEMPTS` at 0.
 - Evidence: gate green; `zip-install-0.8.17.json` 13/13 on the installed zip.
 
+## 0.8.18 — the pages fill the view; the sidebar is not opened
+
+**Owner direction, verbatim:** *"the n panel sidebars can take up as much space as
+they want so the n panel sidebar in the custom view needs to take up that space"*,
+then choosing *"the whole custom view: pages fill the sidebar, no empty main
+region"*.
+
+A region's width cannot be set from Python (`Region.width` is read-only), and two
+measured attempts to reclaim it changed nothing: `SCREEN_OT_region_toggle(
+region_type='WINDOW')` returns `{'FINISHED'}` and leaves `WINDOW 1294 / UI 280`
+identical, and `SCREEN_OT_region_scale('EXEC_DEFAULT')` returns `PASS_THROUGH`
+(`artifacts/receipts/sidebar-fill.json`, `tools/blender_sidebar_fill_probe.py`).
+So the page content moved back to the WINDOW region, which is the only region that
+can fill the area, and the page buttons moved to the header.
+
+- Page panels register in `WINDOW` with the page poll; the page buttons are a row
+  of icon buttons in the header (`prop_enum` on `props_page`), next to
+  `Workbench` and the version.
+- The sidebar is closed when the editor opens (and `_ensure_sidebar` keeps it
+  closed), so nothing sits between the page and its buttons.
+- Evidence: gate green; `zip-install-0.8.18.json` 12/12 — every page panel is in
+  `WINDOW`, `show_region_ui` is false, the sidebar stays closed;
+  `pages-0.8.18.png` shows the Cloth page filling the area with header buttons.
+
+Not checked: a real click on a header page button — the probe sets `props_page`
+through the same enum property the buttons write.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
