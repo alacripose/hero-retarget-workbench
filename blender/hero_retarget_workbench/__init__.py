@@ -19,7 +19,7 @@ if (_PACKAGE / "_vendor").is_dir() and str(_PACKAGE / "_vendor") not in sys.path
 bl_info = {
     "name": "Hero Retarget Workbench",
     "author": "ala",
-    "version": (0, 8, 2),
+    "version": (0, 8, 3),
     "blender": (5, 4, 0),
     "location": "Workbench editor (PR 165087 builds); View3D > Sidebar > Deadlock elsewhere",
     "description": "Fit and retarget a custom model onto a live Deadlock hero, then install the unchanged S2V vmdl as a CSDK13 addon",
@@ -53,8 +53,29 @@ from . import (  # noqa: E402
 )
 
 
+def _release_stale_classes() -> None:
+    """Unregister this addon's classes left behind by an enabled copy.
+
+    Blender's Install re-enables the module in the same process. When an older
+    copy is still enabled, its classes are still registered, and the new
+    register() dies on ``register_class(...): already registered as a subclass
+    'DMF_BoneEntry'`` - the owner's report. Release anything named DMF_ first;
+    classes the old module owned can still be unregistered by their RNA class.
+    """
+    stale = [name for name in dir(bpy.types) if name.startswith("DMF_")]
+    for name in stale:
+        cls = getattr(bpy.types, name, None)
+        if cls is None:
+            continue
+        try:
+            bpy.utils.unregister_class(cls)
+        except (RuntimeError, TypeError):
+            continue
+
+
 def register() -> None:
     global SURFACE, EDITOR_ERROR
+    _release_stale_classes()
     properties.register()
     hierarchy_view.register()
     workbench.register()
