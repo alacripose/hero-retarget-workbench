@@ -215,13 +215,11 @@ def _tab_draw(self, context, page: str) -> None:
     add-on can put the pages themselves in that strip; the switch is scheduled
     from a timer because the selection arrives during draw.
     """
-    settings = context.scene.dmf
-    if settings.props_page != page and _PENDING_PAGE["page"] != page:
-        # The selected category's panel is the only signal an add-on gets that
-        # its tab was chosen. A timer does the write: assigning from inside a
-        # draw does not stick, and a timer context often has no bpy.context.scene.
-        _PENDING_PAGE["page"] = page
-        bpy.app.timers.register(lambda: _select_page(page), first_interval=0.01)
+    # Deliberately no page write here. The UI region's active category is the
+    # single writer (see _ensure_sidebar). Doing both made a tab click flicker:
+    # the tab's draw answered the old page while the category answered the new
+    # one, and the area redrew into the default sidebar width.
+    return None
 
 
 def _tab_draw_for(page: str):
