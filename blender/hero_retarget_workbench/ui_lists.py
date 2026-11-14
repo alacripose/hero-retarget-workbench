@@ -236,13 +236,15 @@ class DMF_UL_clips(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
+        wanted = getattr(getattr(context.scene, "dmf", None), "clip_ag_filter", "ALL")
         return _filter(
             self,
             [
                 f"{row.label} {row.name} {row.kind} {'compiled' if row.compiled else ''} "
-                f"{row.state} {row.action}"
+                f"{row.ag} {row.state} {row.action}"
                 for row in rows
             ],
+            restrict=None if wanted == "ALL" else [row.ag != wanted for row in rows],
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
@@ -251,7 +253,7 @@ class DMF_UL_clips(UIList):
         right = row.row(align=True)
         right.alignment = "RIGHT"
         tag = item.kind if item.kind != "dmx" else ("dmx_c" if item.compiled else "dmx")
-        right.label(text=tag)
+        right.label(text=f"{item.ag.lower()} {tag}" if item.ag != "UNKNOWN" else tag)
         if item.action and item.action != item.label:
             right.label(text="", icon="ACTION")
         if item.export_bytes:
@@ -277,6 +279,25 @@ class DMF_UL_ik(UIList):
         right.alignment = "RIGHT"
         right.label(text=item.target or "choose a limb")
         if item.constraints:
+            right.label(text="", icon="CHECKMARK")
+
+
+class DMF_UL_tail(UIList):
+    bl_idname = "DMF_UL_tail"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [f"{row.source} {row.target} {row.state}" for row in rows])
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        width = float(getattr(context.scene.dmf, "list_name_width", 0.5))
+        split = layout.split(factor=width, align=True)
+        left = split.row(align=True)
+        left.label(text=item.source or "hero tail", icon="BONE_DATA")
+        right = split.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=item.target or "choose a tail bone")
+        if item.state == "MATCHED":
             right.label(text="", icon="CHECKMARK")
 
 
@@ -377,6 +398,7 @@ CLASSES = (
     DMF_UL_rules,
     DMF_UL_clips,
     DMF_UL_ik,
+    DMF_UL_tail,
 )
 
 

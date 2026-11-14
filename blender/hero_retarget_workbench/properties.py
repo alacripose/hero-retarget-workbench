@@ -115,6 +115,33 @@ class DMF_ClothChain(PropertyGroup):
     count: IntProperty(name="Segments", default=0)
     root: StringProperty(name="First bone", default="")
     bones: StringProperty(name="Bones", default="")
+    source: EnumProperty(
+        name="Source rig",
+        description="Where the chain's bones were read from",
+        items=[
+            ("HERO", "Hero skeleton", "The chain already exists on the imported hero skeleton"),
+            ("CUSTOM", "Custom rig", "Copy these bones out of the imported custom armature"),
+        ],
+        default="HERO",
+    )
+    source_armature: StringProperty(name="Source armature", default="")
+    source_mesh: PointerProperty(
+        name="Cloth mesh",
+        description="The custom mesh this chain is skinned to; its weights drive the cloth",
+        type=Object,
+        poll=lambda self, obj: obj.type == "MESH",
+    )
+    parent: StringProperty(
+        name="New parent bone",
+        description="Hero bone the first copied chain bone hangs from",
+        default="",
+    )
+    joined: IntProperty(name="Joined bones", default=0, min=0)
+    proxy: BoolProperty(
+        name="Source 2 proxy",
+        description="Export this mesh as a PulseSrcOps CLOTHPROXY with cloth_enable weights",
+        default=False,
+    )
     target_mesh: PointerProperty(
         name="Cloth mesh",
         description="The imported hero mesh this chain was built on",
@@ -130,6 +157,22 @@ class DMF_ClothChain(PropertyGroup):
     pin_bone: StringProperty(name="Pinned bone", default="")
     pin_count: IntProperty(name="Pinned vertices", default=0)
     cloth_modifier: StringProperty(name="Cloth modifier", default="")
+
+
+class DMF_TailRow(PropertyGroup):
+    """One hero tail channel and the tail-armature bone it drives."""
+
+    source: StringProperty(name="Hero bone", default="")
+    target: StringProperty(name="Tail bone", default="")
+    state: EnumProperty(
+        name="State",
+        items=[
+            ("MATCHED", "Matched", "The same name exists on both rigs"),
+            ("CHOOSE", "Choose", "Pick the tail bone this hero bone drives"),
+            ("MISSING", "Missing", "The chosen tail bone is not on the tail armature"),
+        ],
+        default="CHOOSE",
+    )
 
 
 class DMF_MaterialRow(PropertyGroup):
@@ -237,9 +280,11 @@ class DMF_ClipRow(PropertyGroup):
     label: StringProperty(name="Clip", default="")
     kind: StringProperty(name="Kind", default="dmx")
     compiled: BoolProperty(name="Compiled", default=False)
+    ag: StringProperty(name="AnimGraph", default="UNKNOWN")
     path: StringProperty(name="Path", subtype="FILE_PATH", default="")
     size: IntProperty(name="Bytes", default=0)
     action: StringProperty(name="Action", default="")
+    tail_action: StringProperty(name="Tail action", default="")
     exported: StringProperty(name="Written", subtype="FILE_PATH", default="")
     export_bytes: IntProperty(name="Written bytes", default=0)
     state: EnumProperty(
@@ -450,6 +495,15 @@ class DMF_Settings(PropertyGroup):
         description="Numbered bone chains on the hero skeleton",
     )
     cloth_index: IntProperty(name="Cloth chain row", default=0)
+    cloth_source: EnumProperty(
+        name="Scan chains from",
+        description="Use chains already on the hero skeleton, or copy them from the custom rig",
+        items=[
+            ("HERO", "Hero", "Scan the imported hero skeleton"),
+            ("CUSTOM", "Custom rig", "Scan the imported custom model armature"),
+        ],
+        default="HERO",
+    )
     cloth_build_skipped: StringProperty(
         name="Cloth build notes",
         description="Chains the last import could not build cloth for, and why",
@@ -610,10 +664,27 @@ class DMF_Settings(PropertyGroup):
     clips_dir: StringProperty(
         name="Clip folder",
         description=(
-            "Folder holding the animation DMX clips and their vnmclip pairs; blank uses the "
-            "hero extraction"
+            "Optional folder holding animation DMX clips and their vnmclip pairs. Blank "
+            "auto-discovers clips beside the hero extraction and its .vnmskel"
         ),
         subtype="DIR_PATH",
+    )
+    clip_ag_filter: EnumProperty(
+        name="AnimGraph",
+        description="Show only clips classified for one animation graph generation",
+        items=[
+            ("ALL", "All graphs", "Show every discovered clip"),
+            ("AG1", "AG1", "Legacy AnimGraph 1 source clips"),
+            ("AG2", "AG2", "AnimGraph 2 source clips and vnmclips"),
+            ("UNKNOWN", "Unknown", "Clips whose folder does not identify a graph generation"),
+        ],
+        default="ALL",
+    )
+    clip_vnmskel: StringProperty(
+        name="AG2 skeleton",
+        description="Decompiled .vnmskel used by ModelDoc's Make Default Animgraph2",
+        subtype="FILE_PATH",
+        default="",
     )
     clip_export_dir: StringProperty(
         name="Write folder",
@@ -630,6 +701,25 @@ class DMF_Settings(PropertyGroup):
     clip_note: StringProperty(name="Clip note", default="")
     clip_imported: IntProperty(name="Imported clips", default=0)
     clip_written: IntProperty(name="Written clips", default=0)
+    clip_baked: IntProperty(name="Baked clips", default=0)
+    clip_auto_note: StringProperty(name="Auto scan note", default="")
+    tail_armature: PointerProperty(
+        name="Tail armature",
+        description="Custom tail rig that receives the hero clip's tail channels (experimental)",
+        type=Object,
+        poll=lambda self, obj: obj.type == "ARMATURE",
+    )
+    tail_bones: CollectionProperty(type=DMF_TailRow, description="Hero tail channels mapped to tail bones")
+    tail_index: IntProperty(name="Tail row", default=0)
+    tail_scanned: IntProperty(name="Tail bones", default=0)
+    tail_weight: FloatProperty(
+        name="Blend",
+        description="How much of the hero tail motion reaches the custom tail rig",
+        default=1.0,
+        min=0.0,
+        max=1.0,
+    )
+    tail_note: StringProperty(name="Tail note", default="")
     ik_bones: CollectionProperty(type=DMF_IKRow, description="Source 2 IK targets on the hero rig")
     ik_index: IntProperty(name="IK row", default=0)
     ik_scanned: IntProperty(name="IK targets", default=0)
@@ -957,6 +1047,7 @@ CLASSES = (
     DMF_BoneRule,
     DMF_ClipRow,
     DMF_IKRow,
+    DMF_TailRow,
     DMF_HierarchyRow,
     DMF_ScanRoot,
     DMF_ModRow,

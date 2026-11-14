@@ -20,6 +20,15 @@ KINDS: tuple[tuple[str, str], ...] = (
     (".dmx", "dmx"),
 )
 
+# Folder names that hold animation sources. AG2 projects keep the decompiled
+# ``.vnmskel`` beside a ``clips`` folder; AG1 projects normally use ``anims``.
+# These are discovery hints, never a rule: a clip found directly in the
+# extraction root is still listed.
+CLIP_DIRS: tuple[str, ...] = ("clips", "anims", "anims2", "ag1", "ag2", "animgraph2")
+
+AG2_TOKENS: tuple[str, ...] = ("ag2", "animgraph2", "anims2", "vnmclip", "vnmskel", "vnmgraph")
+AG1_TOKENS: tuple[str, ...] = ("ag1", "animgraph1", "anims1", "vanmgrph")
+
 
 @dataclass(frozen=True)
 class Clip:
@@ -95,6 +104,99 @@ def scan(folder: Path | str, recursive: bool = True) -> list[Clip]:
     return sorted(rows, key=lambda row: (row.label.lower(), row.kind, str(row.path)))
 
 
+def animgraph(path: Path | str, roots: tuple[Path, ...] | list[Path] = (), vnmskel: Path | None = None) -> str:
+    """Classify a clip as ``AG1``, ``AG2`` or ``UNKNOWN`` from its location.
+
+    This is deliberately a path/type read, not a file parse.  The Cooked ``.vnmskel``
+    and ``.vnmclip`` suffixes belong to AnimGraph 2, and the community workflow
+    puts a decompiled ``.vnmskel`` beside a ``clips`` directory.  A bare DMX under
+    ``anims`` is the legacy AnimGraph 1 shape.  If neither signal exists, the row
+    says ``UNKNOWN`` rather than inventing a graph version.
+    """
+    file = Path(path)
+    lowered = [part.lower() for part in file.parts]
+    joined = "/".join(lowered)
+    name = file.name.lower()
+    if any(token in joined for token in AG2_TOKENS):
+        return "AG2"
+    if any(token in name for token in AG2_TOKENS):
+        return "AG2"
+    if any(part == "clips" for part in lowered):
+        return "AG2"
+    if vnmskel is not None:
+        skeleton = Path(vnmskel)
+        try:
+            relative = file.resolve().relative_to(skeleton.parent.resolve())
+        except (OSError, ValueError):
+            relative = None
+        if relative is not None and relative.parts and relative.parts[0].lower() in ("clips", "anims2", "ag2"):
+            return "AG2"
+    if any(token in joined for token in AG1_TOKENS):
+        return "AG1"
+    if any(token in name for token in AG1_TOKENS):
+        return "AG1"
+    if "anims" in lowered or "anims" in joined:
+        return "AG1"
+    return "UNKNOWN"
+
+
+def clip_roots(root: Path | str, max_depth: int = 4) -> list[Path]:
+    """Directories worth scanning for clips under one extraction root.
+
+    An extraction root also contains models, materials and compiled VPK content.
+    The named clip folders are preferred when present; otherwise the root itself
+    is returned so an unusual layout is still scanned.  The walk is bounded, so a
+    drive-sized folder cannot turn a panel redraw into a filesystem crawl.
+    """
+    base = Path(root)
+    if not base.is_dir():
+        return []
+    found: list[Path] = []
+    base_depth = len(base.parts)
+    for current, dirs, _files in os.walk(base):
+        path = Path(current)
+        depth = len(path.parts) - base_depth
+        if depth >= max_depth:
+            dirs[:] = []
+        else:
+            dirs.sort()
+        if path.name.lower() in CLIP_DIRS:
+            found.append(path)
+    return found or [base]
+
+
+def find_vnmskel(roots: tuple[Path, ...] | list[Path]) -> Path | None:
+    """The first decompiled AnimGraph 2 skeleton under the scan roots."""
+    for root in roots:
+        base = Path(root)
+        if not base.is_dir():
+            continue
+        direct = sorted(path for path in base.glob("*.vnmskel") if path.is_file())
+        if direct:
+            return direct[0]
+        nested = sorted(path for path in base.rglob("*.vnmskel") if path.is_file())
+        if nested:
+            return nested[0]
+    return None
+
+
+def discover(roots: tuple[Path, ...] | list[Path]) -> list[Clip]:
+    """Scan every root once and de-duplicate clips by resolved path."""
+    seen: set[Path] = set()
+    rows: list[Clip] = []
+    for root in roots:
+        for row in scan(root):
+            try:
+                key = row.path.resolve()
+            except OSError:
+                key = row.path
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append(row)
+    return sorted(rows, key=lambda row: (row.label.lower(), row.kind, str(row.path)))
+
+
 def summary(rows: list[Clip]) -> dict[str, int]:
     """Counts the panel prints, including how many pairs are complete."""
     stems: dict[str, set[str]] = {}
@@ -149,9 +251,14 @@ def glob_escape(name: str) -> str:
     return "".join(escaped)
 
 
-def written_path(root: Path | str, label: str) -> Path:
-    """``<root>/anims/<label>.dmx`` — the layout an animgraph clip is compiled from."""
-    return Path(root) / "anims" / f"{label}.dmx"
+def written_path(root: Path | str, label: str, ag: str = "") -> Path:
+    """Where an edited clip is written for ModelDoc to import.
+
+    AG2 uses the decompiled skeleton's ``clips`` folder, the layout the VmClip
+    guide puts the DMX in; AG1 and unknown clips keep the legacy ``anims`` folder.
+    """
+    folder = "clips" if ag == "AG2" else "anims"
+    return Path(root) / folder / f"{label}.dmx"
 
 
 def pairs(rows: list[Clip]) -> dict[str, dict[str, Clip]]:

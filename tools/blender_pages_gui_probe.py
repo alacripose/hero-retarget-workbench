@@ -252,10 +252,19 @@ def main() -> int:
     settings.props_page = "CLOTH"
 
     prefix = "space" if surface == "editor" else "props"
-    pages = [("root", getattr(bpy.types, f"DMF_PT_{prefix}_main").draw, "ALL")]
+    root_name = f"DMF_PT_{prefix}_main"
+    if not hasattr(bpy.types, root_name):
+        root_name = "DMF_PT_main"
+    pages = [("root", getattr(bpy.types, root_name).draw, "ALL")]
     for panel_idname, page in ui_props.PAGE_BY_ID.items():
         name = f"DMF_PT_{prefix}_{panel_idname[len('DMF_PT_'):]}"
         cls = getattr(bpy.types, name, None)
+        if cls is None:
+            # The sidebar registers the source panels directly; the Properties
+            # mirrors only exist on that surface.
+            cls = getattr(bpy.types, panel_idname, None)
+            if cls is not None:
+                name = panel_idname
         if cls is not None:
             pages.append((name, cls.draw, page))
     RESULT["pages"] = sorted({page for _, _, page in pages})
@@ -308,6 +317,10 @@ def main() -> int:
         except Exception as error:
             RESULT["area_switch_error"] = f"{type(error).__name__}: {error}"
     elif area is not None:
+        try:
+            area.type = "VIEW_3D"
+        except Exception as error:
+            RESULT["area_switch_error"] = f"{type(error).__name__}: {error}"
         space = area.spaces.active
         if hasattr(space, "context"):
             try:

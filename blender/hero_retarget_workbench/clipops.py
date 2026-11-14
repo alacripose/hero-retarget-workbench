@@ -7,7 +7,7 @@ the prefix, preview, export and clear actions work from afterwards.
 
 Writing a clip is one PulseSrcOps animation export per row: the armature is the
 only exportable, the action filter names that one action, and PulseSrcOps writes
-``<root>/anims/<action>.dmx``. The action, the export list and the scene's export
+``<root>/anims`` for AG1 and ``<root>/clips`` for AG2. The action, the export list and the scene's export
 settings are saved and put back, so an export never becomes the file's state.
 """
 from __future__ import annotations
@@ -18,6 +18,7 @@ from pathlib import Path
 import bpy
 from bpy.types import Operator
 from forge import clips as clipscan
+from forge import tails as tailscan
 
 from . import core, proofing
 
@@ -28,20 +29,57 @@ _STEP_SECONDS = 0.05
 
 
 def folder(settings) -> Path | None:
-    value = settings.clips_dir or settings.extraction_dir
+    value = settings.clips_dir
     if not value:
         return None
     return Path(bpy.path.abspath(value))
 
 
+def roots(settings) -> list[Path]:
+    """Every folder that can hold this hero's clips, without a mandatory pick.
+
+    An explicit Clip folder is authoritative.  Otherwise the extraction, the
+    body DMX folder and the vmdl folder are offered to the bounded clip-folder
+    discovery, which is what turns "ask the owner for a folder" into "find the
+    clips beside the model".
+    """
+    chosen = folder(settings)
+    if chosen is not None:
+        return [chosen]
+    candidates: list[Path] = []
+    for value in (settings.extraction_dir, settings.body_dmx, settings.hero_model_path, settings.vmdl):
+        if not value:
+            continue
+        path = Path(bpy.path.abspath(value))
+        candidates.append(path if path.is_dir() else path.parent)
+    found: list[Path] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        for root in clipscan.clip_roots(candidate):
+            key = str(root.resolve()).lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            found.append(root)
+    return found
+
+
 def scan(settings) -> dict[str, int]:
-    """Read the clip folder into the panel rows; nothing is imported."""
-    root = folder(settings)
-    if root is None:
-        raise RuntimeError("clip-folder-missing: set the clip folder or extract a hero first")
-    if not root.is_dir():
-        raise RuntimeError(f"clip-folder-missing: {root} is not a folder")
-    rows = clipscan.scan(root)
+    """Discover AG1/AG2 clips beside the extraction; nothing is imported."""
+    roots_found = roots(settings)
+    if not roots_found:
+        raise RuntimeError(
+            "clip-folder-missing: extract a hero, choose its body DMX, or set a clip folder"
+        )
+    missing = [str(root) for root in roots_found if not root.is_dir()]
+    if missing and len(missing) == len(roots_found):
+        raise RuntimeError(f"clip-folder-missing: {missing[0]} is not a folder")
+    rows = clipscan.discover(roots_found)
+    skeleton = clipscan.find_vnmskel(roots_found)
+    if skeleton is None and settings.clip_vnmskel:
+        candidate = Path(bpy.path.abspath(settings.clip_vnmskel))
+        skeleton = candidate if candidate.is_file() else None
+    settings.clip_vnmskel = str(skeleton) if skeleton is not None else ""
     settings.clips.clear()
     for row in rows:
         entry = settings.clips.add()
@@ -52,9 +90,23 @@ def scan(settings) -> dict[str, int]:
         entry.path = str(row.path)
         entry.size = row.size
         entry.state = "EDITABLE" if row.editable else "OPAQUE"
+        entry.ag = clipscan.animgraph(row.path, roots_found, skeleton)
     settings.clip_index = 0
     settings.clip_imported = 0
-    return clipscan.summary(rows)
+    settings.clip_written = 0
+    settings.clip_baked = 0
+    counts = clipscan.summary(rows)
+    counts["ag1"] = sum(1 for row in settings.clips if row.ag == "AG1")
+    counts["ag2"] = sum(1 for row in settings.clips if row.ag == "AG2")
+    counts["unknown"] = sum(1 for row in settings.clips if row.ag == "UNKNOWN")
+    counts["vnmskel"] = 1 if skeleton is not None else 0
+    settings.clip_auto_note = (
+        f"{len(roots_found)} clip root{'s' if len(roots_found) != 1 else ''}; "
+        f"AG2 skeleton {skeleton.name if skeleton else 'not found'}"
+    )
+    if skeleton is None and counts["ag2"]:
+        settings.clip_auto_note += "; make the vnmskel in ModelDoc for AG2"
+    return counts
 
 
 def _armature(settings):
@@ -106,6 +158,7 @@ def _tick():
         return _STEP_SECONDS
     entry = settings.clips[index]
     exporting = _MODE == "export"
+    baking = _MODE == "bake"
     try:
         if exporting:
             written = write_action(settings, entry, write_folder(settings))
@@ -113,6 +166,15 @@ def _tick():
             core.set_status(
                 settings,
                 f"Wrote {written.name} ({entry.export_bytes:,} bytes); {len(_QUEUE)} left",
+                "BUSY",
+            )
+        elif baking:
+            baked = bake_action(settings, entry)
+            written = write_action(settings, entry, write_folder(settings))
+            settings.clip_written += 1
+            core.set_status(
+                settings,
+                f"Baked {baked['frames']} frames and wrote {written.name}; {len(_QUEUE)} left",
                 "BUSY",
             )
         else:
@@ -127,10 +189,11 @@ def _tick():
         core.set_status(settings, f"{entry.label}: {error}", "WARN")
     if not _QUEUE:
         failed = sum(1 for row in settings.clips if row.state == "FAILED")
-        if exporting:
+        if exporting or baking:
             core.set_status(
                 settings,
-                f"Wrote {settings.clip_written} clips to {write_folder(settings)}; {failed} failed",
+                f"Baked {settings.clip_baked}, wrote {settings.clip_written} clips to "
+                f"{write_folder(settings)}; {failed} failed",
                 "OK" if not failed else "WARN",
             )
         else:
@@ -144,8 +207,13 @@ def _tick():
 
 
 def write_folder(settings) -> Path:
-    """The folder written clips go to; an empty field means ``<clip folder>/edited``."""
-    root = clipscan.export_folder(folder(settings), settings.clip_export_dir or None)
+    """The folder written clips go to; nothing is written into the extraction."""
+    base = folder(settings)
+    if base is None and settings.clip_vnmskel:
+        base = Path(bpy.path.abspath(settings.clip_vnmskel)).parent
+    if base is None and settings.extraction_dir:
+        base = Path(bpy.path.abspath(settings.extraction_dir))
+    root = clipscan.export_folder(base, settings.clip_export_dir or None)
     if root is None:
         raise RuntimeError(
             "clip-export-folder-missing: set the clip folder or a write folder first"
@@ -220,7 +288,7 @@ def _dmx_files(root: Path) -> dict[Path, int]:
 
 
 def write_action(settings, entry, destination: Path) -> Path:
-    """Write one imported action back to ``<destination>/anims/<label>.dmx``."""
+    """Write one imported action back under its animgraph's source folder."""
     armature = _armature(settings)
     from . import ikops
 
@@ -236,7 +304,7 @@ def write_action(settings, entry, destination: Path) -> Path:
     scene = bpy.context.scene
     if not hasattr(armature, "vs") or not hasattr(scene, "vs"):
         raise RuntimeError("clip-export-needs-pulsesrcops: enable the PulseSrcOps extension")
-    target = clipscan.written_path(destination, entry.label)
+    target = clipscan.written_path(destination, entry.label, entry.ag)
     target.parent.mkdir(parents=True, exist_ok=True)
     before = _dmx_files(target.parent)
     saved = _snapshot(scene, armature)
@@ -246,7 +314,7 @@ def write_action(settings, entry, destination: Path) -> Path:
         # action name the filter matches, which this narrows to exactly this one.
         armature.data.vs.action_selection = "FILTERED_ACTIONS"
         armature.vs.action_filter = clipscan.glob_escape(action.name)
-        armature.vs.subdir = "anims"
+        armature.vs.subdir = target.parent.name
         armature.vs.export = True
         data = armature.animation_data or armature.animation_data_create()
         data.action = action
@@ -300,6 +368,62 @@ def write_action(settings, entry, destination: Path) -> Path:
     return chosen
 
 
+def bake_action(settings, entry) -> dict:
+    """Bake one imported action with visual keying before it is written.
+
+    The VmClip guide's Blender section requires the IK/weapon constraints to be
+    baked and cleared before export.  Every pose bone is baked, so extra tail
+    bones carried by a joined custom chain are included.  Only this addon's IK
+    constraints are removed; any other constraint the owner added stays.
+    """
+    armature = _armature(settings)
+    action = bpy.data.actions.get(entry.action) if entry.action else None
+    if action is None:
+        raise RuntimeError(
+            f"clip-not-imported: {entry.label} has no action; import it before baking it"
+        )
+    start, end = (int(round(value)) for value in action.frame_range)
+    if end <= start:
+        raise RuntimeError(f"clip-bake-empty-range: {entry.label} has no frame range")
+    data = armature.animation_data or armature.animation_data_create()
+    data.action = action
+    if hasattr(data, "action_slot") and getattr(action, "slots", None):
+        data.action_slot = action.slots[0]
+    active = bpy.context.view_layer.objects.active
+    selected = list(bpy.context.selected_objects)
+    try:
+        core.select_only(bpy.context, [armature])
+        bpy.context.view_layer.objects.active = armature
+        if armature.mode != "OBJECT":
+            bpy.ops.object.mode_set(mode="OBJECT")
+        bpy.ops.object.mode_set(mode="POSE")
+        result = bpy.ops.nla.bake(
+            frame_start=start,
+            frame_end=end,
+            step=1,
+            only_selected=False,
+            visual_keying=True,
+            clear_constraints=False,
+            clear_parents=False,
+            use_current_action=True,
+            bake_types={"POSE"},
+        )
+    finally:
+        current = bpy.data.objects.get(armature.name) or armature
+        if current.mode != "OBJECT":
+            bpy.ops.object.mode_set(mode="OBJECT")
+        core.select_only(bpy.context, selected)
+        if active is not None:
+            bpy.context.view_layer.objects.active = active
+    if "FINISHED" not in result:
+        raise RuntimeError(f"clip-bake-refused: Blender did not finish {entry.label}")
+    from . import ikops
+
+    cleared = ikops.clear(settings) if ikops.has_constraints(armature) else 0
+    settings.clip_baked += 1
+    return {"action": action.name, "frames": end - start + 1, "cleared": cleared}
+
+
 def start_export(settings, only_index: int | None = None) -> int:
     """Queue the imported clips that can be written out; returns how many were queued."""
     global _QUEUE, _TIMER, _MODE
@@ -322,6 +446,29 @@ def start_export(settings, only_index: int | None = None) -> int:
     return len(_QUEUE)
 
 
+def start_bake_export(settings, only_index: int | None = None) -> int:
+    """Queue imported actions for visual bake, then write each as DMX."""
+    global _QUEUE, _TIMER, _MODE
+    _armature(settings)
+    write_folder(settings)
+    if only_index is not None:
+        rows = [only_index]
+    else:
+        rows = [
+            index
+            for index, row in enumerate(settings.clips)
+            if row.action and row.state in ("IMPORTED", "WRITTEN", "FAILED")
+        ]
+    if not rows:
+        raise RuntimeError("clip-bake-empty: import a clip before baking it")
+    _QUEUE = list(rows)
+    _MODE = "bake"
+    settings.clip_baked = 0
+    if _TIMER is None:
+        _TIMER = bpy.app.timers.register(_tick, first_interval=0.0, persistent=True)
+    return len(_QUEUE)
+
+
 def _settings():
     scene = getattr(bpy.context, "scene", None)
     return getattr(scene, "dmf", None) if scene is not None else None
@@ -339,7 +486,7 @@ def _stop() -> None:
 
 def start(settings, only_index: int | None = None) -> int:
     """Queue every editable clip (or the selected one) and return how many were queued."""
-    global _QUEUE, _TIMER
+    global _QUEUE, _TIMER, _MODE
     _QUEUE = []
     # Fail here, with the reason, rather than once per queued file.
     _armature(settings)
@@ -352,6 +499,7 @@ def start(settings, only_index: int | None = None) -> int:
     if not candidates:
         raise RuntimeError("clip-import-empty: scan a folder with .dmx clips first")
     _QUEUE = list(candidates)
+    _MODE = "import"
     if _TIMER is None:
         _TIMER = bpy.app.timers.register(_tick, first_interval=0.0, persistent=True)
     return len(_QUEUE)
@@ -434,9 +582,49 @@ class DMF_OT_scan_clips(Operator):
         )
         core.set_status(
             settings,
-            f"{counts['dmx']} DMX / {counts['vnmclip']} vnmclip; {counts['paired']} pairs, {counts['dmx_only']} DMX only",
+            f"{counts['dmx']} DMX / {counts['vnmclip']} vnmclip; "
+            f"AG1 {counts['ag1']}, AG2 {counts['ag2']}, unknown {counts['unknown']}",
             "OK" if counts["editable"] else "WARN",
         )
+        return {"FINISHED"}
+
+
+class DMF_OT_bake_clips(Operator):
+    bl_idname = "dmf.bake_clips"
+    bl_label = "Bake And Write Clips"
+    bl_description = (
+        "Bake every imported action with visual keying, clear this addon's IK constraints, "
+        "and write each one as a Model 22 DMX for ModelDoc"
+    )
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            queued = start_bake_export(settings)
+        except Exception as error:
+            core.set_status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        core.set_status(settings, f"Baking and writing {queued} clips; the viewport stays usable", "BUSY")
+        return {"FINISHED"}
+
+
+class DMF_OT_bake_clip(Operator):
+    bl_idname = "dmf.bake_clip"
+    bl_label = "Bake Clip"
+    bl_description = "Bake the selected action and write it as a Model 22 DMX"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        if not settings.clips:
+            self.report({"ERROR"}, "Scan clips first")
+            return {"CANCELLED"}
+        try:
+            start_bake_export(settings, only_index=settings.clip_index)
+        except Exception as error:
+            core.set_status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
         return {"FINISHED"}
 
 
@@ -577,6 +765,8 @@ CLASSES = (
     DMF_OT_preview_clip,
     DMF_OT_export_clips,
     DMF_OT_export_clip,
+    DMF_OT_bake_clips,
+    DMF_OT_bake_clip,
 )
 
 
