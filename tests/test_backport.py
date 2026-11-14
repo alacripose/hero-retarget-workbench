@@ -63,7 +63,7 @@ class BackportBuildTests(unittest.TestCase):
         build_vpk(game / "pak01_dir.vpk", [("models/heroes_wip/kelvin/", "kelvin.vmdl_c")])
         for root in (self.tmp_path / "old-client", self.tmp_path / "old-client" / "game", game):
             build = client_build(root)
-            self.assertEqual(build.game_dir, game)
+            self.assertEqual(build.game_dir, game.resolve())
             self.assertEqual([path.name for path in build.vpks], ["pak01_dir.vpk"])
             self.assertIsNotNone(build.gameinfo)
 
@@ -91,7 +91,7 @@ class BackportBuildTests(unittest.TestCase):
 
         self.assertTrue(match.exact)
         self.assertEqual(match.relative, "models/heroes_wip/haze/haze.vmdl")
-        self.assertEqual(match.vpk, vpk)
+        self.assertEqual(match.vpk.resolve(), vpk.resolve())
 
     def test_model_source_path_matches_its_compiled_entry(self) -> None:
         game = self.make_game()
@@ -171,7 +171,10 @@ class BackportBuildTests(unittest.TestCase):
                 force=True,
             )
 
-        self.assertEqual(captured["extract"], ("models/heroes_wip/doorman_v2/doorman.vmdl", vpk))
+        self.assertEqual(
+            (captured["extract"][0], captured["extract"][1].resolve()),
+            ("models/heroes_wip/doorman_v2/doorman.vmdl", vpk.resolve()),
+        )
         self.assertEqual(captured["addon_name"], "doorman_backport")
         self.assertEqual(
             captured["vmdl_relative"], "models/heroes_wip/doorman_v2/doorman.vmdl"
@@ -179,7 +182,7 @@ class BackportBuildTests(unittest.TestCase):
         self.assertEqual(captured["old_vmdl"], old_model)
         data = json.loads(Path(result.manifest).read_text(encoding="utf-8"))
         self.assertFalse(data["backport_exact_model"])
-        self.assertEqual(data["backport_client_vpk"], str(vpk))
+        self.assertEqual(Path(data["backport_client_vpk"]).resolve(), vpk.resolve())
         self.assertEqual(data["backport_model"], "models/heroes_wip/doorman_v2/doorman.vmdl")
 
     def test_single_file_pack_without_gameinfo_is_a_build(self) -> None:
