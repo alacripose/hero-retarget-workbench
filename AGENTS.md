@@ -20,6 +20,10 @@ overlapped the native tab column and pushed the page body below the fold.
   `artifacts/receipts/pages-0.8.1.png`.
 - Not checked: the strip's buttons were not driven by a real mouse click, and the
   narrow companion area does not scroll its mirrors.
+- 0.8.2: CI was red on 0.8.0/0.8.1 because `test_components.py` and
+  `test_oldmods.py` imported `pytest` while the workflow runs
+  `python -m unittest discover`; that import is gone (unittest classes,
+  `tempfile`, `assertRaisesRegex`). 114 tests pass under the workflow's command.
 
 ## 2026-11-14 — 0.8.0: the page rail, the mods pipeline, tool setup, and components as body groups
 
