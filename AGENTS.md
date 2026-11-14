@@ -1,3 +1,20 @@
+## 2026-11-14 — 0.8.5: the pages live in the Workbench's expandable sidebar
+
+**Owner report, verbatim:** *"in the custom view it literall has a fucking side
+panel that expands out and for some reason you aren't putting anything in it?????
+now you've moved pages into it's own thing?"*
+
+- A custom space has a real `UI` region (the sidebar that expands out) and it
+  accepts an add-on panel. `DMF_PT_space_pages` is now that panel:
+  `bl_region_type='UI'`, `bl_category="Workbench"`, one icon+label button per
+  page with the current page depressed.
+- The separate `DMF_ST_workbench_pages` area and the split are removed.
+  `dmf.open_workbench` switches the area and sets `show_region_ui = True`.
+- Evidence: zip 0.8.5, 9/9 on PR 165087 (`ui_types: ['DMF_ST_workbench']`,
+  `sidebar: True`, `pages_panel: True`); reinstall 4/4; screenshot
+  `artifacts/receipts/pages-0.8.5.png` shows the page list in the Workbench
+  sidebar. Not checked: a real click on a page button.
+
 ## 2026-11-14 — 0.8.4: the editor registers first, the strip cannot take it down
 
 **Owner report, verbatim:** *"ana again, now the 8.3 versionhas no fucking view on

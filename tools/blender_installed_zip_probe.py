@@ -28,7 +28,7 @@ import bpy
 REPO = Path(__file__).resolve().parents[1]
 MODULE = "hero_retarget_workbench"
 SPACE_IDNAME = "DMF_ST_workbench"
-PAGES_SPACE_IDNAME = "DMF_ST_workbench_pages"
+PAGES_PANEL_IDNAME = "DMF_PT_space_pages"
 HEADER_IDNAME = "DMF_HT_workbench"
 
 
@@ -117,14 +117,22 @@ def main() -> int:
         ]
         report["ui_types"] = ui_types
         if expected == "editor":
+            report["pages_strip"] = PAGES_PANEL_IDNAME in dir(bpy.types)
+            space = area.spaces.active
             check(
                 "open-workbench",
                 switched == {"FINISHED"}
                 and SPACE_IDNAME in ui_types
-                and PAGES_SPACE_IDNAME in ui_types,
-                {"result": str(switched), "type": report["area_type"], "ui_types": ui_types},
+                and bool(getattr(space, "show_region_ui", False))
+                and report["pages_strip"],
+                {
+                    "result": str(switched),
+                    "type": report["area_type"],
+                    "ui_types": ui_types,
+                    "sidebar": bool(getattr(space, "show_region_ui", False)),
+                    "pages_panel": report["pages_strip"],
+                },
             )
-            report["pages_strip"] = PAGES_SPACE_IDNAME in ui_types
         else:
             space = area.spaces.active
             check(
