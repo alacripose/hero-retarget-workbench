@@ -145,7 +145,10 @@ def _page_polls(context, panels) -> dict[str, dict[str, bool]]:
     probe = {}
     for page in ("CLOTH", "SKELETON", "HANDOFF"):
         settings.props_page = page
-        probe[page] = {name: bool(cls.poll(context)) for name, cls in panels.items()}
+        probe[page] = {}
+        for name, cls in panels.items():
+            poll = getattr(cls, "poll", None)
+            probe[page][name] = bool(poll(context)) if callable(poll) else True
     settings.props_page = "CLOTH"
     return probe
 
@@ -187,6 +190,7 @@ def main() -> int:
         raise RuntimeError(f"forge-shadowed: forge.cloth came from {report['forge_cloth']}")
     cloth_ops = sys.modules["dmf_cloth_probe.cloth_ops"]
     ui_props = sys.modules["dmf_cloth_probe.ui_props"]
+    ui_space = sys.modules["dmf_cloth_probe.ui_space"]
 
     _clear_scene()
     context = bpy.context
@@ -236,15 +240,98 @@ def main() -> int:
         {"rows": len(rows), "first": rows[0].bones[:60] if rows else ""},
     )
 
+    # Chain to cloth: the action the Cloth page runs, called directly so the
+    # probe tests the same function the button does.
+    coat = next((row for row in settings.cloth_chains if row.name == "coat"), None)
+    built = {}
+    try:
+        built = cloth_ops.build_chain_cloth(settings, name="coat") if coat else {}
+    except Exception as error:
+        report["cloth_build_error"] = f"{type(error).__name__}: {error}"
+        built = {}
+    report["cloth_built"] = built
+    check(
+        "cloth-target-mesh",
+        bool(built) and "jacket" in str(built.get("mesh", "")).lower(),
+        built.get("mesh", ""),
+    )
+    check(
+        "cloth-bone-groups",
+        bool(built) and all(count > 0 for count in (built.get("assigned") or {}).values()),
+        built.get("assigned"),
+    )
+    check("cloth-pin", bool(built) and built.get("pinned", 0) > 0, built.get("pinned"))
+    mesh_obj = bpy.data.objects.get(built.get("mesh", "")) if built else None
+    modifier = (
+        mesh_obj.modifiers.get(built["cloth_modifier"])
+        if mesh_obj is not None and built.get("cloth_modifier")
+        else None
+    )
+    check(
+        "cloth-modifier",
+        modifier is not None
+        and modifier.type == "CLOTH"
+        and modifier.settings.vertex_group_mass == built.get("pin_group")
+        and [mod.type for mod in mesh_obj.modifiers][-1] == "CLOTH",
+        {"modifier": getattr(modifier, "name", ""), "order": [m.type for m in mesh_obj.modifiers] if mesh_obj else []},
+    )
+    chain_obj = bpy.data.objects.get(built.get("chain_object", "")) if built else None
+    chain_bones = list(chain_obj.data.bones) if chain_obj is not None and chain_obj.type == "ARMATURE" else []
+    # Ordered means parented in sequence. ``use_connect`` is left to the rest
+    # positions: a hero chain whose bones do not share a head and tail is a gap,
+    # not a defect, so the build must not weld it shut.
+    ordered = all(
+        bone.parent is not None and bone.parent.name == chain_bones[index - 1].name
+        for index, bone in enumerate(chain_bones)
+        if index
+    )
+    check(
+        "cloth-chain-object",
+        chain_obj is not None
+        and [bone.name for bone in chain_bones] == built.get("bones", [])
+        and ordered,
+        {
+            "object": getattr(chain_obj, "name", ""),
+            "bones": [bone.name for bone in chain_bones],
+            "connected": [bone.use_connect for bone in chain_bones],
+        },
+    )
+    hair = next((row for row in settings.cloth_chains if row.name == "hair"), None)
+    hair_built = {}
+    try:
+        hair_built = cloth_ops.build_chain_cloth(settings, name="hair") if hair else {}
+    except Exception as error:
+        report["hair_build_error"] = f"{type(error).__name__}: {error}"
+        hair_built = {}
+    check(
+        "cloth-second-chain",
+        bool(hair_built) and "hair" in str(hair_built.get("mesh", "")).lower() and hair_built.get("pinned", 0) > 0,
+        {"mesh": hair_built.get("mesh"), "pinned": hair_built.get("pinned")},
+    )
+    check(
+        "cloth-rows-recorded",
+        all(row.target_mesh is not None and row.cloth_modifier for row in settings.cloth_chains if row.name in {"coat", "hair"}),
+        [f"{row.name}:{getattr(row.target_mesh, 'name', '')}" for row in settings.cloth_chains if row.name in {"coat", "hair"}],
+    )
+
+    addon_module = sys.modules["dmf_cloth_probe"]
+    surface = getattr(addon_module, "SURFACE", "properties")
+    prefix = "space" if surface == "editor" else "props"
+    report["surface"] = surface
     panels = {
-        "cloth": getattr(bpy.types, "DMF_PT_props_cloth", None),
-        "skeleton": getattr(bpy.types, "DMF_PT_props_skeleton", None),
-        "handoff": getattr(bpy.types, "DMF_PT_props_handoff", None),
-        "root": getattr(bpy.types, "DMF_PT_props_main", None),
+        "cloth": getattr(bpy.types, f"DMF_PT_{prefix}_cloth", None),
+        "skeleton": getattr(bpy.types, f"DMF_PT_{prefix}_skeleton", None),
+        "handoff": getattr(bpy.types, f"DMF_PT_{prefix}_handoff", None),
+        "root": getattr(bpy.types, f"DMF_PT_{prefix}_main", None),
     }
-    check("props-surface", all(panels.values()), sorted(name for name, cls in panels.items() if cls))
+    check("page-surface", all(panels.values()), {"surface": surface, "panels": sorted(name for name, cls in panels.items() if cls)})
     polls = _page_polls(context, {k: v for k, v in panels.items() if v is not None})
     report["page_polls"] = polls
+    check(
+        "surface-matches-build",
+        surface == ("editor" if ui_space.custom_space_supported() else "properties"),
+        {"surface": surface, "custom_space_supported": ui_space.custom_space_supported()},
+    )
     check(
         "page-switches",
         polls["CLOTH"]["cloth"] and not polls["CLOTH"]["skeleton"]
@@ -252,11 +339,22 @@ def main() -> int:
         and polls["HANDOFF"]["handoff"] and not polls["HANDOFF"]["cloth"],
         polls,
     )
+    mirror_prefix = f"DMF_PT_{prefix}_"
     mirror_ids = sorted(
-        name for name in dir(bpy.types) if name.startswith("DMF_PT_props_") and name != "DMF_PT_props_main"
+        name
+        for name in dir(bpy.types)
+        if name.startswith(mirror_prefix) and name != f"DMF_PT_{prefix}_main"
     )
-    check("props-mirrors", len(mirror_ids) == len(ui_props.PAGE_BY_ID), {"mirrors": len(mirror_ids), "mapped": len(ui_props.PAGE_BY_ID)})
-    sidebar_ids = sorted(name for name in dir(bpy.types) if name.startswith("DMF_PT_") and not name.startswith("DMF_PT_props_"))
+    check("page-twins", len(mirror_ids) == len(ui_props.PAGE_BY_ID), {"twins": len(mirror_ids), "mapped": len(ui_props.PAGE_BY_ID)})
+    sidebar_ids = sorted(
+        name
+        for name in dir(bpy.types)
+        if name.startswith("DMF_PT_")
+        and not name.startswith(mirror_prefix)
+        and name != "DMF_PT_main"
+        and not name.startswith("DMF_PT_props_")
+        and not name.startswith("DMF_PT_space_")
+    )
     check("sidebar-still-registered", len(sidebar_ids) >= len(ui_props.PAGE_BY_ID), {"sidebar": len(sidebar_ids)})
 
     report["hero"] = {

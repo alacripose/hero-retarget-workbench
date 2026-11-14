@@ -15,10 +15,25 @@ is the same set either way.
 """
 from __future__ import annotations
 
+import sys
+
 import bpy
 from bpy.types import Panel
 
 from . import ui
+
+
+def materialize(cls):
+    """Publish a dynamically created class in its module.
+
+    Blender resolves a registered panel back to its Python class by module and
+    name, so a class made with ``type()`` that is not an attribute of its module
+    draws as a struct with no Python class ("unable to get Python class for RNA
+    struct"). Every class this addon creates at runtime goes through here.
+    """
+    cls.__module__ = __name__
+    setattr(sys.modules[__name__], cls.__name__, cls)
+    return cls
 
 ROOT = "DMF_PT_props_main"
 
@@ -57,6 +72,21 @@ PAGES = (
 )
 
 
+def status_icon(settings) -> str:
+    level = getattr(settings, "status_kind", "")
+    return {"ERROR": "ERROR", "WARN": "ERROR", "BUSY": "TIME"}.get(level, "INFO")
+
+
+def draw_page_selector(layout, settings) -> None:
+    """The page row every surface draws: one page at a time, same enum."""
+    header = layout.row(align=True)
+    header.label(text="Page", icon="WINDOW")
+    header.prop(settings, "props_page", text="")
+    grid = layout.grid_flow(columns=2, even_columns=True, even_rows=True, align=True)
+    for page in PAGES:
+        grid.prop_enum(settings, "props_page", page)
+
+
 def current_page(context) -> str:
     scene = getattr(context, "scene", None)
     settings = getattr(scene, "dmf", None) if scene is not None else None
@@ -84,26 +114,40 @@ def _page_poll(panel, page: str):
     return classmethod(poll)
 
 
-def mirror(panel, page: str) -> type[Panel]:
-    """A properties-editor twin of ``panel``, visible only on ``page``."""
-    idname = mirror_id(panel.bl_idname)
-    parent = ROOT
+def mirror(
+    panel,
+    page: str,
+    space_type: str = "PROPERTIES",
+    prefix: str = "props",
+    space_idname: str = "",
+    root_idname: str = ROOT,
+) -> type[Panel]:
+    """A twin of ``panel`` in another space, visible only on ``page``.
+
+    The space is a parameter because the same page set serves two surfaces: the
+    Properties editor (always available) and the add-on's own editor type (only
+    on builds with custom space registration). The draw body is inherited either
+    way, so a page cannot differ between them.
+    """
+    suffix = panel.bl_idname[len("DMF_PT_"):]
+    idname = f"DMF_PT_{prefix}_{suffix}"
+    parent = root_idname
     source_parent = getattr(panel, "bl_parent_id", "") or ""
     if source_parent and source_parent != "DMF_PT_main":
-        parent = mirror_id(source_parent)
-    return type(
-        idname,
-        (panel,),
-        {
-            "bl_idname": idname,
-            "bl_space_type": "PROPERTIES",
-            "bl_region_type": "WINDOW",
-            "bl_context": "scene",
-            "bl_parent_id": parent,
-            "bl_options": set(),
-            "poll": _page_poll(panel, page),
-        },
-    )
+        parent = f"DMF_PT_{prefix}_{source_parent[len('DMF_PT_'):]}"
+    attributes = {
+        "bl_idname": idname,
+        "bl_space_type": space_type,
+        "bl_region_type": "WINDOW",
+        "bl_parent_id": parent,
+        "bl_options": set(),
+        "poll": _page_poll(panel, page),
+    }
+    if space_type == "PROPERTIES":
+        attributes["bl_context"] = "scene"
+    if space_idname:
+        attributes["bl_space_idname"] = space_idname
+    return materialize(type(idname, (panel,), attributes))
 
 
 class DMF_PT_props_main(Panel):
@@ -129,30 +173,40 @@ class DMF_PT_props_main(Panel):
         grid = layout.grid_flow(columns=2, even_columns=True, even_rows=True, align=True)
         for page in PAGES:
             grid.prop_enum(settings, "props_page", page)
+        layout.operator(
+            "dmf.open_workbench",
+            text="Open the Workbench editor",
+            icon="WINDOW",
+        )
 
         message = getattr(settings, "status", "")
-        level = getattr(settings, "status_kind", "")
         if message:
-            layout.label(
-                text=message,
-                icon={"ERROR": "ERROR", "WARN": "ERROR", "BUSY": "TIME"}.get(level, "INFO"),
-            )
+            layout.label(text=message, icon=status_icon(settings))
+
+
+def page_panels() -> list[type[Panel]]:
+    """Every sidebar panel that belongs to a page, in registration order."""
+    return [
+        panel
+        for panel in ui.CLASSES
+        if isinstance(panel, type)
+        and issubclass(panel, Panel)
+        and panel.bl_idname in PAGE_BY_ID
+    ]
 
 
 CLASSES = [DMF_PT_props_main] + [
-    mirror(panel, PAGE_BY_ID[panel.bl_idname])
-    for panel in ui.CLASSES
-    if isinstance(panel, type)
-    and issubclass(panel, Panel)
-    and panel.bl_idname in PAGE_BY_ID
+    mirror(panel, PAGE_BY_ID[panel.bl_idname]) for panel in page_panels()
 ]
+_REGISTERED: list[type] = []
 
 
 def register() -> None:
     for cls in CLASSES:
         bpy.utils.register_class(cls)
+        _REGISTERED.append(cls)
 
 
 def unregister() -> None:
-    for cls in reversed(CLASSES):
-        bpy.utils.unregister_class(cls)
+    while _REGISTERED:
+        bpy.utils.unregister_class(_REGISTERED.pop())
