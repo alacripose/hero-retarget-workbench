@@ -88,6 +88,14 @@ def _header_draw(self, context) -> None:
         # A build without the template still gets the page box and the status.
         pass
     layout.label(text="Workbench", icon="ARMATURE_DATA")
+    import sys
+
+    module = sys.modules.get(__package__ or "")
+    version = ".".join(
+        str(part) for part in getattr(module, "bl_info", {}).get("version", ())
+    )
+    if version:
+        layout.label(text=f"v{version}")
     # The page is chosen by the sidebar's own page tabs; a second selector here
     # would fight the tab that is currently selected.
     layout.separator_spacer()

@@ -314,6 +314,27 @@ To cross from an older build once: fully quit Blender with the add-on disabled
 (or delete its folder while Blender is closed), then install 0.8.11 and enable.
 From 0.8.11 on, installing over an enabled copy replaces the files.
 
+## 0.8.12 — a reloaded module repairs the registered UI
+
+**Owner report, verbatim:** *"notice how 8.11 is installed fresh and the pages
+are still not tabs nor is there a pinned version number?"*
+
+Their screenshot shows Preferences at 0.8.11 but the custom view still has the
+`Workbench | Cloth` header dropdown, which 0.8.10 removed. So Blender had the new
+files (Preferences reads the module) while the registered panels were the old
+ones: Install reloads the Python module without re-running `register()`.
+
+- `register()` starts a persistent timer. If the editor surface is active, the
+  space exists, and no page tab is registered, it re-registers once or twice and
+  logs `DMF stale UI: re-registering the loaded version`.
+- The custom view header prints `v<version>` beside `Workbench`, so the running
+  build is visible in the view itself, not only in Preferences.
+- Zip 0.8.12 install probe 9/9; `artifacts/receipts/pages-0.8.12.png` shows
+  `Workbench v0.8.12` with Setup…Components as the right-edge tabs.
+
+A restart is still the clean path; the self-heal covers the reload case that the
+owner hit.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
