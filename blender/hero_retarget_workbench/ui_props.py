@@ -115,12 +115,20 @@ def status_icon(settings) -> str:
     return {"ERROR": "ERROR", "WARN": "ERROR", "BUSY": "TIME"}.get(level, "INFO")
 
 
-def draw_page_selector(layout, settings) -> None:
-    """The header row: the page enum for quick jumping and the icon rail below."""
+def draw_page_grid(layout, settings) -> None:
+    """The page grid for narrow columns: a column of icons is too tall here.
+
+    The Properties editor's workbench tab is only as tall as the properties
+    column, and its width belongs to the property fields. A vertical icon rail
+    pushed the page body below the fold (the 0.8.0 complaint), so that surface
+    keeps the two-column text grid and the editor surface gets the rail.
+    """
     header = layout.row(align=True)
     header.label(text="Page", icon="WINDOW")
     header.prop(settings, "props_page", text="")
-    draw_page_rail(layout, settings)
+    grid = layout.grid_flow(columns=2, even_columns=True, even_rows=True, align=True)
+    for page in PAGES:
+        grid.prop_enum(settings, "props_page", page)
 
 
 def current_page(context) -> str:
@@ -203,10 +211,7 @@ class DMF_PT_props_main(Panel):
         layout.use_property_split = False
         layout.use_property_decorate = False
 
-        header = layout.row(align=True)
-        header.label(text="Page", icon="WINDOW")
-        header.prop(settings, "props_page", text="")
-        draw_page_rail(layout, settings)
+        draw_page_grid(layout, settings)
         editor = ui.surface_name() == "editor"
         layout.operator(
             "dmf.open_workbench",

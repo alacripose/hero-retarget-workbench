@@ -1,3 +1,26 @@
+## 2026-11-14 — 0.8.1: the page strip is its own column in the Workbench view
+
+**Owner correction, verbatim:** *"Not the n panelkt sidebar … the fucking black
+sidepanel int he view"* and *"not in the properties window in it's own view"*.
+0.8.0 drew the page rail inside the Properties editor's Workbench tab, where it
+overlapped the native tab column and pushed the page body below the fold.
+
+- The Properties editor no longer registers a Workbench page, and
+  `dmf.open_workbench` no longer falls back to it. A build without custom editor
+  types opens the 3D viewport sidebar (N) instead and says so in the status line.
+- `DMF_ST_workbench_pages` is a narrow companion area split off the left of the
+  Workbench editor when it opens; its only panel is the page strip, one icon
+  button per page with the current page depressed. Blender still does not allow
+  an add-on panel in a space's `NAVIGATION_BAR`, so this real area is the strip.
+- The split aims at ~46 px, clamped to 2–30% of the area, so it is neither a
+  sliver in the Properties column nor a void in a maximised viewport.
+- Verified: zip 0.8.1, 9/9 on PR 165087 (both spaces present after
+  `dmf.open_workbench`) and 9/9 on stock (`sidebar`, `VIEW_3D`,
+  `show_region_ui`); pages probe 20/20 draws, 0 exceptions; strip visible in
+  `artifacts/receipts/pages-0.8.1.png`.
+- Not checked: the strip's buttons were not driven by a real mouse click, and the
+  narrow companion area does not scroll its mirrors.
+
 ## 2026-11-14 — 0.8.0: the page rail, the mods pipeline, tool setup, and components as body groups
 
 **Owner request, verbatim:** *"if you could tweak the ui a little bit to be a
