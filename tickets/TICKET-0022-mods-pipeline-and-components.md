@@ -205,6 +205,33 @@ Not checked: the owner's own profile. If it still reports `surface: sidebar`,
 `<BLENDER_USER_CONFIG>/dmf/surface.json` now names the failing class instead of
 silently dropping the view.
 
+## 0.8.5 — the pages go in the Workbench's own expanding sidebar
+
+**Owner report, verbatim:** *"he older 7.2 behavior works fine yeajh but here's the
+thing in the custom view it literall has a fucking side panel that expands out
+and for some reason you aren't putting anything in it????? now you've moved pages
+into it's own thing?"*
+
+The custom space has a real `UI` region — the sidebar that expands out — and it
+accepts an add-on panel there. 0.8.1-0.8.4 ignored it and split a second area
+beside the editor instead.
+
+- `DMF_PT_space_pages` is now a `bl_region_type='UI'` panel in
+  `DMF_ST_workbench`, `bl_category="Workbench"`, listing every page with its icon
+  and label; the current page is depressed. That is the black expanding side
+  panel in the owner's screenshot.
+- The separate `DMF_ST_workbench_pages` area, its header and the area split are
+  gone. `dmf.open_workbench` switches the area to the editor and sets
+  `show_region_ui = True`, so the pages are visible on first open and collapse
+  with the sidebar.
+- Evidence: zip 0.8.5 on PR 165087, 9/9; the probe reports
+  `ui_types: ['DMF_ST_workbench']`, `sidebar: True`, `pages_panel: True`.
+  Screenshot `artifacts/receipts/pages-0.8.5.png` shows the page list in the
+  Workbench sidebar with Cloth selected. Reinstall probe 4/4.
+- Not checked: clicking a page in that panel was not driven by a real mouse click
+  (the entries are standard `prop_enum` buttons); the sidebar is the UI region's
+  normal collapse/expand, not a custom animation.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and

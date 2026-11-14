@@ -106,16 +106,14 @@ def _pages_draw(self, context) -> None:
     layout = self.layout
     layout.use_property_split = False
     layout.use_property_decorate = False
-    current = getattr(settings, "props_page", "SETUP")
     strip = layout.column(align=True)
     for page in ui_props.PAGES:
         icon = ui_props.PAGE_ICONS.get(page, "DOT")
+        label = page.replace("_", " ").title()
         try:
-            strip.prop_enum(settings, "props_page", page, text="", icon=icon)
+            strip.prop_enum(settings, "props_page", page, text=label, icon=icon)
         except TypeError:
-            strip.prop_enum(settings, "props_page", page, text="")
-        if page == current:
-            strip.separator(factor=0.2)
+            strip.prop_enum(settings, "props_page", page, text=label)
 
 
 def _pages_header_draw(self, context) -> None:
@@ -168,37 +166,23 @@ def editor_space_classes() -> list[type]:
 
 
 def pages_space_classes() -> list[type]:
-    """The optional companion strip. Losing it must not lose the editor."""
-    pages_space = type(
-        PAGES_SPACE_IDNAME,
-        (Space,),
-        {
-            "bl_idname": PAGES_SPACE_IDNAME,
-            "bl_label": "Workbench Pages",
-            "bl_icon": "WINDOW",
-            "bl_description": "The Workbench page strip",
-        },
-    )
-    pages_header = type(
-        PAGES_HEADER_IDNAME,
-        (Header,),
-        {
-            "bl_idname": PAGES_HEADER_IDNAME,
-            "bl_space_type": "CUSTOM",
-            "bl_space_idname": PAGES_SPACE_IDNAME,
-            "bl_region_type": "HEADER",
-            "draw": _pages_header_draw,
-        },
-    )
+    """The page panel in the Workbench's own expandable sidebar (UI region).
+
+    A custom space has a real UI region - the black strip that expands out - and
+    it accepts an add-on panel there. That is where the pages belong; 0.8.1-0.8.4
+    split a second area beside the editor instead, which is the regression the
+    owner called out.
+    """
     pages_panel = type(
         PAGES_PANEL_IDNAME,
         (Panel,),
         {
             "bl_idname": PAGES_PANEL_IDNAME,
             "bl_label": "Pages",
+            "bl_category": "Workbench",
             "bl_space_type": "CUSTOM",
-            "bl_space_idname": PAGES_SPACE_IDNAME,
-            "bl_region_type": "WINDOW",
+            "bl_space_idname": SPACE_IDNAME,
+            "bl_region_type": "UI",
             "bl_options": set(),
             "poll": classmethod(
                 lambda cls, context: getattr(getattr(context, "scene", None), "dmf", None)
@@ -207,9 +191,8 @@ def pages_space_classes() -> list[type]:
             "draw": _pages_draw,
         },
     )
-    for cls in (pages_space, pages_header, pages_panel):
-        ui_props.materialize(cls)
-    return [pages_space, pages_header, pages_panel]
+    ui_props.materialize(pages_panel)
+    return [pages_panel]
 
 
 def page_mirror_classes() -> list[type]:
@@ -275,57 +258,16 @@ def unregister() -> None:
 
 
 def _open_editor(context, area) -> bool:
-    """Put the pages strip on the left and the Workbench editor beside it."""
-    screen = context.screen
-    if screen is None:
-        return False
-    if PAGES_PANEL_IDNAME not in dir(bpy.types):
-        # The strip was refused by this build; the editor itself still opens.
+    """Make this area the Workbench and open its own page sidebar."""
+    try:
         area.type = "CUSTOM"
         area.ui_type = SPACE_IDNAME
-        return True
-    existing = [
-        candidate
-        for candidate in screen.areas
-        if candidate.type == "CUSTOM" and candidate.ui_type == SPACE_IDNAME
-    ]
-    if existing:
-        # Already open somewhere in this screen: just name this area.
-        area.type = "CUSTOM"
-        area.ui_type = SPACE_IDNAME
-        return True
-    before = {candidate.as_pointer() for candidate in screen.areas}
-    # A fixed share of the area is wrong at both ends: 7% of the Properties
-    # column is 15 px and clips the icons, 7% of a maximised viewport is 130 px of
-    # empty strip. Aim at a strip's width in pixels and clamp the share.
-    share = min(0.3, max(0.02, 46.0 / max(float(area.width), 1.0)))
-    try:
-        with context.temp_override(window=context.window, screen=screen, area=area):
-            split = bpy.ops.screen.area_split(direction="VERTICAL", factor=share)
     except (TypeError, RuntimeError) as error:
-        print(f"DMF page-strip split declined: {error}", flush=True)
+        print(f"DMF editor switch declined: {error}", flush=True)
         return False
-    if split != {"FINISHED"}:
-        return False
-    fresh = next(
-        (candidate for candidate in screen.areas if candidate.as_pointer() not in before),
-        None,
-    )
-    if fresh is None:
-        return False
-    left, right = (area, fresh) if area.x <= fresh.x else (fresh, area)
-    try:
-        left.type = "CUSTOM"
-        left.ui_type = PAGES_SPACE_IDNAME
-        right.type = "CUSTOM"
-        right.ui_type = SPACE_IDNAME
-    except (TypeError, RuntimeError) as error:
-        print(f"DMF editor switch declined after the split: {error}", flush=True)
-        return False
-    try:
-        left.spaces.active.show_region_header = False
-    except (AttributeError, TypeError):
-        pass
+    space = area.spaces.active
+    if hasattr(space, "show_region_ui"):
+        space.show_region_ui = True
     return True
 
 
