@@ -3,5 +3,11 @@
   "python compileall": "pass",
   "no KV3 parser in source": "pass",
   "no vmdl writes in forge": "pass",
-  "blake3 dependency": "pass"
+  "blake3 dependency": "pass",
+  "receipt probe-cloth.json": "pass",
+  "receipt probe-pages.json": "pass",
+  "receipt probe-tail-ui.json": "pass",
+  "receipt tail-live.json": "pass",
+  "receipt probe-zip.json": "pass",
+  "probe lane": "pass"
 }

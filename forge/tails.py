@@ -13,9 +13,15 @@ from dataclasses import dataclass
 from pathlib import Path
 
 _TOKEN = re.compile(r"[A-Za-z]+|\d+")
-TAIL_WORDS = ("tail", "ponytail", "braid", "hair")
-TAIL_BONE_WORDS = ("tail", "ponytail", "braid")
-TAIL_BAD_WORDS = ("target", "socket", "attachment", "constraint", "helper")
+# A real tail, not a coat tail, ponytail, braid, hair strand, scarf, or a bone
+# whose name merely contains the letters t-a-i-l (``detail``).  The owner found
+# both false-positive families in the first live scan, so this is token-aware.
+TAIL_WORDS = ("tail",)
+TAIL_BAD_WORDS = (
+    "target", "socket", "attachment", "constraint", "helper", "weapon",
+    "coat", "cloak", "scarf", "cape", "skirt", "hair", "braid", "ponytail",
+    "cuff", "ribbon", "cloth", "sleeve", "collar", "belt", "detail",
+)
 
 
 @dataclass(frozen=True)
@@ -33,17 +39,21 @@ def _normal(name: str) -> str:
     return "".join(_tokens(name))
 
 
+def _tail_word(tokens: tuple[str, ...]) -> bool:
+    """``tail`` or a stem such as ``tailA``; never ``detail`` or ``coattail``."""
+    return any(token == "tail" or token.startswith("tail") for token in tokens)
+
+
 def is_tail(name: str) -> bool:
-    lowered = (name or "").lower()
-    return any(word in lowered for word in TAIL_WORDS)
+    return _tail_word(_tokens(name))
 
 
 def is_tail_bone(name: str) -> bool:
     """A tail bone, not the weapon target that happens to end in ``_tail``."""
-    lowered = (name or "").lower()
-    if any(word in lowered for word in TAIL_BAD_WORDS):
+    tokens = _tokens(name)
+    if any(token in TAIL_BAD_WORDS for token in tokens):
         return False
-    return any(word in lowered for word in TAIL_BONE_WORDS)
+    return _tail_word(tokens)
 
 
 def dmx_bone_names(path: Path | str) -> list[str]:
@@ -59,7 +69,10 @@ def dmx_bone_names(path: Path | str) -> list[str]:
         return []
     if not data.startswith(b"<!-- dmx"):
         return []
-    tokens = re.findall(rb"[\x20-\x7e]{2,}", data)
+    # The string table stores each element/bone name as one quoted token.  The
+    # old printable-run scan returned whole structural runs such as
+    # ``"name" "string" "owl_tail_0"``, which then became the chain label.
+    tokens = re.findall(rb'"([^"\r\n]{1,160})"', data)
     found: list[str] = []
     seen: set[str] = set()
     for raw in tokens:

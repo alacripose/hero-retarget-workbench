@@ -292,7 +292,11 @@ def main() -> int:
     attributes = {
         "bl_idname": "PROBE_PT_pages",
         "bl_label": "Workbench Draw Probe",
-        "bl_region_type": "WINDOW",
+        # A UI-region panel is what the addon itself uses; a WINDOW panel can be
+        # registered yet never enter the sidebar's draw list when the region is
+        # collapsed or the area is fresh.
+        "bl_region_type": "UI",
+        "bl_category": "Deadlock",
         "bl_order": -100,
         "bl_options": set(),
         "draw": host_draw,
@@ -322,6 +326,10 @@ def main() -> int:
         except Exception as error:
             RESULT["area_switch_error"] = f"{type(error).__name__}: {error}"
         space = area.spaces.active
+        if hasattr(space, "show_region_ui"):
+            # A collapsed sidebar means no panel in the UI region draws at all;
+            # the probe must open it explicitly or it measures an empty region.
+            space.show_region_ui = True
         if hasattr(space, "context"):
             try:
                 space.context = "SCENE"

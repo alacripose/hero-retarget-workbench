@@ -21,7 +21,7 @@ from mathutils import Matrix
 from forge import live, tails as tailscan
 from forge import tailimage
 
-from . import core, source2
+from . import core, jobs, source2
 
 
 def _rigs(settings):
@@ -88,9 +88,12 @@ def _add_option(settings, *, label, source, path, chain, points, armature=None) 
     bones = ",".join(chain.bones)
     source_path = str(path or "")
     for existing in settings.tail_options:
+        same_chain = existing.chain == chain.name and existing.bones == bones
+        same_label = existing.label.strip().lower() == label.strip().lower()
+        if same_chain and same_label:
+            return
         if (
-            existing.chain == chain.name
-            and existing.bones == bones
+            same_chain
             and existing.path
             and source_path
             and Path(bpy.path.abspath(existing.path)).resolve() == Path(bpy.path.abspath(source_path)).resolve()
@@ -128,12 +131,22 @@ def _candidate_roots(settings) -> list[Path]:
     extraction = Path(bpy.path.abspath(settings.extraction_dir)) if settings.extraction_dir else None
     if extraction and extraction.is_dir():
         roots.append(extraction)
-        parent = extraction.parent
-        if parent.is_dir() and parent.name.lower() in ("extractions", "extraction"):
-            roots.extend(child for child in parent.iterdir() if child.is_dir())
+        # Every sibling with a models/ tree is another hero extraction.  Do not
+        # require the parent folder to be literally named "extractions"; the
+        # owner's Source page can point anywhere, and the first scanner missed
+        # every sibling in a differently named workspace folder because of it.
+        for parent in (extraction.parent, extraction.parent.parent):
+            if parent.is_dir():
+                roots.extend(
+                    child for child in parent.iterdir()
+                    if child.is_dir() and (child / "models").is_dir()
+                )
     extra = Path(bpy.path.abspath(settings.tail_scan_dir)) if settings.tail_scan_dir else None
     if extra and extra.is_dir():
         roots.append(extra)
+    project = core.project_root(settings)
+    if project:
+        roots.append(project / "artifacts" / "extractions")
     unique: list[Path] = []
     seen: set[str] = set()
     for root in roots:
@@ -182,7 +195,72 @@ def _candidate_rank(path: Path, names: list[str]) -> tuple[int, int]:
     return (1 if live.looks_like_body(path) else 0, len(names))
 
 
-def discover(settings) -> int:
+def _live_root(settings) -> Path:
+    return core.project_root(settings) / "artifacts" / "tail-skeletons"
+
+
+def _live_titles(settings) -> dict[str, str]:
+    """Map the Source page's hero folder to its display title."""
+    titles: dict[str, str] = {}
+    try:
+        from .properties import HERO_ITEMS
+    except Exception:
+        return titles
+    for _slug, title, model in HERO_ITEMS:
+        parts = Path(model or "").parts
+        for index, part in enumerate(parts):
+            if part.lower() in ("heroes_wip", "heroes_staging") and index + 1 < len(parts):
+                titles.setdefault(parts[index + 1].lower(), title)
+                break
+    return titles
+
+
+def _live_label(settings, path: Path, chain: tailscan.TailChain) -> str:
+    root = _live_root(settings)
+    try:
+        parts = path.relative_to(root).parts
+    except ValueError:
+        parts = path.parts
+    hero = ""
+    rest: tuple[str, ...] = ()
+    for index, part in enumerate(parts):
+        if part.lower() in ("heroes_wip", "heroes_staging") and index + 2 < len(parts):
+            hero = parts[index + 1]
+            rest = parts[index + 2:-1]
+            break
+    title = _live_titles(settings).get(hero.lower(), hero or path.parent.name)
+    rest = tuple(part for part in rest if part.lower() not in ("dmx", "mesh"))
+    variant = " ".join(rest[:1])
+    return f"{title}{(' ' + variant) if variant else ''} / {chain.name}"
+
+
+def _add_live_skeletons(settings, files: list[Path]) -> int:
+    """Add every live hero skeleton's tail chains without importing its mesh.
+
+    The skeleton cache is produced by Source 2 Viewer from the live VPK, so this
+    path covers heroes that were never extracted by hand.  Names are read from
+    the DMX header; the chosen tile is imported only when the owner clicks it.
+    """
+    found = 0
+    for path in files:
+        names = tailscan.dmx_bone_names(path)
+        for chain in tailscan.chains(names):
+            label = _live_label(settings, path, chain)
+            if any(option.label.lower() == label.lower() for option in settings.tail_options):
+                continue
+            _add_option(
+                settings,
+                label=label,
+                source="LIVE",
+                path=path,
+                chain=chain,
+                points=[(0.0, 0.0, 0.0), (0.0, 0.0, 0.2 + 0.05 * len(chain.bones))],
+            )
+            found += 1
+    return found
+
+
+def discover(settings, *, live_files: list[Path] | None = None) -> int:
     """Find tail skeletons in the hero, custom rig, sibling extracts and clips."""
     settings.tail_options.clear()
     settings.tail_option_index = 0
@@ -215,6 +293,10 @@ def discover(settings) -> int:
                 armature=custom,
             )
             found += 1
+
+    live_files = live_files if live_files is not None else live.tail_skeleton_files(_live_root(settings))
+    live_found = _add_live_skeletons(settings, live_files) if live_files else 0
+    found += live_found
 
     scanned = 0
     imported = 0
@@ -261,11 +343,65 @@ def discover(settings) -> int:
 
     settings.tail_option_index = 0
     found = len(settings.tail_options)
+    roots = len(_candidate_roots(settings))
     settings.tail_option_note = (
-        f"{found} tail chain(s) from {len(_candidate_roots(settings))} root(s); "
-        f"{imported}/{scanned} representative skeletons opened"
+        f"{found} tail chain(s): {live_found} from the live roster, {imported}/{scanned} "
+        f"extracted skeletons opened across {roots} folder(s)"
     )
     return found
+
+
+def start_discover(settings) -> str:
+    """Start a tail scan without running S2V on the main thread.
+
+    The live skeleton cache is the only expensive step, and it is a subprocess,
+    so it runs through the existing background job.  The scan itself is scheduled
+    as a timer after it returns.  A cached roster is scanned immediately.
+    """
+    if jobs.is_running():
+        raise RuntimeError("tail-scan-busy: another background job is already running")
+    settings.tail_options.clear()
+    settings.tail_option_index = 0
+    settings.tail_option_note = "scanning tail sources"
+    root = _live_root(settings)
+    cached = live.tail_skeleton_files(root)
+    try:
+        env = core.detect_environment(settings, core.core(settings))
+    except Exception:
+        env = None
+    if cached and (env is None or live.tail_skeleton_cache_fresh(env, root)):
+        _schedule_scan(settings, cached)
+        return f"Scanning {len(cached)} cached live hero skeletons"
+    if env is not None and env.s2v is not None and env.vpk is not None:
+        def work(progress):
+            progress(0.1, "decompiling live hero skeletons")
+            return live.extract_tail_skeletons(env, root)
+
+        def done(files):
+            settings.tail_option_note = f"reading {len(files)} live hero skeletons"
+            _schedule_scan(settings, files)
+
+        def failed(error):
+            settings.tail_option_note = f"live skeleton scan failed: {error}"
+            _schedule_scan(settings, [])
+
+        message = jobs.start(settings, "Scanning live heroes for tails", work, done, failed)
+        if message:
+            raise RuntimeError(message)
+        return "Decompiling all live hero skeletons; the viewport stays responsive"
+    _schedule_scan(settings, [])
+    return "Scanning extracted folders only; set the live game and S2V to include every hero"
+
+
+def _schedule_scan(settings, files: list[Path]) -> None:
+    def run():
+        try:
+            count = discover(settings, live_files=files)
+            settings.tail_option_note = settings.tail_option_note or f"{count} tail chains"
+        except Exception as error:
+            settings.tail_option_note = f"Tail scan failed: {error}"
+        return None
+    bpy.app.timers.register(run, first_interval=0.05)
 
 
 def load_option(settings, index: int) -> str:
@@ -439,12 +575,12 @@ class DMF_OT_scan_tails(Operator):
     def execute(self, context):
         settings = context.scene.dmf
         try:
-            count = discover(settings)
+            message = start_discover(settings)
         except Exception as error:
             self.report({"ERROR"}, f"Tail scan failed: {error}")
             settings.tail_option_note = f"Tail scan failed: {error}"
             return {"CANCELLED"}
-        self.report({"INFO"}, settings.tail_option_note or f"{count} tail chains")
+        self.report({"INFO"}, message)
         return {"FINISHED"}
 
 

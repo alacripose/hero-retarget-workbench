@@ -768,18 +768,26 @@ class DMF_PT_rules(Panel):
 
 def _draw_ik(layout, settings) -> None:
     """Source 2 IK targets: list, constrain, bake, then export the clip."""
-    box = layout.box()
-    head = box.row(align=True)
-    head.label(text="SOURCE 2 IK", icon="CONSTRAINT")
-    right = head.row(align=True)
-    right.alignment = "RIGHT"
     count = len(settings.ik_bones)
-    right.label(text=(f"{count} target" if count == 1 else f"{count} targets") if count else "not scanned")
-    row = box.row(align=True)
-    row.operator("dmf.scan_ik", text="Find IK bones", icon="FILE_REFRESH")
-    row.operator("dmf.apply_ik", text="Apply constraints", icon="CONSTRAINT")
+    box = ui_popit.title(
+        layout,
+        "Source 2 IK",
+        (f"{count} target" if count == 1 else f"{count} targets") if count else "not scanned",
+        "CONSTRAINT",
+    )
+    ui_popit.glyphs(
+        box,
+        ["dmf.scan_ik", "dmf.apply_ik", "dmf.bake_ik", "dmf.clear_ik"],
+        labels={
+            "dmf.scan_ik": "Find",
+            "dmf.apply_ik": "Constrain",
+            "dmf.bake_ik": "Bake",
+            "dmf.clear_ik": "Clear",
+        },
+    )
     if settings.ik_bones:
         index = max(0, min(settings.ik_index, len(settings.ik_bones) - 1))
+        ui_popit.micro(box, "Targets")
         head = box.split(factor=settings.list_name_width, align=True)
         head.label(text="Target")
         side = head.row(align=True)
@@ -799,23 +807,17 @@ def _draw_ik(layout, settings) -> None:
             "target",
             text="Follows",
         )
-        action = box.row(align=True)
-        action.operator("dmf.bake_ik", text="Bake action", icon="ACTION")
-        action.operator("dmf.clear_ik", text="Clear IK", icon="X")
-    if settings.ik_note:
-        _hint(box, settings.ik_note, "INFO", width=34)
-    _hint(
-        box,
-        "Copy Location + Copy Rotation follow the real limb; Bake action writes visual keys "
-        "and removes only these constraints, so extra tail bones are baked too.",
-        "INFO",
-        width=34,
+    message = settings.ik_note or (
+        "Copy Location + Copy Rotation follow the real limb; Bake writes visual keys "
+        "and removes only these constraints, so extra tail bones are baked too."
     )
+    ui_popit.bubble(box, message, "INFO", width=34)
 
 
 def _draw_tail(layout, settings) -> None:
     """Tail sources as tiles, then the channel pairing for the chosen one."""
     options = settings.tail_options
+    live = sum(1 for option in options if option.source == "LIVE")
     box = ui_popit.title(
         layout,
         "Tails",
@@ -825,6 +827,7 @@ def _draw_tail(layout, settings) -> None:
     ui_popit.glyphs(
         box,
         ["dmf.scan_tails", "dmf.load_tail_option", "dmf.preview_tail"],
+        enabled=not settings.job_running,
         labels={
             "dmf.scan_tails": "Scan tails",
             "dmf.load_tail_option": "Use tile",
@@ -833,9 +836,9 @@ def _draw_tail(layout, settings) -> None:
     )
     _path_row(box, settings, "tail_scan_dir", "Extra folder")
     if options:
-        ui_popit.micro(box, "Tail sources")
+        ui_popit.micro(box, f"Tail sources · {live} live" if live else "Tail sources")
         grid = box.grid_flow(row_major=True, columns=2, even_columns=True, even_rows=True, align=True)
-        for index, option in enumerate(options[:16]):
+        for index, option in enumerate(options):
             tile = grid.box()
             tile.alert = index == settings.tail_option_index
             icon = tailpreview.icon(option.preview)
@@ -846,8 +849,6 @@ def _draw_tail(layout, settings) -> None:
             choice = tile.operator("dmf.load_tail_option", text=option.label, icon="BONE_DATA")
             choice.index = index
             tile.label(text=f"{option.count} bones  ·  {option.source.lower()}", icon="BLANK1")
-        if len(options) > 16:
-            box.label(text=f"…and {len(options) - 16} more; the tile list is capped at 16", icon="INFO")
     ui_popit.micro(box, "Pairing")
     box.prop(settings, "tail_armature", text="Tail rig")
     box.prop(settings, "tail_weight", text="Blend", slider=True)
@@ -1028,9 +1029,15 @@ class DMF_PT_skeleton(Panel):
         layout.use_property_decorate = False
 
         ui_popit.job(layout, settings)
-        top = layout.row(align=True)
-        top.operator("dmf.scan_bones", text="Scan bone map", icon="FILE_REFRESH")
-        top.prop(settings, "bone_filter", text="")
+        mapped = sum(1 for row in settings.bone_map if row.state == "MAPPED")
+        top = ui_popit.title(
+            layout,
+            "Bone map",
+            f"{mapped}/{len(settings.bone_map)}" if settings.bone_map else "not scanned",
+            "BONE_DATA",
+        )
+        ui_popit.glyphs(top, ["dmf.scan_bones"], labels={"dmf.scan_bones": "Scan"})
+        top.prop(settings, "bone_filter", text="Show")
         if settings.bone_rules:
             _hint(
                 layout,
@@ -1183,7 +1190,7 @@ class DMF_PT_weights(Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False
         ui_popit.job(layout, settings)
-        _hint(layout, "Solver maps your groups, samples the hero surface, uses envelopes outside it. No DATA_TRANSFER.", "MOD_VERTEX_WEIGHT")
+        ui_popit.title(layout, "Weights", settings.weight_mode.title(), "MOD_VERTEX_WEIGHT")
 
         layout.prop(settings, "weight_mode", text="Method")
         options = layout.column(align=True)

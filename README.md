@@ -142,10 +142,19 @@ exists.
 
 ### Tails: any hero's chain, not only the two imported rigs
 
-**Animations → Tails** scans the imported hero, the custom rig, one representative
-skeleton per sibling S2V extraction, and an optional extra folder. Tail bones are
-read from the DMX header for clips, so a hero whose tail lives only in its AG1/AG2
-animations still appears. `weapon_target_tail` is not a tail chain and is left out.
+**Animations → Tails** scans the imported hero, the custom rig, every live hero
+skeleton in the VPK, one representative skeleton per sibling S2V extraction, and
+an optional extra folder. The live pass asks S2V for the small `vnmskel_c` files
+under `models/heroes_`, not a full model extraction, so it covers heroes that were
+never decompiled by hand. That extraction runs in the background; a cached roster
+refreshes when the VPK changes. Tail bones are read from the DMX header, so a hero
+whose tail lives only in its AG1/AG2 animations still appears.
+
+Names are token-aware and classify real tails, not hair or clothing:
+`a_hair_braid`, `ponytail`, `coattail`, `cloak_tail`, `brow_detail` and
+`weapon_target_tail` are left out. `owl_tail`, `cat_tail`, `tailA`, `tail_0` and
+`pigeon_tail` remain. This is the fix for Gen Man/Hornet tiles that were never
+tails and for the live heroes the first extracted-folder scan never reached.
 
 Each discovered chain is a tile with a generated preview of its rest shape. Select
 a tile to load that skeleton as the tail rig and pair the hero channels; the same

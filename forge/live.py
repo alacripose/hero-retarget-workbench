@@ -7,6 +7,7 @@ by the CSDK13 compiler.
 """
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import tempfile
@@ -252,6 +253,69 @@ def inventory(root: Path, hero: Hero, *, log: Path | None = None) -> Extraction:
 
 def extraction_vmdl_candidates(root: Path) -> list[Path]:
     return sorted(path for path in root.rglob("*.vmdl") if path.is_file())
+
+
+def tail_skeleton_files(root: Path) -> list[Path]:
+    """Skeleton DMXs from the live-game skeleton cache, not mesh or clip DMX."""
+    if not root.is_dir():
+        return []
+    return sorted(
+        path for path in root.rglob("*.dmx")
+        if path.is_file() and ("_skel" in path.stem.lower() or "skeleton" in path.stem.lower())
+    )
+
+
+def tail_skeleton_cache_key(env: Environment) -> dict:
+    return {"vpk": str(env.vpk), "mtime": env.vpk.stat().st_mtime if env.vpk else 0}
+
+
+def tail_skeleton_cache_fresh(env: Environment, root: Path) -> bool:
+    stamp = root / "s2v-tail-skeletons.json"
+    try:
+        return stamp.is_file() and json.loads(stamp.read_text(encoding="utf-8")) == tail_skeleton_cache_key(env)
+    except (OSError, json.JSONDecodeError):
+        return False
+
+
+def extract_tail_skeletons(
+    env: Environment,
+    destination: Path,
+    *,
+    force: bool = False,
+    timeout: int = 900,
+) -> list[Path]:
+    """Decompile every live hero skeleton into a small, reusable cache.
+
+    A full hero extraction carries hundreds of clips.  The tail scanner only
+    needs bone names and rest positions, so this asks S2V for ``vnmskel_c`` under
+    ``models/heroes_`` instead of decompiling every hero model tree.  The cache
+    is keyed by the VPK mtime so a game patch refreshes it.
+    """
+    root = destination.resolve()
+    root.mkdir(parents=True, exist_ok=True)
+    stamp = root / "s2v-tail-skeletons.json"
+    key = tail_skeleton_cache_key(env)
+    try:
+        if not force and stamp.is_file() and json.loads(stamp.read_text(encoding="utf-8")) == key:
+            cached = tail_skeleton_files(root)
+            if cached:
+                return cached
+    except (OSError, json.JSONDecodeError):
+        pass
+    log = root / "s2v-tail-skeletons.log"
+    result = _run(
+        env,
+        ["-o", str(root), "-d", "-q", "-f", "models/heroes_", "-e", "vnmskel_c"],
+        timeout=timeout,
+    )
+    log.write_text(result.stdout + ("\n" + result.stderr if result.stderr else ""), encoding="utf-8")
+    if result.returncode != 0:
+        raise LiveError(f"s2v-tail-skeletons-failed: see {log}")
+    files = tail_skeleton_files(root)
+    if not files:
+        raise LiveError(f"s2v-tail-skeletons-empty: see {log}")
+    stamp.write_text(json.dumps(key, indent=2), encoding="utf-8")
+    return files
 
 
 def logical_path(path: Path, root: Path) -> str:

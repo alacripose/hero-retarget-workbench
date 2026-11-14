@@ -186,6 +186,7 @@ class DMF_TailOption(PropertyGroup):
             ("CUSTOM", "Custom rig", "The custom model's rig"),
             ("BODY", "Hero extract", "A body skeleton from an S2V extraction"),
             ("CLIP", "Clip", "An AG1/AG2 clip skeleton"),
+            ("LIVE", "Live roster", "A skeleton decompiled from the live VPK"),
         ],
         default="CLIP",
     )
