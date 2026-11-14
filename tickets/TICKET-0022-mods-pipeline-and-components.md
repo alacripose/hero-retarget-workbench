@@ -128,6 +128,16 @@ Not checked: the strip's click behaviour was not driven by a real mouse click in
 this pass (the icons are standard `prop_enum` buttons); the page mirrors still
 have no scrolling in the narrow companion area.
 
+## 0.8.2 — CI could not collect the new tests
+
+`tests/test_components.py` and `tests/test_oldmods.py` imported `pytest`, which
+is not in `requirements.txt`; the workflow runs `python -m unittest discover`,
+so both modules failed at import and the 0.8.0/0.8.1 test jobs stopped before the
+build (no release asset). Both files are `unittest.TestCase` classes with
+`tempfile.TemporaryDirectory` now, `assertRaisesRegex` instead of
+`pytest.raises`, so the workflow's own command collects them: 114 tests pass
+under `unittest discover`, 191 under `pytest`.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
