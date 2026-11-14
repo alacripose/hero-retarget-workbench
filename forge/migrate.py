@@ -364,6 +364,53 @@ def migrate_trees(
     )
 
 
+def add_component_mesh(
+    vmdl: Path,
+    *,
+    mesh_name: str,
+    dmx_relative: str,
+    bodygroup: str = "",
+    replace: bool = False,
+) -> dict:
+    """Add one DMX-backed render mesh to a staged vmdl, plus a body-group choice.
+
+    A modeldoc can reference several render meshes as separate DMX files, which
+    is how the game's own heroes carry a body and a gun. A cosmetic component is
+    the same shape: one more ``RenderMeshFile`` whose name appears in a
+    ``BodyGroupChoice``, so the game can show or hide it. This is the only place
+    that writes an edited vmdl for components; the caller owns the copy.
+    """
+    path = Path(vmdl).resolve()
+    if not path.is_file():
+        raise MigrationError(f"component-vmdl-missing: {path}")
+    relative = dmx_relative.replace("\\", "/").lstrip("/")
+    if not relative:
+        raise MigrationError("component-dmx-path-required")
+    text = path.read_text(encoding="utf-8", errors="replace")
+    try:
+        merged = modeldoc.add_render_mesh_file(
+            text,
+            name=mesh_name,
+            filename=relative,
+            bodygroup=bodygroup,
+            replace=replace,
+        )
+    except modeldoc.ModeldocError as error:
+        raise MigrationError(str(error)) from error
+    if merged.text != text:
+        path.write_text(merged.text, encoding="utf-8", newline="\n")
+    return {
+        "vmdl": str(path),
+        "mesh": mesh_name,
+        "filename": relative,
+        "actions": merged.actions,
+        "bodygroup": merged.bodygroup,
+        "choice": merged.choice,
+        "render_meshes": [item.name for item in modeldoc.render_mesh_files(merged.text)],
+        "bodygroups": {group.name: list(group.meshes) for group in modeldoc.body_groups(merged.text)},
+    }
+
+
 def update_from_package(
     env: Environment,
     package: Path,

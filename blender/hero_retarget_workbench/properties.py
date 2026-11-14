@@ -262,6 +262,50 @@ class DMF_HierarchyRow(PropertyGroup):
     children: IntProperty(name="Children", default=0, min=0)
 
 
+class DMF_ScanRoot(PropertyGroup):
+    """One folder the Mods page scans for old packages."""
+
+    path: StringProperty(name="Folder", subtype="DIR_PATH", default="")
+    enabled: BoolProperty(name="On", description="Include this folder in the next scan", default=True)
+    packages: IntProperty(name="Packages", default=0)
+    with_cloth: IntProperty(name="With cloth", default=0)
+    note: StringProperty(name="Note", default="")
+
+
+class DMF_ModRow(PropertyGroup):
+    """One old package found on disk."""
+
+    path: StringProperty(name="Path", subtype="FILE_PATH", default="")
+    addon: StringProperty(name="Package", default="")
+    kind: StringProperty(name="Kind", default="vpk")
+    hero: StringProperty(name="Hero", default="")
+    modified: StringProperty(name="Modified", default="")
+    sections: StringProperty(name="Cloth sections", default="")
+    bytes: IntProperty(name="Bytes", default=0)
+    note: StringProperty(name="Note", default="")
+    models: StringProperty(name="Models", default="")
+
+
+class DMF_ClientRow(PropertyGroup):
+    """One CSDK-style client install that can be compiled or backported to."""
+
+    path: StringProperty(name="Path", subtype="DIR_PATH", default="")
+    label: StringProperty(name="Client", default="")
+    build: StringProperty(name="Build", default="")
+    active: BoolProperty(name="Active", default=False)
+
+
+class DMF_ComponentRow(PropertyGroup):
+    """One cosmetic-shaped asset in the current hero extraction."""
+
+    name: StringProperty(name="File", default="")
+    relative: StringProperty(name="Relative path", default="")
+    path: StringProperty(name="Source", subtype="FILE_PATH", default="")
+    kind: StringProperty(name="Kind", default="dmx")
+    bytes: IntProperty(name="Bytes", default=0)
+    selected: BoolProperty(name="Stage", default=False)
+
+
 class DMF_Settings(PropertyGroup):
     project_root: StringProperty(
         name="Workspace folder",
@@ -380,9 +424,77 @@ class DMF_Settings(PropertyGroup):
             ("COMPARE", "Compare", "Split view and preview action"),
             ("WEIGHTS", "Weights", "Weight solve and the proof gate"),
             ("HANDOFF", "Handoff", "Export, stage and compile"),
+            ("MODS", "Mods", "Scan older packages, update them, or backport them"),
+            ("COMPONENTS", "Components", "Stage live cosmetic parts beside a mod"),
         ],
         default="CLOTH",
     )
+
+    # Mods page: folders to scan, what the scan found, and where a port goes.
+    scan_roots: CollectionProperty(type=DMF_ScanRoot, description="Folders scanned for old packages")
+    scan_root_index: IntProperty(name="Scan folder row", default=0)
+    scan_since: StringProperty(name="Since", description="Only packages modified on or after this date", default="2024-01-01")
+    scan_until: StringProperty(name="Until", description="Only packages modified on or before this date", default="")
+    mods: CollectionProperty(type=DMF_ModRow, description="Old packages found by the last scan")
+    mod_index: IntProperty(name="Package row", default=0)
+    mod_report: StringProperty(name="Corpus receipt", subtype="FILE_PATH", default="")
+    mod_note: StringProperty(name="Mods note", default="")
+    mods_scanned: IntProperty(name="Packages scanned", default=0)
+    mod_target_client: StringProperty(
+        name="Target client",
+        description="Older CSDK client whose game data a backport compiles against",
+        subtype="DIR_PATH",
+        default="",
+    )
+    backport_experimental: BoolProperty(
+        name="Enable backport",
+        description="Allow transplanting a mod onto an older client's hero model; experimental",
+        default=False,
+    )
+
+    # Setup page: tools and client installs.
+    tools_folder: StringProperty(
+        name="Tools folder",
+        description="Where downloaded tools are installed; blank uses <workspace>/tools",
+        subtype="DIR_PATH",
+        default="",
+    )
+    clients_folder: StringProperty(
+        name="Clients folder",
+        description="Folder holding custom CSDK installs; blank uses <workspace>/clients",
+        subtype="DIR_PATH",
+        default="",
+    )
+    s2v_version: StringProperty(name="Source 2 Viewer version", default="")
+    clients: CollectionProperty(type=DMF_ClientRow, description="CSDK-style installs this file can compile with")
+    client_index: IntProperty(name="Client row", default=0)
+    tools_note: StringProperty(name="Tools note", default="")
+
+    # Components page: cosmetic-shaped assets and their staging target.
+    components: CollectionProperty(type=DMF_ComponentRow, description="Component assets found in the hero extraction")
+    component_index: IntProperty(name="Component row", default=0)
+    component_addon: StringProperty(name="Component addon", description="Addon folder the component files are staged under", default="")
+    component_note: StringProperty(name="Components note", default="")
+    component_vmdl: StringProperty(
+        name="Target vmdl",
+        description="The staged addon vmdl whose RenderMeshList and BodyGroupList receive the component",
+        subtype="FILE_PATH",
+        default="",
+    )
+    component_slot: StringProperty(
+        name="Body group",
+        description="Body group the staged meshes become choices of; created when absent",
+        default="component",
+    )
+    component_merge: BoolProperty(
+        name="Register in vmdl",
+        description=(
+            "Add each staged DMX as a RenderMeshFile and a BodyGroupChoice so the game can "
+            "switch it, instead of copying files only"
+        ),
+        default=True,
+    )
+    component_manifest: StringProperty(name="Components manifest", subtype="FILE_PATH", default="")
     material_source: PointerProperty(
         name="Material source",
         description="Object whose material slots are the source list; defaults to the hero body",
@@ -782,6 +894,10 @@ CLASSES = (
     DMF_BoneRule,
     DMF_ClipRow,
     DMF_HierarchyRow,
+    DMF_ScanRoot,
+    DMF_ModRow,
+    DMF_ClientRow,
+    DMF_ComponentRow,
     DMF_Settings,
 )
 

@@ -2,7 +2,16 @@ from __future__ import annotations
 
 import unittest
 
-from forge.modeldoc import ModeldocError, cloth_physics_sections, merge, sections
+from forge.modeldoc import (
+    ModeldocError,
+    add_render_mesh_file,
+    body_groups,
+    cloth_physics_sections,
+    ensure_bodygroup,
+    merge,
+    render_mesh_files,
+    sections,
+)
 
 
 HEADER = """<!-- modeldoc fixture -->
@@ -100,6 +109,108 @@ class ModeldocSectionTests(unittest.TestCase):
         )
         with self.assertRaises(ModeldocError):
             sections(text)
+
+
+RENDER_BODY = """\t\t\t{
+\t\t\t\t_class = "RenderMeshList"
+\t\t\t\tchildren = 
+\t\t\t\t[
+\t\t\t\t\t{
+\t\t\t\t\t\t_class = "RenderMeshFile"
+\t\t\t\t\t\tname = "body"
+\t\t\t\t\t\tfilename = "models/heroes_staging/haze/haze_body.dmx"
+\t\t\t\t\t},
+\t\t\t\t]
+\t\t\t},
+"""
+
+RENDER_BODYGROUP = """\t\t\t{
+\t\t\t\t_class = "BodyGroupList"
+\t\t\t\tchildren = 
+\t\t\t\t[
+\t\t\t\t\t{
+\t\t\t\t\t\t_class = "BodyGroup"
+\t\t\t\t\t\tname = "gun"
+\t\t\t\t\t\tchildren = 
+\t\t\t\t\t\t[
+\t\t\t\t\t\t\t{
+\t\t\t\t\t\t\t\t_class = "BodyGroupChoice"
+\t\t\t\t\t\t\t\tname = "0_#&gun_model"
+\t\t\t\t\t\t\t\tmeshes = 
+\t\t\t\t\t\t\t\t[
+\t\t\t\t\t\t\t\t\t"gun_model",
+\t\t\t\t\t\t\t\t]
+\t\t\t\t\t\t\t},
+\t\t\t\t\t\t]
+\t\t\t\t\t},
+\t\t\t\t]
+\t\t\t},
+"""
+
+
+def render_document(*bodygroups: str) -> str:
+    return document(block("BoneMarkupList", "\t\t\t\tchildren = [  ]\n"), RENDER_BODY, *bodygroups)
+
+
+class RenderMeshBodyGroupTests(unittest.TestCase):
+    def test_reads_render_mesh_files(self):
+        files = render_mesh_files(render_document())
+        self.assertEqual([(item.name, item.filename) for item in files], [("body", "models/heroes_staging/haze/haze_body.dmx")])
+
+    def test_adds_separate_dmx_and_creates_bodygroup(self):
+        result = add_render_mesh_file(
+            render_document(),
+            name="hat",
+            filename="models/heroes_staging/haze/haze_hat.dmx",
+            bodygroup="headwear",
+        )
+        self.assertIn('filename = "models/heroes_staging/haze/haze_hat.dmx"', result.text)
+        self.assertEqual(result.actions["RenderMeshList"], "inserted")
+        self.assertEqual(result.actions["BodyGroupList"], "created")
+        self.assertEqual(result.choice, "0_#&hat")
+        groups = {group.name: group for group in body_groups(result.text)}
+        self.assertEqual(groups["headwear"].meshes, ("hat",))
+        self.assertIn("BodyGroupList", sections(result.text))
+        self.assertIn("body", [item.name for item in render_mesh_files(result.text)])
+
+    def test_adds_choice_to_an_existing_group(self):
+        result = add_render_mesh_file(
+            render_document(RENDER_BODYGROUP),
+            name="gun_chrome",
+            filename="models/heroes_staging/haze/haze_gun_chrome.dmx",
+            bodygroup="gun",
+        )
+        self.assertEqual(result.actions["BodyGroupList"], "choice-inserted")
+        groups = {group.name: group for group in body_groups(result.text)}
+        self.assertEqual(sorted(groups["gun"].meshes), ["gun_chrome", "gun_model"])
+        self.assertIn("1_#&gun_chrome", groups["gun"].choices)
+
+    def test_duplicate_mesh_is_refused_and_replacement_updates_filename(self):
+        text = render_document()
+        with self.assertRaises(ModeldocError):
+            add_render_mesh_file(text, name="body", filename="models/other/body.dmx")
+        replaced = add_render_mesh_file(
+            text, name="body", filename="models/new/body.dmx", replace=True
+        )
+        self.assertEqual(replaced.actions["RenderMeshList"], "replaced")
+        self.assertEqual(render_mesh_files(replaced.text)[0].filename, "models/new/body.dmx")
+
+    def test_bodygroup_choice_is_idempotent(self):
+        text = render_document(RENDER_BODYGROUP)
+        again = ensure_bodygroup(text, "gun", "gun_model")
+        self.assertEqual(again.actions["BodyGroupList"], "exists")
+        self.assertEqual(again.text, text)
+
+    def test_added_sections_keep_the_document_parseable(self):
+        result = add_render_mesh_file(
+            render_document(RENDER_BODYGROUP),
+            name="hat",
+            filename="models/heroes_staging/haze/haze_hat.dmx",
+            bodygroup="headwear",
+        )
+        parsed = sections(result.text)
+        self.assertEqual(list(parsed), ["BoneMarkupList", "RenderMeshList", "BodyGroupList"])
+        self.assertTrue(result.text.rstrip().endswith("}"))
 
 
 if __name__ == "__main__":
