@@ -137,9 +137,76 @@ def list_heroes(env: Environment) -> list[Hero]:
         return parse_hero_roster(candidates[0].read_text(encoding="utf-8", errors="replace"))
 
 
-def _looks_like_body(path: Path) -> bool:
+_BODY = re.compile(r"(?:^|[_.\- ])body(?:[_.\- ]?(?:lod)?[_.\- ]?\d+)?(?:$|[_.\- ])", re.IGNORECASE)
+_NON_BODY = (
+    "head",
+    "hair",
+    "clothes",
+    "clothing",
+    "jacket",
+    "coat",
+    "glasses",
+    "weapon",
+    "gun",
+    "pillow",
+    "balloon",
+    "cloth_proxy",
+    "hull",
+    "bindpose",
+    "ref",
+    "eyes",
+    "ear",
+    "hat",
+    "helmet",
+    "mask",
+    "tail",
+    "wings",
+    "accessory",
+    "skirt",
+    "cape",
+    "boots",
+    "gloves",
+)
+
+
+def looks_like_body(path: Path | str) -> bool:
+    """Whether a DMX name declares the body, including a numbered body variant.
+
+    S2V does not emit one naming scheme. ``shiv_body`` and ``haze_body_lod0``
+    are obvious, but Familiar's body is ``familiar_wip_8inf_body8`` and its
+    head is the larger ``familiar_wip_head5``. Treating ``body8`` as a body and
+    ``head5`` as a part is what stops the importer opening a head as the hero.
+    """
+    return bool(_BODY.search(Path(path).stem.lower()))
+
+
+def _body_score(path: Path) -> int:
     name = path.stem.lower()
-    return name.endswith("_body") or name == "body" or name.endswith("_body_lod0")
+    score = 100 if looks_like_body(path) else 0
+    if any(token in name for token in _NON_BODY):
+        score -= 120
+    if "lod" not in name:
+        score += 10
+    return score
+
+
+def choose_body(paths: list[Path] | tuple[Path, ...]) -> Path | None:
+    """Choose the body DMX from an extraction by name, not by file size.
+
+    File size is the wrong signal: a detailed head can be larger than the body.
+    Prefer a declared body token, ignore known part words, then use the largest
+    remaining file only as a last resort.
+    """
+    candidates = [Path(path) for path in paths if Path(path).suffix.lower() == ".dmx"]
+    if not candidates:
+        return None
+    strong = [path for path in candidates if _body_score(path) >= 100]
+    if strong:
+        return max(strong, key=lambda path: (_body_score(path), path.stat().st_size))
+    fallback = [path for path in candidates if _body_score(path) > 0]
+    if fallback:
+        return max(fallback, key=lambda path: path.stat().st_size)
+    return max(candidates, key=lambda path: path.stat().st_size)
 
 
 def extract(env: Environment, hero: Hero, destination: Path, *, force: bool = False) -> Extraction:
@@ -170,9 +237,7 @@ def inventory(root: Path, hero: Hero, *, log: Path | None = None) -> Extraction:
     dmx = sorted(path for path in files if path.suffix.lower() == ".dmx")
     gltf = sorted(path for path in files if path.suffix.lower() in (".gltf", ".glb"))
     materials = sorted(path for path in files if path.suffix.lower() == ".vmat")
-    body = next((path for path in dmx if _looks_like_body(path)), None)
-    if body is None and dmx:
-        body = max(dmx, key=lambda path: path.stat().st_size)
+    body = choose_body(dmx)
     return Extraction(
         hero=hero,
         root=root,

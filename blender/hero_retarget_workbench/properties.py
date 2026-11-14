@@ -175,6 +175,29 @@ class DMF_TailRow(PropertyGroup):
     )
 
 
+class DMF_TailOption(PropertyGroup):
+    """One discovered tail skeleton the Animations page can load as a tile."""
+
+    label: StringProperty(name="Tail", default="")
+    source: EnumProperty(
+        name="Source",
+        items=[
+            ("HERO", "Hero", "The imported hero skeleton"),
+            ("CUSTOM", "Custom rig", "The custom model's rig"),
+            ("BODY", "Hero extract", "A body skeleton from an S2V extraction"),
+            ("CLIP", "Clip", "An AG1/AG2 clip skeleton"),
+        ],
+        default="CLIP",
+    )
+    path: StringProperty(name="File", subtype="FILE_PATH", default="")
+    chain: StringProperty(name="Chain", default="")
+    bones: StringProperty(name="Bones", default="")
+    points: StringProperty(name="Points", default="")
+    preview: StringProperty(name="Preview", subtype="FILE_PATH", default="")
+    count: IntProperty(name="Bones", default=0)
+    rig: PointerProperty(type=Object)
+
+
 class DMF_MaterialRow(PropertyGroup):
     material: PointerProperty(name="Material", type=bpy.types.Material)
     slot_index: IntProperty(name="Slot", default=-1)
@@ -720,6 +743,15 @@ class DMF_Settings(PropertyGroup):
         max=1.0,
     )
     tail_note: StringProperty(name="Tail note", default="")
+    tail_options: CollectionProperty(type=DMF_TailOption, description="Tail skeletons found in the hero, custom rig, extractions and clips")
+    tail_option_index: IntProperty(name="Tail option", default=0)
+    tail_scan_dir: StringProperty(
+        name="Extra tail folder",
+        description="Optional folder of older hero models or clips to scan for tails",
+        subtype="DIR_PATH",
+        default="",
+    )
+    tail_option_note: StringProperty(name="Tail scan note", default="")
     ik_bones: CollectionProperty(type=DMF_IKRow, description="Source 2 IK targets on the hero rig")
     ik_index: IntProperty(name="IK row", default=0)
     ik_scanned: IntProperty(name="IK targets", default=0)
@@ -1043,6 +1075,7 @@ CLASSES = (
     DMF_Part,
     DMF_ClothChain,
     DMF_MaterialRow,
+    DMF_TailOption,
     DMF_LodLevel,
     DMF_BoneRule,
     DMF_ClipRow,

@@ -19,7 +19,7 @@ import bpy
 from bpy.types import Panel
 from forge import bonerules, paths, stageflow
 
-from . import core, rules, ui_popit, workbench
+from . import core, rules, tailpreview, ui_popit, workbench
 
 
 _STATUS_ICONS = {
@@ -814,17 +814,45 @@ def _draw_ik(layout, settings) -> None:
 
 
 def _draw_tail(layout, settings) -> None:
-    """Tail channels on a second armature. Experimental, and says so."""
-    box = layout.box()
-    head = box.row(align=True)
-    head.label(text="TAIL ARMATURE (EXPERIMENTAL)", icon="ARMATURE_DATA")
-    right = head.row(align=True)
-    right.alignment = "RIGHT"
-    right.label(text=f"{len(settings.tail_bones)} channels" if settings.tail_bones else "not paired")
+    """Tail sources as tiles, then the channel pairing for the chosen one."""
+    options = settings.tail_options
+    box = ui_popit.title(
+        layout,
+        "Tails",
+        f"{len(options)} found" if options else "not scanned",
+        "ARMATURE_DATA",
+    )
+    ui_popit.glyphs(
+        box,
+        ["dmf.scan_tails", "dmf.load_tail_option", "dmf.preview_tail"],
+        labels={
+            "dmf.scan_tails": "Scan tails",
+            "dmf.load_tail_option": "Use tile",
+            "dmf.preview_tail": "Frame",
+        },
+    )
+    _path_row(box, settings, "tail_scan_dir", "Extra folder")
+    if options:
+        ui_popit.micro(box, "Tail sources")
+        grid = box.grid_flow(row_major=True, columns=2, even_columns=True, even_rows=True, align=True)
+        for index, option in enumerate(options[:16]):
+            tile = grid.box()
+            tile.alert = index == settings.tail_option_index
+            icon = tailpreview.icon(option.preview)
+            if icon:
+                tile.template_icon(icon_value=icon, scale=5.0)
+            else:
+                tile.label(text="", icon="BONE_DATA")
+            choice = tile.operator("dmf.load_tail_option", text=option.label, icon="BONE_DATA")
+            choice.index = index
+            tile.label(text=f"{option.count} bones  ·  {option.source.lower()}", icon="BLANK1")
+        if len(options) > 16:
+            box.label(text=f"…and {len(options) - 16} more; the tile list is capped at 16", icon="INFO")
+    ui_popit.micro(box, "Pairing")
     box.prop(settings, "tail_armature", text="Tail rig")
     box.prop(settings, "tail_weight", text="Blend", slider=True)
     actions = box.row(align=True)
-    actions.operator("dmf.scan_tail", text="Find channels", icon="FILE_REFRESH")
+    actions.operator("dmf.scan_tail", text="Map channels", icon="FILE_REFRESH")
     actions.operator("dmf.blend_tail_all", text="Blend all", icon="ACTION")
     if settings.tail_bones:
         index = max(0, min(settings.tail_index, len(settings.tail_bones) - 1))
@@ -849,16 +877,9 @@ def _draw_tail(layout, settings) -> None:
         else:
             box.prop(row, "target", text="Tail bone")
         box.operator("dmf.blend_tail", text="Blend selected clip", icon="PLAY")
-    if settings.tail_note:
-        _hint(box, settings.tail_note, "INFO", width=34)
-    _hint(
-        box,
-        "Copies the hero clip's tail channels onto the chosen tail rig in local space. "
-        "A tail rig that does not share the hero's rest orientation will need its own "
-        "correction; treat this as experimental.",
-        "INFO",
-        width=34,
-    )
+    message = settings.tail_note or settings.tail_option_note
+    if message:
+        ui_popit.bubble(box, message, "INFO", width=34)
 
 
 class DMF_PT_animations(Panel):

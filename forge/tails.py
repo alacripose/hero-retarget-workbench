@@ -10,9 +10,12 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 _TOKEN = re.compile(r"[A-Za-z]+|\d+")
 TAIL_WORDS = ("tail", "ponytail", "braid", "hair")
+TAIL_BONE_WORDS = ("tail", "ponytail", "braid")
+TAIL_BAD_WORDS = ("target", "socket", "attachment", "constraint", "helper")
 
 
 @dataclass(frozen=True)
@@ -33,6 +36,81 @@ def _normal(name: str) -> str:
 def is_tail(name: str) -> bool:
     lowered = (name or "").lower()
     return any(word in lowered for word in TAIL_WORDS)
+
+
+def is_tail_bone(name: str) -> bool:
+    """A tail bone, not the weapon target that happens to end in ``_tail``."""
+    lowered = (name or "").lower()
+    if any(word in lowered for word in TAIL_BAD_WORDS):
+        return False
+    return any(word in lowered for word in TAIL_BONE_WORDS)
+
+
+def dmx_bone_names(path: Path | str) -> list[str]:
+    """Tail-looking bone names from a binary or text DMX without importing it.
+
+    Source 2 DMX stores its element name table as NUL-separated ASCII before the
+    binary payload. Reading those tokens is enough to answer "does this clip
+    carry a tail?" even when the file is AG2 and no vnmskel was emitted.
+    """
+    try:
+        data = Path(path).read_bytes()
+    except OSError:
+        return []
+    if not data.startswith(b"<!-- dmx"):
+        return []
+    tokens = re.findall(rb"[\x20-\x7e]{2,}", data)
+    found: list[str] = []
+    seen: set[str] = set()
+    for raw in tokens:
+        text = raw.decode("ascii", errors="ignore").strip()
+        if not text or not is_tail_bone(text):
+            continue
+        key = text.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        found.append(text)
+    return found
+
+
+@dataclass(frozen=True)
+class TailChain:
+    name: str
+    bones: tuple[str, ...]
+
+
+def chains(names: list[str] | tuple[str, ...]) -> list[TailChain]:
+    """Group the tail bone names in one skeleton into displayable chains."""
+    groups: dict[tuple[str, ...], list[tuple[int, str]]] = {}
+    for name in names or []:
+        if not is_tail_bone(name):
+            continue
+        tokens = _tokens(name)
+        if not tokens:
+            continue
+        index = -1
+        base = tokens
+        if tokens[-1].isdigit():
+            index = int(tokens[-1])
+            base = tokens[:-1]
+        elif len(tokens) > 1 and tokens[-1] in ("end", "tip", "root", "base"):
+            base = tokens[:-1]
+        groups.setdefault(base, []).append((index, name))
+    found: list[TailChain] = []
+    for base, members in groups.items():
+        def order(item):
+            index, name = item
+            tokens = _tokens(name)
+            if index >= 0:
+                return (1, index, name.lower())
+            if tokens and tokens[-1] in ("end", "tip"):
+                return (2, 0, name.lower())
+            return (0, 0, name.lower())
+
+        ordered = tuple(name for _index, name in sorted(members, key=order))
+        found.append(TailChain(name="_".join(base) or "tail", bones=ordered))
+    return sorted(found, key=lambda chain: (chain.bones[0].lower(), chain.name.lower()))
 
 
 def candidates(hero_names: list[str], tail_names: list[str]) -> list[TailPair]:

@@ -11,13 +11,17 @@ hero's rest orientation and is labelled experimental for every other rig.
 """
 from __future__ import annotations
 
+import hashlib
+from pathlib import Path
+
 import bpy
 from bpy.types import Operator
 from mathutils import Matrix
 
-from forge import tails as tailscan
+from forge import live, tails as tailscan
+from forge import tailimage
 
-from . import core
+from . import core, source2
 
 
 def _rigs(settings):
@@ -54,6 +58,273 @@ def scan(settings) -> int:
         f"are paired with {tail.name}"
     )
     return len(rows)
+
+
+def _chains(armature) -> list[tailscan.TailChain]:
+    return tailscan.chains([bone.name for bone in armature.data.bones])
+
+
+def _points(armature, chain: tailscan.TailChain) -> list[tuple[float, float, float]]:
+    points = []
+    for name in chain.bones:
+        bone = armature.data.bones.get(name)
+        if bone is None:
+            continue
+        points.append(tuple(bone.head_local))
+    if chain.bones:
+        last = armature.data.bones.get(chain.bones[-1])
+        if last is not None:
+            points.append(tuple(last.tail_local))
+    return points
+
+
+def _points_text(points) -> str:
+    return ";".join(",".join(f"{value:.5f}" for value in point) for point in points)
+
+
+def _add_option(settings, *, label, source, path, chain, points, armature=None) -> None:
+    if not points:
+        return
+    bones = ",".join(chain.bones)
+    source_path = str(path or "")
+    for existing in settings.tail_options:
+        if (
+            existing.chain == chain.name
+            and existing.bones == bones
+            and existing.path
+            and source_path
+            and Path(bpy.path.abspath(existing.path)).resolve() == Path(bpy.path.abspath(source_path)).resolve()
+        ):
+            return
+    safe = "".join(character if character.isalnum() else "_" for character in label)[:48]
+    digest = hashlib.sha1(f"{label}|{source}|{chain.name}|{path}".encode("utf-8")).hexdigest()[:10]
+    preview = core.project_root(settings) / "artifacts" / "tail-previews" / f"{safe}-{digest}.png"
+    tailimage.write_tail_png(preview, [points])
+    option = settings.tail_options.add()
+    option.label = label
+    option.source = source
+    option.path = str(path or "")
+    option.chain = chain.name
+    option.bones = bones
+    option.points = _points_text(points)
+    option.preview = str(preview) if preview.is_file() else ""
+    option.count = len(chain.bones)
+    option.rig = armature
+
+
+def _hero_key(root: Path, path: Path) -> str:
+    try:
+        parts = path.relative_to(root).parts
+    except ValueError:
+        parts = path.parts
+    for index, part in enumerate(parts):
+        if part.lower() in ("heroes_wip", "heroes_staging") and index + 1 < len(parts):
+            return parts[index + 1]
+    return path.parent.name
+
+
+def _candidate_roots(settings) -> list[Path]:
+    roots: list[Path] = []
+    extraction = Path(bpy.path.abspath(settings.extraction_dir)) if settings.extraction_dir else None
+    if extraction and extraction.is_dir():
+        roots.append(extraction)
+        parent = extraction.parent
+        if parent.is_dir() and parent.name.lower() in ("extractions", "extraction"):
+            roots.extend(child for child in parent.iterdir() if child.is_dir())
+    extra = Path(bpy.path.abspath(settings.tail_scan_dir)) if settings.tail_scan_dir else None
+    if extra and extra.is_dir():
+        roots.append(extra)
+    unique: list[Path] = []
+    seen: set[str] = set()
+    for root in roots:
+        key = str(root.resolve()).lower()
+        if key not in seen:
+            seen.add(key)
+            unique.append(root)
+    return unique
+
+
+def _import_candidate(path: Path):
+    """Import one skeleton for its rest positions, then remove it again."""
+    before_objects = {obj.name for obj in bpy.context.scene.objects}
+    before_actions = {action.name for action in bpy.data.actions}
+    try:
+        source2.import_dmx(path, append="NEW_ARMATURE")
+        armatures = [
+            obj for obj in bpy.context.scene.objects
+            if obj.name not in before_objects and obj.type == "ARMATURE"
+        ]
+        if not armatures:
+            return None
+        armature = max(armatures, key=lambda item: len(item.data.bones))
+        result = (armature, _chains(armature), {
+            chain.name: _points(armature, chain) for chain in _chains(armature)
+        })
+        return result
+    except Exception:
+        return None
+    finally:
+        for obj in [obj for obj in bpy.context.scene.objects if obj.name not in before_objects]:
+            kind = obj.type
+            data = obj.data if kind in ("MESH", "ARMATURE") else None
+            bpy.data.objects.remove(obj, do_unlink=True)
+            if data is not None and getattr(data, "users", 0) == 0:
+                if kind == "MESH":
+                    bpy.data.meshes.remove(data)
+                else:
+                    bpy.data.armatures.remove(data)
+        for action in [action for action in bpy.data.actions if action.name not in before_actions]:
+            bpy.data.actions.remove(action)
+
+
+def _candidate_rank(path: Path, names: list[str]) -> tuple[int, int]:
+    """Prefer the declared body over a clip when both describe the same tail."""
+    return (1 if live.looks_like_body(path) else 0, len(names))
+
+
+def discover(settings) -> int:
+    """Find tail skeletons in the hero, custom rig, sibling extracts and clips."""
+    settings.tail_options.clear()
+    settings.tail_option_index = 0
+    found = 0
+
+    hero = settings.target_armature
+    if hero is not None and hero.type == "ARMATURE":
+        for chain in _chains(hero):
+            _add_option(
+                settings,
+                label=f"{hero.name} / {chain.name}",
+                source="HERO",
+                path=settings.body_dmx,
+                chain=chain,
+                points=_points(hero, chain),
+                armature=None,
+            )
+            found += 1
+
+    custom = settings.custom_armature
+    if custom is not None and custom.type == "ARMATURE" and custom != hero:
+        for chain in _chains(custom):
+            _add_option(
+                settings,
+                label=f"{custom.name} / {chain.name}",
+                source="CUSTOM",
+                path="",
+                chain=chain,
+                points=_points(custom, chain),
+                armature=custom,
+            )
+            found += 1
+
+    scanned = 0
+    imported = 0
+    for root in _candidate_roots(settings):
+        best: dict[str, tuple[Path, list[str]]] = {}
+        for path in root.rglob("*.dmx"):
+            if path.name.startswith("_."):
+                continue
+            names = tailscan.dmx_bone_names(path)
+            if len(names) < 2:
+                continue
+            key = _hero_key(root, path)
+            if key not in best or _candidate_rank(path, names) > _candidate_rank(*best[key]):
+                best[key] = (path, names)
+        for key, (path, names) in sorted(best.items()):
+            scanned += 1
+            loaded = _import_candidate(path)
+            if loaded is None:
+                # The names still describe a real tail; draw the tile from the
+                # names alone so a failed import is visible rather than silent.
+                for chain in tailscan.chains(names):
+                    _add_option(
+                        settings,
+                        label=f"{key} / {chain.name}",
+                        source="CLIP",
+                        path=path,
+                        chain=chain,
+                        points=[(0.0, 0.0, 0.0), (0.0, 0.0, 1.0)],
+                    )
+                    found += 1
+                continue
+            armature, chains, points = loaded
+            imported += 1
+            for chain in chains:
+                _add_option(
+                    settings,
+                    label=f"{key} / {chain.name}",
+                    source="BODY" if live.looks_like_body(path) else "CLIP",
+                    path=path,
+                    chain=chain,
+                    points=points.get(chain.name, []),
+                )
+                found += 1
+
+    settings.tail_option_index = 0
+    found = len(settings.tail_options)
+    settings.tail_option_note = (
+        f"{found} tail chain(s) from {len(_candidate_roots(settings))} root(s); "
+        f"{imported}/{scanned} representative skeletons opened"
+    )
+    return found
+
+
+def load_option(settings, index: int) -> str:
+    """Load the chosen tile as the tail armature and map the hero channels."""
+    if not settings.tail_options:
+        raise RuntimeError("tail-options-empty: scan for tails first")
+    option = settings.tail_options[max(0, min(index, len(settings.tail_options) - 1))]
+    if option.rig is not None:
+        settings.tail_armature = option.rig
+    elif option.source == "HERO" and settings.target_armature is not None:
+        source = settings.target_armature
+        rig = bpy.data.objects.new(f"DMF Tail {option.chain}", source.data.copy())
+        bpy.context.scene.collection.objects.link(rig)
+        option.rig = rig
+        settings.tail_armature = rig
+    elif option.source == "CUSTOM":
+        settings.tail_armature = settings.custom_armature
+    else:
+        path = Path(bpy.path.abspath(option.path)) if option.path else None
+        if path is None or not path.is_file():
+            raise RuntimeError(f"tail-source-missing: {option.path}")
+        before = {obj.name for obj in bpy.context.scene.objects}
+        source2.import_dmx(path, append="NEW_ARMATURE")
+        armatures = [
+            obj for obj in bpy.context.scene.objects
+            if obj.name not in before and obj.type == "ARMATURE"
+        ]
+        if not armatures:
+            raise RuntimeError(f"tail-import-empty: {path.name} produced no armature")
+        rig = max(armatures, key=lambda item: len(item.data.bones))
+        for obj in [obj for obj in bpy.context.scene.objects if obj.name not in before]:
+            if obj.type == "MESH":
+                bpy.data.objects.remove(obj, do_unlink=True)
+        rig.name = f"DMF Tail {option.chain}"
+        option.rig = rig
+        settings.tail_armature = rig
+    if settings.tail_armature is None:
+        raise RuntimeError("tail-no-rig: the chosen tail has no armature")
+    if settings.target_armature is None:
+        settings.tail_note = f"{option.label}: tail rig loaded; import the hero to map channels"
+        return settings.tail_note
+    count = scan(settings)
+    return f"{option.label}: {count} hero channels on {settings.tail_armature.name}"
+
+
+def preview(settings) -> None:
+    armature = settings.tail_armature
+    if armature is None:
+        return
+    for obj in bpy.context.selected_objects:
+        obj.select_set(False)
+    armature.hide_set(False)
+    armature.select_set(True)
+    bpy.context.view_layer.objects.active = armature
+    if bpy.context.area is not None and bpy.context.area.type == "VIEW_3D":
+        try:
+            bpy.ops.view3d.view_selected(use_all_regions=False)
+        except Exception:
+            pass
 
 
 def _pairs(settings) -> list[tuple[str, str]]:
@@ -160,6 +431,54 @@ def blend(settings, row) -> dict:
     }
 
 
+class DMF_OT_scan_tails(Operator):
+    bl_idname = "dmf.scan_tails"
+    bl_label = "Scan Tail Sources"
+    bl_description = "Find tail chains on this hero, the custom rig, sibling extractions and AG1/AG2 clips"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            count = discover(settings)
+        except Exception as error:
+            self.report({"ERROR"}, f"Tail scan failed: {error}")
+            settings.tail_option_note = f"Tail scan failed: {error}"
+            return {"CANCELLED"}
+        self.report({"INFO"}, settings.tail_option_note or f"{count} tail chains")
+        return {"FINISHED"}
+
+
+class DMF_OT_load_tail_option(Operator):
+    bl_idname = "dmf.load_tail_option"
+    bl_label = "Use Tail"
+    bl_description = "Load this tail skeleton as the tail rig and pair its channels"
+
+    index: bpy.props.IntProperty(name="Tail", default=-1)
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        if self.index >= 0:
+            settings.tail_option_index = min(self.index, len(settings.tail_options) - 1)
+        try:
+            message = load_option(settings, settings.tail_option_index)
+        except Exception as error:
+            self.report({"ERROR"}, f"Tail load failed: {error}")
+            settings.tail_note = f"Tail load failed: {error}"
+            return {"CANCELLED"}
+        self.report({"INFO"}, message)
+        return {"FINISHED"}
+
+
+class DMF_OT_preview_tail(Operator):
+    bl_idname = "dmf.preview_tail"
+    bl_label = "Frame Tail"
+    bl_description = "Select and frame the chosen tail rig in the 3D view"
+
+    def execute(self, context):
+        preview(context.scene.dmf)
+        return {"FINISHED"}
+
+
 class DMF_OT_scan_tail(Operator):
     bl_idname = "dmf.scan_tail"
     bl_label = "Find Tail Bones"
@@ -224,7 +543,14 @@ class DMF_OT_blend_tail_all(Operator):
         return {"FINISHED"}
 
 
-CLASSES = (DMF_OT_scan_tail, DMF_OT_blend_tail, DMF_OT_blend_tail_all)
+CLASSES = (
+    DMF_OT_scan_tails,
+    DMF_OT_load_tail_option,
+    DMF_OT_preview_tail,
+    DMF_OT_scan_tail,
+    DMF_OT_blend_tail,
+    DMF_OT_blend_tail_all,
+)
 
 
 def register() -> None:

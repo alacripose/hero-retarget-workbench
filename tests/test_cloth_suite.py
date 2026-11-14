@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from pathlib import Path
+import tempfile
+import unittest
 
 from forge import cloth
 
@@ -61,6 +63,19 @@ def test_mesh_files_keeps_a_cloth_part_that_has_no_lods(tmp_path: Path):
     assert [row.stem for row in found] == ["doorman_jacket"]
 
 
+def test_mesh_files_keeps_a_numbered_head_and_its_lod(tmp_path: Path):
+    _write(tmp_path, "familiar_wip_8inf_body8.dmx", 400)
+    _write(tmp_path, "familiar_wip_head5.dmx", 900)
+    _write(tmp_path, "familiar_wip_head_lod12.dmx")
+    _write(tmp_path, "familiar_wip_aim_idle.dmx")
+    found = cloth.mesh_files(tmp_path)
+    assert [row.stem for row in found] == [
+        "familiar_wip_8inf_body8",
+        "familiar_wip_head5",
+    ]
+    assert [lod.name for lod in found[1].lods] == ["familiar_wip_head_lod12.dmx"]
+
+
 def test_mesh_files_on_a_missing_folder_is_empty(tmp_path: Path):
     assert cloth.mesh_files(tmp_path / "nope") == []
 
@@ -94,3 +109,34 @@ def test_cloth_chains_leaves_fingers_out():
 def test_chain_order_is_deterministic_and_by_index_not_text():
     names = ["hem_2_L", "hem_10_L", "hem_1_L"]
     assert cloth.chains(names)[0].bones == ("hem_1_L", "hem_2_L", "hem_10_L")
+
+
+class MeshBlindSpotTests(unittest.TestCase):
+    def test_numbered_head_and_lod_are_companions(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            _write(root, "familiar_wip_8inf_body8.dmx", 400)
+            _write(root, "familiar_wip_head5.dmx", 900)
+            _write(root, "familiar_wip_head_lod12.dmx")
+            _write(root, "familiar_wip_aim_idle.dmx")
+            found = cloth.mesh_files(root)
+            self.assertEqual(
+                [row.stem for row in found],
+                ["familiar_wip_8inf_body8", "familiar_wip_head5"],
+            )
+            self.assertEqual([lod.name for lod in found[1].lods], ["familiar_wip_head_lod12.dmx"])
+
+    def test_render_variants_do_not_duplicate_a_part(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            _write(root, "hero_body.dmx", 400)
+            _write(root, "hero_head5.dmx", 900)
+            _write(root, "hero_head_eyes_closed7.dmx")
+            _write(root, "hero_head_ui_smile6.dmx")
+            _write(root, "hero_clothes1.dmx", 300)
+            _write(root, "hero_clothes_no_shirt11.dmx", 300)
+            _write(root, "hero_clothes_nosim9.dmx", 300)
+            _write(root, "hero_cloth_proxy.dmx")
+            _write(root, "hero_duplicate.dmx", 500)
+            found = cloth.mesh_files(root)
+            self.assertEqual([row.stem for row in found], ["hero_body", "hero_clothes1", "hero_head5"])
