@@ -186,6 +186,41 @@ def main() -> int:
     assert checks["rescan_pelvis"] == ("MAPPED", "pelvis"), checks["rescan_pelvis"]
     rows = again
 
+    # --- the native list header actually filters and sorts --------------
+    class _FakeList:
+        filter_name = "skirt"
+        use_filter_sort_alpha = False
+        use_filter_sort_reverse = False
+        use_filter_invert = False
+        bitflag_filter_item = 4
+
+    texts = [dmf.ui_lists._bone_map_text(entry) for entry in settings.bone_map]
+    flags, _order = dmf.ui_lists._filter(_FakeList(), texts)
+    checks["filter_skirt_flags"] = flags
+    checks["filter_skirt_kept"] = sum(1 for flag in flags if flag)
+    assert checks["filter_skirt_kept"] == 2, checks["filter_skirt_flags"]
+
+    _FakeList.filter_name = ""
+    _FakeList.use_filter_sort_alpha = True
+    sorted_flags, order = dmf.ui_lists._filter(
+        _FakeList(), [dmf.ui_lists._bone_map_text(entry) for entry in settings.bone_map]
+    )
+    checks["sort_kept_all"] = all(sorted_flags)
+    checks["sort_order_len"] = len(order)
+    assert checks["sort_kept_all"], sorted_flags
+    assert checks["sort_order_len"] == len(settings.bone_map), checks["sort_order_len"]
+
+    lists = [name for name in dir(bpy.types) if name.startswith("DMF_UL_")]
+    checks["lists"] = lists
+    # bpy.types.UIList has no filter_items of its own: a list either defines it
+    # or inherits nothing, which is exactly the case that ignores the header.
+    checks["lists_filter"] = [
+        name
+        for name in lists
+        if callable(getattr(getattr(bpy.types, name), "filter_items", None))
+    ]
+    assert sorted(checks["lists_filter"]) == sorted(lists), checks["lists_filter"]
+
     # --- a wide rig is answered in bounded chunks, not one long hold --
     wide = 250
     wide_source = armature(

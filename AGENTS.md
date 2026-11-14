@@ -534,3 +534,34 @@ one regex rule, headless, empty scene): `scan_bone_map` returned in **5.4 ms**
 with 250 rows still unanswered; the answers then took **2 chunks**, worst chunk
 **8.3 ms**, all 250 answered, 13.2 ms total. The claim is about this rig, not
 about the owner's full scene: the bound is the chunk, the total is unchanged.
+
+## 2026-11-13 — 0.5.3: every list header searches and sorts its own view
+
+**Owner report, verbatim:** *"one problem is that when I expand the blender native
+settings for the search bar and sorting options those options don't apply to it's
+view, this needs to be double checked on all of the views that have this so it
+works for all of them"*
+
+Blender shows the magnifier, invert and A-Z controls above a `template_list` when
+the UIList defines `filter_items`. `DMF_UL_bone_map` defined one that ignored
+`filter_name` and returned a fixed selection from the state selector — so the
+search box and the sort arrow were live controls attached to nothing. The other
+five lists defined no `filter_items` at all.
+
+- `forge/uilist.py` is the pure half: `rows(texts, query, sort_alpha, reverse,
+  invert, restrict)` returns the per-row flags and the display order. The search is
+  every whitespace-separated term appearing in the row's visible text, case
+  insensitive.
+- `ui_lists._filter` translates that into `bitflag_filter_item`, and all six lists
+  — bone map, hierarchy, parts, materials, rules, clips — implement
+  `filter_items` through it. The bone map's state selector is passed as a
+  *restriction*: the search narrows it and never widens it, and sorting applies to
+  whatever survives.
+- Each list searches the text it shows: source/target/note/state for the bone map,
+  pattern/target/state/origin for rules, label/file/kind/state/action for clips, and
+  the part, bone or material name for the rest.
+- Evidence: `tests/test_uilist.py` (7 tests) and the rig probe: filtering the real
+  bone map for `skirt` keeps exactly the two skirt rows, an empty query with A-Z on
+  returns an order for all rows, and all six registered lists define their own
+  `filter_items`. Not checked: typing into the search field of a running Blender —
+  the GUI probe cannot reach the sidebar's header widgets.

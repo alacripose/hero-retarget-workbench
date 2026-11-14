@@ -1,8 +1,15 @@
-"""Native UI lists for the workbench."""
+"""Native UI lists for the workbench.
+
+Every list implements ``filter_items`` through ``_filter``, so the native header
+Blender shows above it — the search field, the invert toggle, the A-Z button and
+its reverse — actually changes the view. A list that returns a fixed selection
+makes those controls look available while doing nothing.
+"""
 from __future__ import annotations
 
 import bpy
 from bpy.types import UIList
+from forge import uilist
 
 _ICONS = {
     "MAPPED": "CHECKMARK",
@@ -17,6 +24,30 @@ def _short(value: str, limit: int = 28) -> str:
     return text if len(text) <= limit else text[: limit - 3].rstrip() + "..."
 
 
+def _filter(ui_list, texts, restrict=None):
+    """The list header's search, invert and sort, as ``bitflag_filter_item`` flags."""
+    flags, order = uilist.rows(
+        texts,
+        getattr(ui_list, "filter_name", "") or "",
+        sort_alpha=bool(getattr(ui_list, "use_filter_sort_alpha", False)),
+        reverse=bool(getattr(ui_list, "use_filter_sort_reverse", False)),
+        invert=bool(getattr(ui_list, "use_filter_invert", False)),
+        restrict=restrict,
+    )
+    bit = getattr(ui_list, "bitflag_filter_item", 1)
+    return [bit if flag else 0 for flag in flags], order
+
+
+def _bone_map_text(entry) -> str:
+    return f"{entry.source} {entry.target} {entry.note} {entry.state}"
+
+
+def _rules_text(entry) -> str:
+    state = "extra" if entry.state == "EXTRA" else "ignore" if entry.state == "IGNORED" else "mapped"
+    origin = "learned" if entry.origin == "learned" else "user"
+    return f"{entry.source} {entry.target} {state} {origin}"
+
+
 class DMF_UL_bone_map(UIList):
     bl_idname = "DMF_UL_bone_map"
 
@@ -24,10 +55,10 @@ class DMF_UL_bone_map(UIList):
         settings = context.scene.dmf
         rows = getattr(data, propname)
         mode = settings.bone_filter
-        if mode == "ALL":
-            return [], []
-        flags = [self.bitflag_filter_item if row.state == mode else 0 for row in rows]
-        return flags, []
+        # The state selector is a restriction; the header's search narrows it and
+        # the A-Z button sorts what survives.
+        restrict = None if mode == "ALL" else [row.state == mode for row in rows]
+        return _filter(self, [_bone_map_text(row) for row in rows], restrict)
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row(align=True)
@@ -39,6 +70,10 @@ class DMF_UL_bone_map(UIList):
 
 class DMF_UL_hierarchy(UIList):
     bl_idname = "DMF_UL_hierarchy"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [f"{row.name} {row.parent}" for row in rows])
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row(align=True)
@@ -59,6 +94,13 @@ class DMF_UL_hierarchy(UIList):
 class DMF_UL_parts(UIList):
     bl_idname = "DMF_UL_parts"
 
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(
+            self,
+            [row.object.name if row.object is not None else "missing part" for row in rows],
+        )
+
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row(align=True)
         obj = item.object
@@ -74,6 +116,16 @@ class DMF_UL_parts(UIList):
 class DMF_UL_materials(UIList):
     bl_idname = "DMF_UL_materials"
 
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(
+            self,
+            [
+                f"{row.label} {row.material.name if row.material else ''} {row.slot_index}"
+                for row in rows
+            ],
+        )
+
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row(align=True)
         material = item.material
@@ -85,6 +137,10 @@ class DMF_UL_materials(UIList):
 
 class DMF_UL_rules(UIList):
     bl_idname = "DMF_UL_bone_rules"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [_rules_text(row) for row in rows])
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row(align=True)
@@ -118,6 +174,17 @@ class DMF_UL_clips(UIList):
         "FAILED": "ERROR",
         "OPAQUE": "LOCKED",
     }
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(
+            self,
+            [
+                f"{row.label} {row.name} {row.kind} {'compiled' if row.compiled else ''} "
+                f"{row.state} {row.action}"
+                for row in rows
+            ],
+        )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row(align=True)
