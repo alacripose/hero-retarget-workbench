@@ -68,7 +68,7 @@ class PathConfigurationTests(unittest.TestCase):
             env = paths.detect(
                 deadlock_root=self.root / "missing-game",
                 s2v_cli=self.root / "missing-s2v.exe",
-                csdk_root=self.root / "missing-csdk",
+                csdk_root=self.root / "missing-tools",
             )
         self.assertIsNone(env.game_root)
         self.assertIsNone(env.s2v)
@@ -147,12 +147,10 @@ class PathConfigurationTests(unittest.TestCase):
         self.assertTrue(any("GUI only" in item for item in env.problems))
         self.assertTrue(any("Source2Viewer-CLI.exe" in item for item in env.problems))
 
-    def test_personal_folders_are_not_candidates(self):
+    def test_no_vendor_folder_is_a_hardcoded_candidate(self):
         home = self.root / "home"
         (home / "Documents" / "openlock_modern" / "tools" / "s2v").mkdir(parents=True)
         (home / "Documents" / "openlock_modern" / "tools" / "s2v" / "Source2Viewer-CLI.exe").write_bytes(b"fake")
-        (home / "Downloads" / "Reduced_CSDK_13" / "game" / "bin" / "win64").mkdir(parents=True)
-        (home / "Downloads" / "Reduced_CSDK_13" / "game" / "bin" / "win64" / "resourcecompiler.exe").write_bytes(b"fake")
         with patch.dict(
             os.environ,
             {
@@ -164,15 +162,41 @@ class PathConfigurationTests(unittest.TestCase):
             },
             clear=False,
         ):
-            self.assertIsNone(paths.find_s2v())
-            self.assertIsNone(paths.find_csdk()[0])
+            with patch.object(paths, "_tool_search_roots", return_value=[]):
+                self.assertIsNone(paths.find_s2v())
+
+    def test_stale_saved_viewer_falls_back_to_a_download_root(self):
+        downloads = self.root / "home" / "Downloads"
+        cli = downloads / "cli-windows-x64" / "Source2Viewer-CLI.exe"
+        cli.parent.mkdir(parents=True)
+        cli.write_bytes(b"cli")
+
+        with patch.object(paths, "_tool_search_roots", return_value=[downloads]):
+            with patch.dict(os.environ, {"S2V_CLI": "", "PATH": ""}, clear=False):
+                self.assertEqual(paths.find_s2v(None), cli)
+                env = paths.detect(s2v_cli=self.root / "moved" / "Source2Viewer-CLI.exe")
+                self.assertEqual(env.s2v, cli)
+
+    def test_unpacked_csdk_in_a_download_root_is_found(self):
+        downloads = self.root / "home" / "Downloads"
+        tools = downloads / "Reduced_CSDK_13"
+        (tools / "game" / "bin" / "win64").mkdir(parents=True)
+        compiler = tools / "game" / "bin" / "win64" / "resourcecompiler.exe"
+        compiler.write_bytes(b"compiler")
+        (tools / "game" / "citadel").mkdir(parents=True)
+
+        with patch.object(paths, "_tool_search_roots", return_value=[downloads]):
+            root, found, _info = paths.find_csdk()
+
+        self.assertEqual(root, tools)
+        self.assertEqual(found, compiler)
 
     def test_source_has_no_personal_or_drive_letter_defaults(self):
         source = Path(paths.__file__).read_text(encoding="utf-8")
         self.assertNotIn("openlock_modern", source)
         self.assertNotIn("Reduced_CSDK_13", source)
         self.assertNotIn("for letter in", source)
-        self.assertNotIn("Path.home()", source)
+        self.assertNotIn("C:\\\\Users\\\\ala", source)
 
 
 if __name__ == "__main__":
