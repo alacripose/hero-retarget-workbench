@@ -722,6 +722,53 @@ class DMF_PT_rules(Panel):
         side.operator("dmf.clear_rules", text="", icon="TRASH")
 
 
+def _draw_ik(layout, settings) -> None:
+    """Source 2 IK targets: list, constrain, bake, then export the clip."""
+    box = layout.box()
+    head = box.row(align=True)
+    head.label(text="SOURCE 2 IK", icon="CONSTRAINT")
+    right = head.row(align=True)
+    right.alignment = "RIGHT"
+    count = len(settings.ik_bones)
+    right.label(text=(f"{count} target" if count == 1 else f"{count} targets") if count else "not scanned")
+    row = box.row(align=True)
+    row.operator("dmf.scan_ik", text="Find IK bones", icon="FILE_REFRESH")
+    row.operator("dmf.apply_ik", text="Apply constraints", icon="CONSTRAINT")
+    if settings.ik_bones:
+        index = max(0, min(settings.ik_index, len(settings.ik_bones) - 1))
+        head = box.split(factor=settings.list_name_width, align=True)
+        head.label(text="Target")
+        side = head.row(align=True)
+        side.alignment = "RIGHT"
+        side.label(text="Follows")
+        box.template_list(
+            "DMF_UL_ik",
+            "",
+            settings,
+            "ik_bones",
+            settings,
+            "ik_index",
+            rows=4,
+        )
+        box.prop(
+            settings.ik_bones[index],
+            "target",
+            text="Follows",
+        )
+        action = box.row(align=True)
+        action.operator("dmf.bake_ik", text="Bake action", icon="ACTION")
+        action.operator("dmf.clear_ik", text="Clear IK", icon="X")
+    if settings.ik_note:
+        _hint(box, settings.ik_note, "INFO", width=34)
+    _hint(
+        box,
+        "Copy Location + Copy Rotation follow the real limb; Bake action writes visual keys "
+        "and removes only these constraints, so extra tail bones are baked too.",
+        "INFO",
+        width=34,
+    )
+
+
 class DMF_PT_animations(Panel):
     bl_label = "Animations"
     bl_idname = "DMF_PT_animations"
@@ -752,6 +799,7 @@ class DMF_PT_animations(Panel):
         )
         _path_row(box, settings, "clips_dir", "Folder")
         if not settings.clips:
+            _draw_ik(layout, settings)
             _hint(
                 box,
                 "Point at the S2V extraction's clip folder, then scan it.",
@@ -795,6 +843,7 @@ class DMF_PT_animations(Panel):
         if settings.clip_note:
             _hint(box, settings.clip_note, "LOCKED", width=30)
 
+        _draw_ik(layout, settings)
         ui_popit.micro(box, "Write back", "EXPORT")
         _path_row(box, settings, "clip_export_dir", "Folder")
         write = box.row(align=True)

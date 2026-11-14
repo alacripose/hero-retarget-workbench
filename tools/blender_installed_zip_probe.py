@@ -62,6 +62,11 @@ def _arguments() -> argparse.Namespace:
         help="run Find clients before the screenshot and report how many installs were read",
     )
     parser.add_argument(
+        "--ik",
+        action="store_true",
+        help="build a synthetic IK rig, apply constraints, and bake an action",
+    )
+    parser.add_argument(
         "--demo-job",
         action="store_true",
         help="draw a representative running job so the bar and log are visible",
@@ -73,6 +78,89 @@ def _page_labels() -> dict[str, str]:
     module = sys.modules.get(MODULE)
     pages = getattr(getattr(module, "ui_props", None), "PAGES", ())
     return {page: page.replace("_", " ").title() for page in pages}
+
+
+def _ik_check(check, report: dict) -> None:
+    """Exercise the installed IK operators on a small synthetic rig."""
+    settings = bpy.context.scene.dmf
+    data = bpy.data.armatures.new("DMF IK probe rig")
+    armature = bpy.data.objects.new("DMF IK probe rig", data)
+    bpy.context.scene.collection.objects.link(armature)
+    bpy.context.view_layer.objects.active = armature
+    armature.select_set(True)
+    bpy.ops.object.mode_set(mode="EDIT")
+
+    def bone(name: str, head, tail, parent: str = "") -> None:
+        item = data.edit_bones.new(name)
+        item.head = head
+        item.tail = tail
+        if parent:
+            item.parent = data.edit_bones[parent]
+
+    bone("root", (0.0, 0.0, 0.0), (0.0, 0.0, 0.5))
+    bone("pelvis", (0.0, 0.0, 0.9), (0.0, 0.0, 1.1), "root")
+    bone("hand_L", (0.5, 0.0, 1.2), (0.5, 0.3, 1.2), "root")
+    bone("Ik_Hand_L", (0.5, 0.0, 1.2), (0.5, 0.3, 1.2), "root")
+    bone("tail_01", (0.0, 0.2, 0.9), (0.0, 0.5, 0.9), "pelvis")
+    bpy.ops.object.mode_set(mode="OBJECT")
+    settings.target_armature = armature
+    armature.animation_data_create()
+
+    scene = bpy.context.scene
+    scene.frame_start = 1
+    scene.frame_end = 10
+    hand = armature.pose.bones["hand_L"]
+    hand.location = (0.0, 0.0, 0.0)
+    hand.keyframe_insert(data_path="location", frame=1)
+    hand.location = (0.0, 0.4, 0.0)
+    hand.keyframe_insert(data_path="location", frame=10)
+    action = armature.animation_data.action
+    if action is not None:
+        action.name = "ik_probe"
+
+    scanned = bpy.ops.dmf.scan_ik()
+    row = next((item for item in settings.ik_bones if item.bone == "Ik_Hand_L"), None)
+    suggested = row.target if row is not None else ""
+    applied = bpy.ops.dmf.apply_ik()
+    target = armature.pose.bones["Ik_Hand_L"]
+    constraints = len([item for item in target.constraints if item.name.startswith("DMF IK ")])
+    scene.frame_set(5)
+    bpy.context.view_layer.update()
+    before = target.matrix.copy()
+    baked = bpy.ops.dmf.bake_ik()
+    scene.frame_set(5)
+    bpy.context.view_layer.update()
+    kept = len([item for item in target.constraints if item.name.startswith("DMF IK ")])
+    difference = max(
+        abs(before[row_index][column] - target.matrix[row_index][column])
+        for row_index in range(4)
+        for column in range(4)
+    )
+    report["ik"] = {
+        "scan": str(scanned),
+        "apply": str(applied),
+        "bake": str(baked),
+        "suggested": suggested,
+        "constraints_before": constraints,
+        "constraints_after": kept,
+        "matrix_difference": difference,
+        "action": armature.animation_data.action.name if armature.animation_data.action else "",
+    }
+    check(
+        "ik-scan-suggests-limb",
+        scanned == {"FINISHED"} and suggested == "hand_L",
+        {"result": str(scanned), "suggested": suggested},
+    )
+    check(
+        "ik-constraints-applied",
+        applied == {"FINISHED"} and constraints == 2,
+        {"result": str(applied), "constraints": constraints},
+    )
+    check(
+        "ik-bake-keeps-pose-and-clears",
+        baked == {"FINISHED"} and kept == 0 and difference < 1e-4,
+        {"result": str(baked), "constraints": kept, "difference": difference},
+    )
 
 
 def main() -> int:
@@ -246,6 +334,8 @@ def main() -> int:
                     row.sections = "Softbody" if cloth else ""
                     row.path = f"D:/mods/{name}.vpk"
                 report["demo_mods"] = len(settings.mods)
+            if args.ik:
+                _ik_check(check, report)
             if args.find_clients:
                 result = bpy.ops.dmf.refresh_clients()
                 rows = bpy.context.scene.dmf.clients

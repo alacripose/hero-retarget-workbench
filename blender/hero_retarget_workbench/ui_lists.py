@@ -258,6 +258,28 @@ class DMF_UL_clips(UIList):
             right.label(text="", icon="EXPORT")
 
 
+class DMF_UL_ik(UIList):
+    bl_idname = "DMF_UL_ik"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [f"{row.bone} {row.target} {row.state}" for row in rows])
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        width = float(getattr(context.scene.dmf, "list_name_width", 0.5))
+        split = layout.split(factor=width, align=True)
+        left = split.row(align=True)
+        left.label(
+            text=item.bone or "IK target",
+            icon="BONE_DATA" if item.state == "READY" else "CONSTRAINT",
+        )
+        right = split.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=item.target or "choose a limb")
+        if item.constraints:
+            right.label(text="", icon="CHECKMARK")
+
+
 class DMF_UL_mods(UIList):
     bl_idname = "DMF_UL_mods"
 
@@ -354,6 +376,7 @@ CLASSES = (
     DMF_UL_cloth_chains,
     DMF_UL_rules,
     DMF_UL_clips,
+    DMF_UL_ik,
 )
 
 

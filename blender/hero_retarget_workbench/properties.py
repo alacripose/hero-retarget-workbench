@@ -255,6 +255,24 @@ class DMF_ClipRow(PropertyGroup):
     )
 
 
+class DMF_IKRow(PropertyGroup):
+    """One Source 2 IK target bone and the limb it is constrained to."""
+
+    bone: StringProperty(name="IK target", default="")
+    target: StringProperty(name="Follows", default="")
+    state: EnumProperty(
+        name="State",
+        items=[
+            ("READY", "Ready", "A limb is suggested; apply the constraints"),
+            ("CHOOSE", "Choose", "No limb was suggested; choose one"),
+            ("APPLIED", "Applied", "This addon's IK constraints are on the target"),
+            ("MISSING", "Missing", "The chosen limb is not on the armature"),
+        ],
+        default="CHOOSE",
+    )
+    constraints: IntProperty(name="Constraints", default=0, min=0)
+
+
 class DMF_HierarchyRow(PropertyGroup):
     name: StringProperty(name="Bone", default="")
     parent: StringProperty(name="Parent", default="")
@@ -612,6 +630,10 @@ class DMF_Settings(PropertyGroup):
     clip_note: StringProperty(name="Clip note", default="")
     clip_imported: IntProperty(name="Imported clips", default=0)
     clip_written: IntProperty(name="Written clips", default=0)
+    ik_bones: CollectionProperty(type=DMF_IKRow, description="Source 2 IK targets on the hero rig")
+    ik_index: IntProperty(name="IK row", default=0)
+    ik_scanned: IntProperty(name="IK targets", default=0)
+    ik_note: StringProperty(name="IK note", default="")
     rule_fill_running: BoolProperty(name="Rules running", default=False)
     rule_fill_done: IntProperty(name="Rows answered", default=0)
     rule_fill_total: IntProperty(name="Rows to answer", default=0)
@@ -934,6 +956,7 @@ CLASSES = (
     DMF_LodLevel,
     DMF_BoneRule,
     DMF_ClipRow,
+    DMF_IKRow,
     DMF_HierarchyRow,
     DMF_ScanRoot,
     DMF_ModRow,
