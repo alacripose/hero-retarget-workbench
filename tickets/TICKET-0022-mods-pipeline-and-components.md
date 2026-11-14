@@ -495,6 +495,15 @@ can fill the area, and the page buttons moved to the header.
 Not checked: a real click on a header page button — the probe sets `props_page`
 through the same enum property the buttons write.
 
+## 0.8.19 (withdrawn) — "in place of the title" did not authorise removing the icons
+
+0.8.19 replaced the `Workbench` title with the page dropdown **and removed the
+page icon row**. The owner's sentence was: *"okay fine this is acceptable but
+could you add a dropdown menu in place of the workbench title for the different
+pages"*. Only the title was named. The icon row was not mentioned, so removing it
+was an assumption, not a reading of the request. 0.8.20 keeps the icons and adds
+the dropdown in the title's place.
+
 ## 0.8.20 — the page menu is the title, the icon buttons stay
 
 **Owner request, verbatim:** *"okay fine this is acceptable but could you add a
