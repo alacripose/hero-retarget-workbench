@@ -156,3 +156,11 @@ Under the Scan button the Skeleton page shows the fill's progress
 (`Rules 150/400` with a cancel glyph) only while a fill is running, so the page
 does not grow a permanent row for it. The rows answer themselves as the ticks
 run; the pose preview refreshes once at the end instead of once per row.
+
+## 2026-11-13 — list headers are part of the surface (0.5.3)
+
+Every panel list answers the header Blender puts above it. The header is not
+decoration: if the A-Z button and the search field are visible, they narrow and
+reorder that list, and the state selector on the bone map composes with the
+search instead of replacing it. A list that cannot honour the header should not
+show controls it ignores.
