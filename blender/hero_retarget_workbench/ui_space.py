@@ -162,6 +162,8 @@ def editor_space_classes() -> list[type]:
     )
     for cls in (space, header, root):
         ui_props.materialize(cls)
+    # The root must stay: a page panel with an empty parent id draws nothing in
+    # a custom space, which is exactly the empty view 0.8.7 shipped.
     return [space, header, root]
 
 
@@ -249,12 +251,41 @@ def register() -> bool:
     EDITOR_ERROR = ("; ".join(optional) if optional else "")
     if optional:
         print(f"DMF editor optional classes skipped: {EDITOR_ERROR}", flush=True)
+    try:
+        bpy.app.timers.register(_ensure_sidebar, persistent=True)
+    except (ValueError, TypeError):
+        pass
     return True
 
 
 def unregister() -> None:
+    try:
+        bpy.app.timers.unregister(_ensure_sidebar)
+    except (ValueError, TypeError):
+        pass
     while _REGISTERED:
         bpy.utils.unregister_class(_REGISTERED.pop())
+
+
+def _ensure_sidebar() -> float:
+    """Open the Workbench sidebar once, from a timer rather than from draw.
+
+    Setting ``show_region_ui`` inside a panel's draw re-lays the area during the
+    draw and can leave the first frame without the page panel; the timer is also
+    the only hook that runs when the space is created from the editor-type menu
+    instead of our operator.
+    """
+    for window in bpy.context.window_manager.windows:
+        if not window:
+            continue
+        for area in window.screen.areas:
+            if area.type != "CUSTOM" or area.ui_type != SPACE_IDNAME:
+                continue
+            space = area.spaces.active
+            if hasattr(space, "show_region_ui") and not space.show_region_ui:
+                space.show_region_ui = True
+                area.tag_redraw()
+    return 1.0
 
 
 def _open_editor(context, area) -> bool:

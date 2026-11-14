@@ -93,15 +93,15 @@ def main() -> int:
     )
 
     window = bpy.context.window
-    area = next(
-        (
-            candidate
-            for screen in (window.screen for window in bpy.context.window_manager.windows if window)
-            for candidate in screen.areas
-            if candidate.type in {"PROPERTIES", "VIEW_3D", "CUSTOM"}
-        ),
-        None,
-    )
+    # The widest area makes the screenshot show the page surface beside its
+    # sidebar; the Properties column is ~220 px and the sidebar eats it.
+    candidates = [
+        candidate
+        for screen in (window.screen for window in bpy.context.window_manager.windows if window)
+        for candidate in screen.areas
+        if candidate.type in {"PROPERTIES", "VIEW_3D", "CUSTOM"}
+    ]
+    area = max(candidates, key=lambda candidate: candidate.width, default=None)
     report["area_found"] = area is not None
     if area is not None:
         before = str(area.type)

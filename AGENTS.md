@@ -1,3 +1,22 @@
+## 2026-11-14 — 0.8.9: the page panel returns on the editor-type path
+
+**Owner report, verbatim:** *"custom view works fine after pressing open workspace
+button (0.8.5) but in the custom view that opens from the thing that lets you
+choose what view it's on it only shows the fucking buttons to switch the damn
+page"*.
+
+- 0.8.7 removed the `DMF_PT_space_main` root; a page mirror then inherited the
+  sidebar panel's `bl_parent_id`, whose parent does not exist in the custom
+  space, so the space drawn from the editor-type menu showed only the Pages
+  sidebar. The root is back and mirrors are parented to it.
+- Pages stay a `UI`-region panel: measured regions are `UI x=1296 width=280` and
+  `WINDOW x=2 width=1294`; `DMF_PT_space_pages.bl_region_type == 'UI'`.
+- `show_region_ui` is set from a timer, not from a panel draw.
+- Evidence: `artifacts/probes/probe_direct_view.py` (no operator, direct
+  `ui_type`) reports root and pages registered, sidebar true, and
+  `artifacts/receipts/direct-view.png` shows the Cloth page beside Pages. Zip
+  0.8.9 install probe 9/9.
+
 ## 2026-11-14 — 0.8.5: the pages live in the Workbench's expandable sidebar
 
 **Owner report, verbatim:** *"in the custom view it literall has a fucking side
