@@ -478,6 +478,80 @@ class DMF_PT_parts_materials(Panel):
         actions.operator("dmf.clear_part_material", text="Clear selected slot", icon="REMOVE")
 
 
+class DMF_PT_cloth(Panel):
+    bl_label = "Cloth"
+    bl_idname = "DMF_PT_cloth"
+    bl_parent_id = "DMF_PT_main"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+
+    def draw(self, context):
+        settings = context.scene.dmf
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+
+        chains = len(settings.cloth_chains)
+        box = ui_popit.title(
+            layout,
+            "Cloth",
+            f"{chains} chains" if chains else "not scanned",
+            "MOD_CLOTH",
+        )
+        ui_popit.glyphs(
+            box,
+            ["dmf.import_hero_parts", "dmf.scan_cloth"],
+            labels={"dmf.import_hero_parts": "Hero parts", "dmf.scan_cloth": "Chains"},
+        )
+
+        if settings.hero_parts:
+            ui_popit.micro(box, "Hero meshes", "MESH_DATA")
+            row = box.row(align=True)
+            row.template_list(
+                "DMF_UL_hero_parts",
+                "",
+                settings,
+                "hero_parts",
+                settings,
+                "hero_part_index",
+                rows=3,
+            )
+            row.label(text=f"{len(settings.hero_parts)}", icon="OBJECT_DATA")
+        else:
+            _hint(
+                box,
+                "Import the hero to bring in the hair, jacket and the rest beside the body.",
+                "QUESTION",
+                width=32,
+            )
+
+        if settings.cloth_chains:
+            ui_popit.micro(box, "Bone chains", "MOD_CLOTH")
+            row = box.row(align=True)
+            row.template_list(
+                "DMF_UL_cloth_chains",
+                "",
+                settings,
+                "cloth_chains",
+                settings,
+                "cloth_index",
+                rows=4,
+            )
+            index = max(0, min(settings.cloth_index, len(settings.cloth_chains) - 1))
+            chain = settings.cloth_chains[index]
+            box.label(text=f"{chain.count} bones, from {chain.root}", icon="BONE_DATA")
+            if chain.bones:
+                _hint(box, chain.bones, "ARMATURE_DATA", width=34)
+        _hint(
+            box,
+            "Cloth constraint nodes live in the modeldoc. This page imports the meshes and shows "
+            "the chains a simulation can hang from; it does not author those nodes.",
+            "INFO",
+            width=34,
+        )
+
+
 class DMF_PT_rules(Panel):
     bl_label = "Mapping rules"
     bl_idname = "DMF_PT_rules"
@@ -1023,6 +1097,7 @@ CLASSES = (
     DMF_PT_source_files,
     DMF_PT_parts,
     DMF_PT_parts_materials,
+    DMF_PT_cloth,
     DMF_PT_skeleton,
     DMF_PT_skeleton_bones,
     DMF_PT_rules,

@@ -114,8 +114,27 @@ def main() -> int:
             raise RuntimeError(f"core imported the stale forge module: {bundled['paths'].__name__}")
 
         panels = len(dmf.ui.CLASSES)
-        if panels != 16:
-            raise RuntimeError(f"expected 16 panel classes, found {panels}")
+        if panels != 17:
+            raise RuntimeError(f"expected 17 panel classes, found {panels}")
+        # Every sidebar page panel gets a properties twin, under one root. The
+        # sidebar's own root has no page, so the twins count is one less than the
+        # panel count, not one more.
+        mirrored = [
+            cls
+            for cls in dmf.ui_props.CLASSES
+            if getattr(cls, "bl_space_type", "") == "PROPERTIES"
+        ]
+        expected_twins = panels - 1
+        if (
+            len(dmf.ui_props.CLASSES) != expected_twins + 1
+            or len(mirrored) != len(dmf.ui_props.CLASSES)
+            or len(dmf.ui_props.PAGE_BY_ID) != expected_twins
+        ):
+            raise RuntimeError(
+                "expected one properties twin per page panel plus a root: "
+                f"{panels} panels, {len(dmf.ui_props.PAGE_BY_ID)} mapped, "
+                f"{len(dmf.ui_props.CLASSES)} properties classes, {len(mirrored)} in PROPERTIES"
+            )
         # Every operator the package defines has to reach dmf.*, and every
         # registered one has to come from a CLASSES tuple. A count constant here
         # only records how many existed the day it was typed.
@@ -128,6 +147,7 @@ def main() -> int:
                 dmf.rules.CLASSES,
                 dmf.poseview.CLASSES,
                 dmf.clipops.CLASSES,
+                dmf.cloth_ops.CLASSES,
             )
             for cls in group
             if isinstance(cls, type) and issubclass(cls, bpy.types.Operator)
@@ -141,7 +161,14 @@ def main() -> int:
             raise RuntimeError(f"operators registered but not reachable: {unregistered}")
         defined = {
             value
-            for module in (dmf.operators, dmf.workbench, dmf.rules, dmf.poseview, dmf.clipops)
+            for module in (
+                dmf.operators,
+                dmf.workbench,
+                dmf.rules,
+                dmf.poseview,
+                dmf.clipops,
+                dmf.cloth_ops,
+            )
             for name in dir(module)
             if name.startswith("DMF_OT_")
             for value in (getattr(module, name),)

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import bpy
 from bpy.types import UIList
+from forge import cloth as clothscan
 from forge import uilist
 
 _ICONS = {
@@ -135,6 +136,58 @@ class DMF_UL_materials(UIList):
         right.label(text=f"[{item.slot_index}]")
 
 
+class DMF_UL_hero_parts(UIList):
+    bl_idname = "DMF_UL_hero_parts"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(
+            self,
+            [
+                f"{row.object.name if row.object else 'missing part'} "
+                f"{'cloth' if row.object and clothscan.is_cloth(row.object.name) else ''}"
+                for row in rows
+            ],
+        )
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        obj = item.object
+        if obj is None:
+            row.label(text="missing part", icon="ERROR")
+            return
+        row.label(text=_short(obj.name, 24), icon="MESH_DATA")
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        if clothscan.is_cloth(obj.name):
+            right.label(text="cloth")
+        right.label(text=f"{len(obj.data.vertices):,}v")
+
+
+class DMF_UL_cloth_chains(UIList):
+    bl_idname = "DMF_UL_cloth_chains"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(
+            self,
+            [
+                f"{row.name} {row.root} {row.side} {'cloth' if clothscan.is_cloth(row.name) else ''}"
+                for row in rows
+            ],
+        )
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        row.label(
+            text=_short(item.name, 24) or "chain",
+            icon="MOD_CLOTH" if clothscan.is_cloth(item.name) else "BONE_DATA",
+        )
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=f"{item.count}")
+
+
 class DMF_UL_rules(UIList):
     bl_idname = "DMF_UL_bone_rules"
 
@@ -206,6 +259,8 @@ CLASSES = (
     DMF_UL_hierarchy,
     DMF_UL_parts,
     DMF_UL_materials,
+    DMF_UL_hero_parts,
+    DMF_UL_cloth_chains,
     DMF_UL_rules,
     DMF_UL_clips,
 )

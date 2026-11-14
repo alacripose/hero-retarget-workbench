@@ -71,7 +71,11 @@ use it.
 For development from this checkout, add `blender/` as a script directory instead;
 the addon then uses the checkout's `forge/` package and writes under the checkout.
 
-The sidebar is in **3D Viewport → Sidebar → Deadlock**.
+The workbench is in **3D Viewport → Sidebar → Deadlock** and, one page at a time,
+in **Properties → Scene → Hero Retarget Workbench**. The properties tab
+shows a page selector — Setup, Source, Parts, Cloth, Skeleton, Rules, Animations,
+Compare, Weights, Handoff — and each page draws the same panel as the sidebar, so
+the two surfaces never disagree.
 
 ### Set the tool paths once
 
@@ -87,6 +91,19 @@ The sidebar is in **3D Viewport → Sidebar → Deadlock**.
 
 The Setup fields are scene properties, not a launcher script. A teammate with a
 newer Deadlock build or a different drive updates the fields in their own file.
+
+### Cloth: the hero's other meshes and its chains
+
+A hero extraction is several meshes, not one. Importing a hero now imports every
+mesh DMX beside the body onto the same armature: Shiv arrives with `shiv_hair3`,
+`shiv_jacket4`, `shiv_glasses2` and `shiv_gun1` alongside `shiv_body`, all skinned
+to the hero skeleton. **Cloth → Hero parts** re-runs that import for a file added
+to the folder later; **Cloth → Chains** groups the skeleton's numbered bones into
+chains (`coat_0..coat_3`, `sleeve_L`, `hair_01`), with segments and first bone.
+
+Cloth constraint nodes and their modeldoc sections are not authored here. The
+page imports the meshes and names the chains a simulation hangs from; it says so
+in the panel rather than implying the other half exists.
 
 ## Continuous integration and releases
 

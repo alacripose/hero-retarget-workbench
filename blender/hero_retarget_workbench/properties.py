@@ -107,6 +107,16 @@ class DMF_Part(PropertyGroup):
     )
 
 
+class DMF_ClothChain(PropertyGroup):
+    """One numbered bone chain: a cloth chain, a hair strand set, or a finger."""
+
+    name: StringProperty(name="Chain", default="")
+    side: StringProperty(name="Side", default="")
+    count: IntProperty(name="Segments", default=0)
+    root: StringProperty(name="First bone", default="")
+    bones: StringProperty(name="Bones", default="")
+
+
 class DMF_MaterialRow(PropertyGroup):
     material: PointerProperty(name="Material", type=bpy.types.Material)
     slot_index: IntProperty(name="Slot", default=-1)
@@ -326,6 +336,33 @@ class DMF_Settings(PropertyGroup):
         description="Mesh objects found in the selected part collection",
     )
     part_index: IntProperty(name="Part row", default=0)
+    hero_parts: CollectionProperty(
+        type=DMF_Part,
+        description="Meshes imported from the hero extraction beside the body",
+    )
+    hero_part_index: IntProperty(name="Hero part row", default=0)
+    cloth_chains: CollectionProperty(
+        type=DMF_ClothChain,
+        description="Numbered bone chains on the hero skeleton",
+    )
+    cloth_index: IntProperty(name="Cloth chain row", default=0)
+    props_page: EnumProperty(
+        name="Page",
+        description="Which page the Hero Retarget properties tab shows",
+        items=[
+            ("SETUP", "Setup", "Live game, CSDK13 and workspace"),
+            ("SOURCE", "Source", "Hero and custom model import"),
+            ("PARTS", "Parts", "Custom model parts and material slots"),
+            ("CLOTH", "Cloth", "Hero meshes and the chains cloth hangs from"),
+            ("SKELETON", "Skeleton", "Bone map and reference pose"),
+            ("RULES", "Rules", "Mapping rules"),
+            ("ANIMATIONS", "Animations", "Clip import and write-back"),
+            ("COMPARE", "Compare", "Split view and preview action"),
+            ("WEIGHTS", "Weights", "Weight solve and the proof gate"),
+            ("HANDOFF", "Handoff", "Export, stage and compile"),
+        ],
+        default="CLOTH",
+    )
     material_source: PointerProperty(
         name="Material source",
         description="Object whose material slots are the source list; defaults to the hero body",
@@ -719,6 +756,7 @@ CLASSES = (
     DMF_BoneEntry,
     DMF_ProofCheck,
     DMF_Part,
+    DMF_ClothChain,
     DMF_MaterialRow,
     DMF_LodLevel,
     DMF_BoneRule,
