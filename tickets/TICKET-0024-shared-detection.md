@@ -77,6 +77,12 @@ Three separate faults made a detected install look missing on other pages.
   forbids baked personal paths.
 - Installed-zip probe 13/13, including `path-edit-clears-stale-failure`
   (failed job fields set, a path edited, state/log/progress empty).
+- `artifacts/probes/detection_probe.py` installs the 0.8.25 zip in a fresh
+  profile, sets the owner's dead `openlock_modern/tools/s2v` path, and runs
+  Detect: `FINISHED`, `s2v_cli` repaired to
+  `Downloads/cli-windows-x64/Source2Viewer-CLI.exe`, status
+  `All tool paths found · CLI found elsewhere`, exit 0. Log:
+  `artifacts/receipts/detection-0.8.25.log`.
 - `artifacts/receipts/source-0.8.23.png` shows the Source page with no stale
   failure card after the fix.
 - Gate green.
