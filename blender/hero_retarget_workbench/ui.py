@@ -562,6 +562,17 @@ class DMF_PT_cloth(Panel):
             ["dmf.import_hero_parts", "dmf.scan_cloth"],
             labels={"dmf.import_hero_parts": "Hero parts", "dmf.scan_cloth": "Chains"},
         )
+        source = box.row(align=True)
+        source.label(text="Chains from")
+        source.prop(settings, "cloth_source", text="", expand=True)
+        if settings.cloth_source == "CUSTOM":
+            if settings.custom_armature is None:
+                _hint(box, "Choose your model's rig in Parts first.", "QUESTION", width=32)
+            else:
+                box.label(
+                    text=f"{settings.custom_armature.name}: {len(settings.custom_armature.data.bones)} bones",
+                    icon="ARMATURE_DATA",
+                )
 
         if settings.hero_parts:
             ui_popit.micro(box, "Hero meshes", "MESH_DATA")
@@ -612,16 +623,49 @@ class DMF_PT_cloth(Panel):
             )
             index = max(0, min(settings.cloth_index, len(settings.cloth_chains) - 1))
             chain = settings.cloth_chains[index]
-            box.label(text=f"{chain.count} bones, from {chain.root}", icon="BONE_DATA")
+            box.label(
+                text=f"{chain.count} bones, from {chain.root}"
+                + (f" ({chain.source.lower()})" if chain.source == "CUSTOM" else ""),
+                icon="BONE_DATA",
+            )
             if chain.bones:
                 _hint(box, chain.bones, "ARMATURE_DATA", width=34)
+            if chain.source == "CUSTOM":
+                edit = box.column(align=True)
+                edit.prop(chain, "source_mesh", text="Mesh")
+                if settings.target_armature is not None:
+                    edit.prop_search(
+                        chain,
+                        "parent",
+                        settings.target_armature.data,
+                        "bones",
+                        text="New parent",
+                    )
+                else:
+                    edit.prop(chain, "parent", text="New parent")
+                if chain.joined:
+                    box.label(text=f"{chain.joined} bones joined to the hero", icon="CHECKMARK")
+                _hint(
+                    box,
+                    "Join copies this chain into the hero armature at its viewport size. "
+                    "ModelDoc then replaces the Skeleton node from the exported rig; the "
+                    ".vnmskel stays out of the mod VPK.",
+                    "INFO",
+                    width=34,
+                )
             action = box.row(align=True)
+            if chain.source == "CUSTOM":
+                action.operator("dmf.join_cloth_chain", text="Join to hero", icon="ARMATURE_DATA")
             action.operator(
                 "dmf.build_chain_cloth",
-                text="Build cloth on this chain",
+                text="Build cloth",
                 icon="MOD_CLOTH",
             )
             action.operator("dmf.build_all_cloth", text="", icon="MOD_PHYSICS")
+            proxy = box.row(align=True)
+            proxy.operator("dmf.mark_cloth_proxy", text="Mark Source 2 proxy", icon="MOD_PHYSICS")
+            if chain.proxy:
+                box.label(text="CLOTHPROXY + cloth_enable", icon="CHECKMARK")
             if chain.target_mesh is not None:
                 box.label(
                     text=f"{chain.target_mesh.name}: {chain.pin_group}, {chain.cloth_modifier}",
@@ -638,8 +682,8 @@ class DMF_PT_cloth(Panel):
                 )
         _hint(
             box,
-            "Cloth constraint nodes live in the modeldoc. This page imports the meshes and shows "
-            "the chains a simulation can hang from; it does not author those nodes.",
+            "Source 2 cloth chains are modeldoc ClothChain nodes. This page joins the chain and "
+            "writes the proxy's cloth maps; the ClothChain node is authored in ModelDoc.",
             "INFO",
             width=34,
         )
@@ -769,6 +813,54 @@ def _draw_ik(layout, settings) -> None:
     )
 
 
+def _draw_tail(layout, settings) -> None:
+    """Tail channels on a second armature. Experimental, and says so."""
+    box = layout.box()
+    head = box.row(align=True)
+    head.label(text="TAIL ARMATURE (EXPERIMENTAL)", icon="ARMATURE_DATA")
+    right = head.row(align=True)
+    right.alignment = "RIGHT"
+    right.label(text=f"{len(settings.tail_bones)} channels" if settings.tail_bones else "not paired")
+    box.prop(settings, "tail_armature", text="Tail rig")
+    box.prop(settings, "tail_weight", text="Blend", slider=True)
+    actions = box.row(align=True)
+    actions.operator("dmf.scan_tail", text="Find channels", icon="FILE_REFRESH")
+    actions.operator("dmf.blend_tail_all", text="Blend all", icon="ACTION")
+    if settings.tail_bones:
+        index = max(0, min(settings.tail_index, len(settings.tail_bones) - 1))
+        row = settings.tail_bones[index]
+        box.template_list(
+            "DMF_UL_tail",
+            "",
+            settings,
+            "tail_bones",
+            settings,
+            "tail_index",
+            rows=4,
+        )
+        if settings.tail_armature is not None:
+            box.prop_search(
+                row,
+                "target",
+                settings.tail_armature.data,
+                "bones",
+                text="Tail bone",
+            )
+        else:
+            box.prop(row, "target", text="Tail bone")
+        box.operator("dmf.blend_tail", text="Blend selected clip", icon="PLAY")
+    if settings.tail_note:
+        _hint(box, settings.tail_note, "INFO", width=34)
+    _hint(
+        box,
+        "Copies the hero clip's tail channels onto the chosen tail rig in local space. "
+        "A tail rig that does not share the hero's rest orientation will need its own "
+        "correction; treat this as experimental.",
+        "INFO",
+        width=34,
+    )
+
+
 class DMF_PT_animations(Panel):
     bl_label = "Animations"
     bl_idname = "DMF_PT_animations"
@@ -794,15 +886,27 @@ class DMF_PT_animations(Panel):
         )
         ui_popit.glyphs(
             box,
-            ["dmf.scan_clips", "dmf.import_clips", "dmf.cancel_clips"],
-            labels={"dmf.scan_clips": "Scan", "dmf.import_clips": "Import all", "dmf.cancel_clips": "Stop"},
+            ["dmf.scan_clips", "dmf.import_clips", "dmf.bake_clips", "dmf.cancel_clips"],
+            labels={
+                "dmf.scan_clips": "Scan",
+                "dmf.import_clips": "Import all",
+                "dmf.bake_clips": "Bake + write",
+                "dmf.cancel_clips": "Stop",
+            },
         )
-        _path_row(box, settings, "clips_dir", "Folder")
+        _path_row(box, settings, "clips_dir", "Folder (optional)")
+        box.prop(settings, "clip_ag_filter", text="Show")
+        if settings.clip_auto_note:
+            box.label(text=_short(settings.clip_auto_note, 46), icon="FILE_FOLDER")
+        if settings.clip_vnmskel:
+            box.label(text=_short(Path(settings.clip_vnmskel).name, 32), icon="ARMATURE_DATA")
         if not settings.clips:
             _draw_ik(layout, settings)
+            _draw_tail(layout, settings)
             _hint(
                 box,
-                "Point at the S2V extraction's clip folder, then scan it.",
+                "Extract a hero and press Scan. The page finds the clips folders beside "
+                "the body and the .vnmskel on its own.",
                 "QUESTION",
                 width=30,
             )
@@ -824,6 +928,7 @@ class DMF_PT_animations(Panel):
         detail.label(text=_short(entry.name, 32), icon="FILE")
         meta = detail.row(align=True)
         meta.label(text=f"{entry.kind}{'_c' if entry.compiled else ''}")
+        meta.label(text=entry.ag)
         right = meta.row(align=True)
         right.alignment = "RIGHT"
         right.label(text=f"{entry.size:,} bytes")
@@ -836,6 +941,7 @@ class DMF_PT_animations(Panel):
         actions.operator("dmf.import_clip", text="Import", icon="IMPORT")
         actions.operator("dmf.preview_clip", text="Preview", icon="PLAY")
         actions.operator("dmf.export_clip", text="Write", icon="EXPORT")
+        actions.operator("dmf.bake_clip", text="Bake", icon="ACTION")
         prefix = box.row(align=True)
         prefix.prop(settings, "clip_prefix", text="Prefix")
         prefix.operator("dmf.prefix_clips", text="", icon="SORTALPHA")
@@ -844,6 +950,7 @@ class DMF_PT_animations(Panel):
             _hint(box, settings.clip_note, "LOCKED", width=30)
 
         _draw_ik(layout, settings)
+        _draw_tail(layout, settings)
         ui_popit.micro(box, "Write back", "EXPORT")
         _path_row(box, settings, "clip_export_dir", "Folder")
         write = box.row(align=True)
@@ -854,8 +961,9 @@ class DMF_PT_animations(Panel):
             box.label(text=f"{written} clips written", icon="CHECKMARK")
         _hint(
             box,
-            "Writes <folder>/anims/<clip>.dmx. The extraction's own clips are never overwritten, "
-            "and the vnmclip beside each clip is left as it is.",
+            "Bake + write makes Model 22 DMX clips: visual keying, original frame range, "
+            "constraints cleared. AG2 writes <folder>/clips/<clip>.dmx. ModelDoc's "
+            "Make Default Animgraph2 converts those into vnmclip_c; pack the clip, not the .vnmskel.",
             "INFO",
             width=34,
         )

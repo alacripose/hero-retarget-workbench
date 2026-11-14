@@ -107,6 +107,34 @@ def test_export_folder_never_writes_over_the_extraction(tmp_path: Path):
 
 def test_written_path_is_the_anims_layout_a_clip_is_compiled_from(tmp_path: Path):
     assert clips.written_path(tmp_path, "walk_lower_L") == tmp_path / "anims" / "walk_lower_L.dmx"
+    assert clips.written_path(tmp_path, "walk_lower_L", "AG2") == tmp_path / "clips" / "walk_lower_L.dmx"
+
+
+def test_animgraph_reads_the_folder_without_parsing_a_clip(tmp_path: Path):
+    ag2 = tmp_path / "hero" / "clips" / "walk.dmx"
+    ag1 = tmp_path / "hero" / "anims" / "walk.dmx"
+    compiled = tmp_path / "hero" / "walk.vnmclip_c"
+    for path in (ag2, ag1, compiled):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"\0")
+    skeleton = tmp_path / "hero" / "hero.vnmskel"
+    skeleton.write_bytes(b"\0")
+    assert clips.animgraph(ag2, [tmp_path], skeleton) == "AG2"
+    assert clips.animgraph(ag2, [tmp_path], None) == "AG2"
+    assert clips.animgraph(ag1, [tmp_path], skeleton) == "AG1"
+    assert clips.animgraph(compiled, [tmp_path], skeleton) == "AG2"
+    assert clips.animgraph(tmp_path / "loose.dmx", [tmp_path], None) == "UNKNOWN"
+
+
+def test_clip_roots_find_the_clips_and_anims_folders(tmp_path: Path):
+    clips_dir = tmp_path / "models" / "hero" / "clips"
+    anims_dir = tmp_path / "models" / "hero" / "anims"
+    clips_dir.mkdir(parents=True)
+    anims_dir.mkdir(parents=True)
+    assert set(clips.clip_roots(tmp_path)) == {clips_dir, anims_dir}
+    skeleton = tmp_path / "models" / "hero" / "hero.vnmskel"
+    skeleton.write_bytes(b"\0")
+    assert clips.find_vnmskel([tmp_path]) == skeleton
 
 
 def test_glob_escape_matches_one_action_name_and_no_others():

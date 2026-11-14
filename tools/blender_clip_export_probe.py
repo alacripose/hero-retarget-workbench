@@ -200,14 +200,15 @@ def main() -> int:
     entry.path = str(destination / "source" / f"{label}.dmx")
     entry.action = action.name
     entry.state = "IMPORTED"
+    entry.ag = "AG2"
 
     before_export_path = scene.vs.export_path
     armature.vs.subdir = "keep_me"
     armature.data.vs.action_selection = "CURRENT"
 
     written = clipops.write_action(settings, entry, destination)
-    expected = destination / "anims" / f"{label}.dmx"
-    check("writes the clip name under anims", written == expected and expected.is_file(), str(written))
+    expected = destination / "clips" / f"{label}.dmx"
+    check("writes an AG2 clip under clips", written == expected and expected.is_file(), str(written))
     size = expected.stat().st_size if expected.is_file() else 0
     check("the written DMX is not empty", size > 0, f"{size} bytes")
     check(
@@ -225,6 +226,24 @@ def main() -> int:
         f"selection={armature.data.vs.action_selection}",
     )
     check("only one file was written", len(list(destination.rglob('*.dmx'))) == 1, len(list(destination.rglob('*.dmx'))))
+
+    legacy_label = "walk_upper_L"
+    legacy_action = _build_action(armature, legacy_label)
+    legacy = settings.clips.add()
+    legacy.name = f"{legacy_label}.dmx"
+    legacy.label = legacy_label
+    legacy.kind = "dmx"
+    legacy.path = str(destination / "source" / f"{legacy_label}.dmx")
+    legacy.action = legacy_action.name
+    legacy.state = "IMPORTED"
+    legacy.ag = "AG1"
+    legacy_written = clipops.write_action(settings, legacy, destination)
+    legacy_expected = destination / "anims" / f"{legacy_label}.dmx"
+    check(
+        "writes an AG1 clip under anims",
+        legacy_written == legacy_expected and legacy_expected.is_file(),
+        str(legacy_written),
+    )
 
     source_length = round(action.frame_range[1] - action.frame_range[0])
     existing = {found.name for found in bpy.data.actions}
