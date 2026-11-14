@@ -31,7 +31,6 @@ ROOT_IDNAME = "DMF_PT_space_main"
 PAGES_SPACE_IDNAME = "DMF_ST_workbench_pages"
 PAGES_HEADER_IDNAME = "DMF_HT_workbench_pages"
 PAGES_PANEL_IDNAME = "DMF_PT_space_pages"
-_PAGE_BY_LABEL = {page.replace("_", " ").title(): page for page in ui_props.PAGES}
 PREFIX = "space"
 _REGISTERED: list[type] = []
 # Why register() declined, when this build could have hosted the editor. The
@@ -172,123 +171,45 @@ def editor_space_classes() -> list[type]:
     )
     for cls in (space, header, root):
         ui_props.materialize(cls)
-    # The root must stay: a page panel with an empty parent id draws nothing in
-    # a custom space, which is exactly the empty view 0.8.7 shipped.
-    return [space, header, root]
-
-
-_PENDING_PAGE = {"page": ""}
-
-
-def _active_settings():
-    """Scene settings from a timer, where ``bpy.context.scene`` can be None."""
-    scene = getattr(bpy.context, "scene", None)
-    if scene is None:
-        window = getattr(bpy.context, "window", None)
-        if window is None and bpy.context.window_manager.windows:
-            window = bpy.context.window_manager.windows[0]
-        scene = getattr(window, "scene", None)
-    return getattr(scene, "dmf", None)
-
-
-def _select_page(page: str):
-    _PENDING_PAGE["page"] = ""
-    settings = _active_settings()
-    if settings is not None and settings.props_page != page:
-        settings.props_page = page
-        for window in bpy.context.window_manager.windows:
-            if window:
-                for area in window.screen.areas:
-                    if area.type == "CUSTOM" and area.ui_type == SPACE_IDNAME:
-                        area.tag_redraw()
-    return None
+    # The root is not registered: the pages now live in the sidebar's own
+    # categories, so a WINDOW-region root would only leave an empty box in the
+    # main region. It stays defined because Properties still uses ROOT.
+    return [space, header]
 
 
 _SEEN_AREAS: set[int] = set()
 
 
-def _tab_draw(self, context, page: str) -> None:
-    """A page tab: selecting the category switches the Workbench page.
+def page_mirror_classes() -> list[type]:
+    """The page panels, in the custom view's own sidebar categories.
 
-    The tab strip at the right edge of a sidebar is built from categories, not
-    from a list inside one panel. One category per page is the only way an
-    add-on can put the pages themselves in that strip; the switch is scheduled
-    from a timer because the selection arrives during draw.
-    """
-    # Deliberately no page write here. The UI region's active category is the
-    # single writer (see _ensure_sidebar). Doing both made a tab click flicker:
-    # the tab's draw answered the old page while the category answered the new
-    # one, and the area redrew into the default sidebar width.
-    return None
-
-
-def _tab_draw_for(page: str):
-    """A two-argument draw closure; Blender rejects a default page argument."""
-
-    def draw(self, context) -> None:
-        _tab_draw(self, context, page)
-
-    return draw
-
-
-def pages_space_classes() -> list[type]:
-    """One sidebar tab per Workbench page, in the sidebar's own tab strip.
-
-    The custom space has a real UI region whose category tabs are the vertical
-    strip on its right edge. A single "Pages" panel listed the pages inside the
-    strip instead of being the strip; the owner asked for the pages themselves
-    to be the tabs.
+    Each page is a category in the UI region, the way every editor's N sidebar
+    has its own tabs, and the page's panels are what that tab shows. There is no
+    WINDOW-region copy and no page selector: the tab is the page.
     """
     classes: list[type] = []
-    for page in ui_props.PAGES:
-        label = page.replace("_", " ").title()
-        idname = f"DMF_PT_space_tab_{page.lower()}"
-        cls = type(
-            idname,
-            (Panel,),
-            {
-                "bl_idname": idname,
-                "bl_label": label,
-                "bl_category": label,
-                "bl_space_type": "CUSTOM",
-                "bl_space_idname": SPACE_IDNAME,
-                "bl_region_type": "UI",
-                # Header hidden: the category tab above is the only visible
-                # control. Without this each tab also draws an empty panel box
-                # named after the page beside the strip.
-                "bl_options": {"HIDE_HEADER"},
-                "poll": classmethod(
-                    lambda cls, context: getattr(
-                        getattr(context, "scene", None), "dmf", None
-                    )
-                    is not None
-                ),
-                "draw": _tab_draw_for(page),
-            },
+    for panel in ui_props.page_panels():
+        page = ui_props.PAGE_BY_ID[panel.bl_idname]
+        classes.append(
+            ui_props.mirror(
+                panel,
+                page,
+                space_type="CUSTOM",
+                prefix=PREFIX,
+                space_idname=SPACE_IDNAME,
+                root_idname="",
+                region_type="UI",
+                category=page.replace("_", " ").title(),
+            )
         )
-        classes.append(ui_props.materialize(cls))
     return classes
-
-
-def page_mirror_classes() -> list[type]:
-    return [
-        ui_props.mirror(
-            panel,
-            ui_props.PAGE_BY_ID[panel.bl_idname],
-            space_type="CUSTOM",
-            prefix=PREFIX,
-            space_idname=SPACE_IDNAME,
-            root_idname=ROOT_IDNAME,
-        )
-        for panel in ui_props.page_panels()
-    ]
 
 
 def editor_classes() -> list[type]:
     """Every class the editor would like, or [] when the build cannot host it."""
     if not custom_space_supported():
         return []
-    return [*editor_space_classes(), *pages_space_classes(), *page_mirror_classes()]
+    return [*editor_space_classes(), *page_mirror_classes()]
 
 
 def _register_each(classes: list[type]) -> list[str]:
@@ -320,7 +241,7 @@ def register() -> bool:
         print(f"DMF editor surface declined: {EDITOR_ERROR}", flush=True)
         unregister()
         return False
-    optional = _register_each([*pages_space_classes(), *page_mirror_classes()])
+    optional = _register_each(page_mirror_classes())
     EDITOR_ERROR = ("; ".join(optional) if optional else "")
     if optional:
         print(f"DMF editor optional classes skipped: {EDITOR_ERROR}", flush=True)
@@ -374,22 +295,6 @@ def _ensure_sidebar() -> float:
                     opened = True
                 if hasattr(space, "show_region_footer") and space.show_region_footer:
                     space.show_region_footer = False
-                    opened = True
-            # The selected sidebar category is readable from the UI region. It is
-            # the reliable tab signal: a hidden-header tab panel may not be drawn
-            # at all, and a write from inside draw does not persist.
-            ui_region = next(
-                (region for region in area.regions if region.type == "UI"), None
-            )
-            category = getattr(ui_region, "active_panel_category", "") if ui_region else ""
-            page = _PAGE_BY_LABEL.get(category)
-            if page:
-                scene = getattr(bpy.context, "scene", None) or (
-                    bpy.context.window.scene if bpy.context.window else None
-                )
-                settings = getattr(scene, "dmf", None)
-                if settings is not None and settings.props_page != page:
-                    settings.props_page = page
                     opened = True
             if opened:
                 area.tag_redraw()

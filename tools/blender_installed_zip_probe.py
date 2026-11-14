@@ -1,16 +1,21 @@
 """Install the built zip into an isolated profile and check the page surface.
 
-The dev probe imports the addon from this repo, so it says nothing about the
+The dev probes import the addon from this repo, so they say nothing about the
 artifact a user downloads. This one runs against the zip: it installs it through
 Blender's own add-on installer into the profile named by ``BLENDER_USER_SCRIPTS``
-(set by the caller), enables it, and reports which page surface registered, the
-area switch, and the page panels.
+(set by the caller), enables it, and checks the surface, the sidebar pages and the
+installed-copy path.
+
+The page surface is the custom view's own N sidebar: every page is a category in
+the UI region and the page's panels are what that tab shows. There is no
+WINDOW-region page copy and no page selector, so the probe checks the panels'
+region and category rather than a page property.
 
 Usage::
 
-    BLENDER_USER_SCRIPTS=<repo>/artifacts/zip-profile/scripts \
-    blender --factory-startup --python tools/blender_installed_zip_probe.py -- \
-        --zip dist/hero_retarget_workbench-0.7.1.zip \
+    BLENDER_USER_SCRIPTS=<repo>/artifacts/zip-profile/scripts \\
+    blender --factory-startup --python tools/blender_installed_zip_probe.py -- \\
+        --zip dist/hero_retarget_workbench-0.8.16.zip \\
         --report artifacts/receipts/zip-install.json
 """
 from __future__ import annotations
@@ -28,8 +33,8 @@ import bpy
 REPO = Path(__file__).resolve().parents[1]
 MODULE = "hero_retarget_workbench"
 SPACE_IDNAME = "DMF_ST_workbench"
-PAGES_PANEL_IDNAME = "DMF_PT_space_pages"
 HEADER_IDNAME = "DMF_HT_workbench"
+ROOT_IDNAME = "DMF_PT_space_main"
 
 
 def _arguments() -> argparse.Namespace:
@@ -40,6 +45,12 @@ def _arguments() -> argparse.Namespace:
     parser.add_argument("--expect", choices=("editor", "sidebar"), default="")
     parser.add_argument("--screenshot", default="")
     return parser.parse_args(argv)
+
+
+def _page_labels() -> dict[str, str]:
+    module = sys.modules.get(MODULE)
+    pages = getattr(getattr(module, "ui_props", None), "PAGES", ())
+    return {page: page.replace("_", " ").title() for page in pages}
 
 
 def main() -> int:
@@ -71,20 +82,19 @@ def main() -> int:
     report["version"] = ".".join(str(part) for part in addon.bl_info["version"])
     check(
         "installed-copy",
-        Path(report["addon_file"]).is_relative_to(Path(os.environ.get("BLENDER_USER_SCRIPTS", ""))),
+        Path(report["addon_file"]).is_relative_to(
+            Path(os.environ.get("BLENDER_USER_SCRIPTS", ""))
+        ),
         report["addon_file"],
     )
 
-    panels = sorted(name for name in dir(bpy.types) if name.startswith("DMF_PT_"))
     spaces = [name for name in dir(bpy.types) if name == SPACE_IDNAME]
     expected = args.expect or ("editor" if spaces else "sidebar")
     report["expect"] = expected
     report["space_registered"] = bool(spaces)
     report["header_registered"] = HEADER_IDNAME in dir(bpy.types)
-    report["panels"] = panels
     check("space-registered", bool(spaces) == (expected == "editor"), spaces or "not on this build")
     check("header-registered", report["header_registered"] == (expected == "editor"), HEADER_IDNAME in dir(bpy.types))
-    check("pages-registered", bool(panels), len(panels))
     check("expected-surface", report["surface"] == expected, report["surface"])
     check(
         "surface-consistent",
@@ -93,20 +103,15 @@ def main() -> int:
     )
 
     window = bpy.context.window
-    # The widest area makes the screenshot show the page surface beside its
-    # sidebar; the Properties column is ~220 px and the sidebar eats it.
     candidates = [
         candidate
-        for screen in (window.screen for window in bpy.context.window_manager.windows if window)
+        for screen in (candidate.screen for candidate in bpy.context.window_manager.windows if candidate)
         for candidate in screen.areas
         if candidate.type in {"PROPERTIES", "VIEW_3D", "CUSTOM"}
     ]
     area = max(candidates, key=lambda candidate: candidate.width, default=None)
     report["area_found"] = area is not None
     if area is not None:
-        # Start the page away from Setup: the selected tab must draw and switch
-        # it back, which is the only signal an add-on panel gets for its tab.
-        bpy.context.scene.dmf.props_page = "CLOTH"
         before = str(area.type)
         with bpy.context.temp_override(window=window, area=area):
             switched = bpy.ops.dmf.open_workbench()
@@ -119,27 +124,86 @@ def main() -> int:
             if candidate.type == "CUSTOM"
         ]
         report["ui_types"] = ui_types
+        space = area.spaces.active
         if expected == "editor":
-            report["pages_strip"] = any(
-                name.startswith("DMF_PT_space_tab_") for name in dir(bpy.types)
-            )
-            space = area.spaces.active
+            labels = _page_labels()
+            pages: dict[str, object] = {}
+            for page, label in labels.items():
+                cls = getattr(bpy.types, f"DMF_PT_space_{page.lower()}", None)
+                pages[label] = None if cls is None else {
+                    "region": str(getattr(cls, "bl_region_type", "")),
+                    "category": str(getattr(cls, "bl_category", "")),
+                }
+            report["pages"] = pages
             check(
                 "open-workbench",
                 switched == {"FINISHED"}
                 and SPACE_IDNAME in ui_types
-                and bool(getattr(space, "show_region_ui", False))
-                and report["pages_strip"],
+                and bool(getattr(space, "show_region_ui", False)),
                 {
                     "result": str(switched),
                     "type": report["area_type"],
                     "ui_types": ui_types,
                     "sidebar": bool(getattr(space, "show_region_ui", False)),
-                    "pages_panel": report["pages_strip"],
                 },
             )
+            check(
+                "pages-in-sidebar",
+                bool(pages)
+                and all(
+                    entry
+                    and entry["region"] == "UI"
+                    and entry["category"] == label
+                    for label, entry in pages.items()
+                ),
+                pages,
+            )
+            check(
+                "no-window-page-root",
+                ROOT_IDNAME not in dir(bpy.types),
+                ROOT_IDNAME if ROOT_IDNAME in dir(bpy.types) else "not registered",
+            )
+            with bpy.context.temp_override(window=window, area=area):
+                bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=3)
+            ui_region = next(
+                (region for region in area.regions if region.type == "UI"), None
+            )
+            report["active_category"] = getattr(ui_region, "active_panel_category", "")
+            categories: list[str] = []
+            if ui_region is not None:
+                for label in labels.values():
+                    try:
+                        ui_region.active_panel_category = label
+                        categories.append(str(ui_region.active_panel_category))
+                    except (AttributeError, TypeError) as error:
+                        categories.append(f"{type(error).__name__}: {error}")
+            report["categories"] = categories
+            check(
+                "categories-selectable",
+                bool(categories) and categories == list(labels.values()),
+                categories,
+            )
+            space_module = getattr(sys.modules.get(MODULE), "ui_space", None)
+            # The operator forgets the area so the next opening opens the
+            # sidebar; let the timer see it once before testing a collapse.
+            if space_module is not None:
+                space_module._ensure_sidebar()
+            space.show_region_ui = False
+            if space_module is not None:
+                space_module._ensure_sidebar()
+            check(
+                "respects-collapse",
+                space.show_region_ui is False,
+                "re-asserted"
+                if space.show_region_ui
+                else "left collapsed",
+            )
+            space.show_region_ui = True
+            if ui_region is not None:
+                ui_region.active_panel_category = labels.get("CLOTH", "Cloth")
+            with bpy.context.temp_override(window=window, area=area):
+                bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=3)
         else:
-            space = area.spaces.active
             check(
                 "open-workbench",
                 switched == {"FINISHED"}
@@ -151,111 +215,21 @@ def main() -> int:
                     "sidebar": bool(getattr(space, "show_region_ui", False)),
                 },
             )
-        if expected == "editor":
-            # Force real panel draws without waiting on the event loop.
-            with bpy.context.temp_override(window=window, area=area):
-                bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=3)
-            ui_region = next(
-                (region for region in area.regions if region.type == "UI"), None
-            )
-            report["active_category"] = getattr(
-                ui_region, "active_panel_category", ""
-            )
-            space_module = getattr(sys.modules.get(MODULE), "ui_space", None)
-            switched_pages = {}
-            if ui_region is not None and space_module is not None:
-                for category in ("Cloth", "Setup"):
-                    try:
-                        ui_region.active_panel_category = category
-                    except (AttributeError, TypeError):
-                        continue
-                    space_module._ensure_sidebar()
-                    switched_pages[category] = bpy.context.scene.dmf.props_page
-            report["category_switches"] = switched_pages
-            report["tab_switched_page"] = bpy.context.scene.dmf.props_page
-            # Leave it on a page with content and redraw before the screenshot.
-            if ui_region is not None:
-                ui_region.active_panel_category = "Cloth"
-                if space_module is not None:
-                    space_module._ensure_sidebar()
-                with bpy.context.temp_override(window=window, area=area):
-                    bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=3)
-            report["regions"] = [
-                {
-                    "type": region.type,
-                    "x": region.x,
-                    "y": region.y,
-                    "width": region.width,
-                    "height": region.height,
-                }
-                for region in area.regions
-            ]
-            report["space_region_flags"] = {
-                name: getattr(space, name, None)
-                for name in dir(space)
-                if "show_region" in name
+        report["regions"] = [
+            {
+                "type": region.type,
+                "x": region.x,
+                "y": region.y,
+                "width": region.width,
+                "height": region.height,
             }
-            check(
-                "tab-switch",
-                switched_pages.get("Cloth") == "CLOTH"
-                and switched_pages.get("Setup") == "SETUP",
-                switched_pages,
-            )
-
-            # A second page writer made a tab click flicker in 0.8.14. The tab
-            # panels must draw without changing the page.
-            page_before_draw = bpy.context.scene.dmf.props_page
-            draw_results = {}
-            for name in ("DMF_PT_space_tab_cloth", "DMF_PT_space_tab_setup"):
-                tab_class = getattr(bpy.types, name, None)
-                if tab_class is None:
-                    draw_results[name] = "missing"
-                    continue
-                try:
-                    tab_class.draw(tab_class, bpy.context)
-                    draw_results[name] = "ok"
-                except Exception as error:
-                    draw_results[name] = f"{type(error).__name__}: {error}"
-            report["tab_draws"] = draw_results
-            check(
-                "tab-draw-is-read-only",
-                bpy.context.scene.dmf.props_page == page_before_draw
-                and all(value == "ok" for value in draw_results.values()),
-                {
-                    "before": page_before_draw,
-                    "after": bpy.context.scene.dmf.props_page,
-                    "draws": draw_results,
-                },
-            )
-
-            # Re-reading the same category must not change the page or re-assert
-            # sidebar flags; that is what reset a dragged width.
-            stable_page = bpy.context.scene.dmf.props_page
-            stable_width = ui_region.width if ui_region is not None else 0
-            for _ in range(3):
-                if space_module is not None:
-                    space_module._ensure_sidebar()
-            report["stable"] = {
-                "page": bpy.context.scene.dmf.props_page,
-                "width": ui_region.width if ui_region is not None else 0,
-            }
-            check(
-                "page-and-width-stable",
-                bpy.context.scene.dmf.props_page == stable_page
-                and report["stable"]["width"] == stable_width,
-                report["stable"],
-            )
-            space.show_region_ui = False
-            if space_module is not None:
-                space_module._ensure_sidebar()
-            check(
-                "respects-collapse",
-                space.show_region_ui is False,
-                "show_region_ui re-asserted"
-                if space.show_region_ui
-                else "left collapsed",
-            )
-            space.show_region_ui = True
+            for region in area.regions
+        ]
+        report["space_region_flags"] = {
+            name: getattr(space, name, None)
+            for name in dir(space)
+            if "show_region" in name
+        }
         if args.screenshot:
             for _ in range(3):
                 bpy.context.view_layer.update()
@@ -264,7 +238,11 @@ def main() -> int:
 
     Path(args.report).parent.mkdir(parents=True, exist_ok=True)
     Path(args.report).write_text(json.dumps(report, indent=2), encoding="utf-8")
-    print(f"ZIPINSTALL {'PASS' if not report['failed'] else 'FAIL'} {len(report['checks']) - len(report['failed'])}/{len(report['checks'])} checks", flush=True)
+    print(
+        f"ZIPINSTALL {'PASS' if not report['failed'] else 'FAIL'} "
+        f"{len(report['checks']) - len(report['failed'])}/{len(report['checks'])} checks",
+        flush=True,
+    )
     return 0 if not report["failed"] else 1
 
 
