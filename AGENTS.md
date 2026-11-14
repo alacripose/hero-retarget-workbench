@@ -325,6 +325,11 @@ quietly widen the scope into model reconstruction.
 - Each UI surface is an Operate surface: dense, native, legible, and honest about
   failure. Use the `impeccable` skill's Operate floor before UI edits.
 - Do not claim an unobserved compile. A staged hash is not a compiled model.
+- Change only the control the request names. "In place of X" authorises changing
+  X and nothing else; never remove, hide or reorder an adjacent control unless
+  the request names it. If a request admits two layouts, ask instead of picking
+  one — 0.8.19 removed the page icon row from "in place of the workbench title"
+  and that was an assumption, not a reading.
 
 ## Evidence format
 
