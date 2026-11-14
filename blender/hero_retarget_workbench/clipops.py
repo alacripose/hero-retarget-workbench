@@ -38,20 +38,25 @@ def folder(settings) -> Path | None:
 def roots(settings) -> list[Path]:
     """Every folder that can hold this hero's clips, without a mandatory pick.
 
-    An explicit Clip folder is authoritative.  Otherwise the extraction, the
-    body DMX folder and the vmdl folder are offered to the bounded clip-folder
-    discovery, which is what turns "ask the owner for a folder" into "find the
-    clips beside the model".
+    An explicit Clip folder is authoritative.  Otherwise the body DMX, the live
+    model and the vmdl identify the current hero; the extraction is added only
+    when the body still lives inside it.  Adding a stale extraction is how
+    Werewolf clips ended up in Shiv's list after a body swap.
     """
     chosen = folder(settings)
     if chosen is not None:
         return [chosen]
     candidates: list[Path] = []
-    for value in (settings.extraction_dir, settings.body_dmx, settings.hero_model_path, settings.vmdl):
+    body = Path(bpy.path.abspath(settings.body_dmx)) if settings.body_dmx else None
+    for value in (settings.body_dmx, settings.hero_model_path, settings.vmdl):
         if not value:
             continue
         path = Path(bpy.path.abspath(value))
         candidates.append(path if path.is_dir() else path.parent)
+    if settings.extraction_dir:
+        extraction = Path(bpy.path.abspath(settings.extraction_dir))
+        if body is None or extraction in body.parents:
+            candidates.append(extraction)
     found: list[Path] = []
     seen: set[str] = set()
     for candidate in candidates:
@@ -62,6 +67,17 @@ def roots(settings) -> list[Path]:
             seen.add(key)
             found.append(root)
     return found
+
+
+def hero_source(settings) -> str:
+    """A stable label for the hero extraction a clip row came from."""
+    if settings.hero_slug not in ("", "NONE"):
+        return settings.hero_slug
+    if settings.body_dmx:
+        return Path(bpy.path.abspath(settings.body_dmx)).parent.name
+    if settings.extraction_dir:
+        return Path(bpy.path.abspath(settings.extraction_dir)).name
+    return ""
 
 
 def scan(settings) -> dict[str, int]:
@@ -81,6 +97,7 @@ def scan(settings) -> dict[str, int]:
         skeleton = candidate if candidate.is_file() else None
     settings.clip_vnmskel = str(skeleton) if skeleton is not None else ""
     settings.clips.clear()
+    source_hero = hero_source(settings)
     for row in rows:
         entry = settings.clips.add()
         entry.name = row.name
@@ -89,12 +106,14 @@ def scan(settings) -> dict[str, int]:
         entry.compiled = row.compiled
         entry.path = str(row.path)
         entry.size = row.size
+        entry.source_hero = source_hero
         entry.state = "EDITABLE" if row.editable else "OPAQUE"
         entry.ag = clipscan.animgraph(row.path, roots_found, skeleton)
     settings.clip_index = 0
     settings.clip_imported = 0
     settings.clip_written = 0
     settings.clip_baked = 0
+    settings.tail_clip = "NONE"
     counts = clipscan.summary(rows)
     counts["ag1"] = sum(1 for row in settings.clips if row.ag == "AG1")
     counts["ag2"] = sum(1 for row in settings.clips if row.ag == "AG2")
@@ -143,6 +162,7 @@ def _import_one(settings, entry) -> str:
         if hasattr(armature.animation_data, "action_slot") and getattr(action, "slots", None):
             armature.animation_data.action_slot = action.slots[0]
     entry.action = action.name
+    entry.source_hero = entry.source_hero or hero_source(settings)
     entry.state = "IMPORTED"
     return action.name
 
@@ -180,6 +200,7 @@ def _tick():
         else:
             _import_one(settings, entry)
             settings.clip_imported += 1
+            settings.tail_clip = str(index)
             core.set_status(settings, f"Imported {entry.label}; {len(_QUEUE)} left", "BUSY")
     except Exception as error:
         entry.state = "FAILED"

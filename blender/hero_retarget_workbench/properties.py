@@ -31,6 +31,15 @@ def set_hero_items(heroes) -> None:
     HERO_ITEMS.extend((hero.slug, hero.title, hero.model_path) for hero in heroes)
 
 
+def tail_clip_items(self, context):
+    """Imported clips, named explicitly so a tail write never guesses the row."""
+    items = [("NONE", "Choose an imported clip", "No source action selected yet")]
+    for index, row in enumerate(getattr(self, "clips", ())):
+        if row.action:
+            items.append((str(index), row.label or row.name, row.path))
+    return items
+
+
 def _rule_changed(self, context) -> None:
     """A rule edit reaches the bone map just after the last keystroke."""
     settings = getattr(getattr(context, "scene", None), "dmf", None)
@@ -307,6 +316,7 @@ class DMF_ClipRow(PropertyGroup):
     ag: StringProperty(name="AnimGraph", default="UNKNOWN")
     path: StringProperty(name="Path", subtype="FILE_PATH", default="")
     size: IntProperty(name="Bytes", default=0)
+    source_hero: StringProperty(name="Source hero", default="")
     action: StringProperty(name="Action", default="")
     tail_action: StringProperty(name="Tail action", default="")
     exported: StringProperty(name="Written", subtype="FILE_PATH", default="")
@@ -727,6 +737,11 @@ class DMF_Settings(PropertyGroup):
     clip_written: IntProperty(name="Written clips", default=0)
     clip_baked: IntProperty(name="Baked clips", default=0)
     clip_auto_note: StringProperty(name="Auto scan note", default="")
+    tail_clip: EnumProperty(
+        name="Source clip",
+        description="Imported hero clip whose tail channels are written to the tail rig",
+        items=tail_clip_items,
+    )
     tail_armature: PointerProperty(
         name="Tail armature",
         description="Custom tail rig that receives the hero clip's tail channels (experimental)",

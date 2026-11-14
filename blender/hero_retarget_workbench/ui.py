@@ -19,7 +19,7 @@ import bpy
 from bpy.types import Panel
 from forge import bonerules, paths, stageflow
 
-from . import core, rules, tailpreview, ui_popit, workbench
+from . import clipops, core, rules, tailops, tailpreview, ui_popit, workbench
 
 
 _STATUS_ICONS = {
@@ -65,6 +65,11 @@ def _hero_label(settings) -> str:
     slug = settings.hero_slug
     if slug in ("", "NONE"):
         return "no hero"
+    from . import properties
+
+    for value, title, _model in properties.HERO_ITEMS:
+        if value == slug:
+            return title
     return slug.replace("_", " ").title()
 
 
@@ -815,46 +820,58 @@ def _draw_ik(layout, settings) -> None:
 
 
 def _draw_tail(layout, settings) -> None:
-    """Tail sources as tiles, then the channel pairing for the chosen one."""
+    """Pick a tail rig, pair it, then write one named clip or the hero's clips."""
     options = settings.tail_options
     live = sum(1 for option in options if option.source == "LIVE")
     box = ui_popit.title(
         layout,
         "Tails",
-        f"{len(options)} found" if options else "not scanned",
+        f"{len(options)} sources" if options else "not scanned",
         "ARMATURE_DATA",
     )
     ui_popit.glyphs(
         box,
-        ["dmf.scan_tails", "dmf.load_tail_option", "dmf.preview_tail"],
+        ["dmf.scan_tails", "dmf.preview_tail"],
         enabled=not settings.job_running,
-        labels={
-            "dmf.scan_tails": "Scan tails",
-            "dmf.load_tail_option": "Use tile",
-            "dmf.preview_tail": "Frame",
-        },
+        labels={"dmf.scan_tails": "Scan tails", "dmf.preview_tail": "Frame rig"},
     )
     _path_row(box, settings, "tail_scan_dir", "Extra folder")
+
     if options:
+        index = max(0, min(settings.tail_option_index, len(options) - 1))
+        selected = options[index]
+        chosen = box.box()
+        chosen.alert = True
+        chosen.label(text=_short(selected.label, 34), icon="BONE_DATA")
+        chosen.label(
+            text=f"{selected.count} bones · {selected.source.lower()} · {_short(selected.chain, 24)}",
+            icon="BLANK1",
+        )
+        chosen.operator("dmf.load_tail_option", text="Use this tail rig", icon="ARMATURE_DATA")
+
         ui_popit.micro(box, f"Tail sources · {live} live" if live else "Tail sources")
-        grid = box.grid_flow(row_major=True, columns=2, even_columns=True, even_rows=True, align=True)
-        for index, option in enumerate(options):
+        grid = box.grid_flow(row_major=True, columns=3, even_columns=True, even_rows=True, align=True)
+        for tile_index, option in enumerate(options):
             tile = grid.box()
-            tile.alert = index == settings.tail_option_index
+            tile.alert = tile_index == settings.tail_option_index
             icon = tailpreview.icon(option.preview)
             if icon:
-                tile.template_icon(icon_value=icon, scale=5.0)
+                tile.template_icon(icon_value=icon, scale=2.2)
             else:
                 tile.label(text="", icon="BONE_DATA")
-            choice = tile.operator("dmf.load_tail_option", text=option.label, icon="BONE_DATA")
-            choice.index = index
-            tile.label(text=f"{option.count} bones  ·  {option.source.lower()}", icon="BLANK1")
-    ui_popit.micro(box, "Pairing")
+            choice = tile.operator(
+                "dmf.load_tail_option",
+                text=_short(option.label, 19),
+                icon="BONE_DATA",
+            )
+            choice.index = tile_index
+            tile.label(text=f"{option.count} bones · {option.source.lower()}", icon="BLANK1")
+
+    ui_popit.micro(box, "1 · Pair the hero tail to this rig")
     box.prop(settings, "tail_armature", text="Tail rig")
-    box.prop(settings, "tail_weight", text="Blend", slider=True)
-    actions = box.row(align=True)
-    actions.operator("dmf.scan_tail", text="Map channels", icon="FILE_REFRESH")
-    actions.operator("dmf.blend_tail_all", text="Blend all", icon="ACTION")
+    pair = box.row(align=True)
+    pair.operator("dmf.scan_tail", text="Pair hero tail bones", icon="LINKED")
+    box.prop(settings, "tail_weight", text="Tail influence", slider=True)
     if settings.tail_bones:
         index = max(0, min(settings.tail_index, len(settings.tail_bones) - 1))
         row = settings.tail_bones[index]
@@ -877,7 +894,23 @@ def _draw_tail(layout, settings) -> None:
             )
         else:
             box.prop(row, "target", text="Tail bone")
-        box.operator("dmf.blend_tail", text="Blend selected clip", icon="PLAY")
+
+    ui_popit.micro(box, "2 · Choose what to write")
+    box.prop(settings, "tail_clip", text="Source clip")
+    source = tailops.source_row(settings)
+    if source is not None:
+        box.label(text=f"Action {_short(source.action, 30)}", icon="ACTION")
+    else:
+        _hint(box, "Import a clip on this page, then choose it as the source clip.", "INFO", width=34)
+    write = box.column(align=True)
+    write.operator("dmf.blend_tail", text="Write selected clip to tail", icon="PLAY")
+    hero = clipops.hero_source(settings)
+    write.operator(
+        "dmf.blend_tail_all",
+        text=f"Write every {hero} clip to tail" if hero else "Write every clip for this hero to tail",
+        icon="ACTION",
+    )
+
     message = settings.tail_note or settings.tail_option_note
     if message:
         ui_popit.bubble(box, message, "INFO", width=34)
@@ -948,6 +981,8 @@ class DMF_PT_animations(Panel):
         entry = settings.clips[index]
         detail = box.column(align=True)
         detail.label(text=_short(entry.name, 32), icon="FILE")
+        if entry.source_hero:
+            detail.label(text=f"from {_short(entry.source_hero, 30)}", icon="FILE_FOLDER")
         meta = detail.row(align=True)
         meta.label(text=f"{entry.kind}{'_c' if entry.compiled else ''}")
         meta.label(text=entry.ag)

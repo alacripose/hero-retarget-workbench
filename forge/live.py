@@ -121,8 +121,213 @@ def parse_hero_roster(text: str) -> list[Hero]:
     return sorted((hero for hero in heroes if hero.slug != "base"), key=lambda hero: (hero.title.lower(), hero.slug.lower()))
 
 
+_MODEL_ROOTS = ("models/heroes_wip", "models/heroes_staging", "models/npc")
+_MODEL_EXCLUDE = (
+    "_gun",
+    "_weapon",
+    "_brk",
+    "_gib",
+    "_piece",
+    "_fx",
+    "_arrow",
+    "_projectile",
+    "_bomb",
+    "_bottle",
+    "_cuffs",
+    "_bola",
+    "_grenade",
+    "_diorama",
+    "_banner",
+    "_pipes",
+    "_pizza",
+    "_statue",
+    "_roller",
+    "/roller/",
+    "_plank",
+    "_speaker",
+    "_zipline",
+    "_gibs",
+    "cracked_soul",
+    "/piece",
+    "/particle/",
+)
+_NPC_ROOTS = (
+    "trooper",
+    "boss",
+    "neutral",
+    "ghost",
+    "sewer",
+    "midboss",
+    "gargoyle",
+    "titan",
+    "medic",
+)
+
+
+def parse_model_listing(text: str) -> list[str]:
+    """Read the compiled model paths from an S2V ``-l -e vmdl_c`` listing."""
+    paths = []
+    for line in text.splitlines():
+        path = line.split(" CRC:", 1)[0].strip().replace("\\", "/")
+        if path.lower().endswith(".vmdl_c"):
+            paths.append(path)
+    return paths
+
+
+def _is_character_model(path: str, roster_paths: set[str]) -> bool:
+    """Whether a listed model is a character rather than a gun, prop or break piece."""
+    normalized = path.replace("\\", "/").lower()
+    if normalized in roster_paths:
+        return True
+    stem = Path(normalized).stem
+    if any(token in normalized for token in _MODEL_EXCLUDE):
+        return False
+    parts = Path(normalized).parts
+    if "heroes_wip" in parts or "heroes_staging" in parts:
+        # A direct hero model (abrams/abrams), a transform/variant folder
+        # (werewolf/transform, nano/nano_v2), or a named character variant
+        # (familiar_wip, ratking_minion).
+        return (
+            "transform" in parts
+            or any(part.endswith("_v2") or part == "v2" for part in parts)
+            or "_wip" in stem
+            or "minion" in stem
+            or (len(parts) >= 2 and stem == parts[-2])
+        )
+    if "npc" in parts:
+        npc_root = parts[parts.index("npc") + 1] if parts.index("npc") + 1 < len(parts) else ""
+        return any(token in npc_root for token in _NPC_ROOTS)
+    return False
+
+
+def _display_variant(value: str) -> str:
+    words = value.replace("-", "_").split("_")
+    labels = {"wip": "WIP", "v2": "V2", "npc": "NPC", "2": "2"}
+    return " ".join(labels.get(word.lower(), word.capitalize()) for word in words if word)
+
+
+def _variant_suffix(path: str, base_folder: str) -> str:
+    relative = path[len(base_folder):].strip("/")
+    if not relative:
+        return ""
+    parent = Path(relative).parent
+    stem = Path(relative).stem
+    base_name = Path(base_folder).name.lower()
+    pieces = [part for part in parent.parts if part.lower() not in ("dmx", "mesh")]
+    stem_tail = stem.lower()
+    for prefix in (base_name + "_", base_name, "hero_"):
+        if stem_tail.startswith(prefix):
+            stem_tail = stem_tail[len(prefix):]
+            break
+    if stem_tail and stem_tail != base_name and stem_tail not in {piece.lower() for piece in pieces}:
+        pieces.append(stem_tail)
+    label = _display_variant(" ".join(pieces))
+    base_label = _display_variant(base_name)
+    if label.lower().startswith(base_label.lower() + " "):
+        label = label[len(base_label) + 1:]
+    return label
+
+
+def _npc_title(path: str, parts: tuple[str, ...]) -> str:
+    index = parts.index("npc")
+    folder = parts[index + 1] if index + 1 < len(parts) else "npc"
+    folder_title = _display_variant(folder)
+    stem_title = _display_variant(Path(path).stem)
+    if stem_title.lower() == folder_title.lower() or folder_title.lower().startswith(stem_title.lower()):
+        return f"NPC · {folder_title}"
+    if stem_title.lower() in {"model", folder_title.lower() + " model"}:
+        return f"NPC · {folder_title}"
+    if stem_title.lower().startswith(folder_title.lower()):
+        return f"NPC · {stem_title}"
+    return f"NPC · {folder_title} · {stem_title}"
+
+
+def augment_roster(roster: list[Hero], model_paths: list[str]) -> list[Hero]:
+    """Add the character model variants the hero table does not name.
+
+    Transforms, alternate bodies, minions and NPC models exist in the VPK but
+    not as top-level hero entries.  They are still valid retarget targets, so
+    the Source page lists them without turning every gun and break piece into a
+    selectable hero.
+    """
+    unique_roster: list[Hero] = []
+    roster_seen: set[str] = set()
+    for hero in roster:
+        key = hero.model_path.replace("\\", "/").lower()
+        if key in roster_seen:
+            continue
+        roster_seen.add(key)
+        stem = Path(hero.model_path).stem.lower()
+        title = hero.title
+        if "wip" in stem and "wip" not in title.lower():
+            title = f"{title} · WIP"
+        elif (
+            stem != title.lower()
+            and not stem.startswith(title.lower())
+            and not title.lower().startswith(stem)
+        ):
+            title = f"{title} · {_display_variant(stem)}"
+        unique_roster.append(Hero(hero.slug, hero.model_path, title))
+    roster = unique_roster
+    by_path = {hero.model_path.replace("\\", "/").lower(): hero for hero in roster}
+    folders = {str(Path(path).parent).lower(): hero for path, hero in by_path.items()}
+    roster_paths = set(by_path)
+    found: list[Hero] = []
+    seen = set(by_path)
+    for raw in model_paths:
+        path = raw.replace("\\", "/")
+        key = path.lower()
+        if key in seen or not _is_character_model(path, roster_paths):
+            continue
+        seen.add(key)
+        directory = str(Path(path).parent).lower()
+        base = next(
+            (hero for prefix, hero in folders.items() if directory == prefix or directory.startswith(prefix + "/")),
+            None,
+        )
+        if base is not None:
+            folder = str(Path(base.model_path).parent)
+            suffix = _variant_suffix(path, folder)
+            base_title = base.title.split(" · ", 1)[0]
+            title = f"{base_title} · {suffix}" if suffix else f"{base_title} · Base"
+            slug = f"{base.slug}__{_display_variant(suffix).lower().replace(' ', '_') or 'base'}"
+        else:
+            parts = Path(path).parts
+            if "npc" in parts:
+                index = parts.index("npc")
+                folder_name = parts[index + 1] if index + 1 < len(parts) else "npc"
+                title = _npc_title(path, parts)
+                slug = f"npc__{folder_name}__{Path(path).stem}"
+            else:
+                index = next(
+                    (i for i, part in enumerate(parts) if part in ("heroes_wip", "heroes_staging")),
+                    0,
+                )
+                folder_name = parts[index + 1] if index + 1 < len(parts) else Path(path).stem
+                suffix = _variant_suffix(path, str(Path(*parts[: index + 2])))
+                title = _display_variant(folder_name) + (f" · {suffix}" if suffix else "")
+                slug = f"{folder_name}__{_display_variant(suffix).lower().replace(' ', '_') or 'base'}"
+        if key in {hero.model_path.lower() for hero in found}:
+            continue
+        found.append(Hero(slug=f"{slug}__{Path(path).stem}", model_path=path, title=title))
+    return sorted([*roster, *found], key=lambda hero: (hero.title.lower(), hero.slug.lower()))
+
+
+def list_models(env: Environment) -> list[str]:
+    """List character model paths from the live VPK, tolerating a failed root."""
+    paths: list[str] = []
+    for root in _MODEL_ROOTS:
+        try:
+            result = _run(env, ["-l", "-f", root, "-e", "vmdl_c"], timeout=180)
+        except (LiveError, OSError, subprocess.SubprocessError):
+            continue
+        if result.returncode == 0:
+            paths.extend(parse_model_listing(result.stdout))
+    return paths
+
+
 def list_heroes(env: Environment) -> list[Hero]:
-    """List every hero declared by the live build through Source 2 Viewer."""
+    """List every playable hero plus its live model variants and NPCs."""
     with tempfile.TemporaryDirectory(prefix="dmf-roster-") as temporary:
         root = Path(temporary)
         result = _run(
@@ -135,10 +340,14 @@ def list_heroes(env: Environment) -> list[Hero]:
         candidates = sorted(root.rglob("heroes.vdata"))
         if not candidates:
             raise LiveError("s2v-roster-missing: Source 2 Viewer emitted no scripts/heroes.vdata")
-        return parse_hero_roster(candidates[0].read_text(encoding="utf-8", errors="replace"))
+        roster = parse_hero_roster(candidates[0].read_text(encoding="utf-8", errors="replace"))
+    return augment_roster(roster, list_models(env))
 
 
-_BODY = re.compile(r"(?:^|[_.\- ])body(?:[_.\- ]?(?:lod)?[_.\- ]?\d+)?(?:$|[_.\- ])", re.IGNORECASE)
+_BODY = re.compile(
+    r"(?:^|[_.\- ])(?:body|model|hull)(?:[_.\- ]?(?:lod)?[_.\- ]?\d+)?(?:$|[_.\- ])",
+    re.IGNORECASE,
+)
 _NON_BODY = (
     "head",
     "hair",
@@ -152,7 +361,6 @@ _NON_BODY = (
     "pillow",
     "balloon",
     "cloth_proxy",
-    "hull",
     "bindpose",
     "ref",
     "eyes",
@@ -175,8 +383,11 @@ def looks_like_body(path: Path | str) -> bool:
 
     S2V does not emit one naming scheme. ``shiv_body`` and ``haze_body_lod0``
     are obvious, but Familiar's body is ``familiar_wip_8inf_body8`` and its
-    head is the larger ``familiar_wip_head5``. Treating ``body8`` as a body and
-    ``head5`` as a part is what stops the importer opening a head as the hero.
+    head is the larger ``familiar_wip_head5``. Drifter and several WIP heroes
+    call their body ``drifter_model``, and Werewolf emits ``werewolf_hull`` as a
+    tiny physics hull beside its real model. Recognising ``model`` and ``hull``
+    lets the importer repair a body field that points at a head or a clip; the
+    size tiebreak still picks the real model over the hull.
     """
     return bool(_BODY.search(Path(path).stem.lower()))
 
@@ -186,6 +397,11 @@ def _body_score(path: Path) -> int:
     score = 100 if looks_like_body(path) else 0
     if any(token in name for token in _NON_BODY):
         score -= 120
+    folders = {part.lower() for part in path.parts[:-1]}
+    if folders & {"clips", "animation", "anims"}:
+        # An animation DMX can be larger than a low-poly body.  It is never the
+        # body, even when its stem happens to contain a body-like word.
+        score -= 200
     if "lod" not in name:
         score += 10
     return score
