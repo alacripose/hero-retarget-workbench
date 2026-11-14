@@ -287,8 +287,11 @@ class DMF_OT_backport_mod(Operator):
             self.report({"ERROR"}, "Choose a target client in Setup > Clients")
             return {"CANCELLED"}
         relative = _mod_vmdl(row)
-        if not relative:
-            self.report({"ERROR"}, "The package has no hero vmdl path to extract from the client")
+        if not relative and not row.hero:
+            self.report(
+                {"ERROR"},
+                "The package names no model and no hero, so the target build cannot be searched",
+            )
             return {"CANCELLED"}
         module = core.core(settings)
         env = core.detect_environment(settings, module)
@@ -298,7 +301,10 @@ class DMF_OT_backport_mod(Operator):
         output = _workspace(settings) / "backports"
 
         def work(progress):
-            progress(0.1, f"extracting {relative} from {client.name}")
+            progress(
+                0.05,
+                f"searching {client.name} for {relative or row.hero or 'the hero model'}",
+            )
             return module["backport"].backport_package(
                 env,
                 client,
@@ -306,6 +312,7 @@ class DMF_OT_backport_mod(Operator):
                 output,
                 addon,
                 relative=relative,
+                hero=row.hero,
                 preserve_model=settings.update_model_policy,
                 preserve_materials=settings.update_preserve_materials,
                 force=True,
@@ -315,9 +322,17 @@ class DMF_OT_backport_mod(Operator):
             settings.stage_dir = str(result.output)
             settings.extraction_dir = str(result.new_root)
             actions = ", ".join(f"{name}:{action['action']}" for name, action in result.sections.items()) or "no sections"
+            detail = ""
+            try:
+                data = json.loads(Path(result.manifest).read_text(encoding="utf-8"))
+                detail = f" using {data.get('backport_model', '')}"
+                if not data.get("backport_exact_model", True):
+                    detail += " (path moved in this build)"
+            except (OSError, ValueError):
+                pass
             core.set_status(
                 settings,
-                f"Backported {row.addon} onto {client.name} (experimental): {actions}",
+                f"Backported {row.addon} onto {client.name} (experimental):{detail}; {actions}",
                 "OK",
             )
 

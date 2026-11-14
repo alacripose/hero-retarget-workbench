@@ -442,7 +442,7 @@ class DMF_Settings(PropertyGroup):
     mods_scanned: IntProperty(name="Packages scanned", default=0)
     mod_target_client: StringProperty(
         name="Target client",
-        description="Older CSDK client whose game data a backport compiles against",
+        description="Older game build (install, game, or game/citadel folder); every VPK in it is searched for the hero model",
         subtype="DIR_PATH",
         default="",
     )

@@ -146,7 +146,10 @@ class DMF_PT_mods(Panel):
                     text="Backport to client (experimental)",
                     icon="LOOP_BACK",
                 )
-            _hint(packages, "Update transplants the package onto today's hero model.")
+            _hint(
+                packages,
+                "Update transplants onto today's hero. Backport searches every VPK in the target build and uses the model's path, or the hero if the path moved.",
+            )
         else:
             _hint(packages, "Add a folder and scan for VPKs and unpacked addons.", "QUESTION")
         if settings.mod_report:
