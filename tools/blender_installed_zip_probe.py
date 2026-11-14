@@ -88,6 +88,19 @@ def main() -> int:
         report["addon_file"],
     )
 
+    # The self-heal must not fire on a current build: 0.8.16 left it looking for
+    # the removed tab class, so every session re-registered the editor.
+    guard = getattr(addon, "_stale_ui_check", None)
+    guard_attempts = getattr(addon, "_STALE_ATTEMPTS", -1)
+    if guard is not None:
+        guard()
+    report["guard_attempts"] = getattr(addon, "_STALE_ATTEMPTS", -1)
+    check(
+        "stale-guard-quiet",
+        guard is not None and report["guard_attempts"] == 0,
+        {"before": guard_attempts, "after": report["guard_attempts"]},
+    )
+
     spaces = [name for name in dir(bpy.types) if name == SPACE_IDNAME]
     expected = args.expect or ("editor" if spaces else "sidebar")
     report["expect"] = expected

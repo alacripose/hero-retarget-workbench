@@ -19,7 +19,7 @@ if (_PACKAGE / "_vendor").is_dir() and str(_PACKAGE / "_vendor") not in sys.path
 bl_info = {
     "name": "Hero Retarget Workbench",
     "author": "ala",
-    "version": (0, 8, 16),
+    "version": (0, 8, 17),
     "blender": (5, 4, 0),
     "location": "Workbench editor (PR 165087 builds); View3D > Sidebar > Deadlock elsewhere",
     "description": "Fit and retarget a custom model onto a live Deadlock hero, then install the unchanged S2V vmdl as a CSDK13 addon",
@@ -123,7 +123,13 @@ def _stale_ui_check() -> float:
         return 3.0
     if "DMF_ST_workbench" not in dir(bpy.types):
         return 3.0
-    if "DMF_PT_space_tab_setup" in dir(bpy.types):
+    # 0.8.16 moved the pages into the sidebar's categories; the tab marker no
+    # longer exists in a current build, so the check must accept either shape.
+    current = (
+        "DMF_PT_space_setup" in dir(bpy.types)
+        or "DMF_PT_space_tab_setup" in dir(bpy.types)
+    )
+    if current:
         return 3.0
     _STALE_REPAIRING = True
     _STALE_ATTEMPTS += 1
