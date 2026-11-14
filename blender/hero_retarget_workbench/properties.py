@@ -287,11 +287,15 @@ class DMF_ModRow(PropertyGroup):
 
 
 class DMF_ClientRow(PropertyGroup):
-    """One CSDK-style client install that can be compiled or backported to."""
+    """One game or tools install the file can compile with or backport onto."""
 
     path: StringProperty(name="Path", subtype="DIR_PATH", default="")
     label: StringProperty(name="Client", default="")
     build: StringProperty(name="Build", default="")
+    kind: StringProperty(name="Kind", default="")
+    engine: StringProperty(name="Game", default="")
+    can_compile: BoolProperty(name="Has compiler", default=False)
+    can_backport: BoolProperty(name="Has game VPKs", default=False)
     active: BoolProperty(name="Active", default=False)
 
 

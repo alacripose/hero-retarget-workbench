@@ -290,15 +290,25 @@ class DMF_UL_clients(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [f"{row.label} {row.build} {row.path}" for row in rows])
+        return _filter(
+            self,
+            [f"{row.label} {row.kind} {row.engine} {row.build} {row.path}" for row in rows],
+        )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         row = layout.row(align=True)
-        row.label(text=_short(item.label or "client", 18), icon="CHECKMARK" if item.active else "PACKAGE")
+        icon = "CHECKMARK" if item.active else ("TOOL_SETTINGS" if item.can_compile else "PACKAGE")
+        row.label(text=_short(item.label or "install", 18), icon=icon)
         right = row.row(align=True)
         right.alignment = "RIGHT"
+        bits = [item.kind or "install"]
+        if item.can_compile:
+            bits.append("compiler")
+        if item.can_backport:
+            bits.append("vpk")
         if item.build:
-            right.label(text=_short(item.build, 16))
+            bits.append(item.build)
+        right.label(text=_short(" · ".join(bits), 34))
 
 
 class DMF_UL_components(UIList):

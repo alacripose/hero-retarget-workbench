@@ -46,6 +46,11 @@ def _arguments() -> argparse.Namespace:
     parser.add_argument("--screenshot", default="")
     parser.add_argument("--page", default="", help="page to show before the screenshot")
     parser.add_argument(
+        "--find-clients",
+        action="store_true",
+        help="run Find clients before the screenshot and report how many installs were read",
+    )
+    parser.add_argument(
         "--demo-job",
         action="store_true",
         help="draw a representative running job so the bar and log are visible",
@@ -209,6 +214,25 @@ def main() -> int:
             )
             if args.page:
                 bpy.context.scene.dmf.props_page = args.page
+            if args.find_clients:
+                result = bpy.ops.dmf.refresh_clients()
+                rows = bpy.context.scene.dmf.clients
+                report["clients"] = [
+                    {
+                        "label": row.label,
+                        "kind": row.kind,
+                        "engine": row.engine,
+                        "compiler": row.can_compile,
+                        "backport": row.can_backport,
+                        "build": row.build,
+                    }
+                    for row in rows
+                ]
+                check(
+                    "find-clients-reads-installs",
+                    result == {"FINISHED"} and len(rows) > 1,
+                    {"result": str(result), "count": len(rows)},
+                )
             if args.demo_job:
                 settings = bpy.context.scene.dmf
                 settings.job_running = True

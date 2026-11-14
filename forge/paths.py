@@ -2,8 +2,8 @@
 
 The addon passes the paths the user saved in the scene. Environment variables
 remain explicit fallbacks for headless commands. When neither is set, Steam's
-own library manifest is the only automatic source; no personal home-directory
-or drive-letter path is a candidate.
+own registry and every library it records are read, and the standard Steam
+folders on each drive are checked; no single user's absolute path is baked in.
 """
 from __future__ import annotations
 
@@ -23,6 +23,13 @@ def _library_key(path: Path) -> str:
 
 
 def _steam_install_roots() -> list[Path]:
+    """Every Steam install, from the registry, Program Files, and any drive.
+
+    Openlock's installer scans the standard Steam folders on every drive instead
+    of trusting one registry value; a second library on D: is found even when
+    Steam itself lives elsewhere. The list is bounded to Steam's own folder
+    names, never a drive walk.
+    """
     roots: list[Path] = []
     if os.name == "nt":
         try:
@@ -38,6 +45,22 @@ def _steam_install_roots() -> list[Path]:
         base = os.environ.get(variable)
         if base:
             roots.append(Path(base) / "Steam")
+    places = (
+        "Program Files (x86)/Steam",
+        "Program Files/Steam",
+        "Steam",
+        "Games/Steam",
+    )
+    letters = "CDEFGHIJKLMNOPQRSTUVWXYZAB" if os.name == "nt" else ""
+    for letter in letters:
+        drive = Path(f"{letter}:/")
+        try:
+            if not drive.exists():
+                continue
+        except OSError:
+            continue
+        for place in places:
+            roots.append(drive / place)
     return roots
 
 
