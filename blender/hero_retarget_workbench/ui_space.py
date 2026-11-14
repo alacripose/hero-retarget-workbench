@@ -204,6 +204,9 @@ def _select_page(page: str):
     return None
 
 
+_SEEN_AREAS: set[int] = set()
+
+
 def _tab_draw(self, context, page: str) -> None:
     """A page tab: selecting the category switches the Workbench page.
 
@@ -331,6 +334,7 @@ def register() -> bool:
 
 
 def unregister() -> None:
+    _SEEN_AREAS.clear()
     try:
         bpy.app.timers.unregister(_ensure_sidebar)
     except (ValueError, TypeError):
@@ -340,12 +344,16 @@ def unregister() -> None:
 
 
 def _ensure_sidebar() -> float:
-    """Open the Workbench sidebar once, from a timer rather than from draw.
+    """Open the Workbench sidebar once per area, from a timer rather than draw.
 
     Setting ``show_region_ui`` inside a panel's draw re-lays the area during the
     draw and can leave the first frame without the page panel; the timer is also
     the only hook that runs when the space is created from the editor-type menu
     instead of our operator.
+
+    The area is handled exactly once. Re-asserting ``show_region_ui`` on every
+    tick reopened a sidebar the owner had collapsed or narrowed and put the
+    default width back, which looked like a tab switch resetting the layout.
     """
     for window in bpy.context.window_manager.windows:
         if not window:
@@ -355,17 +363,20 @@ def _ensure_sidebar() -> float:
                 continue
             space = area.spaces.active
             opened = False
-            if hasattr(space, "show_region_ui") and not space.show_region_ui:
-                space.show_region_ui = True
-                opened = True
-            # The custom space creates an empty TOOLS strip on the left that has
-            # no panels; close it so the view does not carry a blank sidebar.
-            if hasattr(space, "show_region_toolbar") and space.show_region_toolbar:
-                space.show_region_toolbar = False
-                opened = True
-            if hasattr(space, "show_region_footer") and space.show_region_footer:
-                space.show_region_footer = False
-                opened = True
+            if area.as_pointer() not in _SEEN_AREAS:
+                _SEEN_AREAS.add(area.as_pointer())
+                if hasattr(space, "show_region_ui") and not space.show_region_ui:
+                    space.show_region_ui = True
+                    opened = True
+                # The custom space creates an empty TOOLS strip on the left that
+                # has no panels; close it so the view does not carry a blank
+                # sidebar. Its handle stays; Python cannot delete a region.
+                if hasattr(space, "show_region_toolbar") and space.show_region_toolbar:
+                    space.show_region_toolbar = False
+                    opened = True
+                if hasattr(space, "show_region_footer") and space.show_region_footer:
+                    space.show_region_footer = False
+                    opened = True
             # The selected sidebar category is readable from the UI region. It is
             # the reliable tab signal: a hidden-header tab panel may not be drawn
             # at all, and a write from inside draw does not persist.
@@ -396,6 +407,7 @@ def _open_editor(context, area) -> bool:
         print(f"DMF editor switch declined: {error}", flush=True)
         return False
     space = area.spaces.active
+    _SEEN_AREAS.discard(area.as_pointer())
     if hasattr(space, "show_region_ui"):
         space.show_region_ui = True
     return True
