@@ -77,6 +77,11 @@ class DMF_PT_setup_tools(Panel):
         row.operator("dmf.refresh_clients", text="Find clients", icon="FILE_REFRESH")
         row.operator("dmf.add_client", text="Add folder", icon="FILE_FOLDER")
         if settings.clients:
+            head = csdk.split(factor=settings.list_name_width, align=True)
+            head.label(text="Install")
+            right = head.row(align=True)
+            right.alignment = "RIGHT"
+            right.label(text="Kind · build")
             csdk.template_list(
                 "DMF_UL_clients",
                 "",
@@ -86,6 +91,7 @@ class DMF_PT_setup_tools(Panel):
                 "client_index",
                 rows=5,
             )
+            csdk.prop(settings, "list_name_width", text="Name width", slider=True)
             use = csdk.row(align=True)
             use.alignment = "RIGHT"
             use.operator("dmf.use_client", text="Use this client", icon="CHECKMARK")
@@ -136,6 +142,11 @@ class DMF_PT_mods(Panel):
 
         packages = _section(layout, "Packages", "PACKAGE", f"{settings.mods_scanned} found")
         if settings.mods:
+            head = packages.split(factor=settings.list_name_width, align=True)
+            head.label(text="Package")
+            right = head.row(align=True)
+            right.alignment = "RIGHT"
+            right.label(text="Hero · updated")
             packages.template_list(
                 "DMF_UL_mods",
                 "",
@@ -145,6 +156,7 @@ class DMF_PT_mods(Panel):
                 "mod_index",
                 rows=6,
             )
+            packages.prop(settings, "list_name_width", text="Name width", slider=True)
             row = packages.row(align=True)
             row.operator("dmf.port_mod", text="Update to latest", icon="FILE_REFRESH")
             row.prop(settings, "backport_experimental", text="Backport")
@@ -181,6 +193,11 @@ class DMF_PT_components(Panel):
         source = _section(layout, "Live components", "MESH_DATA", Path(settings.extraction_dir).name if settings.extraction_dir else "no extraction")
         source.operator("dmf.scan_components", text="Find components", icon="VIEWZOOM")
         if settings.components:
+            head = source.split(factor=settings.list_name_width, align=True)
+            head.label(text="Component")
+            right = head.row(align=True)
+            right.alignment = "RIGHT"
+            right.label(text="Kind")
             source.template_list(
                 "DMF_UL_components",
                 "",
@@ -190,6 +207,7 @@ class DMF_PT_components(Panel):
                 "component_index",
                 rows=6,
             )
+            source.prop(settings, "list_name_width", text="Name width", slider=True)
             for row in settings.components:
                 _ = row
         else:

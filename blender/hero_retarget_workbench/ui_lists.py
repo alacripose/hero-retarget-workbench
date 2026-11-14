@@ -272,17 +272,21 @@ class DMF_UL_mods(UIList):
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
-        row.label(
-            text=_short(item.addon or "package", 20),
+        width = float(getattr(context.scene.dmf, "list_name_width", 0.5))
+        split = layout.split(factor=width, align=True)
+        left = split.row(align=True)
+        left.label(
+            text=item.addon or "package",
             icon="PACKAGE" if item.kind == "vpk" else "FILE_FOLDER",
         )
-        right = row.row(align=True)
-        right.alignment = "RIGHT"
-        right.label(text=_short(item.hero or "unknown", 14))
+        right = split.row(align=True)
+        middle = right.row(align=True)
+        middle.label(text=item.hero or "unknown")
         if item.sections:
-            right.label(text="", icon="MOD_CLOTH")
-        right.label(text=item.modified)
+            middle.label(text="", icon="MOD_CLOTH")
+        tail = right.row(align=True)
+        tail.alignment = "RIGHT"
+        tail.label(text=item.modified)
 
 
 class DMF_UL_clients(UIList):
@@ -296,10 +300,12 @@ class DMF_UL_clients(UIList):
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
+        width = float(getattr(context.scene.dmf, "list_name_width", 0.5))
+        split = layout.split(factor=width, align=True)
         icon = "CHECKMARK" if item.active else ("TOOL_SETTINGS" if item.can_compile else "PACKAGE")
-        row.label(text=_short(item.label or "install", 18), icon=icon)
-        right = row.row(align=True)
+        left = split.row(align=True)
+        left.label(text=item.label or "install", icon=icon)
+        right = split.row(align=True)
         right.alignment = "RIGHT"
         bits = [item.kind or "install"]
         if item.can_compile:
@@ -308,7 +314,7 @@ class DMF_UL_clients(UIList):
             bits.append("vpk")
         if item.build:
             bits.append(item.build)
-        right.label(text=_short(" · ".join(bits), 34))
+        right.label(text=" · ".join(bits))
 
 
 class DMF_UL_components(UIList):
@@ -319,16 +325,18 @@ class DMF_UL_components(UIList):
         return _filter(self, [f"{row.name} {row.relative} {row.kind} {row.bytes}" for row in rows])
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
-        row.prop(
+        width = float(getattr(context.scene.dmf, "list_name_width", 0.5))
+        split = layout.split(factor=width, align=True)
+        left = split.row(align=True)
+        left.prop(
             item,
             "selected",
             text="",
             emboss=False,
             icon="CHECKBOX_HLT" if item.selected else "CHECKBOX_DEHLT",
         )
-        row.label(text=_short(item.name, 26), icon="MESH_DATA" if item.kind == "dmx" else "FILE")
-        right = row.row(align=True)
+        left.label(text=item.name, icon="MESH_DATA" if item.kind == "dmx" else "FILE")
+        right = split.row(align=True)
         right.alignment = "RIGHT"
         right.label(text=item.kind)
         right.label(text=f"{item.bytes // 1024}k")
