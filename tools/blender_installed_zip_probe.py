@@ -107,6 +107,23 @@ def main() -> int:
         {"before": guard_attempts, "after": report["guard_attempts"]},
     )
 
+    # A finished failure is history, not current state. Editing a tool path must
+    # clear it everywhere, or the other pages keep saying the tool is missing.
+    settings = bpy.context.scene.dmf
+    original_s2v = settings.s2v_cli
+    settings.job_state = "FAILED"
+    settings.job_message = "Source 2 Viewer CLI not found"
+    settings.job_log = "Detecting live build: starting\nfailed: Source 2 Viewer CLI not found"
+    settings.job_progress = 1.0
+    settings.s2v_cli = str(Path(original_s2v).with_name("other.exe")) if original_s2v else "C:/missing/Source2Viewer-CLI.exe"
+    cleared = settings.job_state == "" and not settings.job_log and settings.job_progress == 0.0
+    settings.s2v_cli = original_s2v
+    check(
+        "path-edit-clears-stale-failure",
+        cleared,
+        {"state": settings.job_state, "log": settings.job_log, "progress": settings.job_progress},
+    )
+
     spaces = [name for name in dir(bpy.types) if name == SPACE_IDNAME]
     expected = args.expect or ("editor" if spaces else "sidebar")
     report["expect"] = expected

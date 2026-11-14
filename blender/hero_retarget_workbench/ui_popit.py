@@ -100,6 +100,7 @@ def job(layout, settings):
         right.label(text=f"{int(getattr(settings, 'job_progress', 0.0) * 100)}%")
     else:
         right.label(text=state.lower() or "finished")
+        right.operator("dmf.clear_job", text="", icon="X")
     if running:
         box.prop(
             settings,

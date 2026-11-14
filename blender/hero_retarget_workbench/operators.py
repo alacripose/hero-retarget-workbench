@@ -78,21 +78,22 @@ class DMF_OT_detect_paths(Operator):
         try:
             module = core.core(settings)
             env = core.detect_environment(settings, module)
-            if env.game_root is None:
-                raise RuntimeError("Deadlock install not found. Choose the Steam Deadlock folder in Setup.")
-            settings.deadlock_root = str(env.game_root)
-            settings.build = f"{env.build} {env.version_date}".strip()
-            chosen_s2v = ""
+            # Each tool is saved independently: finding the viewer but not the
+            # install must not throw away the viewer, which is how a partly
+            # detected file used to look undetected on every other page.
+            swapped = False
+            if env.game_root is not None:
+                settings.deadlock_root = str(env.game_root)
+                settings.build = f"{env.build} {env.version_date}".strip()
             if env.s2v is not None:
                 chosen_s2v = str(settings.s2v_cli or "").strip()
                 settings.s2v_cli = str(env.s2v)
-            # A pick that pointed at the GUI still resolves to the CLI beside it;
-            # say so, because the field's value changed without the user asking.
-            swapped = (
-                env.s2v is not None
-                and chosen_s2v
-                and Path(chosen_s2v).name.lower() != env.s2v.name.lower()
-            )
+                # A pick that pointed at the GUI still resolves to the CLI beside
+                # it; say so, because the field changed without the user asking.
+                swapped = bool(
+                    chosen_s2v
+                    and Path(chosen_s2v).name.lower() != env.s2v.name.lower()
+                )
             if env.csdk_root is not None:
                 settings.csdk_root = str(env.csdk_root)
             # Short tokens: the bubble is one line per part, not a paragraph, and
@@ -100,14 +101,17 @@ class DMF_OT_detect_paths(Operator):
             missing = [
                 name
                 for name, value in (
+                    ("Deadlock install", env.game_root),
                     ("S2V CLI", env.s2v),
                     ("CSDK13 root", env.csdk_root),
                 )
                 if value is None
             ]
-            # The card above already shows the build; the bubble only carries what
-            # is missing, so it stays one line instead of repeating the header.
             note = " · CLI beside the pick" if swapped else ""
+            if env.game_root is not None:
+                # Detection just proved the current state; the last job's card
+                # is history and must not keep saying the tool is missing.
+                jobs.clear_feedback(settings)
             if missing:
                 _status(settings, "Set " + " and ".join(missing) + note, "WARN")
             else:
@@ -116,6 +120,16 @@ class DMF_OT_detect_paths(Operator):
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
+        return {"FINISHED"}
+
+
+class DMF_OT_clear_job(Operator):
+    bl_idname = "dmf.clear_job"
+    bl_label = "Clear job message"
+    bl_description = "Dismiss the last job's progress card and steps"
+
+    def execute(self, context):
+        jobs.clear_feedback(context.scene.dmf)
         return {"FINISHED"}
 
 
@@ -129,17 +143,19 @@ class DMF_OT_detect(Operator):
         try:
             module = core.core(settings)
             root = core.project_root(settings)
+            # Resolve on the main thread: the worker must not read RNA. A saved
+            # scene path read from a daemon thread can arrive empty, which made
+            # this page report a tool missing while Setup had just detected it.
+            env = core.detect_environment(settings, module)
+            if not env.game_root:
+                raise RuntimeError("Live game not found. Choose the Steam Deadlock folder in Setup.")
+            if not env.s2v:
+                raise RuntimeError(
+                    "Source 2 Viewer CLI not found. Choose Source2Viewer-CLI.exe in Setup; "
+                    "Source2Viewer.exe is the GUI and cannot extract VPK files for the addon."
+                )
 
             def work(progress):
-                progress(0.05, "reading live install")
-                env = core.detect_environment(settings, module)
-                if not env.game_root:
-                    raise RuntimeError("Live game not found. Choose the Steam Deadlock folder in Setup.")
-                if not env.s2v:
-                    raise RuntimeError(
-                        "Source 2 Viewer CLI not found. Choose Source2Viewer-CLI.exe in Setup; "
-                        "Source2Viewer.exe is the GUI and cannot extract VPK files for the addon."
-                    )
                 progress(0.25, "reading hero table through S2V")
                 heroes = module["live"].list_heroes(env)
                 return env, heroes
@@ -192,10 +208,11 @@ class DMF_OT_extract(Operator):
                 if settings.extraction_dir
                 else root / "artifacts" / "extractions" / slug
             )
+            env = core.detect_environment(settings, module)
+            if env.game_root is None or env.s2v is None:
+                raise RuntimeError("Set the live game and Source 2 Viewer in Setup first")
 
             def work(progress):
-                progress(0.1, "reading live install")
-                env = core.detect_environment(settings, module)
                 progress(0.2, "reading hero table through S2V")
                 heroes = module["live"].list_heroes(env)
                 hero = next((item for item in heroes if item.slug == slug), None)
@@ -1173,9 +1190,9 @@ class DMF_OT_compile(Operator):
             log_path = core.project_root(settings) / "logs" / "compile.log"
             addon_name = settings.addon_name
 
+            env = core.detect_environment(settings, module)
+
             def work(progress):
-                progress(0.1, "detecting CSDK13")
-                env = core.detect_environment(settings, module)
                 progress(0.25, "running resourcecompiler")
                 return module["compile"].compile_stage(env, stage_dir, addon_name, log_path=log_path)
 
@@ -1383,6 +1400,7 @@ class DMF_OT_pick_vmdl(Operator):
 
 CLASSES = (
     DMF_OT_detect_paths,
+    DMF_OT_clear_job,
     DMF_OT_detect,
     DMF_OT_extract,
     DMF_OT_import_hero,

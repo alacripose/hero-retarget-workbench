@@ -306,6 +306,26 @@ class DMF_ComponentRow(PropertyGroup):
     selected: BoolProperty(name="Stage", default=False)
 
 
+def _paths_edited(self, context=None) -> None:
+    """A path edit invalidates a detection failure shown on every page.
+
+    The job card and status line outlive the failure that produced them. Without
+    this, fixing the tool path still leaves the other pages saying it was not
+    found, which is what 0.8.22's shared job block made visible.
+    """
+    if getattr(self, "job_state", "") == "FAILED":
+        self.job_state = ""
+        self.job_log = ""
+        self.job_message = ""
+        self.job_progress = 0.0
+    status = (getattr(self, "status", "") or "").lower()
+    if any(
+        token in status
+        for token in ("not found", "not detected", "choose source2viewer", "no tool paths")
+    ):
+        self.status = ""
+
+
 class DMF_Settings(PropertyGroup):
     project_root: StringProperty(
         name="Workspace folder",
@@ -316,6 +336,7 @@ class DMF_Settings(PropertyGroup):
         name="Deadlock install",
         description="The Steam Deadlock folder that contains game/citadel/gameinfo.gi; saved with this .blend",
         subtype="DIR_PATH",
+        update=_paths_edited,
     )
     s2v_cli: StringProperty(
         name="Source 2 Viewer CLI",
@@ -324,11 +345,13 @@ class DMF_Settings(PropertyGroup):
             "the GUI itself cannot extract VPK files. Saved with this .blend"
         ),
         subtype="FILE_PATH",
+        update=_paths_edited,
     )
     csdk_root: StringProperty(
         name="CSDK13 root",
         description="The CSDK13 folder that contains game/bin/win64/resourcecompiler.exe; saved with this .blend",
         subtype="DIR_PATH",
+        update=_paths_edited,
     )
     hero_slug: EnumProperty(name="Hero", items=hero_items)
     build: StringProperty(name="Build", default="")
