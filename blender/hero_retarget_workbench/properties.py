@@ -758,6 +758,14 @@ class DMF_Settings(PropertyGroup):
     job_label: StringProperty(name="Job", default="")
     job_message: StringProperty(name="Job step", default="")
     job_progress: FloatProperty(name="Progress", default=0.0, min=0.0, max=1.0, subtype="FACTOR")
+    list_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a list row given to the name; the rest holds the details",
+        default=0.5,
+        min=0.25,
+        max=0.8,
+        subtype="FACTOR",
+    )
     job_cancellable: BoolProperty(name="Cancellable", default=False)
     job_state: StringProperty(name="Job state", default="")
     job_log: StringProperty(

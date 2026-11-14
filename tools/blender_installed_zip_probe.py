@@ -46,6 +46,17 @@ def _arguments() -> argparse.Namespace:
     parser.add_argument("--screenshot", default="")
     parser.add_argument("--page", default="", help="page to show before the screenshot")
     parser.add_argument(
+        "--demo-mods",
+        action="store_true",
+        help="add representative package rows so the list column split is visible",
+    )
+    parser.add_argument(
+        "--list-width",
+        type=float,
+        default=0.5,
+        help="name column width for the list screenshot",
+    )
+    parser.add_argument(
         "--find-clients",
         action="store_true",
         help="run Find clients before the screenshot and report how many installs were read",
@@ -214,6 +225,27 @@ def main() -> int:
             )
             if args.page:
                 bpy.context.scene.dmf.props_page = args.page
+            settings = bpy.context.scene.dmf
+            settings.list_name_width = args.list_width
+            if args.demo_mods:
+                for index, (name, hero, kind, date, cloth) in enumerate(
+                    (
+                        ("the_silent_cartographer", "cartographer", "vpk", "2026-08-24", False),
+                        ("primelock_3lane", "1002826_149", "addon", "2026-07-12", False),
+                        ("deadlock_project8", "ivy, tengu", "vpk", "2026-07-10", True),
+                        ("primelock_openlock", "akimbo, astro", "addon", "2026-07-10", False),
+                        ("botw", "terrain", "vpk", "2026-07-10", False),
+                        ("plant", "cadence_creep", "vpk", "2026-06-27", True),
+                    )
+                ):
+                    row = settings.mods.add()
+                    row.addon = name
+                    row.hero = hero
+                    row.kind = kind
+                    row.modified = date
+                    row.sections = "Softbody" if cloth else ""
+                    row.path = f"D:/mods/{name}.vpk"
+                report["demo_mods"] = len(settings.mods)
             if args.find_clients:
                 result = bpy.ops.dmf.refresh_clients()
                 rows = bpy.context.scene.dmf.clients
