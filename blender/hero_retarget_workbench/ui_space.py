@@ -29,6 +29,9 @@ HEADER_IDNAME = "DMF_HT_workbench"
 ROOT_IDNAME = "DMF_PT_space_main"
 PREFIX = "space"
 _REGISTERED: list[type] = []
+# Why register() declined, when this build could have hosted the editor. The
+# panel shows it, so a failed editor is never a silent Properties fallback.
+EDITOR_ERROR = ""
 
 
 def supports(values) -> bool:
@@ -58,6 +61,7 @@ def _header_draw(self, context) -> None:
     except (AttributeError, TypeError, RuntimeError):
         # A build without the template still gets the page box and the status.
         pass
+    layout.label(text="Workbench", icon="ARMATURE_DATA")
     layout.prop(settings, "props_page", text="")
     layout.separator_spacer()
     _status_line(layout, settings)
@@ -132,6 +136,7 @@ def editor_classes() -> list[type]:
 
 def register() -> bool:
     """Register the editor surface; False means the caller must fall back."""
+    global EDITOR_ERROR
     classes = editor_classes()
     if not classes:
         return False
@@ -140,9 +145,11 @@ def register() -> bool:
             bpy.utils.register_class(cls)
             _REGISTERED.append(cls)
     except Exception as error:
-        print(f"DMF editor surface declined: {type(error).__name__}: {error}", flush=True)
+        EDITOR_ERROR = f"{type(error).__name__}: {error}"
+        print(f"DMF editor surface declined: {EDITOR_ERROR}", flush=True)
         unregister()
         return False
+    EDITOR_ERROR = ""
     return True
 
 

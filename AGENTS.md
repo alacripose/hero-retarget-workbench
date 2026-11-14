@@ -739,3 +739,34 @@ must bring the hair and jacket in cloth-capable, not just present. Authority:
   `artifacts/receipts/cloth-page-editor.png` shows the Cloth parts list.
 - Not checked: no simulation frame was stepped, and the stock Properties shot
   still has native panels above the page.
+
+## 2026-11-14 — 0.7.2: the installed zip opens its editor
+
+**Owner report, verbatim:** *"also every time I install the ci zip the custom
+editor isn't there or if it is there it's not the real one like you have when you
+launch it"*, then *"Dude I'm using the fucking branhcht that allowd for the editor
+and it's not showing up what the fuck can i say"*. Authority:
+`logs/authority/2026-11-14-editor-surface-reachable.jsonl`; contract:
+`TICKET-0020`.
+
+- **The artifact was not stale.** The 0.7.1 release asset carries `ui_space.py`,
+  and installing it through Blender's own add-on installer into an isolated
+  profile registers `DMF_ST_workbench` and switches an area to it on PR 165087.
+  The owner's installed copy is 0.7.1 with that file, and a GUI session on their
+  profile reports `SURFACE = "editor"`.
+- **The reachability was the bug.** The editor existed but nothing in the add-on
+  took you there: only the Properties page root called `dmf.open_workbench`, the
+  sidebar did not, and the owner's editor-type menu did not list the registered
+  space. The Workbench sidebar panel now draws **Open the Workbench editor** (or
+  **Open the Workbench page** on builds without editor types) and calls the same
+  area switch; the editor header labels itself **Workbench**.
+- **A declined editor is no longer silent.** `ui_space.EDITOR_ERROR` keeps the
+  registration exception and the page root shows it, instead of an unexplained
+  Properties fallback.
+- **New evidence path.** `tools/blender_installed_zip_probe.py` installs the built
+  zip into an isolated profile and checks surface, space/header, pages and the
+  area switch: 9/9 on the stock daily and 9/9 on PR 165087. Every earlier probe
+  imported the checkout, which is why this gap survived.
+- Not checked: the editor-type menu's C-side listing could not be opened from
+  Python, so the button routes around it rather than proving the menu fixed. The
+  stock daily still cannot host an editor type.

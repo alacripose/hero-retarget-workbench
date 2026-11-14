@@ -77,12 +77,21 @@ Animations, Compare, Weights, Handoff. Each page draws the same panel as the
 sidebar, so the two never disagree.
 
 Which surface that is depends on the build. Blender can only register an add-on
-editor type on builds with the custom-space patch (PR 165087); there the add-on
-adds **Hero Retarget Workbench** to the editor-type menu and `dmf.open_workbench`
-switches the current area to it. Every other build, including the stock daily,
+editor type on builds with the custom-space patch (PR 165087). There the add-on
+registers the **Hero Retarget Workbench** editor and the sidebar's **Open the
+Workbench editor** button switches the current area to it; that button uses the
+same area switch as the editor-type menu, so it also works on patch builds whose
+menu does not list custom spaces. Every other build, including the stock daily,
 gets the same pages in **Properties → Scene → Hero Retarget Workbench** and the
-same operator switches an area to that instead. On a PR 165087 build, use the
-patch build from <https://builder.blender.org/download/patch/PR165087>.
+button reads **Open the Workbench page** instead. The Properties page sits after
+Blender's own Scene panels (an add-on cannot reorder those), so scroll to it once
+and it stays where you left it.
+
+Opened from the zip, the add-on names its surface in the panel: the editor build
+shows **Open the Workbench editor**, a build without editor types says so in one
+line rather than leaving a Properties tab that looks like the old sidebar. On a
+PR 165087 build, use the patch build from
+<https://builder.blender.org/download/patch/PR165087>.
 
 ### Set the tool paths once
 

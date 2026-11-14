@@ -361,6 +361,85 @@ def main() -> int:
         {"mesh": jacket_rows[0].target_mesh.name, "vertices": len(jacket_rows[0].target_mesh.data.vertices), "chains": [r.name for r in jacket_rows]} if jacket_rows else "",
     )
 
+    # Step real frames: structural setup is not simulation. The hero gets one
+    # keyed spine rotation so pinned vertices have to follow a moving bone while
+    # the free cloth solves under gravity.
+    import math
+
+    def _eval_coords(obj, depsgraph):
+        evaluated = obj.evaluated_get(depsgraph)
+        mesh = evaluated.to_mesh()
+        coords = [evaluated.matrix_world @ vertex.co for vertex in mesh.vertices]
+        evaluated.to_mesh_clear()
+        return coords
+
+    scene = bpy.context.scene
+    scene.render.fps = 24
+    scene.frame_start, scene.frame_end = 1, 12
+    bpy.ops.object.select_all(action="DESELECT")
+    armature.select_set(True)
+    bpy.context.view_layer.objects.active = armature
+    bpy.ops.object.mode_set(mode="POSE")
+    pose_bone = None
+    for candidate in ("spine_1", "spine_0", "pelvis", "root"):
+        pose_bone = armature.pose.bones.get(candidate)
+        if pose_bone is not None:
+            break
+    if pose_bone is not None:
+        pose_bone.rotation_mode = "XYZ"
+        pose_bone.rotation_euler = (0.0, 0.0, 0.0)
+        pose_bone.keyframe_insert("rotation_euler", frame=scene.frame_start)
+        pose_bone.rotation_euler = (0.2, 0.0, 0.3)
+        pose_bone.keyframe_insert("rotation_euler", frame=scene.frame_end)
+    bpy.ops.object.mode_set(mode="OBJECT")
+    report["simulation"] = {"fps": scene.render.fps, "frames": [scene.frame_start, scene.frame_end],
+                            "posed_bone": pose_bone.name if pose_bone else ""}
+
+    cloth_meshes: dict[str, list] = {}
+    for row in built_rows:
+        cloth_meshes.setdefault(row.target_mesh.name, []).append(row)
+    simulated: dict[str, dict] = {}
+    for mesh_name, rows in cloth_meshes.items():
+        obj = bpy.data.objects.get(mesh_name)
+        modifier = next((mod for mod in obj.modifiers if mod.type == "CLOTH"), None) if obj else None
+        pin_group = obj.vertex_groups.get(modifier.settings.vertex_group_mass) if modifier else None
+        pinned = set(_weighted(obj, pin_group)) if pin_group is not None else set()
+        diagonal = float(obj.dimensions.length) if obj is not None else 0.0
+        scene.frame_set(scene.frame_start)
+        bpy.context.view_layer.update()
+        base = _eval_coords(obj, bpy.context.evaluated_depsgraph_get())
+        pin_bone_name = rows[0].pin_bone
+        pin_bone = armature.pose.bones.get(pin_bone_name)
+        base_head = (armature.matrix_world @ pin_bone.head).copy() if pin_bone else None
+        for frame in range(scene.frame_start + 1, scene.frame_end + 1):
+            scene.frame_set(frame)
+            bpy.context.view_layer.update()
+        final = _eval_coords(obj, bpy.context.evaluated_depsgraph_get())
+        head = (armature.matrix_world @ pin_bone.head).copy() if pin_bone else None
+        drift = 0.0
+        if pinned and base_head is not None:
+            drift = max(((final[index] - head) - (base[index] - base_head)).length for index in pinned)
+        free = [index for index in range(len(base)) if index not in pinned]
+        displacement = max((final[index] - base[index]).length for index in free) if free else 0.0
+        finite = all(math.isfinite(component) for vector in final for component in vector)
+        simulated[mesh_name] = {
+            "chain": rows[0].name,
+            "vertices": len(base),
+            "pinned": len(pinned),
+            "pin_bone": pin_bone_name,
+            "pin_drift_max": round(drift, 6),
+            "free_displacement_max": round(displacement, 6),
+            "mesh_diagonal": round(diagonal, 4),
+            "finite": finite,
+            "modifier_order": [mod.type for mod in obj.modifiers],
+            "cloth_modifier": modifier.name if modifier else "",
+        }
+    report["simulation"]["meshes"] = simulated
+    check("cloth-simulates", bool(simulated) and all(v["free_displacement_max"] > 1e-4 and v["finite"] for v in simulated.values()), simulated)
+    check("cloth-pins-hold", bool(simulated) and all(v["pin_drift_max"] <= 0.02 for v in simulated.values()), {name: value["pin_drift_max"] for name, value in simulated.items()})
+    check("cloth-stays-bounded", bool(simulated) and all(v["free_displacement_max"] <= 2.5 for v in simulated.values()), {name: value["free_displacement_max"] for name, value in simulated.items()})
+    check("cloth-order-after-sim", bool(simulated) and all(v["modifier_order"][-2:] == ["ARMATURE", "CLOTH"] for v in simulated.values()), {name: value["modifier_order"] for name, value in simulated.items()})
+
     addon_module = sys.modules["dmf_cloth_probe"]
     surface = getattr(addon_module, "SURFACE", "properties")
     prefix = "space" if surface == "editor" else "props"

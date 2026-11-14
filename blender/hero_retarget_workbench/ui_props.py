@@ -173,11 +173,20 @@ class DMF_PT_props_main(Panel):
         grid = layout.grid_flow(columns=2, even_columns=True, even_rows=True, align=True)
         for page in PAGES:
             grid.prop_enum(settings, "props_page", page)
+        editor = ui.surface_name() == "editor"
         layout.operator(
             "dmf.open_workbench",
-            text="Open the Workbench editor",
-            icon="WINDOW",
+            text="Open the Workbench editor" if editor else "Open the Workbench page",
+            icon="WINDOW" if editor else "PROPERTIES",
         )
+        if not editor:
+            layout.label(
+                text="This Blender build cannot register editor types; pages open here",
+                icon="INFO",
+            )
+        error = ui.surface_error()
+        if error:
+            layout.label(text=f"Editor type failed: {error}", icon="ERROR")
 
         message = getattr(settings, "status", "")
         if message:
