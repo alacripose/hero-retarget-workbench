@@ -88,6 +88,22 @@ def _header_draw(self, context) -> None:
         # A build without the template still gets the page box and the status.
         pass
     layout.label(text="Workbench", icon="ARMATURE_DATA")
+    # Page buttons in the header: the page panels fill the WINDOW region, and the
+    # sidebar is not opened at all, so no strip of empty sidebar sits between the
+    # content and the tab buttons.
+    pages = layout.row(align=True)
+    for page in ui_props.PAGES:
+        try:
+            pages.prop_enum(
+                settings,
+                "props_page",
+                page,
+                text="",
+                icon=ui_props.PAGE_ICONS.get(page, "DOT"),
+            )
+        except TypeError:
+            pages.prop_enum(settings, "props_page", page, text="")
+    layout.separator(factor=0.6)
     import sys
 
     module = sys.modules.get(__package__ or "")
@@ -181,11 +197,11 @@ _SEEN_AREAS: set[int] = set()
 
 
 def page_mirror_classes() -> list[type]:
-    """The page panels, in the custom view's own sidebar categories.
+    """The page panels, filling the custom view's WINDOW region.
 
-    Each page is a category in the UI region, the way every editor's N sidebar
-    has its own tabs, and the page's panels are what that tab shows. There is no
-    WINDOW-region copy and no page selector: the tab is the page.
+    The sidebar is closed, so the page panels are the view. Page buttons live in
+    the header; putting the page's panels in the sidebar meant the sidebar's
+    width sat between the content and the tab strip.
     """
     classes: list[type] = []
     for panel in ui_props.page_panels():
@@ -198,8 +214,6 @@ def page_mirror_classes() -> list[type]:
                 prefix=PREFIX,
                 space_idname=SPACE_IDNAME,
                 root_idname="",
-                region_type="UI",
-                category=page.replace("_", " ").title(),
             )
         )
     return classes
@@ -284,8 +298,11 @@ def _ensure_sidebar() -> float:
             opened = False
             if area.as_pointer() not in _SEEN_AREAS:
                 _SEEN_AREAS.add(area.as_pointer())
-                if hasattr(space, "show_region_ui") and not space.show_region_ui:
-                    space.show_region_ui = True
+                # No sidebar: the pages are the WINDOW region and the page
+                # buttons are in the header, so an empty UI region would only
+                # steal width from them.
+                if hasattr(space, "show_region_ui") and space.show_region_ui:
+                    space.show_region_ui = False
                     opened = True
                 # The custom space creates an empty TOOLS strip on the left that
                 # has no panels; close it so the view does not carry a blank
@@ -302,7 +319,7 @@ def _ensure_sidebar() -> float:
 
 
 def _open_editor(context, area) -> bool:
-    """Make this area the Workbench and open its own page sidebar."""
+    """Make this area the Workbench; the page panels fill it."""
     try:
         area.type = "CUSTOM"
         area.ui_type = SPACE_IDNAME
@@ -311,8 +328,10 @@ def _open_editor(context, area) -> bool:
         return False
     space = area.spaces.active
     _SEEN_AREAS.discard(area.as_pointer())
+    # The pages are the WINDOW region and the page buttons are in the header;
+    # the sidebar stays closed so it cannot take width from the page.
     if hasattr(space, "show_region_ui"):
-        space.show_region_ui = True
+        space.show_region_ui = False
     return True
 
 
@@ -320,8 +339,8 @@ class DMF_OT_open_workbench(Operator):
     bl_idname = "dmf.open_workbench"
     bl_label = "Open Workbench Surface"
     bl_description = (
-        "Open the Workbench in its own editor area, with the page strip on the "
-        "left; on builds without custom editor types, open the 3D viewport sidebar"
+        "Open the Workbench in its own editor area, page buttons in its header; "
+        "on builds without custom editor types, open the 3D viewport sidebar"
     )
 
     def execute(self, context):
