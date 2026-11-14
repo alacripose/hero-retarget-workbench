@@ -335,6 +335,33 @@ ones: Install reloads the Python module without re-running `register()`.
 A restart is still the clean path; the self-heal covers the reload case that the
 owner hit.
 
+## 0.8.13 — tabs without a page box
+
+**Owner report, verbatim:** *"the arrow doesn't appear when the left hand sidebar
+is expanded with empty content"* and *"there's a literally empty right sidebar
+next to the tab buttons that just says the name of the tab instead of it just
+being tabs and the workbench"*.
+
+- The page tab panels drew an empty panel body headed with the page name beside
+  the tab strip. They now set `bl_options = {'HIDE_HEADER'}`; the tab is the only
+  visible control.
+- Switching no longer depends on that panel's draw (which may not run at all for
+  a headerless panel). The timer reads `region.active_panel_category` from the
+  UI region, maps the label to a page, and writes `props_page`.
+- **The strip left of the tabs cannot be shrunk.** The UI region is 280 px wide
+  and `Region.width` is read-only (`AttributeError ... is read-only`). The space
+  between the page and the tab strip is that region, not a panel.
+- **The toolbar handle cannot be removed.** `show_region_toolbar = False` closes
+  the TOOLS region (measured 1 px), but the collapsed handle remains, because a
+  custom space's region set is created in C and Python cannot delete a region.
+- The earlier probe hung because it never quit Blender; it is deleted. The
+  installed-zip probe now drives the category directly, checks Cloth→CLOTH and
+  Setup→SETUP, screenshots, and exits.
+- Evidence: `artifacts/receipts/pages-0.8.13.png` (tabs, no page box, Cloth page,
+  `Workbench v0.8.13`), `zip-install-0.8.13.json` 10/10.
+
+Not checked: a real mouse click on a tab; the category was set through the API.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
