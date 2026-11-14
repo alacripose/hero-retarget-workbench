@@ -9,13 +9,29 @@ like that.
 from __future__ import annotations
 
 import contextlib
+import time
 
+import bpy
 from bpy.types import Operator
 from forge import bonerules
 
-from . import core, proofing
+from . import core, poseview, proofing
 
 _DEPTH = 0  # nesting guard: an auto-fill must not start another auto-fill
+
+# A batch of rule answers is spread over timer ticks. One tick is the longest the
+# main thread may be held, so the viewport keeps drawing while hundreds of rows
+# are answered; the plan is computed once, up front.
+_CHUNK = 150
+_FILL: dict[str, object] = {
+    "settings": None,
+    "plan": {},
+    "done": 0,
+    "total": 0,
+    "chunks": [],
+    "chunk": _CHUNK,
+    "timer": None,
+}
 
 _STATE_LABELS = {
     "MAPPED": "Mapped",
@@ -128,34 +144,158 @@ def remembered(settings) -> dict[str, tuple[str, str, str]]:
     return bonerules.remembered(rows(settings))
 
 
-def fill(settings) -> int:
-    """Apply the rules to every row the user has not answered themselves."""
-    found = bonerules.suggest(panel_rules(settings), [e.source for e in settings.bone_map if e.source], target_names(settings), mapping(settings))
+def plan_fill(settings) -> dict:
+    """What the rules answer right now: source -> suggestion, user rows excluded."""
+    found = bonerules.suggest(
+        panel_rules(settings),
+        [entry.source for entry in settings.bone_map if entry.source],
+        target_names(settings),
+        mapping(settings),
+    )
     kept = set(remembered(settings))
+    return {source: hit for source, hit in found.items() if source not in kept}
+
+
+def _entry(settings, source: str):
+    for entry in settings.bone_map:
+        if entry.source == source:
+            return entry
+    return None
+
+
+def _answer(entry, hit) -> None:
+    if hit.state == "EXTRA":
+        entry.state = "EXTRA"
+        entry.target = entry.source
+    elif hit.state == "IGNORED":
+        entry.state = "IGNORED"
+        entry.target = ""
+    else:
+        entry.state = "MAPPED"
+        entry.target = hit.target
+    entry.note = f"rule {hit.label}"
+    # What a rule wrote is not a decision the user made: a rescan may answer the
+    # row again if the rule changes.
+    entry.scanned = entry.target
+    entry.scanned_state = entry.state
+
+
+def fill(settings) -> int:
+    """Apply the rules now, in this call. Panels use ``start_fill`` instead."""
+    plan = plan_fill(settings)
     changed = 0
     with suppressed():
-        for entry in settings.bone_map:
-            if entry.source and entry.source in kept:
+        for source, hit in plan.items():
+            entry = _entry(settings, source)
+            if entry is None:
                 continue
-            hit = found.get(entry.source)
-            if hit is None:
-                continue
-            if hit.state == "EXTRA":
-                entry.state = "EXTRA"
-                entry.target = entry.source
-            elif hit.state == "IGNORED":
-                entry.state = "IGNORED"
-                entry.target = ""
-            else:
-                entry.state = "MAPPED"
-                entry.target = hit.target
-            entry.note = f"rule {hit.label}"
-            # What a rule wrote is not a decision the user made: a rescan may
-            # answer the row again if the rule changes.
-            entry.scanned = entry.target
-            entry.scanned_state = entry.state
+            _answer(entry, hit)
             changed += 1
     return changed
+
+
+def _finish_fill(settings, cancelled: bool = False) -> None:
+    timer = _FILL.get("timer")
+    if timer is not None:
+        try:
+            bpy.app.timers.unregister(timer)
+        except ValueError:
+            pass
+    _FILL["timer"] = None
+    _FILL["plan"] = {}
+    if settings is None:
+        return
+    settings.rule_fill_running = False
+    if cancelled:
+        core.set_status(settings, f"Stopped after answering {_FILL['done']} rows", "INFO")
+        return
+    answered = int(_FILL.get("done") or 0)
+    left = sum(1 for entry in settings.bone_map if entry.state == "UNMATCHED")
+    # One pose refresh for the whole batch, never one per row.
+    try:
+        poseview.refresh(settings)
+    except Exception:
+        pass
+    proofing.bump_tick(settings)
+    core.set_status(
+        settings,
+        f"Rules answered {answered} rows; {left} still need a decision"
+        if left
+        else f"Rules answered {answered} rows; every row is answered",
+        "WARN" if left else "OK",
+    )
+
+
+def _fill_tick():
+    settings = _FILL.get("settings")
+    plan = _FILL.get("plan") or {}
+    if settings is None or not plan:
+        _finish_fill(settings)
+        return None
+    started = time.monotonic()
+    sources = list(plan)[: int(_FILL.get("chunk") or _CHUNK)]
+    with suppressed():
+        for source in sources:
+            hit = plan.pop(source, None)
+            entry = _entry(settings, source)
+            if hit is None or entry is None:
+                continue
+            _answer(entry, hit)
+            _FILL["done"] = int(_FILL["done"]) + 1
+    settings.rule_fill_done = int(_FILL["done"])
+    _FILL["chunks"].append(round((time.monotonic() - started) * 1000.0, 1))
+    if plan:
+        core.set_status(settings, f"Rules {settings.rule_fill_done}/{settings.rule_fill_total}", "BUSY")
+        return 0.0
+    _finish_fill(settings)
+    return None
+
+
+def start_fill(settings, chunk: int | None = None) -> int:
+    """Plan the rule answers and apply them a chunk per timer tick."""
+    timer = _FILL.get("timer")
+    if timer is not None:
+        try:
+            bpy.app.timers.unregister(timer)
+        except ValueError:
+            pass
+    _FILL["timer"] = None
+    _FILL["plan"] = {}
+    plan = plan_fill(settings)
+    _FILL.update(
+        settings=settings,
+        plan=dict(plan),
+        done=0,
+        total=len(plan),
+        chunks=[],
+        chunk=max(1, int(chunk or _CHUNK)),
+    )
+    settings.rule_fill_total = len(plan)
+    settings.rule_fill_done = 0
+    settings.rule_fill_running = bool(plan)
+    if not plan:
+        return 0
+    _FILL["timer"] = bpy.app.timers.register(_fill_tick, first_interval=0.0, persistent=True)
+    return len(plan)
+
+
+def cancel_fill(settings=None, quiet: bool = False) -> None:
+    if _FILL.get("timer") is None and not _FILL.get("plan"):
+        return
+    _finish_fill(_FILL.get("settings") if settings is None else settings, cancelled=not quiet)
+
+
+def flush_fill(settings) -> dict:
+    """Run a scheduled fill to completion now — headless probes and tests."""
+    if _FILL.get("settings") is not settings or (not _FILL.get("plan") and _FILL.get("timer") is None):
+        start_fill(settings)
+    while _FILL.get("plan"):
+        _fill_tick()
+    return {"done": int(_FILL.get("done") or 0), "chunks": list(_FILL.get("chunks") or [])}
+
+
+def is_filling() -> bool:
+    return _FILL.get("timer") is not None
 
 
 def auto_fill(settings, entry) -> int:
@@ -253,6 +393,17 @@ class DMF_OT_learn_rules(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_stop_rules(Operator):
+    bl_idname = "dmf.stop_rules"
+    bl_label = "Stop Answering"
+    bl_description = "Stop the rule fill; the rows already answered keep their targets"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        cancel_fill(settings)
+        return {"FINISHED"}
+
+
 class DMF_OT_apply_rules(Operator):
     bl_idname = "dmf.apply_rules"
     bl_label = "Apply Rules"
@@ -264,15 +415,14 @@ class DMF_OT_apply_rules(Operator):
             self.report({"ERROR"}, "Scan the bone map first")
             return {"CANCELLED"}
         try:
-            changed = fill(settings)
+            changed = start_fill(settings)
         except Exception as error:
             core.set_status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
-        proofing.bump_tick(settings)
         left = sum(1 for row in settings.bone_map if row.state == "UNMATCHED")
         if changed:
-            core.set_status(settings, f"Rules answered {changed} rows; {left} still need a decision" if left else f"Rules answered {changed} rows; every row is answered", "OK" if not left else "WARN")
+            core.set_status(settings, f"Answering {changed} rows from the rules", "BUSY")
         else:
             core.set_status(settings, "No rule answered an unanswered row", "WARN")
         return {"FINISHED"}
@@ -350,6 +500,7 @@ class DMF_OT_clear_rules(Operator):
 CLASSES = (
     DMF_OT_learn_rules,
     DMF_OT_apply_rules,
+    DMF_OT_stop_rules,
     DMF_OT_add_rule,
     DMF_OT_rule_from_row,
     DMF_OT_remove_rule,

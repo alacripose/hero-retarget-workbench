@@ -18,6 +18,7 @@ import importlib.util
 import json
 import math
 import sys
+import time
 from pathlib import Path
 
 import bpy
@@ -167,6 +168,10 @@ def main() -> int:
     rows["Sp_Hi_Mskirt0_B_00"].target = ""
     rows["elbow_L"].target = "arm_lower_L"
     scanned_again = dmf.workbench.scan_bone_map(settings)
+    # The scan returns before the rules are answered; the panel's timer ticks do
+    # that. A headless probe drives the same ticks itself.
+    rescan = dmf.rules.flush_fill(settings)
+    checks["rescan_chunks"] = len(rescan["chunks"])
     again = {entry.source: entry for entry in settings.bone_map}
     checks["rescan_rows"] = scanned_again
     checks["rescan_shoulder"] = (again["shoulder_L"].state, again["shoulder_L"].target)
@@ -180,6 +185,59 @@ def main() -> int:
     assert checks["rescan_mirror"] == ("MAPPED", "arm_lower_R"), checks["rescan_mirror"]
     assert checks["rescan_pelvis"] == ("MAPPED", "pelvis"), checks["rescan_pelvis"]
     rows = again
+
+    # --- a wide rig is answered in bounded chunks, not one long hold --
+    wide = 250
+    wide_source = armature(
+        "wide_rig",
+        [("pelvis", (0.0, 0.0, 1.0), (0.0, 0.0, 1.1), None)]
+        + [
+            (f"part_{index:04d}", (0.0, 0.0, 0.5), (0.0, 0.1, 0.5), "pelvis")
+            for index in range(wide)
+        ],
+    )
+    wide_hero = armature(
+        "wide_hero",
+        [("pelvis", (0.0, 0.0, 1.0), (0.0, 0.0, 1.1), None)]
+        + [
+            (f"rig_{index:04d}", (0.0, 0.0, 0.5), (0.0, 0.1, 0.5), "pelvis")
+            for index in range(wide)
+        ],
+    )
+    wide_rule = settings.bone_rules.add()
+    wide_rule.source = r"^part_(\d+)$"
+    wide_rule.target = r"rig_\1"
+    wide_rule.regex = True
+    wide_rule.state = "MAPPED"
+    wide_rule.origin = "user"
+    settings.custom_armature = wide_source
+    settings.target_armature = wide_hero
+    started = time.monotonic()
+    wide_scanned = dmf.workbench.scan_bone_map(settings)
+    scan_ms = round((time.monotonic() - started) * 1000.0, 1)
+    checks["wide_rows"] = wide_scanned
+    checks["wide_scan_ms"] = scan_ms
+    checks["wide_scheduled"] = settings.rule_fill_running and settings.rule_fill_total == wide
+    # Before the ticks run, the scan has returned with the rows still unanswered.
+    checks["wide_pending_before_ticks"] = sum(
+        1 for entry in settings.bone_map if entry.state == "UNMATCHED"
+    )
+    assert checks["wide_scheduled"], (settings.rule_fill_running, settings.rule_fill_total)
+    assert checks["wide_pending_before_ticks"] == wide, checks["wide_pending_before_ticks"]
+    assert any(
+        entry.source == "pelvis" and entry.state == "MAPPED" for entry in settings.bone_map
+    )
+    flush = dmf.rules.flush_fill(settings)
+    checks["wide_chunks"] = len(flush["chunks"])
+    checks["wide_worst_chunk_ms"] = max(flush["chunks"]) if flush["chunks"] else 0.0
+    checks["wide_answered"] = sum(
+        1 for entry in settings.bone_map if entry.state == "MAPPED" and entry.target.startswith("rig_")
+    )
+    checks["wide_fill_ms"] = round(sum(flush["chunks"]), 1)
+    assert checks["wide_answered"] == wide, checks["wide_answered"]
+    assert checks["wide_chunks"] >= 1
+    settings.custom_armature = source
+    settings.target_armature = hero
 
     # --- stance: the source is level, the hero is lowered ---------------
     checks["source_stance"] = dmf.poseview.stance(settings)

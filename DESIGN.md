@@ -149,3 +149,10 @@ rows — no object, rest pose, weight or key is touched — and it keeps any row
 state or target differs from what the last scan or rule pass wrote there. The
 page says that in one line under the button, and the status line separates what
 the names answered from what the rules did (`12 mapped (4 by rules)`).
+
+## 2026-11-13 — the rule fill is a background tick, with a visible cursor (0.5.2)
+
+Under the Scan button the Skeleton page shows the fill's progress
+(`Rules 150/400` with a cancel glyph) only while a fill is running, so the page
+does not grow a permanent row for it. The rows answer themselves as the ticks
+run; the pose preview refreshes once at the end instead of once per row.

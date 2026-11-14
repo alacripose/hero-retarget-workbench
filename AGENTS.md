@@ -503,3 +503,34 @@ bone map non destructively so I can see that the bones are mapped"*
   and `Sp_Hi_Mskirt0_B_00` still IGNORED because that was the user's choice.
   23 unit tests in `tests/test_bonerules.py`; the probe also failed loudly now —
   a Blender `--python` script exits 0 on an exception unless it says otherwise.
+
+## 2026-11-13 — 0.5.2: the rule fill no longer holds the main thread
+
+**Owner report, verbatim:** *"okay great but there's some performance hitches, you
+just made the actul s2v scan faster, but now mapping bones locks the blender main
+thread which can be pretty bad when theres lots of bones that need to be mapped"*
+
+Three causes, all removed:
+
+1. **The property callback ran per written row.** `DMF_BoneEntry.target`'s update
+   callback called `poseview.refresh` on every write, so a batch that answered N
+   rows re-applied the whole ref pose N times. The callback now returns
+   immediately while `rules.suppressed()` is active, and the batch refreshes the
+   pose once when it finishes.
+2. **The whole fill ran in one operator call.** `rules.start_fill` plans once
+   (`bonerules.suggest` over the rows) and then applies the answers in chunks of
+   150 rows per `bpy.app.timers` tick. Scan returns immediately; the Skeleton page
+   shows `Rules 150/400` with a Stop (`dmf.stop_rules`) while the ticks run. A
+   cancelled fill keeps the rows it already answered.
+3. **Regex patterns were re-matched with the string form per row.** `bonerules`
+   now compiles each pattern once (`lru_cache`, 256) and reuses it for every row
+   and for the rules page's live match count.
+
+`rules.fill` still exists for headless use, and `rules.flush_fill` drives the
+scheduled ticks to completion so a probe measures the same path the panel uses.
+
+**Measured** (`tools/blender_bone_rules_pose_probe.py`, synthetic 250-row rig with
+one regex rule, headless, empty scene): `scan_bone_map` returned in **5.4 ms**
+with 250 rows still unanswered; the answers then took **2 chunks**, worst chunk
+**8.3 ms**, all 250 answered, 13.2 ms total. The claim is about this rig, not
+about the owner's full scene: the bound is the chunk, the total is unchanged.

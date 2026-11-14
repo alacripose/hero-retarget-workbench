@@ -169,8 +169,10 @@ def scan_bone_map(settings) -> int:
             entry.scanned = entry.target
             entry.scanned_state = entry.state
     # The rules answer what the names could not, so the panel shows the map the
-    # solver would actually read after one press of Scan.
-    rules.fill(settings)
+    # solver would actually read after one press of Scan. This is scheduled a
+    # chunk per timer tick: answering hundreds of rows here is what held the
+    # main thread.
+    rules.start_fill(settings)
     settings.bone_map_index = 0
     return len(sources)
 
@@ -189,15 +191,19 @@ class DMF_OT_scan_bones(Operator):
                 _status(settings, "No custom rig or groups; Surface + envelope will weight the mesh directly", "INFO")
             else:
                 resolved = sum(1 for entry in settings.bone_map if entry.state == "MAPPED")
-                by_rules = sum(1 for entry in settings.bone_map if entry.note.startswith("rule "))
-                detail = f"Scanned {count} source bones; {resolved} mapped"
-                if by_rules:
-                    detail += f" ({by_rules} by rules)"
-                _status(
-                    settings,
-                    f"{detail}, {count - resolved} need a decision",
-                    "OK" if resolved == count else "WARN",
-                )
+                pending = settings.rule_fill_total
+                if pending:
+                    _status(
+                        settings,
+                        f"Scanned {count} source bones; {resolved} mapped by name; answering {pending} rows from the rules",
+                        "BUSY",
+                    )
+                else:
+                    _status(
+                        settings,
+                        f"Scanned {count} source bones; {resolved} mapped, {count - resolved} need a decision",
+                        "OK" if resolved == count else "WARN",
+                    )
         except Exception as error:
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))

@@ -689,6 +689,13 @@ class DMF_PT_skeleton(Panel):
                 "INFO",
                 width=34,
             )
+        if settings.rule_fill_running:
+            filling = layout.row(align=True)
+            filling.label(
+                text=f"Rules {settings.rule_fill_done}/{settings.rule_fill_total}",
+                icon="TIME",
+            )
+            filling.operator("dmf.stop_rules", text="", icon="CANCEL")
 
         pose = _section(layout, "Ref pose", "ARMATURE_DATA", settings.pose_stance or "not read")
         controls = pose.row(align=True)
