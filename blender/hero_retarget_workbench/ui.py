@@ -213,12 +213,15 @@ def surface_error() -> str:
 
 def _surface(layout) -> None:
     """The way out of the sidebar: open the page surface this build has."""
+    error = surface_error()
     if surface_name() == "editor":
         layout.operator("dmf.open_workbench", text="Open the Workbench editor", icon="WINDOW")
+        if error:
+            layout.label(text=f"Editor note: {error}", icon="INFO")
         return
-    layout.operator("dmf.open_workbench", text="Open the Workbench page", icon="PROPERTIES")
+    layout.operator("dmf.open_workbench", text="Open the Workbench sidebar", icon="VIEW3D")
     layout.label(
-        text="This Blender build cannot register editor types; the pages are in Properties > Scene",
+        text="This Blender build cannot register editor types; use the sidebar (N)",
         icon="INFO",
     )
 

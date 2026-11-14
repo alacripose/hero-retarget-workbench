@@ -19,7 +19,7 @@ if (_PACKAGE / "_vendor").is_dir() and str(_PACKAGE / "_vendor") not in sys.path
 bl_info = {
     "name": "Hero Retarget Workbench",
     "author": "ala",
-    "version": (0, 8, 3),
+    "version": (0, 8, 4),
     "blender": (5, 4, 0),
     "location": "Workbench editor (PR 165087 builds); View3D > Sidebar > Deadlock elsewhere",
     "description": "Fit and retarget a custom model onto a live Deadlock hero, then install the unchanged S2V vmdl as a CSDK13 addon",
@@ -94,10 +94,45 @@ def register() -> None:
     # 0.8.0's Properties fallback squeezed the pages into the Scene tab.
     if ui_space.register():
         SURFACE = "editor"
-        EDITOR_ERROR = ""
+        EDITOR_ERROR = ui_space.EDITOR_ERROR
     else:
         SURFACE = "sidebar"
         EDITOR_ERROR = ui_space.EDITOR_ERROR
+    _report_surface()
+
+
+def _report_surface() -> None:
+    """Say which surface this copy got, and why if it did not get the editor.
+
+    The owner kept hitting an editor-less install with no visible reason; the
+    answer belongs in the console and in one file under the user config, not
+    only on a panel nobody opened yet.
+    """
+    message = f"DMF surface={SURFACE} error={EDITOR_ERROR or '-'}"
+    print(message, flush=True)
+    try:
+        import json
+
+        directory = Path(bpy.utils.user_resource("CONFIG", path="dmf", create=True))
+        report = directory / "surface.json"
+        report.write_text(
+            json.dumps(
+                {
+                    "surface": SURFACE,
+                    "error": EDITOR_ERROR,
+                    "version": ".".join(str(part) for part in bl_info["version"]),
+                    "file": __file__,
+                    "blender": bpy.app.version_string,
+                    "space_registered": "DMF_ST_workbench" in dir(bpy.types),
+                    "pages_registered": "DMF_ST_workbench_pages" in dir(bpy.types),
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        print(f"DMF surface report: {report}", flush=True)
+    except Exception as error:
+        print(f"DMF surface report failed: {type(error).__name__}: {error}", flush=True)
 
 
 def unregister() -> None:
