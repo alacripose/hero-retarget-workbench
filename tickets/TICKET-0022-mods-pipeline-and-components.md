@@ -445,6 +445,27 @@ Not checked: a real mouse click on a tab — the probe selects the category thro
 `active_panel_category`; the panels are registered per category, so the click and
 the API take the same path.
 
+## 0.8.17 — the self-heal no longer mistakes a current build for a stale one
+
+**Owner report, verbatim:** *"how is it that I click the blender.exe in the
+blender pr branch and it tells me that the blender version doesn't support custom
+views"*.
+
+- The PR build does support it. Run with the owner's own config, the binary at
+  `Downloads/blender-PR165087/.../blender.exe` loads 0.8.16 from AppData and
+  reports `SURFACE editor`, empty `EDITOR_ERROR`, and `DMF_ST_workbench`
+  registered. The message comes from a session whose `SURFACE` was `sidebar`, not
+  from the binary.
+- The cause was ours: 0.8.16's stale-UI guard still tested for
+  `DMF_PT_space_tab_setup`, a class 0.8.16 removed. A correct session therefore
+  looked stale, and the guard unregistered and re-registered the editor up to
+  twice per session — during which the open area can read as unavailable and the
+  fallback answers the sidebar message.
+- The guard now accepts either shape (a page panel in the sidebar, or the older
+  tab panel). `stale-guard-quiet` is a probe check: calling the guard on a current
+  build leaves `_STALE_ATTEMPTS` at 0.
+- Evidence: gate green; `zip-install-0.8.17.json` 13/13 on the installed zip.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
