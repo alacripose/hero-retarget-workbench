@@ -241,7 +241,7 @@ def main() -> int:
     check("jacket-imported", "jacket" in lowered, [name for name in names if "jacket" in name.lower()])
 
     rigs = {obj.name: _rig_of(obj) for obj in parts}
-    unrigged = [name for name, rig in rigs.items() if rig is None or rig != armature]
+    unrigged = [name for name, rig in rigs.items() if rig is None or rig != settings.target_armature]
     check("parts-on-hero-rig", not unrigged, {"unrigged": unrigged, "parts": len(parts)})
 
     vertices = {obj.name: len(obj.data.vertices) for obj in parts}
@@ -312,9 +312,15 @@ def main() -> int:
         pinned = len(_weighted(obj, pin)) if pin is not None else 0
         modifier = obj.modifiers.get(row.cloth_modifier)
         chain = row.chain_object
-        chain_bones = list(chain.data.bones) if chain is not None and chain.type == "ARMATURE" else []
+        # Bone collection order is not the chain order; read the recorded chain
+        # order and verify each bone's parent is the previous one.
+        chain_bones = (
+            [chain.data.bones.get(name.strip()) for name in (row.bones or "").split(",") if name.strip()]
+            if chain is not None and chain.type == "ARMATURE"
+            else []
+        )
         order = [mod.type for mod in obj.modifiers]
-        ordered = all(
+        ordered = bool(chain_bones) and all(bone is not None for bone in chain_bones) and all(
             bone.parent is not None and bone.parent.name == chain_bones[index - 1].name
             for index, bone in enumerate(chain_bones)
             if index
@@ -374,6 +380,7 @@ def main() -> int:
         return coords
 
     scene = bpy.context.scene
+    armature = settings.target_armature
     scene.render.fps = 24
     scene.frame_start, scene.frame_end = 1, 12
     bpy.ops.object.select_all(action="DESELECT")

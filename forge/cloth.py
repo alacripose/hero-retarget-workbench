@@ -44,6 +44,71 @@ CLOTH_WORDS: tuple[str, ...] = (
     "strap",
 )
 
+# Mesh parts that are not simulated but still belong to the hero. The old filter
+# only accepted cloth words and ``body``, so a head or glasses mesh could be
+# left out of an import even though S2V had emitted it.
+PART_WORDS: tuple[str, ...] = (
+    "body",
+    "head",
+    "face",
+    "eyes",
+    "eyelash",
+    "brow",
+    "teeth",
+    "tongue",
+    "ear",
+    "horn",
+    "glasses",
+    "weapon",
+    "gun",
+    "pillow",
+    "balloon",
+    "hull",
+    "hat",
+    "helmet",
+    "mask",
+    "wings",
+    "accessory",
+    "armor",
+    "boots",
+    "gloves",
+    "shirt",
+    "pants",
+    "belt",
+    "necklace",
+    "bag",
+    "pack",
+)
+
+# Render variants that share a body group with a canonical part. Importing all of
+# them puts three copies of a jacket in the scene; the vmdl chooses between them.
+VARIANT_WORDS: tuple[str, ...] = (
+    "ui",
+    "static_ui",
+    "eyes_closed",
+    "no_shirt",
+    "no_sim",
+    "nosim",
+    "proxy",
+    "bindpose",
+    "ref",
+)
+
+
+def _tokens(name: str) -> tuple[str, ...]:
+    return tuple(part for part in re.split(r"[^a-z0-9]+", (name or "").lower()) if part)
+
+
+def _is_variant(name: str) -> bool:
+    tokens = _tokens(name)
+    return any(word in tokens for word in ("ui", "proxy")) or any(
+        word in (name or "").lower() for word in ("eyes_closed", "no_shirt", "no_sim", "nosim", "bindpose")
+    )
+
+
+def _is_body_stem(stem: str) -> bool:
+    return bool(re.search(r"(?:^|[_.\- ])body\d*(?:$|[_.\- ])", (stem or "").lower()))
+
 
 @dataclass(frozen=True)
 class MeshFile:
@@ -121,16 +186,29 @@ def mesh_files(folder: Path | str) -> list[MeshFile]:
             continue
         bases.append(path)
     found: list[MeshFile] = []
+    seen_parts: set[str] = set()
+    body_present = any(_is_body_stem(base.stem) for base in bases)
     for base in bases:
         key = part_name(base.stem).lower()
         # ``shiv_glasses_lod17`` belongs to ``shiv_glasses2``: the LOD is named after
         # the part, the base carries an index, so both spellings are matched here.
         lods = set(lod_groups.get(key, set()))
         lods.update(lod_groups.get(base.stem.lower(), set()))
-        named_part = is_cloth(key) or key.endswith("body")
+        named_part = is_cloth(key) or any(word in key for word in PART_WORDS)
         if not lods and not named_part:
             # No LOD family and no part word: a clip that happens to sit here.
             continue
+        if _is_variant(key):
+            continue
+        if body_present and not is_cloth(key) and not any(
+            word in key for word in PART_WORDS if word != "body"
+        ) and key.split("_")[-1] not in PART_WORDS:
+            # A second body-named base (``familiar_wip_familiar``) duplicates the
+            # declared body; the vmdl's render mesh list is the authority for it.
+            continue
+        if key in seen_parts:
+            continue
+        seen_parts.add(key)
         found.append(MeshFile(stem=base.stem, path=base, lods=tuple(sorted(lods))))
     return sorted(
         found,

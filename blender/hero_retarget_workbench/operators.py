@@ -14,9 +14,9 @@ import bpy
 from bpy.props import StringProperty
 from bpy.types import Operator
 
-from forge import naming
+from forge import live, naming
 
-from . import cloth_ops, core, jobs, parts, properties, proofing, weights
+from . import cloth_ops, core, jobs, parts, properties, proofing, source2, weights
 
 
 def _status(settings, message: str, kind: str = "INFO") -> None:
@@ -288,9 +288,19 @@ class DMF_OT_import_hero(Operator):
         if path is None or not path.is_file():
             self.report({"ERROR"}, "Choose a hero body DMX from the S2V extraction")
             return {"CANCELLED"}
+        swapped_body = ""
+        # An extraction written before body detection understood numbered body
+        # variants can have a head saved as the body. Repair it from the same
+        # hero folder before the import opens the wrong DMX.
+        siblings = sorted(path.parent.glob("*.dmx"))
+        chosen = live.choose_body(siblings) if siblings else None
+        if chosen is not None and chosen != path and live.looks_like_body(chosen):
+            swapped_body = path.name
+            path = chosen
+            settings.body_dmx = str(path)
         before = {obj.name for obj in context.scene.objects}
         try:
-            bpy.ops.import_scene.kst_dmx(filepath=str(path), append="NEW_ARMATURE", upAxis="Z", forwardAxis="-Y")
+            source2.import_dmx(path, append="NEW_ARMATURE", up_axis="Z", forward_axis="-Y")
         except Exception as error:
             _status(settings, f"Hero import failed: {error}", "ERROR")
             self.report({"ERROR"}, str(error))
@@ -337,7 +347,8 @@ class DMF_OT_import_hero(Operator):
         )
         _status(
             settings,
-            f"Hero ready: {len(arm.data.bones)} bones, {len(mesh.data.vertices):,} vertices{detail}{cloth_note}{misses}",
+            f"Hero ready: {len(arm.data.bones)} bones, {len(mesh.data.vertices):,} vertices{detail}{cloth_note}{misses}"
+            + (f"; used {path.name} instead of {swapped_body}" if swapped_body else ""),
             "OK" if not skipped else "WARN",
         )
         return {"FINISHED"}
@@ -368,7 +379,7 @@ class DMF_OT_import_custom(Operator):
                 else:
                     bpy.ops.import_scene.obj(filepath=str(path))
             elif suffix == ".dmx":
-                bpy.ops.import_scene.kst_dmx(filepath=str(path), append="NEW_ARMATURE")
+                source2.import_dmx(path, append="NEW_ARMATURE")
             else:
                 raise RuntimeError(f"unsupported model type: {suffix or 'no extension'}")
         except Exception as error:

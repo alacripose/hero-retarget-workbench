@@ -930,3 +930,45 @@ and it's not showing up what the fuck can i say"*. Authority:
 - Not checked: the editor-type menu's C-side listing could not be opened from
   Python, so the button routes around it rather than proving the menu fixed. The
   stock daily still cannot host an editor type.
+
+## 2026-11-14 — 0.10.0: tail tiles from any hero, and the import blind spots
+
+**Owner request, verbatim:** *"okay a nother popit and family project ui pass needs
+to be done also the tail section needs to be able to detect tails from any hero not
+just ones from the custom model and not just the ones from the imported hero, which
+is why I mentioned clip scanning, many of the heroes who have tails their tail
+animations are contained in their clips/ag2 animations, I was expecting more of a
+visual tile selector that shows a preview window that shows the heroes tails as
+options. also, currently it's still only been designed with tests on shiv and the
+mayu which has left serious blind spots in the import process for many heroes and
+older models on my drive"*. Authority:
+`logs/authority/2026-11-14-tail-tiles-import-blind-spots.jsonl`; contract:
+`TICKET-0029`.
+
+- **The body is chosen by name, not file size.** Familiar's body is
+  `familiar_wip_8inf_body8.dmx`; its head is larger. `forge.live.choose_body`
+  accepts numbered body variants, rejects part words, and `dmf.import_hero`
+  repairs a stale head saved in `settings.body_dmx` from the same folder.
+- **A hero import brings heads and other real parts.** `forge.cloth.PART_WORDS`
+  widens companion discovery; `VARIANT_WORDS` keeps UI, closed-eye, no-shirt,
+  no-sim and proxy render variants from duplicating a part.
+- **PulseSrcOps' corrective-driver bug is contained.** `source2.import_dmx`
+  wraps only `AddCorrectiveShapeDrivers.addDrivers`, whose `modifiers[0]` access
+  is empty on Blender 5.4, and restores the original classmethod afterwards. That
+  is what lets a Familiar head import instead of aborting the whole operator.
+- **Tail discovery reads clips, not just the two rigs.** `forge.tails` reads the
+  NUL-separated DMX name table without importing, groups numbered tail chains,
+  and excludes `weapon_target_tail`. `tailops.discover` scans the imported hero,
+  the custom rig, one representative skeleton per sibling extraction, and an
+  optional folder; the body preference keeps a clip from winning the same hero.
+- **The Tails page is a tile selector.** `ui._draw_tail` uses the Popit card,
+  uppercase micro groups, glyph actions, a two-column grid of generated chain
+  previews (`forge.tailimage` PNGs through `tailpreview`), a selected alert
+  tile, and one bubble. Selecting a tile loads that skeleton as `tail_armature`
+  and maps the channels; loading before the hero import is allowed and says the
+  mapping waits.
+- Evidence: gate green; Familiar import 195 bones / 17,245 vertices with body8
+  chosen over head5 and the head present; tail discovery 2 chains with previews;
+  tail load 18 channels paired on `DMF Tail tail`; `blender_tail_ui_probe` 6/6
+  with a real draw pass. Not checked: a tail hero outside the three local
+  extractions, a real tile click, an in-game tail render, an older non-DMX model.

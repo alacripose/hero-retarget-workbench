@@ -140,6 +140,28 @@ page imports the meshes, names the chains, and builds Blender cloth from the
 imported skinning. It says that in the panel rather than implying the other half
 exists.
 
+### Tails: any hero's chain, not only the two imported rigs
+
+**Animations → Tails** scans the imported hero, the custom rig, one representative
+skeleton per sibling S2V extraction, and an optional extra folder. Tail bones are
+read from the DMX header for clips, so a hero whose tail lives only in its AG1/AG2
+animations still appears. `weapon_target_tail` is not a tail chain and is left out.
+
+Each discovered chain is a tile with a generated preview of its rest shape. Select
+a tile to load that skeleton as the tail rig and pair the hero channels; the same
+page then lists every source bone, its target, and the blend weight. Loading a tile
+before the hero is imported is allowed: the preview is available immediately and
+the channel map waits for the hero. The pairing is still experimental local-space
+transfer, and the page says so.
+
+### Importing heroes with names S2V did not standardise
+
+The body is chosen by a body token (`body`, `body8`, `bodyN`, `body_lodN`), not by
+file size. Familiar's head is larger than its body and the old fallback opened the
+head; the importer now repairs that choice from the hero folder. Head, eyes,
+glasses, weapons and other real parts are companions, while UI, closed-eye,
+no-shirt, no-sim and proxy variants are not imported as separate copies.
+
 ## Continuous integration and releases
 
 `.github/workflows/ci.yml` runs on every push to `main`, every pull request,

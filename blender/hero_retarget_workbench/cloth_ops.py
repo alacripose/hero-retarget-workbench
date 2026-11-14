@@ -15,7 +15,7 @@ import traceback
 from bpy.types import Operator
 from forge import cloth as clothscan
 
-from . import core
+from . import core, source2
 
 
 def hero_folder(settings) -> Path | None:
@@ -65,7 +65,7 @@ def import_companions(context, settings) -> dict:
         if armature is not None:
             core.select_only(context, [armature])
         try:
-            bpy.ops.import_scene.kst_dmx(filepath=str(entry.path), append="APPEND")
+            source2.import_dmx(entry.path, append="APPEND")
         except Exception as error:  # one bad file must not lose the rest
             skipped.append(f"{entry.stem} ({error})")
             continue

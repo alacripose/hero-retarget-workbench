@@ -20,7 +20,7 @@ from bpy.types import Operator
 from forge import clips as clipscan
 from forge import tails as tailscan
 
-from . import core, proofing
+from . import core, proofing, source2
 
 _QUEUE: list[int] = []
 _TIMER = None
@@ -127,7 +127,7 @@ def _import_one(settings, entry) -> str:
     bpy.context.view_layer.objects.active = armature
     if bpy.context.object is not None and bpy.context.object.mode != "OBJECT":
         bpy.ops.object.mode_set(mode="OBJECT")
-    bpy.ops.import_scene.kst_dmx(filepath=str(path), append="APPEND")
+    source2.import_dmx(path, append="APPEND")
     created = [action for action in bpy.data.actions if action.name not in before]
     if not created:
         raise RuntimeError(f"clip-no-action: PulseSrcOps read {entry.name} but created no action")
