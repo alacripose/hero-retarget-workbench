@@ -565,3 +565,45 @@ five lists defined no `filter_items` at all.
   returns an order for all rows, and all six registered lists define their own
   `filter_items`. Not checked: typing into the search field of a running Blender —
   the GUI probe cannot reach the sidebar's header widgets.
+
+## 2026-11-13 — 0.5.4: rule edits reach the map, and numbered chains learn
+
+**Owner report, verbatim:** *"still the auto mapping is still not quite right, for
+example here I have one for the skirt and yet all the skirts are still pointing at
+no target, also for example the learner with regex needs to be really smart so it
+can handle stuff like fingers, stuff where the user might need to specify how the
+bone names differ between them without expecting them to know regex itself"*
+
+Two separate faults, two fixes.
+
+**1. A rule edit did not reach the map.** Only Scan and Apply filled rows, so a
+rule written after the scan sat in the panel saying "62 unanswered rows match"
+while the rows still read `no target`. Every `DMF_BoneRule` field now has an
+update callback: `rules.request_fill` debounces 0.25 s and then schedules the same
+chunked fill. Typing in a rule answers the map once you stop, with no extra press.
+
+**2. One typed row can now teach a numbered chain, without regex.** A new rule
+kind, `series`, is derived from a single mapped pair whose two names carry one
+number each and line up word for word, with the target allowed extra leading
+words:
+
+    Index_01_L -> finger_index_0_L   =>   Index_#_L -> finger_index_#_L, number -1
+
+`#` is the number; the shift is `target number - source number`. `Index_02_L`
+then answers `finger_index_1_L`, `Index_03_L` → `finger_index_2_L`, and a row
+whose target bone does not exist stays unanswered (nothing is invented). The rule
+is shown in words ("the source's number becomes the target's number -1"), its
+`Number` field is editable in the panel, and the user never writes a regex. A
+pair that is not a pure number shift (different words, two numbers, cross-side
+words) still learns nothing. `learn()` prefers the series over a side stem when
+both are possible, and series rules sort ahead of prefixes so the specific answer
+wins.
+
+- Evidence: `tests/test_bonerules.py` (37 tests with the series cases) and the rig
+  probe: a rule edit on `Sp_Hi_Mskirt*` with target `pelvis` schedules the fill and
+  the skirt row becomes `MAPPED pelvis` while the row the user set by hand stays
+  `IGNORED`; mapping `Index_01_L -> finger_index_0_L` learns
+  `Index_#_L->finger_index_#_L (-1)` and fills `Index_02_L`/`Index_03_L`, leaving
+  `Index_04_L` and `Middle_01_L` unmatched because the hero has no such bones.
+- Not checked: the Series wording and the `Number` field in a running Blender; the
+  GUI probe still cannot scroll the sidebar.

@@ -164,3 +164,15 @@ decoration: if the A-Z button and the search field are visible, they narrow and
 reorder that list, and the state selector on the bone map composes with the
 search instead of replacing it. A list that cannot honour the header should not
 show controls it ignores.
+
+## 2026-11-13 — three rule forms the user can read (0.5.4)
+
+The rules page teaches three shapes, each described in one sentence under its
+editor: a **side rule** (`elbow` → `arm_lower_L`, side written from the source), a
+**prefix** (`Sp_Hi_Mskirt*` → one bone or Extra) and a **series**
+(`Index_#_L` → `finger_index_#_L`, with a `Number` field saying how far the number
+shifts). Only the regex form asks the user to know regex; it stays for the cases
+the other three cannot express.
+
+A rule edit applies itself: the map answers 250 ms after the last keystroke, on
+the same chunked fill as Scan, so "62 unanswered rows match" and the rows agree.

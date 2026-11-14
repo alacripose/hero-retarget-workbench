@@ -526,6 +526,8 @@ class DMF_PT_rules(Panel):
         edit = box.column(align=True)
         edit.prop(rule, "source", text="Pattern")
         edit.prop(rule, "target", text="Target")
+        if "#" in rule.source:
+            edit.prop(rule, "delta", text="Number")
         edit.prop(rule, "state", text="Sets row")
         flags = box.row(align=True)
         flags.prop(rule, "regex", text="Regex")

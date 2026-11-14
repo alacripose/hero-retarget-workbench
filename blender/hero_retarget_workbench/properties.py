@@ -31,6 +31,16 @@ def set_hero_items(heroes) -> None:
     HERO_ITEMS.extend((hero.slug, hero.title, hero.model_path) for hero in heroes)
 
 
+def _rule_changed(self, context) -> None:
+    """A rule edit reaches the bone map just after the last keystroke."""
+    settings = getattr(getattr(context, "scene", None), "dmf", None)
+    if settings is None:
+        return
+    from . import rules
+
+    rules.request_fill(settings)
+
+
 def _bone_target_changed(self, context) -> None:
     """A typed target teaches its rule at once and places the mirror row.
 
@@ -139,13 +149,36 @@ class DMF_LodLevel(PropertyGroup):
 class DMF_BoneRule(PropertyGroup):
     """One pattern rule: a learned side rule, or a regex the user wrote."""
 
-    source: StringProperty(name="Pattern", description="Source stem for a side rule, regex otherwise")
-    target: StringProperty(name="Target", description="Target stem for a side rule, template otherwise")
-    regex: BoolProperty(name="Regex", description="Match the source as a regular expression", default=False)
+    source: StringProperty(
+        name="Pattern",
+        description="Stem for a side rule, prefix with *, # for a numbered series, regex",
+        update=_rule_changed,
+    )
+    target: StringProperty(
+        name="Target",
+        description="Target stem, template with # for a series, or a bone name",
+        update=_rule_changed,
+    )
+    delta: IntProperty(
+        name="Number",
+        description=(
+            "For a series rule: the target's number is the source's number plus this; "
+            "learned from one mapped row, editable by hand"
+        ),
+        default=0,
+        update=_rule_changed,
+    )
+    regex: BoolProperty(
+        name="Regex",
+        description="Match the source as a regular expression",
+        default=False,
+        update=_rule_changed,
+    )
     side_aware: BoolProperty(
         name="Side",
         description="Take the side token from the source and write it into the target",
         default=True,
+        update=_rule_changed,
     )
     state: EnumProperty(
         name="Sets row to",
@@ -156,13 +189,19 @@ class DMF_BoneRule(PropertyGroup):
             ("IGNORED", "Ignored", "Drop the row's weights"),
         ],
         default="MAPPED",
+        update=_rule_changed,
     )
     origin: StringProperty(
         name="From",
         description="Where the rule came from: a typed row, a bone-map row, or you",
         default="user",
     )
-    enabled: BoolProperty(name="On", description="Use this rule when filling rows", default=True)
+    enabled: BoolProperty(
+        name="On",
+        description="Use this rule when filling rows",
+        default=True,
+        update=_rule_changed,
+    )
     support: IntProperty(name="Support", description="How many mapped rows agree with this rule", default=1)
 
 

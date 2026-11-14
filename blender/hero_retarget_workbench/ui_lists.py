@@ -149,6 +149,8 @@ class DMF_UL_rules(UIList):
         target = item.target or "no target"
         if item.regex:
             row.label(text=_short(f"{pattern} -> {target}", 21), icon="DRIVER")
+        elif "#" in pattern:
+            row.label(text=_short(f"{pattern} -> {target} {item.delta:+d}", 21), icon="SORT_NUMERIC")
         elif pattern.strip().endswith("*"):
             row.label(text=_short(f"{pattern} -> {target or 'extra'}", 21), icon="FILE_FONT")
         else:

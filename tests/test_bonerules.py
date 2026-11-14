@@ -190,3 +190,49 @@ def test_an_invalid_regex_is_ignored_instead_of_raising():
     # same bad pattern costs a dict lookup, not a failed compile.
     assert bonerules._compiled("[") is bonerules._compiled("[")
 
+def test_series_turns_one_finger_pair_into_the_whole_chain():
+    rule = bonerules.series("Index_01_L", "finger_index_0_L")
+    assert rule is not None
+    assert rule.kind == "series"
+    assert (rule.source, rule.target, rule.delta) == ("Index_#_L", "finger_index_#_L", -1)
+    assert bonerules._candidate(rule, "Index_02_L") == "finger_index_1_L"
+    assert bonerules._candidate(rule, "Index_03_L") == "finger_index_2_L"
+    assert bonerules._candidate(rule, "Middle_01_L") is None
+
+
+def test_series_refuses_pairs_that_are_not_a_number_shift():
+    assert bonerules.series("Index_01_L", "finger_thumb_0_L") is None
+    assert bonerules.series("Index_01", "Thumb_02") is None
+    assert bonerules.series("pelvis", "pelvis") is None
+    assert bonerules.series("A_1_2", "B_1") is None
+    assert bonerules.series("Index_01_L", "Index_02_R") is None  # the words must line up
+    assert bonerules.series("Index_01_L", "finger_index_2_L") is not None  # the target adds a word
+
+
+def test_series_never_invents_a_negative_number():
+    rule = bonerules.series("Thumb_02", "thumb_0")
+    assert rule is not None and rule.delta == -2
+    assert bonerules._candidate(rule, "Thumb_02") == "thumb_0"
+    assert bonerules._candidate(rule, "Thumb_01") is None
+
+
+def test_learn_prefers_the_number_series_over_a_side_stem():
+    learned = bonerules.learn({"Index_01_L": "finger_index_0_L"})
+    assert [rule.kind for rule in learned] == ["series"]
+    assert learned[0].delta == -1
+    assert bonerules.learn({"elbow_L": "arm_lower_L"})[0].kind == "side"
+
+
+def test_suggest_answers_the_chain_only_where_the_hero_has_the_bone():
+    rule = bonerules.series("Index_01_L", "finger_index_0_L")
+    targets = ["pelvis", "finger_index_0_L", "finger_index_1_L"]
+    found = bonerules.suggest([rule], ["Index_02_L", "Index_03_L"], targets)
+    assert found["Index_02_L"].target == "finger_index_1_L"
+    assert "Index_03_L" not in found
+
+
+def test_a_series_rule_reads_in_plain_words():
+    rule = bonerules.series("Index_01_L", "finger_index_0_L")
+    assert "number -1" in bonerules.describe(rule)
+    assert bonerules.label(rule) == "Index_#_L → finger_index_#_L (number -1)"
+
