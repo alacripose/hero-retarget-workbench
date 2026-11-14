@@ -42,6 +42,11 @@ def _bone_target_changed(self, context) -> None:
         return
     from . import poseview, rules
 
+    if rules.is_suppressed():
+        # A batch (scan, rule fill) writes hundreds of targets. Re-running the
+        # ref pose for each one is what made the panel lock; the batch refreshes
+        # once when it finishes.
+        return
     try:
         rules.auto_fill(settings, self)
     except Exception:
@@ -372,6 +377,9 @@ class DMF_Settings(PropertyGroup):
     clip_note: StringProperty(name="Clip note", default="")
     clip_imported: IntProperty(name="Imported clips", default=0)
     clip_written: IntProperty(name="Written clips", default=0)
+    rule_fill_running: BoolProperty(name="Rules running", default=False)
+    rule_fill_done: IntProperty(name="Rows answered", default=0)
+    rule_fill_total: IntProperty(name="Rows to answer", default=0)
     bone_filter: EnumProperty(
         name="Show",
         description="Filter the bone map without changing what the solver reads",

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from functools import lru_cache
 
 # Longest first, so ``_left`` is not read as ``_l`` + ``eft``.
 SIDE_TOKENS: tuple[tuple[str, str], ...] = (
@@ -195,17 +196,26 @@ def ordered(rules: list[Rule]) -> list[Rule]:
     )
 
 
+@lru_cache(maxsize=256)
+def _compiled(pattern: str):
+    """One compiled regex per pattern, or None when the user's pattern is invalid."""
+    try:
+        return re.compile(pattern, re.IGNORECASE)
+    except re.error:
+        return None
+
+
 def _candidate(rule: Rule, source: str) -> str | None:
     """The target name a rule gives this source, before the hero skeleton is checked."""
     if not rule.source:
         return None
     if rule.regex:
-        try:
-            if re.fullmatch(rule.source, source, flags=re.IGNORECASE) is None:
-                return None
-            return re.sub(rule.source, rule.target, source, count=1, flags=re.IGNORECASE)
-        except re.error:
+        # A scan and a rule fill ask the same pattern about every row, so the
+        # pattern is compiled once instead of once per row.
+        pattern = _compiled(rule.source)
+        if pattern is None or pattern.fullmatch(source) is None:
             return None
+        return pattern.sub(rule.target, source, count=1)
     if rule.kind == "prefix":
         text = rule.source[:-1]
         if not source.lower().startswith(text.lower()):

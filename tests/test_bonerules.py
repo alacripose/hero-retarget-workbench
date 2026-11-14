@@ -182,3 +182,11 @@ def test_labels_and_descriptions_name_the_rule_form():
     assert "side token" in bonerules.describe(side)
     assert "starting with" in bonerules.describe(bonerules.Rule(source="a*", target="b"))
     assert "\\1" in bonerules.describe(bonerules.Rule(source="a", target="b", regex=True))
+
+def test_an_invalid_regex_is_ignored_instead_of_raising():
+    rule = bonerules.Rule(source="[", target="x", regex=True, side_aware=False)
+    assert bonerules.matches(rule, "anything") is False
+    # A compiled pattern is cached by the pattern text, so a second row with the
+    # same bad pattern costs a dict lookup, not a failed compile.
+    assert bonerules._compiled("[") is bonerules._compiled("[")
+
