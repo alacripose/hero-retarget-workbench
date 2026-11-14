@@ -16,7 +16,7 @@ from bpy.types import Operator
 
 from forge import naming
 
-from . import core, jobs, parts, properties, proofing, weights
+from . import cloth_ops, core, jobs, parts, properties, proofing, weights
 
 
 def _status(settings, message: str, kind: str = "INFO") -> None:
@@ -282,6 +282,14 @@ class DMF_OT_import_hero(Operator):
         settings.target_armature = arm
         settings.target_body = mesh
         settings.material_source = mesh
+        settings.hero_parts.clear()
+        cloth_ops.record_part(settings, mesh)
+        companion = {"imported": [], "skipped": []}
+        try:
+            companion = cloth_ops.import_companions(context, settings)
+            cloth_ops.scan_chains(settings)
+        except Exception as error:
+            _status(settings, f"Hero body imported; companion parts failed: {error}", "WARN")
         parts.scan_materials(settings)
         if settings.extraction_dir:
             settings.target_dmx_relative = _logical_relative(
@@ -291,7 +299,15 @@ class DMF_OT_import_hero(Operator):
             )
         context.view_layer.objects.active = arm
         proofing.bump_tick(settings)
-        _status(settings, f"Hero ready: {len(arm.data.bones)} bones, {len(mesh.data.vertices):,} vertices", "OK")
+        imported = companion.get("imported") or []
+        skipped = companion.get("skipped") or []
+        detail = f", plus {', '.join(imported)}" if imported else ""
+        misses = f"; {len(skipped)} part file(s) skipped" if skipped else ""
+        _status(
+            settings,
+            f"Hero ready: {len(arm.data.bones)} bones, {len(mesh.data.vertices):,} vertices{detail}{misses}",
+            "OK" if not skipped else "WARN",
+        )
         return {"FINISHED"}
 
 

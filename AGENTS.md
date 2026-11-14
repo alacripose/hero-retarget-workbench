@@ -1,3 +1,53 @@
+- Not checked: the Series wording and the `Number` field in a running Blender; the
+  GUI probe still cannot scroll the sidebar.
+
+## 2026-11-14 — 0.6.0: the hero's other meshes, its chains, and pages
+
+**Owner request, verbatim:** *"so the next step is going to be the cloth suite of
+tools that will handle stuff like cloth meshes, the cloth node systems, and the
+cloth chains on the blender side … importing shiv using the workbench he doesn't
+have his hair or his jacket. Also, splitting up the panels into their own views
+would be nice … maybe we could do something that's not in the tools panel but
+instead a actual viewport type based on the properties panel instead (please)
+because the n button tools panel is my least favorite part of old blende."*
+Authority: `logs/authority/2026-11-14-cloth-suite.jsonl`; contract:
+`TICKET-0017`.
+
+- **A hero is several meshes, and the import now says so.** An S2V extraction of
+  Shiv carries `shiv_body`, `shiv_hair3`, `shiv_jacket4`, `shiv_glasses2` and
+  `shiv_gun1`; `dmf.import_hero` used to open `settings.body_dmx` alone, which is
+  the entire reason a port had no hair and no jacket. It now imports every mesh
+  DMX beside the body with `append="APPEND"` onto the hero armature.
+- **Candidates come from the folder, not from a vmdl.** `forge/cloth.py` groups a
+  mesh with its LOD family. The LOD is named after the part and the base may
+  carry an index (`shiv_glasses_lod17` belongs to `shiv_glasses2`), so both
+  spellings are matched; a candidate is kept only if importing it actually
+  produces a mesh, so a clip that shares the hero's prefix is skipped by
+  observation. Nothing here reads the vmdl.
+- **Chains are read from the imported skeleton.** `forge/cloth.py:chains` groups
+  numbered bones by base and side (`coat_0..coat_3`, `sleeve_L`, `hair_01`),
+  requires two segments, and orders by the number rather than by text. The Cloth
+  page records name, side, segments, first bone and members; it authors no
+  simulation and no constraint node, and says that in the panel.
+- **Panels have pages, in the Properties editor.** Blender addons cannot add an
+  editor type, so `ui_props.py` adds the tab that comes closest: a
+  `PROPERTIES`/`scene` root with a page selector (Setup, Source, Parts, Cloth,
+  Skeleton, Rules, Animations, Compare, Weights, Handoff) and one mirrored
+  subclass per sidebar panel. A mirror inherits its `draw` body and changes only
+  space, context, parent and `poll`, which compares `scene.dmf.props_page`; the
+  sidebar stays registered, so both surfaces are the same panels rather than a
+  fork.
+- Evidence: `tools/blender_cloth_probe.py` on the owner's real Shiv extraction,
+  14 of 14 checks. Five meshes skinned to one 161-bone rig (47,063 vertices),
+  19 chains including `coat` 4, `hair` 3, `sleeve_L`/`sleeve_R` 2; 16 mirrored
+  pages whose `poll` follows the selected page. Receipt:
+  `artifacts/receipts/cloth.json`. `tests/test_cloth_suite.py` (9) and the suite
+  at 174 passing.
+- Not checked: the Properties tab has not been looked at in a running Blender
+  window — registration and page switching are proven, the drawing is not; no
+  cloth simulation was run on the imported meshes; cloth nodes and the modeldoc
+  are unchanged.
+
 # AGENTS.md
 
 This repository is the Hero Retarget Workbench. The owner is `ala`. The work is a
