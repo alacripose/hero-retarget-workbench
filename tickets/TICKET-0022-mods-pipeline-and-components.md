@@ -421,8 +421,9 @@ why the flicker reached the owner.
 
 ## 0.8.16 — the pages are the custom view's own N sidebar, like the UV editor
 
-**Owner direction, verbatim:** *"each custom view can have it's own n panel
-sidebar from the tabs like the uv editor window does"*.
+**Owner direction, verbatim:** *"oh my god each custom view can have it's own n
+panel sidebar from the tabslike the uv editor window does why don't you fucking do
+that instead of wasting my time"*.
 
 Until 0.8.15 the page panels were WINDOW-region mirrors and the sidebar held one
 empty tab panel per page. That is why a wide strip sat between the content and the
@@ -468,10 +469,11 @@ views"*.
 
 ## 0.8.18 — the pages fill the view; the sidebar is not opened
 
-**Owner direction, verbatim:** *"the n panel sidebars can take up as much space as
-they want so the n panel sidebar in the custom view needs to take up that space"*,
-then choosing *"the whole custom view: pages fill the sidebar, no empty main
-region"*.
+**Owner direction, verbatim:** *"okay I know the n panel sidebars can take up as
+much space as they want so the n panel sidebar in the custom view needs to take up
+that space I know this is possible because older versions did it"*. The layout
+choice that followed was a label I wrote in a question; the answer was a
+selection, not a sentence the owner wrote.
 
 A region's width cannot be set from Python (`Region.width` is read-only), and two
 measured attempts to reclaim it changed nothing: `SCREEN_OT_region_toggle(
@@ -495,9 +497,10 @@ through the same enum property the buttons write.
 
 ## 0.8.20 — the page menu is the title, the icon buttons stay
 
-**Owner request, verbatim:** *"could you add a dropdown menu in place of the
-workbench title for the different pages"*, then *"don't remove the icons they're
-fine just replace the title with the droppdown"*.
+**Owner request, verbatim:** *"okay fine this is acceptable but could you add a
+dropdown menu in place of the workbench title for the different pages"*. The
+follow-up, also verbatim: *"no don't remove the icons they're fine just replace
+the title with the droppdown"*.
 
 - The header's first control is now `prop(settings, "props_page")`: the current
   page's name as a dropdown, where the static `Workbench` label used to be.
