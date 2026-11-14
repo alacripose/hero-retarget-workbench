@@ -127,6 +127,8 @@ class DMF_ClothChain(PropertyGroup):
         type=Object,
     )
     pin_group: StringProperty(name="Pin group", default="")
+    pin_bone: StringProperty(name="Pinned bone", default="")
+    pin_count: IntProperty(name="Pinned vertices", default=0)
     cloth_modifier: StringProperty(name="Cloth modifier", default="")
 
 
@@ -359,6 +361,11 @@ class DMF_Settings(PropertyGroup):
         description="Numbered bone chains on the hero skeleton",
     )
     cloth_index: IntProperty(name="Cloth chain row", default=0)
+    cloth_build_skipped: StringProperty(
+        name="Cloth build notes",
+        description="Chains the last import could not build cloth for, and why",
+        default="",
+    )
     props_page: EnumProperty(
         name="Page",
         description="Which page the Hero Retarget properties tab shows",

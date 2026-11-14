@@ -56,6 +56,7 @@ def _arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--extraction", default=str(DEFAULT_EXTRACTION))
     parser.add_argument("--report", default=str(REPO / "artifacts" / "receipts" / "pages.json"))
+    parser.add_argument("--log", default=str(REPO / "artifacts" / "receipts" / "pages-run.log"))
     parser.add_argument(
         "--screenshot",
         default=str(REPO / "artifacts" / "receipts" / "workbench-surface.png"),
@@ -137,6 +138,20 @@ def _load_addon():
     return module
 
 
+
+def _scan_log(path: Path, markers: tuple[str, ...]) -> list[str]:
+    if not path.is_file():
+        return []
+    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    found = []
+    for index, line in enumerate(lines):
+        if "Traceback (most recent call last)" in line:
+            block = chr(10).join(lines[index : index + 40])
+            if any(marker in block for marker in markers):
+                found.append(lines[index : index + 6])
+    return found
+
+
 def _any_area():
     window = bpy.context.window
     if window is None or window.screen is None:
@@ -203,18 +218,24 @@ def main() -> int:
     bpy.ops.object.select_all(action="DESELECT")
     outcome = bpy.ops.dmf.import_hero()
     _check("hero-import", outcome == {"FINISHED"} and settings.target_armature is not None, str(outcome))
-    _check("chains", cloth_ops.scan_chains(settings) > 0, len(settings.cloth_chains))
-    built = {}
-    try:
-        built = cloth_ops.build_chain_cloth(settings, name="coat")
-    except Exception as error:
-        RESULT["cloth_error"] = f"{type(error).__name__}: {error}"
+    # No rescan: the import scanned the chains and built their cloth; a rescan
+    # here would clear the built rows this probe asserts on.
+    _check("chains", len(settings.cloth_chains) > 0, len(settings.cloth_chains))
+    # No manual build here: the import is expected to have left the cloth parts
+    # built already, which is the symptom this probe exists to guard.
+    built_rows = [
+        {"chain": row.name, "mesh": getattr(row.target_mesh, "name", ""), "pin": row.pin_group}
+        for row in settings.cloth_chains
+        if row.target_mesh is not None
+    ]
+    RESULT["cloth_rows"] = built_rows
     _check(
-        "cloth-build",
-        bool(built) and built.get("pinned", 0) > 0 and built.get("cloth_modifier")
-        and built["cloth_modifier"] in [mod.name for mod in bpy.data.objects[built["mesh"]].modifiers],
-        {key: built.get(key) for key in ("mesh", "pinned", "pin_group", "cloth_modifier")} if built else "",
+        "import-built-cloth",
+        any("jacket" in row["mesh"].lower() for row in built_rows)
+        and any("hair" in row["mesh"].lower() for row in built_rows),
+        built_rows,
     )
+    settings.props_page = "CLOTH"
 
     prefix = "space" if surface == "editor" else "props"
     pages = [("root", getattr(bpy.types, f"DMF_PT_{prefix}_main").draw, "ALL")]
@@ -308,6 +329,25 @@ def main() -> int:
             not errors,
             [entry["panel"] + ": " + entry.get("error", "") for entry in errors],
         )
+        log_path = Path(args.log)
+        tracebacks = _scan_log(log_path, ("hero_retarget_workbench", "dmf_cloth_probe", "dmf_pages_probe"))
+        RESULT["log"] = {"path": str(log_path), "scanned": log_path.is_file(), "addon_tracebacks": tracebacks}
+        _check("log-without-addon-exceptions", not tracebacks, tracebacks or "clean")
+        # Point the page at a cloth part so the shot shows a built jacket/hair row.
+        for index, row in enumerate(settings.cloth_chains):
+            if row.target_mesh is not None and "hair" in row.target_mesh.name.lower():
+                settings.cloth_index = index
+                break
+        bpy.context.view_layer.update()
+        if area is not None:
+            # Give the page the whole window for the shot; native Properties
+            # panels otherwise push the cloth list out of view.
+            try:
+                with bpy.context.temp_override(window=window, area=area):
+                    bpy.ops.screen.screen_full_area(use_hide_panels=False)
+                RESULT["maximized"] = True
+            except Exception as error:
+                RESULT["maximize_error"] = f"{type(error).__name__}: {error}"
         Path(args.screenshot).parent.mkdir(parents=True, exist_ok=True)
         RESULT["summary"] = f"{surface} surface, {len(draws)} page draws, {len(errors)} exceptions"
         try:

@@ -19,7 +19,7 @@ if (_PACKAGE / "_vendor").is_dir() and str(_PACKAGE / "_vendor") not in sys.path
 bl_info = {
     "name": "Hero Retarget Workbench",
     "author": "ala",
-    "version": (0, 7, 0),
+    "version": (0, 7, 1),
     "blender": (5, 4, 0),
     "location": "View3D > Sidebar > Deadlock; Properties > Scene > Hero Retarget Workbench",
     "description": "Fit and retarget a custom model onto a live Deadlock hero, then install the unchanged S2V vmdl as a CSDK13 addon",

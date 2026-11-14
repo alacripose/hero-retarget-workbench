@@ -108,13 +108,23 @@ to the hero skeleton. **Cloth → Hero parts** re-runs that import for a file ad
 to the folder later; **Cloth → Chains** groups the skeleton's numbered bones into
 chains (`coat_0..coat_3`, `sleeve_L`, `hair_01`), with segments and first bone.
 
-**Build cloth on this chain** turns a chain into Blender data: one vertex group
-per chain bone on the hero mesh that is skinned to it (existing weights kept,
-missing groups created empty), a `DMF_pin_<chain>` pin group from the chain root's
-vertices, an ordered `DMF <chain> chain` armature in a `DMF Cloth` collection, and
-a cloth modifier on the mesh with that pin group, after the armature modifier so
-the cloth hangs from the posed mesh. On Shiv, `coat` builds on `shiv_jacket4`
-with 4 bone groups and 932 pinned vertices; `hair` builds on `shiv_hair3` with 434.
+**Importing a hero builds its cloth.** The import scans the chains and runs the
+same chain-to-cloth build the buttons run, so a fresh Shiv arrives with his hair
+and jacket already simulated rather than merely present. A chain becomes one
+vertex group per chain bone on the cloth part skinned to it (existing weights
+kept, missing groups created empty, nothing invented), a `DMF_pin_<chain>` pin
+group from the first chain segment that has vertices, an ordered
+`DMF <chain> chain` armature in a `DMF Cloth` collection, and a cloth modifier
+after the armature modifier so the cloth hangs from the posed mesh.
+
+Blender allows one cloth simulation per object: a second Cloth modifier is
+refused, so every chain on a mesh pins through that mesh's one simulation, named
+after its main chain. On Shiv that is `shiv_jacket4` with `DMF Cloth coat`
+(`coat` 932 pinned vertices, `sleeve_L` 388, `sleeve_R` 176) and `shiv_hair3`
+with `DMF Cloth hair` (`hair` 434, `collar_back` 436). Chains whose weights live
+only on the body (`collar_L`, `collar_R`) are named but not simulated; the page
+lists why instead of building a cloth over the whole hero. **Build cloth on this
+chain** re-runs one chain by hand when a file arrives later.
 
 Cloth constraint nodes and their modeldoc sections are not authored here: the
 page imports the meshes, names the chains, and builds Blender cloth from the

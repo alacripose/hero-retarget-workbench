@@ -11,6 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import bpy
+import traceback
 from bpy.types import Operator
 from forge import cloth as clothscan
 
@@ -134,8 +135,14 @@ def _chain_for(settings, index: int | None = None, name: str = ""):
 
 
 def choose_cloth_mesh(settings, bones: list[str]):
-    """The imported hero mesh most skinned to this chain, by real weights."""
+    """The imported hero mesh most skinned to this chain, by real weights.
+
+    A cloth part wins over the body: the body carries a few stray weights for
+    collar and sleeve bones, and building a jacket chain on the body would make
+    the page read right while the jacket stayed rigid.
+    """
     best = (0, None)
+    best_cloth = (0, None)
     for obj in hero_parts(settings):
         score = 0
         for bone in bones:
@@ -144,12 +151,15 @@ def choose_cloth_mesh(settings, bones: list[str]):
                 score += len(_weighted_vertices(obj, group))
         if score > best[0]:
             best = (score, obj)
-    if best[1] is None:
+        if score > best_cloth[0] and clothscan.is_cloth(obj.name):
+            best_cloth = (score, obj)
+    chosen = best_cloth[1] or best[1]
+    if chosen is None:
         raise RuntimeError(
             "cloth-no-weights: no imported hero mesh carries weights for "
             f"{bones[0]}..{bones[-1]}"
         )
-    return best[1]
+    return chosen
 
 
 def _cloth_collection():
@@ -193,7 +203,17 @@ def build_chain_object(settings, chain_name: str, bones: list[str]):
     return obj
 
 
-def build_chain_cloth(settings, index: int | None = None, name: str = "") -> dict:
+def _cloth_modifier(obj):
+    """The mesh's cloth simulation, if it already has one."""
+    for modifier in obj.modifiers:
+        if modifier.type == "CLOTH" and modifier.name.startswith("DMF Cloth "):
+            return modifier
+    return None
+
+
+def build_chain_cloth(
+    settings, index: int | None = None, name: str = "", mesh=None
+) -> dict:
     """Turn one discovered chain into vertex groups, a chain and a cloth modifier.
 
     Everything comes from the imported data: the mesh is the hero part that is
@@ -207,61 +227,165 @@ def build_chain_cloth(settings, index: int | None = None, name: str = "") -> dic
     bones = [bone.strip() for bone in (row.bones or "").split(",") if bone.strip()]
     if len(bones) < 2:
         raise RuntimeError(f"cloth-chain-short: {row.name} has no segments")
-    mesh = choose_cloth_mesh(settings, bones)
+    target = mesh if mesh is not None else choose_cloth_mesh(settings, bones)
+    if target not in hero_parts(settings):
+        raise RuntimeError(f"cloth-mesh-not-hero: {target.name} is not an imported hero part")
     created: list[str] = []
     assigned: dict[str, int] = {}
     for bone in bones:
-        group = mesh.vertex_groups.get(bone)
+        group = target.vertex_groups.get(bone)
         if group is None:
-            group = mesh.vertex_groups.new(name=bone)
+            group = target.vertex_groups.new(name=bone)
             created.append(bone)
-        assigned[bone] = len(_weighted_vertices(mesh, group))
+        assigned[bone] = len(_weighted_vertices(target, group))
 
     pin_name = f"DMF_pin_{row.name}"
-    pin = mesh.vertex_groups.get(pin_name)
+    pin = target.vertex_groups.get(pin_name)
     if pin is None:
-        pin = mesh.vertex_groups.new(name=pin_name)
-    root_group = mesh.vertex_groups.get(bones[0])
-    pinned = _weighted_vertices(mesh, root_group) if root_group is not None else []
+        pin = target.vertex_groups.new(name=pin_name)
+    # Pin from the first segment that actually has vertices: a chain whose root
+    # bone is a helper with no weights still hangs from the mesh.
+    pin_bone = ""
+    pinned: list[int] = []
+    for bone in bones:
+        group = target.vertex_groups.get(bone)
+        pinned = _weighted_vertices(target, group) if group is not None else []
+        if pinned:
+            pin_bone = bone
+            break
     if pinned:
         pin.add(pinned, 1.0, "REPLACE")
 
+    # Blender runs one cloth simulation per object: a second Cloth modifier is
+    # refused outright (modifiers.new returns None). So a mesh keeps one cloth
+    # and every chain on it pins through that same simulation, while each chain
+    # still owns its pin group and its own DMF <chain> bone chain.
+    modifier = _cloth_modifier(target)
     modifier_name = f"DMF Cloth {row.name}"
-    modifier = mesh.modifiers.get(modifier_name)
     if modifier is None:
-        modifier = mesh.modifiers.new(modifier_name, "CLOTH")
+        modifier = target.modifiers.new(modifier_name, "CLOTH")
+    if modifier is None:
+        raise RuntimeError(
+            f"cloth-modifier-failed: {modifier_name} on {target.name} "
+            f"(mode={target.mode}, existing={[m.name for m in target.modifiers]})"
+        )
     cloth = modifier.settings
-    cloth.vertex_group_mass = pin.name
+    if not cloth.vertex_group_mass or cloth.vertex_group_mass not in target.vertex_groups:
+        cloth.vertex_group_mass = pin.name
+    elif cloth.vertex_group_mass != pin.name and pinned:
+        shared = target.vertex_groups.get(cloth.vertex_group_mass)
+        if shared is not None:
+            shared.add(pinned, 1.0, "REPLACE")
     cloth.pin_stiffness = 1.0
     cloth.quality = 5
     cloth.use_pressure = False
-    if mesh.modifiers and mesh.modifiers[-1] != modifier:
-        core.select_only(bpy.context, [mesh])
-        bpy.context.view_layer.objects.active = mesh
+    if target.modifiers and target.modifiers[-1] != modifier:
+        core.select_only(bpy.context, [target])
+        bpy.context.view_layer.objects.active = target
         bpy.ops.object.modifier_move_to_index(
-            modifier=modifier.name, index=len(mesh.modifiers) - 1
+            modifier=modifier.name, index=len(target.modifiers) - 1
         )
 
     chain = build_chain_object(settings, row.name, bones)
-    mesh["dmf_cloth_chain"] = row.name
-    mesh["dmf_cloth_chain_bones"] = ",".join(bones)
-    mesh["dmf_cloth_pin_group"] = pin.name
-    row.target_mesh = mesh
+    target["dmf_cloth_chain"] = row.name
+    target["dmf_cloth_chain_bones"] = ",".join(bones)
+    target["dmf_cloth_pin_group"] = pin.name
+    row.target_mesh = target
     row.chain_object = chain
     row.pin_group = pin.name
+    row.pin_bone = pin_bone
+    row.pin_count = len(pinned)
     row.cloth_modifier = modifier.name
     return {
         "chain": row.name,
-        "mesh": mesh.name,
+        "mesh": target.name,
         "bones": bones,
         "groups_created": created,
         "assigned": assigned,
         "pinned": len(pinned),
+        "pin_bone": pin_bone,
         "pin_group": pin.name,
         "chain_object": chain.name,
         "cloth_modifier": modifier.name,
-        "modifier_order": [mod.type for mod in mesh.modifiers],
+        "modifier_order": [mod.type for mod in target.modifiers],
     }
+
+
+def _primary_entry(mesh_name: str, entries: list[dict]) -> dict:
+    """The chain a mesh's single cloth simulation should be named for."""
+    lowered = mesh_name.lower()
+    for entry in entries:
+        if entry["chain"].lower() in lowered:
+            return entry
+    if "jacket" in lowered:
+        for entry in entries:
+            if entry["chain"] == "coat":
+                return entry
+    return max(entries, key=lambda entry: entry["pinned"])
+
+
+def name_mesh_cloth(settings, built: list[dict]) -> None:
+    """Name each mesh's one cloth simulation after its main chain.
+
+    The modifier is created by whichever chain is built first, which is
+    alphabetical and would leave the jacket's cloth called after a sleeve. The
+    rows then point at the renamed modifier so the page reports the truth.
+    """
+    by_mesh: dict[str, list[dict]] = {}
+    for entry in built:
+        by_mesh.setdefault(entry["mesh"], []).append(entry)
+    for mesh_name, entries in by_mesh.items():
+        obj = bpy.data.objects.get(mesh_name)
+        modifier = _cloth_modifier(obj) if obj is not None else None
+        if modifier is None:
+            continue
+        primary = _primary_entry(mesh_name, entries)
+        wanted = f"DMF Cloth {primary['chain']}"
+        if modifier.name != wanted:
+            modifier.name = wanted
+        for entry in entries:
+            entry["cloth_modifier"] = modifier.name
+        for row in settings.cloth_chains:
+            if row.target_mesh is not None and row.target_mesh.name == mesh_name:
+                row.cloth_modifier = modifier.name
+
+
+def build_import_cloth(settings) -> dict:
+    """Build every cloth-named chain on the cloth part it is skinned to.
+
+    This is the step that makes a fresh hero import cloth-capable instead of just
+    complete: each chain gets its groups, pin group, bone chain and a cloth
+    simulation before the import operator reports back. Chains that belong to the
+    body rather than to a cloth part are reported, not built: simulating a whole
+    hero body is not what a jacket chain means.
+    """
+    built: list[dict] = []
+    skipped: list[str] = []
+    for row in list(settings.cloth_chains):
+        if not clothscan.is_cloth(row.name):
+            continue
+        bones = [bone.strip() for bone in (row.bones or "").split(",") if bone.strip()]
+        try:
+            target = choose_cloth_mesh(settings, bones)
+            if not clothscan.is_cloth(target.name):
+                skipped.append(
+                    f"{row.name} (weights are on {target.name}, which is not a cloth part)"
+                )
+                continue
+            result = build_chain_cloth(settings, name=row.name, mesh=target)
+        except Exception as error:
+            frame = traceback.extract_tb(error.__traceback__)[-1]
+            skipped.append(
+                f"{row.name} ({type(error).__name__}: {error} at "
+                f"{frame.name}:{frame.lineno})"
+            )
+            continue
+        if result["pinned"]:
+            built.append(result)
+        else:
+            skipped.append(f"{row.name} (no segment has vertices to pin)")
+    name_mesh_cloth(settings, built)
+    return {"built": built, "skipped": skipped}
 
 
 class DMF_OT_import_hero_parts(Operator):
@@ -358,20 +482,9 @@ class DMF_OT_build_all_cloth(Operator):
 
     def execute(self, context):
         settings = context.scene.dmf
-        built: list[str] = []
-        skipped: list[str] = []
-        for row in list(settings.cloth_chains):
-            if not clothscan.is_cloth(row.name):
-                continue
-            try:
-                result = build_chain_cloth(settings, name=row.name)
-            except Exception as error:
-                skipped.append(f"{row.name} ({error})")
-                continue
-            if result["pinned"]:
-                built.append(result["chain"])
-            else:
-                skipped.append(f"{row.name} (no root weights to pin)")
+        result = build_import_cloth(settings)
+        built = [entry["chain"] for entry in result["built"]]
+        skipped = result["skipped"]
         if built:
             core.set_status(
                 settings,

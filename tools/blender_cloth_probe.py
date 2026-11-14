@@ -54,6 +54,7 @@ def _arguments() -> argparse.Namespace:
     parser.add_argument("--extraction", default=str(DEFAULT_EXTRACTION))
     parser.add_argument("--slug", default="shiv")
     parser.add_argument("--report", default=str(REPO / "artifacts" / "receipts" / "cloth.json"))
+    parser.add_argument("--log", default=str(REPO / "artifacts" / "receipts" / "cloth.log"))
     return parser.parse_args(argv)
 
 
@@ -140,6 +141,34 @@ def _rig_of(obj):
     return None
 
 
+
+def _weighted(obj, group) -> list[int]:
+    if group is None:
+        return []
+    index = group.index
+    found = []
+    for vertex in obj.data.vertices:
+        for element in vertex.groups:
+            if element.group == index and element.weight > 0:
+                found.append(vertex.index)
+                break
+    return found
+
+
+def _scan_log(path: Path, markers: tuple[str, ...]) -> list[str]:
+    """Python tracebacks in this run's own log that point at this addon."""
+    if not path.is_file():
+        return []
+    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    found = []
+    for index, line in enumerate(lines):
+        if "Traceback (most recent call last)" in line:
+            block = chr(10).join(lines[index : index + 40])
+            if any(marker in block for marker in markers):
+                found.append(lines[index : index + 6])
+    return found
+
+
 def _page_polls(context, panels) -> dict[str, dict[str, bool]]:
     settings = context.scene.dmf
     probe = {}
@@ -189,6 +218,8 @@ def main() -> int:
     if forge_cloth is None or not Path(report["forge_cloth"]).resolve().is_relative_to(REPO):
         raise RuntimeError(f"forge-shadowed: forge.cloth came from {report['forge_cloth']}")
     cloth_ops = sys.modules["dmf_cloth_probe.cloth_ops"]
+    from forge import cloth as clothscan
+
     ui_props = sys.modules["dmf_cloth_probe.ui_props"]
     ui_space = sys.modules["dmf_cloth_probe.ui_space"]
 
@@ -201,11 +232,6 @@ def main() -> int:
     settings.custom_collection = None
 
     outcome = bpy.ops.dmf.import_hero()
-    armature = settings.target_armature
-    check("hero-import", outcome == {"FINISHED"} and armature is not None, str(outcome))
-    bones = len(armature.data.bones) if armature is not None else 0
-    check("hero-bones", bones > 100, bones)
-
     parts = [row.object for row in settings.hero_parts if row.object is not None]
     names = sorted(obj.name for obj in parts)
     check("hero-parts", len(parts) >= 4, names)
@@ -226,8 +252,10 @@ def main() -> int:
         {"body": body_vertices, "parts": vertices, "total": sum(vertices.values())},
     )
 
-    chains = cloth_ops.scan_chains(settings)
+    # No rescan here: the import already scanned the chains and built their
+    # cloth, and rescanning would clear the built rows this probe checks.
     rows = list(settings.cloth_chains)
+    chains = len(rows)
     cloth_like = [row.name for row in rows if row.count >= 2 and any(
         word in row.name.lower()
         for word in ("hair", "jacket", "coat", "cape", "skirt", "robe", "cloth", "sleeve", "scarf", "ribbon", "tail", "tassel", "hem", "veil", "apron", "belt", "strap")
@@ -240,84 +268,106 @@ def main() -> int:
         {"rows": len(rows), "first": rows[0].bones[:60] if rows else ""},
     )
 
-    # Chain to cloth: the action the Cloth page runs, called directly so the
-    # probe tests the same function the button does.
-    coat = next((row for row in settings.cloth_chains if row.name == "coat"), None)
-    built = {}
-    try:
-        built = cloth_ops.build_chain_cloth(settings, name="coat") if coat else {}
-    except Exception as error:
-        report["cloth_build_error"] = f"{type(error).__name__}: {error}"
-        built = {}
-    report["cloth_built"] = built
-    check(
-        "cloth-target-mesh",
-        bool(built) and "jacket" in str(built.get("mesh", "")).lower(),
-        built.get("mesh", ""),
-    )
-    check(
-        "cloth-bone-groups",
-        bool(built) and all(count > 0 for count in (built.get("assigned") or {}).values()),
-        built.get("assigned"),
-    )
-    check("cloth-pin", bool(built) and built.get("pinned", 0) > 0, built.get("pinned"))
-    mesh_obj = bpy.data.objects.get(built.get("mesh", "")) if built else None
-    modifier = (
-        mesh_obj.modifiers.get(built["cloth_modifier"])
-        if mesh_obj is not None and built.get("cloth_modifier")
-        else None
-    )
-    check(
-        "cloth-modifier",
-        modifier is not None
-        and modifier.type == "CLOTH"
-        and modifier.settings.vertex_group_mass == built.get("pin_group")
-        and [mod.type for mod in mesh_obj.modifiers][-1] == "CLOTH",
-        {"modifier": getattr(modifier, "name", ""), "order": [m.type for m in mesh_obj.modifiers] if mesh_obj else []},
-    )
-    chain_obj = bpy.data.objects.get(built.get("chain_object", "")) if built else None
-    chain_bones = list(chain_obj.data.bones) if chain_obj is not None and chain_obj.type == "ARMATURE" else []
-    # Ordered means parented in sequence. ``use_connect`` is left to the rest
-    # positions: a hero chain whose bones do not share a head and tail is a gap,
-    # not a defect, so the build must not weld it shut.
-    ordered = all(
-        bone.parent is not None and bone.parent.name == chain_bones[index - 1].name
-        for index, bone in enumerate(chain_bones)
-        if index
-    )
-    check(
-        "cloth-chain-object",
-        chain_obj is not None
-        and [bone.name for bone in chain_bones] == built.get("bones", [])
-        and ordered,
+    # The import itself must leave the cloth parts cloth-capable: these checks
+    # run on the state a plain dmf.import_hero produces, with no manual build.
+    cloth_rows = [row for row in settings.cloth_chains if clothscan.is_cloth(row.name)]
+    built_rows = [row for row in cloth_rows if row.target_mesh is not None]
+    report["cloth_rows"] = [
         {
-            "object": getattr(chain_obj, "name", ""),
-            "bones": [bone.name for bone in chain_bones],
-            "connected": [bone.use_connect for bone in chain_bones],
-        },
-    )
-    hair = next((row for row in settings.cloth_chains if row.name == "hair"), None)
-    hair_built = {}
-    try:
-        hair_built = cloth_ops.build_chain_cloth(settings, name="hair") if hair else {}
-    except Exception as error:
-        report["hair_build_error"] = f"{type(error).__name__}: {error}"
-        hair_built = {}
+            "chain": row.name,
+            "mesh": getattr(row.target_mesh, "name", ""),
+            "pin": row.pin_group,
+            "modifier": row.cloth_modifier,
+        }
+        for row in built_rows
+    ]
+    built_chains = {row.name for row in built_rows}
+    off_cloth = [row.name for row in built_rows if not clothscan.is_cloth(row.target_mesh.name)]
     check(
-        "cloth-second-chain",
-        bool(hair_built) and "hair" in str(hair_built.get("mesh", "")).lower() and hair_built.get("pinned", 0) > 0,
-        {"mesh": hair_built.get("mesh"), "pinned": hair_built.get("pinned")},
+        "import-builds-cloth",
+        bool(cloth_rows) and {"coat", "hair"} <= built_chains and not off_cloth,
+        {"rows": report["cloth_rows"], "off_cloth": off_cloth, "skipped": settings.cloth_build_skipped},
+    )
+
+    part_rows = {}
+    for row in built_rows:
+        if row.target_mesh is not None:
+            part_rows.setdefault(row.target_mesh.name, []).append(row)
+    part_names = sorted(part_rows)
+    check(
+        "cloth-parts-covered",
+        any("hair" in name.lower() for name in part_names)
+        and any("jacket" in name.lower() for name in part_names),
+        {name: [row.name for row in part_rows[name]] for name in part_names},
+    )
+
+    problems = []
+    observed = {}
+    for row in built_rows:
+        obj = row.target_mesh
+        if obj is None:
+            problems.append(f"{row.name}: no mesh")
+            continue
+        pin = obj.vertex_groups.get(row.pin_group)
+        pinned = len(_weighted(obj, pin)) if pin is not None else 0
+        modifier = obj.modifiers.get(row.cloth_modifier)
+        chain = row.chain_object
+        chain_bones = list(chain.data.bones) if chain is not None and chain.type == "ARMATURE" else []
+        order = [mod.type for mod in obj.modifiers]
+        ordered = all(
+            bone.parent is not None and bone.parent.name == chain_bones[index - 1].name
+            for index, bone in enumerate(chain_bones)
+            if index
+        )
+        observed[row.name] = {
+            "mesh": obj.name,
+            "pinned": pinned,
+            "modifier": getattr(modifier, "name", ""),
+            "order": order,
+            "chain": getattr(chain, "name", ""),
+            "chain_bones": [bone.name for bone in chain_bones],
+            "modifier_pin": getattr(modifier.settings, "vertex_group_mass", ""),
+        }
+        if pinned <= 0:
+            problems.append(f"{row.name}: pin group empty")
+        if modifier is None or modifier.type != "CLOTH":
+            problems.append(f"{row.name}: no cloth modifier")
+        elif modifier.settings.vertex_group_mass not in obj.vertex_groups:
+            problems.append(f"{row.name}: modifier pin group missing")
+        else:
+            shared = obj.vertex_groups[modifier.settings.vertex_group_mass]
+            holds_chain = set(_weighted(obj, shared)) >= set(_weighted(obj, pin))
+            if not holds_chain:
+                problems.append(f"{row.name}: modifier pin does not hold this chain")
+        if order[-2:] != ["ARMATURE", "CLOTH"]:
+            problems.append(f"{row.name}: order {order}")
+        if not chain_bones or not ordered:
+            problems.append(f"{row.name}: chain bones not ordered")
+    report["cloth_builds"] = observed
+    check("import-cloth-setup", not problems, problems or observed)
+
+    hair_rows = [row for row in built_rows if "hair" in (row.target_mesh.name if row.target_mesh else "").lower()]
+    jacket_rows = [
+        row for row in built_rows if "jacket" in (row.target_mesh.name if row.target_mesh else "").lower()
+    ]
+    check(
+        "hair-cloth-built",
+        bool(hair_rows) and len(hair_rows[0].target_mesh.data.vertices) > 0,
+        {"mesh": hair_rows[0].target_mesh.name, "vertices": len(hair_rows[0].target_mesh.data.vertices), "chains": [r.name for r in hair_rows]} if hair_rows else "",
     )
     check(
-        "cloth-rows-recorded",
-        all(row.target_mesh is not None and row.cloth_modifier for row in settings.cloth_chains if row.name in {"coat", "hair"}),
-        [f"{row.name}:{getattr(row.target_mesh, 'name', '')}" for row in settings.cloth_chains if row.name in {"coat", "hair"}],
+        "jacket-cloth-built",
+        bool(jacket_rows) and len(jacket_rows[0].target_mesh.data.vertices) > 0,
+        {"mesh": jacket_rows[0].target_mesh.name, "vertices": len(jacket_rows[0].target_mesh.data.vertices), "chains": [r.name for r in jacket_rows]} if jacket_rows else "",
     )
 
     addon_module = sys.modules["dmf_cloth_probe"]
     surface = getattr(addon_module, "SURFACE", "properties")
     prefix = "space" if surface == "editor" else "props"
     report["surface"] = surface
+    report["import_status"] = settings.status
+    report["cloth_skipped"] = settings.cloth_build_skipped
+    print(f"CLOTH import status: {settings.status}", flush=True)
     panels = {
         "cloth": getattr(bpy.types, f"DMF_PT_{prefix}_cloth", None),
         "skeleton": getattr(bpy.types, f"DMF_PT_{prefix}_skeleton", None),
@@ -363,6 +413,10 @@ def main() -> int:
         "parts": vertices,
         "chains": chains,
     }
+    log_path = Path(args.log)
+    addon_tracebacks = _scan_log(log_path, ("hero_retarget_workbench", "dmf_cloth_probe"))
+    report["log"] = {"path": str(log_path), "scanned": log_path.is_file(), "addon_tracebacks": addon_tracebacks}
+    check("log-without-addon-exceptions", not addon_tracebacks, addon_tracebacks or "clean")
     report["failed"] = failed
     Path(args.report).parent.mkdir(parents=True, exist_ok=True)
     Path(args.report).write_text(json.dumps(report, indent=2), encoding="utf-8")

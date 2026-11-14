@@ -26,6 +26,7 @@ CLOTH_WORDS: tuple[str, ...] = (
     "hair",
     "jacket",
     "coat",
+    "collar",
     "cape",
     "skirt",
     "robe",
