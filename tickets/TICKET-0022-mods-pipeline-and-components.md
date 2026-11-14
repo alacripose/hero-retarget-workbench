@@ -388,6 +388,28 @@ Not checked: an actual mouse drag of the sidebar edge — `Region.width` is
 read-only to Python, so the persistence is proven by the timer no longer writing
 the flag, not by simulating a drag.
 
+## 0.8.15 — one writer for the page
+
+**Owner report, verbatim:** *"fresh open on 8.14 I fucking click a tab and it
+starts flickering back and forth and goes back to having the wide empty space on
+the right"*.
+
+There were two writers. 0.8.14 read the sidebar's active category in the timer
+*and* kept the old tab-panel `draw` path that requested a page change. Clicking a
+tab made the draw answer the page it was showing while the category answered the
+new one; the two alternated, each redraw re-laid the area, and the sidebar came
+back at its default width.
+
+- `_tab_draw` no longer writes anything; its docstring says why. The active
+  category in `_ensure_sidebar` is the only page writer.
+- Like 0.8.14, the timer touches `show_region_ui`, the toolbar and the footer
+  once per area, so a dragged width is never re-asserted.
+- Evidence: gate green; `zip-install-0.8.15.json` 10/10 with Cloth→CLOTH and
+  Setup→SETUP; `pages-0.8.15.png`.
+
+Not checked: a real mouse click on a tab in a resized window — the probe sets the
+category through the API because it cannot drag a region edge.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
