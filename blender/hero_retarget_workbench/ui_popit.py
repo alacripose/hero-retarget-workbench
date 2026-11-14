@@ -73,6 +73,49 @@ def bubble(layout, text: str, icon: str = "INFO", alert: bool = False, width: in
     return box
 
 
+def job(layout, settings):
+    """Progress for the running job, or the last run's steps once it finished.
+
+    A page whose button starts background work must show that work moving; the
+    Popit allows one message, so the bar carries the current step and the last
+    three steps stay under it. After the job the last run stays visible, which is
+    the verbosity asked for without a console-only trail.
+    """
+    running = bool(getattr(settings, "job_running", False))
+    log = [line for line in (getattr(settings, "job_log", "") or "").splitlines() if line]
+    state = getattr(settings, "job_state", "")
+    if not running and not log:
+        return None
+    box = layout.box()
+    head = box.row(align=True)
+    head.alert = state == "FAILED"
+    icon = "TIME" if running else ("ERROR" if state == "FAILED" else "CHECKMARK")
+    head.label(
+        text=getattr(settings, "job_label", "") or ("Last run" if not running else "Working"),
+        icon=icon,
+    )
+    right = head.row(align=True)
+    right.alignment = "RIGHT"
+    if running:
+        right.label(text=f"{int(getattr(settings, 'job_progress', 0.0) * 100)}%")
+    else:
+        right.label(text=state.lower() or "finished")
+    if running:
+        box.prop(
+            settings,
+            "job_progress",
+            text=getattr(settings, "job_message", ""),
+            slider=True,
+        )
+    for line in log[-3:]:
+        row = box.row(align=True)
+        row.scale_y = 0.75
+        row.label(text=line, icon="BLANK1" if line != log[-1] else "FORWARD")
+    if running and getattr(settings, "job_cancellable", False):
+        box.operator("dmf.cancel_weight_job", text="Cancel after this chunk", icon="CANCEL")
+    return box
+
+
 _GLYPHS = {
     "dmf.detect_paths": "FILE_REFRESH",
     "dmf.detect": "FILE_REFRESH",

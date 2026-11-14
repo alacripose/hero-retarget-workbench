@@ -732,6 +732,12 @@ class DMF_Settings(PropertyGroup):
     job_message: StringProperty(name="Job step", default="")
     job_progress: FloatProperty(name="Progress", default=0.0, min=0.0, max=1.0, subtype="FACTOR")
     job_cancellable: BoolProperty(name="Cancellable", default=False)
+    job_state: StringProperty(name="Job state", default="")
+    job_log: StringProperty(
+        name="Job log",
+        description="Steps of the running or last finished job, newest last",
+        default="",
+    )
 
     generate_lods: BoolProperty(
         name="Generate LODs",

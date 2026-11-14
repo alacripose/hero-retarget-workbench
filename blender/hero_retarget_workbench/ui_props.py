@@ -43,7 +43,7 @@ PAGE_BY_ID = {
     "DMF_PT_setup": "SETUP",
     "DMF_PT_source": "SOURCE",
     "DMF_PT_source_files": "SOURCE",
-    "DMF_PT_update": "SETUP",
+    "DMF_PT_update": "MODS",
     "DMF_PT_parts": "PARTS",
     "DMF_PT_parts_materials": "PARTS",
     "DMF_PT_cloth": "CLOTH",

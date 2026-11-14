@@ -233,12 +233,8 @@ def _surface(layout) -> None:
 
 
 def _job(layout, settings) -> None:
-    if not settings.job_running:
-        return
-    box = _section(layout, settings.job_label or "Working", "TIME", settings.job_kind.title())
-    box.prop(settings, "job_progress", text=settings.job_message, slider=True)
-    if settings.job_cancellable:
-        box.operator("dmf.cancel_weight_job", text="Cancel after this chunk", icon="CANCEL")
+    """The shared job block: the bar while running, the last run's steps after."""
+    ui_popit.job(layout, settings)
 
 
 class DMF_PT_main(Panel):
@@ -289,6 +285,7 @@ class DMF_PT_setup(Panel):
         settings = context.scene.dmf
         layout = self.layout
 
+        ui_popit.job(layout, settings)
         live = _section(layout, "Live game", "WORLD", _short(settings.build, 24) or "not detected")
         live.prop(settings, "deadlock_root", text="Install")
         live.prop(settings, "s2v_cli", text="S2V CLI")
@@ -308,6 +305,29 @@ class DMF_PT_setup(Panel):
         workspace = _section(layout, "Workspace", "FILE_FOLDER", "optional")
         workspace.prop(settings, "project_root", text="Folder")
 
+        # Mods is its own page; Setup names where it is and how much it found so
+        # the old "update old addon" corner is not hunted for here.
+        mods = _section(
+            layout,
+            "Mods & old addons",
+            "PACKAGE",
+            f"{len(settings.scan_roots)} roots, {settings.mods_scanned} found",
+        )
+        mods.operator(
+            "dmf.scan_mods",
+            text="Scan folders",
+            icon="VIEWZOOM",
+        )
+        row = mods.row(align=True)
+        row.enabled = not settings.job_running
+        row.prop_enum(settings, "props_page", "MODS", text="Open Mods", icon="PACKAGE")
+        _hint(
+            mods,
+            "Scanning, update to latest and backport, and the old addon fields live on the Mods page.",
+            "INFO",
+            width=30,
+        )
+
 
 class DMF_PT_source(Panel):
     bl_label = "Source"
@@ -324,6 +344,7 @@ class DMF_PT_source(Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
+        ui_popit.job(layout, settings)
         hero = ui_popit.title(layout, "Hero", _hero_state(settings), "WORLD")
         hero.prop(settings, "hero_slug", text="")
         ui_popit.glyphs(
@@ -432,6 +453,7 @@ class DMF_PT_parts(Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
+        ui_popit.job(layout, settings)
         collection_box = ui_popit.title(
             layout,
             "Parts",
@@ -527,6 +549,7 @@ class DMF_PT_cloth(Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
+        ui_popit.job(layout, settings)
         chains = len(settings.cloth_chains)
         box = ui_popit.title(
             layout,
@@ -714,6 +737,7 @@ class DMF_PT_animations(Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
+        ui_popit.job(layout, settings)
         imported = sum(1 for row in settings.clips if row.state == "IMPORTED")
         box = ui_popit.title(
             layout,
@@ -825,6 +849,7 @@ class DMF_PT_skeleton(Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
+        ui_popit.job(layout, settings)
         top = layout.row(align=True)
         top.operator("dmf.scan_bones", text="Scan bone map", icon="FILE_REFRESH")
         top.prop(settings, "bone_filter", text="")
@@ -979,6 +1004,7 @@ class DMF_PT_weights(Panel):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
+        ui_popit.job(layout, settings)
         _hint(layout, "Solver maps your groups, samples the hero surface, uses envelopes outside it. No DATA_TRANSFER.", "MOD_VERTEX_WEIGHT")
 
         layout.prop(settings, "weight_mode", text="Method")
@@ -1080,6 +1106,7 @@ class DMF_PT_handoff(Panel):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
+        ui_popit.job(layout, settings)
         root = core.csdk_addon_root(settings)
         folder = core.csdk_addon_folder(settings)
         staged = folder is not None and (folder / "stage.json").is_file()

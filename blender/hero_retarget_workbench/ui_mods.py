@@ -14,6 +14,8 @@ from pathlib import Path
 import bpy
 from bpy.types import Panel
 
+from . import ui_popit
+
 
 def _short(value: str, limit: int = 34) -> str:
     text = " ".join((value or "").split())
@@ -103,6 +105,7 @@ class DMF_PT_mods(Panel):
         settings = context.scene.dmf
         layout = self.layout
 
+        ui_popit.job(layout, settings)
         scan = _section(layout, "Scan folders", "FILE_FOLDER", f"{len(settings.scan_roots)} roots")
         for row in settings.scan_roots:
             line = scan.row(align=True)
@@ -162,6 +165,7 @@ class DMF_PT_components(Panel):
         settings = context.scene.dmf
         layout = self.layout
 
+        ui_popit.job(layout, settings)
         source = _section(layout, "Live components", "MESH_DATA", Path(settings.extraction_dir).name if settings.extraction_dir else "no extraction")
         source.operator("dmf.scan_components", text="Find components", icon="VIEWZOOM")
         if settings.components:

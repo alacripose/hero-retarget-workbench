@@ -520,6 +520,41 @@ the title with the droppdown"*.
 
 Not checked: opening the dropdown with a real mouse click.
 
+## 0.8.21 — every long action shows its work, and Setup points at Mods
+
+**Owner request, verbatim:** *"now I need you to go back into the popit
+references folder from earlier and work on making the ui as good as possible and
+adding progress bars/verbosity to things running since clicking some buttons
+doesn't show any feedback, for a non conclusive example the mods page (also now
+that the mods page exists the setup page needs to be updated)"*.
+
+- `ui_popit.job(layout, settings)` is the one job block, following the Popit's
+  single-message rule: the label and percent in the card head, the current step
+  as the progress bar's label, and the last three steps underneath. After the job
+  the same block shows the last run and its steps, marked done or failed, so the
+  feedback is not a status line that expires.
+- `BackgroundJob` records `job_state` and `job_log`: every distinct step is
+  appended (last 12 kept), and the finish line is `done` or `failed: <reason>`.
+- The block is drawn on Setup, Source, Parts, Cloth, Skeleton, Animations,
+  Weights, Handoff, Mods and Components — every page that starts background work.
+- The Mods scan reports while it walks: `forge.oldmods.inventory` takes a
+  `(fraction, message)` callback and reports each root and each directory step
+  (`<dir>: N found`); `dmf.scan_mods` maps that to 2–95% and leaves 96–100% for
+  writing the receipt. `tests/test_oldmods.py` asserts the fractions are ordered,
+  bounded, and non-empty.
+- **Setup now points at Mods.** `DMF_PT_update` (Update old addon) moved from the
+  Setup page to the Mods page, and Setup gained a `MODS & OLD ADDONS` card with
+  the root/package counts, a Scan button and an Open Mods button.
+- Evidence: gate green; 178 tests; `zip-install-0.8.21.json` 12/12;
+  `artifacts/receipts/mods-job-0.8.21.png` shows the Mods page with the bar at
+  41%, `citadel_addons: 14 found`, the 3-step log and the Update old addon panel;
+  `setup-0.8.21.png` shows the new Setup card.
+
+Not checked: a real scan click and a real long-running job walking a large folder;
+`--demo-job` sets representative job fields, so the drawing is verified, not the
+clock. The Components stage and the port/backport buttons are synchronous and still
+have no progress bar of their own.
+
 ## Not checked
 
 - No real backport has been run against an older client yet: the path exists and
