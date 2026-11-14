@@ -112,7 +112,6 @@ class DMF_PT_props_main(Panel):
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
     bl_context = "scene"
-    bl_options = {"DEFAULT_CLOSED"}
 
     @classmethod
     def poll(cls, context):
