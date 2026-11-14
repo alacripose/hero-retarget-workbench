@@ -19,7 +19,7 @@ if (_PACKAGE / "_vendor").is_dir() and str(_PACKAGE / "_vendor") not in sys.path
 bl_info = {
     "name": "Hero Retarget Workbench",
     "author": "ala",
-    "version": (0, 8, 11),
+    "version": (0, 8, 12),
     "blender": (5, 4, 0),
     "location": "Workbench editor (PR 165087 builds); View3D > Sidebar > Deadlock elsewhere",
     "description": "Fit and retarget a custom model onto a live Deadlock hero, then install the unchanged S2V vmdl as a CSDK13 addon",
@@ -99,6 +99,47 @@ def register() -> None:
         SURFACE = "sidebar"
         EDITOR_ERROR = ui_space.EDITOR_ERROR
     _report_surface()
+    _watch_for_stale_ui()
+
+
+def _watch_for_stale_ui() -> None:
+    """Re-register when the loaded module is newer than the registered panels.
+
+    Blender's Install can replace the files and reload the Python module without
+    re-running register(), so the session keeps the previous page panels while
+    Preferences reports the new version (the owner's 0.8.11 install showed the
+    0.8.9 header dropdown). When the new module sees an editor surface with none
+    of the page tabs registered, it re-registers once.
+    """
+    try:
+        bpy.app.timers.register(_stale_ui_check, persistent=True)
+    except (ValueError, TypeError):
+        pass
+
+
+def _stale_ui_check() -> float:
+    global _STALE_REPAIRING, _STALE_ATTEMPTS
+    if SURFACE != "editor" or _STALE_REPAIRING or _STALE_ATTEMPTS >= 2:
+        return 3.0
+    if "DMF_ST_workbench" not in dir(bpy.types):
+        return 3.0
+    if "DMF_PT_space_tab_setup" in dir(bpy.types):
+        return 3.0
+    _STALE_REPAIRING = True
+    _STALE_ATTEMPTS += 1
+    try:
+        print("DMF stale UI: re-registering the loaded version", flush=True)
+        unregister()
+        register()
+    except Exception as error:  # recorded, and retried no more this session
+        print(f"DMF stale UI repair failed: {type(error).__name__}: {error}", flush=True)
+    finally:
+        _STALE_REPAIRING = False
+    return 3.0
+
+
+_STALE_REPAIRING = False
+_STALE_ATTEMPTS = 0
 
 
 def _report_surface() -> None:
