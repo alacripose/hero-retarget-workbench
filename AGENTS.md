@@ -2959,3 +2959,13 @@ proven firing on the shipped v3 skeleton (`REFUSE … 99 of 120 shared joints si
 
 **Not checked.** The rebuild that follows this rule, and her body in game on it.  The installed slot is
 still the 01:23 reference (`haze_noskel.vpk`, `b849c6bf…`).
+
+**Gate state after the parity work (2026-11-15).** `python tools/project.py gate --probes off`:
+`unit tests`, `compileall`, both source scans, blake3, `no effort caveats`, `effort refusal selftest`,
+`tail vnmclip gate`, `port gate haze_parity`, `port gate haze_tail`, `port gate haze_tail_reference`
+all PASS. `port gate shiv` FAILS, and it fails on **four deleted inputs**, not on the build:
+`artifacts/oldviper/shiv_merge_pak.vpk`, `artifacts/oldviper/shiv-merge/item_run_center.dmx`,
+`artifacts/oldviper/shiv_merge_final.vpk`, `artifacts/shiv-168-full-baked3.vpk`. `artifacts/` is
+git-ignored and the disk cleanup recorded above removed superseded `artifacts/oldviper/*.vpk`, so the
+audit cannot run here. Restoring those four files is the fix; relaxing the check is not, and no pin
+was changed to hide it.
