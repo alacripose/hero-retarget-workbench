@@ -119,6 +119,78 @@ def _attach(element, child) -> None:
     element["children"].append(child)
 
 
+def _walk_arrays(element, out) -> list:
+    """Every (parent, key, child) relation under this element."""
+    for key in ("children", "jointList", "m_channels", "channels", "m_tracks"):
+        if key not in element.keys():
+            continue
+        for child in element[key]:
+            out.append((element, key, child))
+            _walk_arrays(child, out)
+    return out
+
+
+def _drop_from(element, key: str, victim) -> bool:
+    if key not in element.keys():
+        return False
+    array = element[key]
+    try:
+        index = list(array).index(victim)
+    except ValueError:
+        return False
+    array.pop(index)
+    return True
+
+
+def _walk_document(root) -> list:
+    """Every (parent, key, child) relation in a document whose root holds `skeleton`,
+    `animationList` and the like, not a bare model."""
+    out: list = []
+    for key in root.keys():
+        value = root[key]
+        if hasattr(value, "keys"):
+            out.append((root, key, value))
+            _walk_arrays(value, out)
+            continue
+        try:
+            children = list(value)
+        except TypeError:
+            continue
+        for child in children:
+            if hasattr(child, "keys"):
+                out.append((root, key, child))
+                _walk_arrays(child, out)
+    return out
+
+
+def _prune_extras(root, keep: set[str]) -> list[str]:
+    """Delete every joint the reference skeleton lacks, and any channel that named it.
+
+    A clip is bound by index, so a joint the skeleton does not carry is not harmless
+    padding: it pushes every later joint one slot further than the skeleton's own
+    list and the client reads the pose through the wrong bones.  The clip's export
+    leaves (`*_end`, the armature object) are exactly that padding.
+    """
+    relations = _walk_document(root)
+    victims = [child for _, _, child in relations if getattr(child, "type", "") == "DmeJoint" and child.name not in keep]
+    if not victims:
+        return []
+    victim_ids = {id(element) for element in victims}
+    dropped = [element.name for element in victims]
+    doomed = list(victims)
+    for parent, key, child in relations:
+        if "joint" in child.keys() and id(child["joint"]) in victim_ids:
+            doomed.append(child)
+    doomed_ids = {id(element) for element in doomed}
+    for parent, key, child in reversed(relations):
+        if id(child) in doomed_ids and id(child) not in {id(v) for v in victims}:
+            _drop_from(parent, key, child)
+    for parent, key, child in reversed(relations):
+        if id(child) in victim_ids:
+            _drop_from(parent, key, child)
+    return dropped
+
+
 def _reorder(element, siblings: list[str], ref_children: dict) -> None:
     """Put each joint's children in the reference's sibling order."""
     if "children" not in element.keys():
@@ -132,7 +204,7 @@ def _reorder(element, siblings: list[str], ref_children: dict) -> None:
             _reorder(kid, ref_children.get(kid.name, []), ref_children)
 
 
-def _align(datamodel, reference: Path, clip_path: Path, out: Path, match_rest: bool = False) -> dict:
+def _align(datamodel, reference: Path, clip_path: Path, out: Path, match_rest: bool = False, prune_extras: bool = False) -> dict:
     ref = datamodel.load(str(reference)).root
     _, order, parents, ref_children = _order(ref)
     ref_joints: dict = {}
@@ -189,6 +261,8 @@ def _align(datamodel, reference: Path, clip_path: Path, out: Path, match_rest: b
         joint["transform"]["orientation"] = _MAKE_ARRAY(list(wanted[1]), float)
         rest_changed += 1
 
+    pruned = _prune_extras(root, set(order)) if prune_extras else []
+
     missing = [name for name in order if name not in present]
     if missing:
         raise SystemExit(f"{clip_path.name}: reference order names {missing[:6]} that are not in the clip after grafting")
@@ -208,6 +282,8 @@ def _align(datamodel, reference: Path, clip_path: Path, out: Path, match_rest: b
     return {
         "clip": clip_path.name,
         "grafted": len(grafted),
+        "pruned": len(pruned),
+        "pruned_names": pruned,
         "joints": len(final_view),
         "order_matches_reference": final_order == order,
         "grafted_names": grafted,
@@ -226,6 +302,11 @@ def _arguments() -> argparse.Namespace:
         "--match-rest",
         action="store_true",
         help="also rewrite every joint's rest to the reference's (experiment only; refused without a channel rebake)",
+    )
+    parser.add_argument(
+        "--prune-extras",
+        action="store_true",
+        help="delete every joint the reference lacks (export leaves) so the clip's joint list is the skeleton's",
     )
     return parser.parse_args(argv)
 
@@ -247,7 +328,16 @@ def main() -> int:
     rows, failed = [], []
     for clip in sorted(Path(args.clips).glob("*.dmx")):
         try:
-            rows.append(_align(datamodel, reference, clip, out_dir / clip.name, match_rest=args.match_rest))
+            rows.append(
+                _align(
+                    datamodel,
+                    reference,
+                    clip,
+                    out_dir / clip.name,
+                    match_rest=args.match_rest,
+                    prune_extras=args.prune_extras,
+                )
+            )
         except SystemExit as error:
             failed.append({"clip": clip.name, "error": str(error)})
         except Exception as error:  # noqa: BLE001 - report the clip, keep the batch
