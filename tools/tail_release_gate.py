@@ -58,6 +58,16 @@ def _arguments() -> argparse.Namespace:
     parser.add_argument("--report", default="")
     parser.add_argument("--clips", default="", help="clip DMX folder; defaults to <model folder>/clips")
     parser.add_argument("--bodies", default="", help="the game's own body DMX per clip, for the rebake check")
+    parser.add_argument(
+        "--game-skeleton",
+        default="",
+        help="the game's own skeleton DMX (what <hero>.vnmskel names in pak01): every shared joint must keep its parent",
+    )
+    parser.add_argument(
+        "--game-model",
+        default="",
+        help="the game's own mesh DMX: the shipped model's bind must not move, because a rest in a mesh document is its skinning bind",
+    )
     return parser.parse_args(argv)
 
 
@@ -225,7 +235,7 @@ def _channel_values_equal(datamodel, left: Path, right: Path) -> bool:
     return bool(shared) and all(left_samples[key] == right_samples[key] for key in shared)
 
 
-def run(root: Path, clips: str = "", bodies: str = "") -> dict:
+def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", game_model: str = "") -> dict:
     datamodel = _datamodel()
     vmdl = next(iter(sorted(root.rglob("*.vmdl"))), None)
     if vmdl is None:
@@ -317,6 +327,79 @@ def run(root: Path, clips: str = "", bodies: str = "") -> dict:
     skeleton_tail = _tail_chain(skeleton_joints)
     if len(skeleton_tail) < 3:
         raise Refused("skeleton-has-no-tail", f"{skeleton_dmx.name} carries {skeleton_tail} as a tail chain")
+
+    # 2b. The tail must be a chain in the *skeleton*, not just present as names.  The
+    #     Haze pak of 2026-11-15 shipped tail_0..tail_7 and tail_end all parented
+    #     straight to pelvis: no chain, nothing to swing, the tail lies down.  The
+    #     clip-side chain check cannot see this because the clips inherit the
+    #     document's parents.
+    flat = []
+    for index, name in enumerate(skeleton_tail):
+        want = skeleton_tail[index - 1] if index else None
+        have = parents.get(name)
+        if index == 0:
+            if have in set(skeleton_tail[1:]):
+                flat.append((name, have, "a non-tail bone"))
+        elif have != want:
+            flat.append((name, have, want))
+    if flat:
+        raise Refused(
+            "skeleton-tail-chain-flat",
+            f"{skeleton_dmx.name} does not parent the tail as a chain: {flat[:4]}; "
+            "a flat chain has no joint to swing and the tail lies on the ground",
+        )
+
+    # 2c. Measured against the game's own skeleton.  `pelvis` under `root_motion` is
+    #     what the body's authored curves expect; `weaponHand_L/R` under
+    #     `arm_L_IKTARGET`/`arm_R_IKTARGET` is where the game puts the hand props.
+    #     Parenting either somewhere else reads the same values in another frame: the
+    #     2026-11-15 Haze pak had pelvis as a root and weaponHand under hand_L/hand_R
+    #     and shipped a body wrong below the pelvis with the head and arms rotated.
+    # 2d. The bind must not move. A rest in a mesh document is the position the mesh
+    #     was skinned to, so it is comparable only with the game's own mesh document.
+    #     Copying the skeleton document's rest into the model (76 joints, pelvis by
+    #     54 units / 60 deg) shredded the body in game — same-kind comparison only.
+    game_model = Path(game_model) if game_model else None
+    if game_model is not None and game_model.is_file():
+        shipped_bind = _joint_table(datamodel, model_dmx)
+        stock_bind = _joint_table(datamodel, game_model)
+        moved = []
+        for name in stock_bind["__order__"]["order"]:
+            here, there = shipped_bind.get(name), stock_bind.get(name)
+            if not here or not there:
+                continue
+            delta = max(abs(a - b) for a, b in zip(here["head"], there["head"]))
+            dot = abs(sum(a * b for a, b in zip(here["orientation"], there["orientation"])))
+            if delta > 0.01 or (1.0 - dot) > 2e-3:
+                moved.append((name, round(delta, 4)))
+        if moved:
+            raise Refused(
+                "model-rest-differs-from-game-model",
+                f"{len(moved)} joints bind the mesh away from {game_model.name} (e.g. {moved[:3]}); "
+                "a rest in a mesh document is where the mesh was skinned, so the body deforms",
+            )
+
+    game_skeleton = Path(game_skeleton) if game_skeleton else None
+    if game_skeleton is not None and game_skeleton.is_file():
+        stock_table = _joint_table(datamodel, game_skeleton)
+        stock_order = [name for name in stock_table["__order__"]["order"] if name in set(skeleton_joints)]
+        parent_differs = [
+            (name, stock_table[name]["parent"], parents.get(name))
+            for name in stock_order
+            if stock_table[name]["parent"] != parents.get(name)
+        ]
+        if parent_differs:
+            raise Refused(
+                "skeleton-parent-differs-from-game",
+                f"{len(parent_differs)} joints keep a different parent than {game_skeleton.name} "
+                f"(e.g. {parent_differs[:3]}); a joint is read in its parent's frame, so the mesh is intact and the pose is wrong",
+            )
+        # Rest is deliberately NOT compared against the game's *skeleton* document.
+        # Two shipped failures bracket that comparison: the Haze skeleton's own pelvis
+        # head is 54 units from `haze_skel.dmx` while the game's own clips read fine,
+        # and copying that rest into the mesh document shredded the body because a
+        # rest here is the skinning bind. Parents and the chain are the comparable
+        # facts. `--game-model` compares like with like for the bind, below.
     model_tail = _tail_chain(model_joints)
     orphaned = [name for name in skeleton_tail if name not in set(model_joints)]
     if orphaned:
@@ -406,12 +489,16 @@ def run(root: Path, clips: str = "", bodies: str = "") -> dict:
                             f"{clip.name} declares a rest moved for {len(moved)} joints ({moved[:4]}) but carries {origin.name}'s own channel values; "
                             "the samples are then read in a frame they were not authored in and the body folds over",
                         )
+            # A clip's declared rest is authored data and legitimately differs from the
+            # model's: the shipping Shiv pak — the build that animates in game — declares
+            # rests up to 179.1 deg from its own skeleton (measured with
+            # tools/skeleton_rest_diff_probe.py, artifacts/receipts/rest-shiv-clip-vs-skel.json),
+            # and the stock Haze clips differ from their body by up to 164.8 deg
+            # (rest-clip-vs-body.json). Refusing that comparison was an invented rule that
+            # refused shipped data. What must not happen is a *tool* moving a rest while
+            # leaving the authored channels in place; 6d above is that check and it stays.
             if drifted:
-                raise Refused(
-                    "clip-rest-differs",
-                    f"{clip.name} declares a different rest for {len(drifted)} joints than {skeleton_dmx.name} "
-                    f"(e.g. {drifted[:3]}); every bone whose rest disagrees is read through the wrong frame, which is bone orientations wrong in game",
-                )
+                report.setdefault("rest_drift_observed", {})[clip.name] = len(drifted)
     report.update(
         {
             "tail_chain": skeleton_tail,
@@ -435,7 +522,7 @@ def main() -> int:
     try:
         if not root.is_dir():
             raise Refused("addon-missing", str(root))
-        report.update(run(root, args.clips, args.bodies))
+        report.update(run(root, args.clips, args.bodies, args.game_skeleton, args.game_model))
         print(f"GATE ADMIT {root.name}: model {report['model_joints']} joints, "
               f"skeleton {report.get('skeleton_joints', 'game')}, tail {len(report['tail_chain'])}", flush=True)
         code = 0

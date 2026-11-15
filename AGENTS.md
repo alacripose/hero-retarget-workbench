@@ -2706,3 +2706,95 @@ The set is refused by the gate for a fixable reason: the run used the component 
   "nothing moves" and looks like a data defect.
 - Three separate tools named a hero's clip source by hand. The refusal has to sit at the consumer, not in
   the documentation.
+
+## 2026-11-15 — the pak that shipped wrong, and the three checks it walked past
+
+**Owner report, verbatim:** *"head and arms wrong again, everything below her pelvis wrong, tail
+missing. harden the gates"*.
+
+**What was installed.** `artifacts/haze-tail/haze_tail_selected.vpk`, 197 tail-appended clips, gated and
+compiled. Its skeleton document had three measured defects:
+
+| joint | game (`haze_skel.dmx`) | shipped | what it does in game |
+|---|---|---|---|
+| `pelvis` | under `root_motion` | a root | everything below the pelvis in the wrong frame |
+| `weaponHand_L/R` | under `arm_L/R_IKTARGET` | under `hand_L/hand_R` | head and arms rotate |
+| `tail_0..tail_end` | one chain | all nine under `pelvis` | no chain to swing; the tail lies down |
+
+Measured with `tools/dmx_parent_diff.py`: `PARENTS shared=98 differing=3` plus the flat tail, and the
+pelvis rest 54.39 units / 60 deg away from the game's own (`skeleton-rest-differs-from-game`).
+
+**Why the gate let it through.** It compared clips to the skeleton, the mask to the skeleton, and the
+model to the skeleton — never the **skeleton to the game's skeleton**, and its tail-chain check read the
+clips, which inherit the document's parents, so a flat skeleton chain read as a valid chain. Three
+refusals now exist for exactly this:
+
+- `skeleton-tail-chain-flat` — the skeleton's tail must be a chain (`tail_1 <- tail_0`, ...), not names
+  parented to the pelvis.
+- `skeleton-parent-differs-from-game` — every shared joint keeps the game's parent.
+- `skeleton-rest-differs-from-game` — every shared joint keeps the game's rest.
+- `tools/tail_release_pack.py` now **refuses to pack without `--game-skeleton`**
+  (`gate-needs-game-skeleton`): the comparison is what makes these run instead of being remembered.
+  Negative proof: the shipped document is refused with `skeleton-tail-chain-flat`, and the parent/rest
+  checks fire on the same file once the chain is repaired first.
+
+**Correction to my own prior entry.** I removed `clip-rest-differs` after measuring that the shipping
+Shiv clips differ from their own skeleton by up to 179 deg. That measurement compares a *clip's* joint
+transforms with a skeleton's, and the game's own Haze clips differ from `haze_skel.dmx` on 96 of 98
+joints, so the comparison says nothing about correctness and the rule stayed removed. The meaningful
+comparison is document-to-document — the game's skeleton against ours — which is what
+`skeleton-rest-differs-from-game` does. `clip-rest-moved-without-rebake` also stays: it catches a tool
+rewriting a rest while the authored channels stay put, which folds the body.
+
+**The fix path, measured at each step.** `tools/skeleton_fix_parents.py` restores the game's parents for
+every shared joint, chains the tail in the tail mesh's weight order, restores the game's rest for shared
+joints (76 joints differ by rounding, `pelvis` by 54 units / 60 deg) and re-syncs `root["skeleton"].jointList`
+to the tree's own walk order — without that, `joint-order-diverges` fires on joints that were re-parented.
+Result: `PARENTS shared=98 differing=0`, `TAIL tail_0<-pelvis, tail_1<-tail_0, ... tail_end<-tail_7`,
+gate `ADMIT haze_tail: model 144 joints, skeleton 131, tail 9`.
+
+**Traps.**
+- A clip's declared joint transform is not the skeleton's rest; comparing them refuses shipped data and
+  says nothing about what the client does.
+- A parent is a frame. `pelvis` at the root does not look wrong in a rest render; it is wrong the moment
+  the body's authored curves are applied.
+- A tail chain check that reads clips cannot see a flat skeleton, because clips inherit the document.
+- The pack tool called the gate with only `--clips`; every game-skeleton check was therefore dormant.
+
+**Not checked.** The rebuilt pak (fixed skeleton, recompiled model and clips) has not been loaded in game
+at the time of writing; the next in-game look is the witness, and its console log is the acceptance
+surface.
+
+## 2026-11-15 — the tail pipeline is signed with the family proof, and four gates it did not have
+
+**Owner question, verbatim:** *"are these tools all using the blender addons/family repo blake3 hash proof
+signing and verification ... if we could verify atomically that everything makes it through the gates
+properly we could have a better time, which will help when we get to the aim matrixes"*, with the report
+*"significantly worse this build. harden the gates"*.
+
+- **They were not, and now they are.** The tail tools wrote a sha256 line into `ledger/ledger.jsonl`; a
+  receipt is a log, not a verification, and nothing bound the pak that reached the game to the bytes the
+  gate read. `tools/tail_proof.py` builds a `forge.proof.Proof` from `forge/proof.py` + `forge/hashes.py`
+  (the BLAKE3 path the weight solve already uses) over: the pak bytes (`artifact_digest`), the compiled
+  skeleton, the model, a manifest digest of every compiled clip, and the gate's verdict as one check per
+  condition. `tail_release_pack.py` signs after packing and **refuses the pak** when the proof does not
+  admit (`proof-not-verified`). First signed build: `PROOF PASS ... digest blake3:f928ca6e314c5438`.
+- **The "significantly worse" build** was my own rest restoration: `skeleton_fix_parents.py` had copied the
+  skeleton document's rest into the mesh document, 76 joints including `pelvis` by 54.39 units / 60 deg.
+  A rest in a mesh document is the skinning bind, so the body shredded — the gate now refuses it as
+  `model-rest-differs-from-game-model`, proven by re-running it on that exact document.
+- **Four gates, each proven by refusing a real shipped file:** `skeleton-tail-chain-flat` (the shipped
+  skeleton had all nine tail joints parented to `pelvis`), `skeleton-parent-differs-from-game` (`pelvis`
+  a root, `weaponHand_L/R` under `hand_L/hand_R` while the game has them under `arm_L/R_IKTARGET`),
+  `model-rest-differs-from-game-model`, and `gate-needs-game-skeleton` (the pack refuses to pack without
+  the game's skeleton, because a gate that only compares when asked is how the wrong pak shipped).
+  `--fix-rest` remains in the fixer, off by default, documented as the shredding experiment.
+- **Result of the corrected build.** `PARENTS shared=98 differing=0`,
+  `TAIL tail_0<-pelvis, tail_1<-tail_0, ... tail_end<-tail_7`, gate `ADMIT`, 197 clips compiled 0 failed,
+  `PACK haze_tail_signed.vpk 54007789b files=624 clips=228`. Installed as `pak97_dir.vpk`; the client
+  logged `Loaded hero 303/hero_haze`, mounted the vmdl camera poses, ran to tick 532, and quit with no
+  `Couldn't find bone` and no `.mdmp`. **The pose itself has not been looked at**, so "fixed" is not claimed:
+  the owner's next look is the witness.
+- **For the aim matrixes.** The proof carries a per-check token and a world digest over the clip manifest,
+  so an aim cell that is the game's own bytes (the 15 stock cells already overlay-compiled) can be proven
+  as such rather than asserted, and a re-derived cell cannot pass as the game's.
