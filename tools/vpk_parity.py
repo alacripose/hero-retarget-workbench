@@ -179,6 +179,11 @@ def main(argv: list[str] | None = None) -> int:
         "without it the mesh-to-skeleton binding is unchecked",
     )
     parser.add_argument("--report", default="")
+    parser.add_argument(
+        "--allow-unchecked",
+        action="store_true",
+        help="diagnostics only: record UNCHECKED dimensions instead of refusing (never a release)",
+    )
     args = parser.parse_args(argv)
 
     candidate = Path(args.candidate)
@@ -371,6 +376,19 @@ def main(argv: list[str] | None = None) -> int:
         label = {"pass": "PASS", "refuse": "REFUSE", "unchecked": "UNCHECKED"}[row["state"]]
         print(f"  {label:9s} {row['code']}: {row['detail']}")
     print(f"  report: {destination}")
+    # An unchecked dimension is not a pass.  `mesh-joint-not-in-skeleton` used to print
+    # UNCHECKED when no --joint-sets receipt was passed and the tool still exited 0, so a pak
+    # whose meshes might bind a joint the document lacks could be called "parity" and shipped.
+    unchecked = [row for row in checks if row["state"] == "unchecked"]
+    if unchecked and not getattr(args, "allow_unchecked", False):
+        print(
+            f"RESULT: REFUSED ({len(unchecked)} unchecked): "
+            + ", ".join(row["code"] for row in unchecked)
+            + " -- a dimension nobody measured is not a dimension that passed. "
+            "Pass the missing input, or --allow-unchecked to record a diagnostic run."
+        )
+        return 2
+    print(f"RESULT: {'PRESENT' if not refused else 'REFUSED'} ({len(checks) - len(unchecked)}/{len(checks)} measured)")
     return 0 if not refused else 2
 
 

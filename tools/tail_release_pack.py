@@ -95,19 +95,14 @@ def main() -> int:
         help="where to write the BLAKE3 Axis proof binding the pak to the gated bytes (default artifacts/proofs/<pak>.proof.json)",
     )
     parser.add_argument(
+        "--parity-report",
+        default="",
+        help="a vpk_parity report the pak must satisfy: any REFUSE or UNCHECKED refuses the pack",
+    )
+    parser.add_argument(
         "--game-clips",
         default="",
         help="the hero's extracted clips folder (*.vnmclip); a shipped skeleton must carry this whole inventory",
-    )
-    parser.add_argument(
-        "--skeleton-convention",
-        choices=("shipped", "in-model"),
-        default="shipped",
-        help=(
-            "which rule this pak follows: 'shipped' carries a compiled .vnmskel_c beside the model "
-            "(the pinned Shiv pak), 'in-model' carries the tail joints inside the model's own "
-            "skeleton and ships no .vnmskel_c (the addon's tail path). The two cannot both hold."
-        ),
     )
     args = parser.parse_args()
 
@@ -178,6 +173,22 @@ def main() -> int:
                 "the pak would ship clips the gate never read",
             )
 
+    # Parity is a gate a pak has to pass, not a report to read afterwards.  `vpk_parity` used to
+    # print UNCHECKED for a dimension nobody measured and still exit 0; a pak that cites such a
+    # report is a pak whose meshes might bind a joint the document lacks.
+    if args.parity_report:
+        parity = json.loads(Path(args.parity_report).read_text(encoding="utf-8"))
+        refused_rows = parity.get("refused") or []
+        unchecked_rows = parity.get("unchecked") or []
+        if refused_rows or unchecked_rows:
+            raise SystemExit(
+                f"refused parity-not-clean: {len(refused_rows)} refused and {len(unchecked_rows)} "
+                f"unchecked dimensions in {args.parity_report} "
+                f"({[row.get('code') for row in (refused_rows + unchecked_rows)][:4]}); "
+                "a dimension nobody measured is not a dimension that passed"
+            )
+        print("PARITY clean", flush=True)
+
     files = _selected(root, args.include_materials)
     if not files:
         raise SystemExit(f"nothing to pack under {root}")
@@ -197,26 +208,21 @@ def main() -> int:
     # frames disagree with the model — the gate refuses that as `skeleton-slots-differ-from-model`
     # and `skeleton-rest-differs-from-model`, which is how the 15:18/15:36 builds became impossible.
     skeleton_shipped = any(path.name.endswith(".vnmskel_c") for path in files)
-    # Two shipped conventions exist and they are mutually exclusive.  The pinned Shiv pak carries a
-    # compiled `.vnmskel_c` beside its model; the addon's tail path appends the tail joints to the
-    # model's own skeleton and ships none.  A pak that does both ships two competing rigs, and one
-    # that states neither is the ambiguity the Haze and Shiv builds were stuck in, so the convention
-    # is declared on the command line and checked against what is actually in the tree.
-    if args.skeleton_convention == "in-model" and skeleton_shipped:
+    # **The skeleton ships.** That is the rule, and there is no second one to declare: the compiled
+    # `.vnmskel_c` carries the tail chain the clips are authored against, and the pinned Shiv pak
+    # ships exactly that.  An earlier revision of this file offered an `in-model` alternative (tail
+    # joints inside the model's own skeleton, no `.vnmskel_c`) because the addon's 0.13.x tail path
+    # did that; the owner corrected it -- *"We ship the nmskeleton for the animations"* -- and 0.13.1/
+    # 0.13.2 are already recorded as not the accepted state.  So the alternative is gone rather than
+    # refused, because a flag that can express the wrong convention is a way to ship it.
+    if not skeleton_shipped:
         raise SystemExit(
-            "refused skeleton-convention-conflict: --skeleton-convention in-model means the tail "
-            "joints live in the model's own skeleton, but a compiled *.vnmskel_c is in this addon; "
-            "the pak would ship two competing rigs for the same model"
+            "refused skeleton-not-shipped: the addon has no compiled *.vnmskel_c. A pak ships its "
+            "skeleton for the animations -- the pinned Shiv pak does, and the tail chain the clips "
+            "are authored against is only resolved through it. Without one the client animates the "
+            "model with the game's own rig and the tail never moves."
         )
-    if args.skeleton_convention == "shipped" and not skeleton_shipped:
-        raise SystemExit(
-            "refused skeleton-not-shipped: the addon has no compiled *.vnmskel_c and the declared "
-            "convention is 'shipped'. The pinned Shiv pak ships its skeleton and so does a Haze "
-            "release; without one the client animates the model with the game's own rig and the tail "
-            "never moves. If the tail joints are inside the model's own skeleton, declare "
-            "--skeleton-convention in-model instead of packing a pak with no stated rig."
-        )
-    print(f"SKELETON {args.skeleton_convention}", flush=True)
+    print("SKELETON shipped", flush=True)
 
     # A pak that ships a skeleton replaces the rig the client animates this model with, so every
     # clip the client can play has to be present or the model is bound to a rig whose clips are
@@ -292,7 +298,6 @@ def main() -> int:
         "sha256": hashlib.sha256(out.read_bytes()).hexdigest(),
         "file_count": len(packed),
         "include_materials": args.include_materials,
-        "skeleton_convention": args.skeleton_convention,
         "kinds": {
             "models": sum(name.endswith(".vmdl_c") for name in packed),
             "skeletons": sum(name.endswith(".vnmskel_c") for name in packed),
