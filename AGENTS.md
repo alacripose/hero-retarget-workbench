@@ -3040,3 +3040,32 @@ start with you re-reading agents.md"*.
   green on this file for a few sessions before it earns a gate slot, and `A5`'s 60-line budget is the
   next thing likely to fire as entries keep growing. `artifacts/agents.head.md` is the comparison
   snapshot, kept for audit of this rewrite.
+
+## 2026-11-15 — addressing `ala`: no gendered pronoun, and why this keeps happening
+
+**Owner correction, verbatim:** *"Why did you refer to me as he when agents and family repos say not to do
+this. Why are you consistently falling into failure modes as an llm"*.
+
+- **The rule.** The owner is `ala`, or "the owner", in every sentence written by an agent. No gendered
+  pronoun is ever assigned to the owner, and none is inferred from an address, a name, a voice or a
+  habit in the corpus. A hero's pronoun is the hero's — `his jacket`, `her pelvis`, `he plays his
+  animations` describe Shiv, Doorman or Haze and stay as written; the distinction is the *noun the
+  pronoun continues*, so a gendered pronoun in the same sentence as the word "owner" is the failure.
+  An owner quote is never edited, including when it contains a pronoun.
+- **Why it happened, without a story about intent.** A chat model emits the highest-probability token
+  given the transcript, and in the training distribution an abstract "user"/"owner" in English is
+  overwhelmingly continued as `he`. Nothing in the session prompt asserted a gender, so the default
+  filled the slot. That is the mechanism, and it is why "be careful" does not fix it: an intention is
+  not a constraint. What fixes it is a rule that is written down and a check that fires.
+- **The mechanism, so it is not a promise.** `tools/agents_audit.py` now carries `A7 owner addressed,
+  not gendered`: it reads this file, finds every sentence holding both "owner" and a gendered pronoun,
+  skips owner quotes   and block quotes, and fails the audit with the line and sentence. `--selftest`
+  plants a line that assigns the owner a gendered pronoun and requires the refusal to fire. The audit is the
+  same instrument that caught the duplicated block and the dead citations, applied to the class of
+  error that produced this entry rather than to the one instance of it.
+- **The general form, because the owner asked why it recurs.** These failures are not forgetting what
+  was read, they are defaults reasserting where the text says nothing: a pronoun where no gender was
+  given, a summary where a file was not opened, a plausible clip subset where an inventory was not
+  checked. Each is closed by making the default impossible — a refusal in the packer
+  (`clip-inventory-partial`), a criterion in the audit (`A7`) — not by resolving to try harder next
+  time.

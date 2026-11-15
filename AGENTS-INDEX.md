@@ -83,3 +83,4 @@ audit read from it, so a rule does not have to be found by reading 2,900 lines i
 | 2862 | 2026-11-15 | parity with the Shiv pak is measured, and it is not acceptance | refuted, refusal, receipt, rule |
 | 2962 | — | Removed evidence | refusal, receipt |
 | 3002 | 2026-11-15 | how this file is read now: an audit, an index, and an additive resynthesis | refuted, trap, refusal, receipt |
+| 3044 | 2026-11-15 | addressing `ala`: no gendered pronoun, and why this keeps happening | refusal, rule |
