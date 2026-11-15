@@ -259,11 +259,16 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
         raise Refused("model-missing", f"no .vmdl in {root}")
     document = next(iter(sorted(root.rglob("*.vnmskel"))), None)
     model_dmx = _model_mesh_dmx(root, vmdl)
-    model_joints = _joint_names(datamodel, model_dmx)
+    # One reading, both sides.  `_joint_names` walks the flat `jointList` while `_joint_table`
+    # walks the children tree: on the same document they disagree (the model document's
+    # `head_end` is slot 16 by tree and slot 38 by list), and comparing one against the other
+    # reported `joint-order-diverges` on joints nobody had touched.  The client binds the tree a
+    # model document declares, so the tree order is the measurement on both sides.
+    model_joints = list(dict.fromkeys(_joint_table(datamodel, model_dmx)["__order__"]["order"]))
     for name, mesh in _render_meshes(root, vmdl):
         if mesh == model_dmx:
             continue
-        for joint in _joint_names(datamodel, mesh):
+        for joint in list(dict.fromkeys(_joint_table(datamodel, mesh)["__order__"]["order"])):
             if joint not in model_joints:
                 model_joints.append(joint)
 
@@ -571,14 +576,22 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
     model_order = _joint_table(datamodel, model_dmx)["__order__"]["order"]
     for mesh_name, mesh in _render_meshes(root, vmdl):
         mesh_order = _joint_table(datamodel, mesh)["__order__"]["order"]
-        limit = min(len(model_order), len(mesh_order))
-        shifted = [(index, mesh_order[index], model_order[index]) for index in range(limit) if mesh_order[index] != model_order[index]]
-        if shifted:
+        # Relative order of the joints the mesh actually shares with the model.  The absolute
+        # slot cannot be compared across documents: the gun meshes carry their own prop bones
+        # (`forearm_tie_0_L`) where the model has `weaponHand_L`, and the model must also hold the
+        # tail and `weaponHand`, so two documents legitimately interleave them differently.  What
+        # must hold is that a joint never moves past another joint it shares with the mesh — the
+        # 15:36 model document inserted `weaponHand_L/R` *before* the body's `attachWorld`, which
+        # reversed that order for 90 joints and tore the body into flat wedges.
+        shared_order = [name for name in mesh_order if name in set(model_order)]
+        in_model = [name for name in model_order if name in set(shared_order)]
+        if shared_order != in_model:
+            first = next(i for i, (a, b) in enumerate(zip(shared_order, in_model)) if a != b)
             raise Refused(
                 "model-joint-order-differs-from-mesh",
-                f"{model_dmx.name} and {Path(mesh).name} disagree from slot {shifted[0][0]} "
-                f"(mesh has {shifted[0][1]!r}, model has {shifted[0][2]!r}; {len(shifted)} slots differ); "
-                "a mesh binds by index into the model's joint list, so every joint after the first shift is read from the wrong bone and the mesh is torn apart",
+                f"{model_dmx.name} and {Path(mesh).name} order their {len(shared_order)} shared joints differently "
+                f"at shared slot {first} (mesh has {shared_order[first]!r}, model has {in_model[first]!r}); "
+                "a mesh binds by index into the model's joint list, so a joint that moves past another is read from the wrong bone",
             )
 
     # 6b. Every shipped clip must carry the shipped skeleton's own track count.  A
