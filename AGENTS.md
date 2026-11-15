@@ -2869,3 +2869,93 @@ curls in on itself and the head and arms are rotated wrong. everything else is f
   `Couldn't find bone … while serializing bone mask` and crash. Any skeleton work must satisfy both
   spellings, which the game's own skeleton does and our grafts did not.
 - **Not checked.** The next build: none was produced or installed after the restore.
+
+## 2026-11-15 — parity with the Shiv pak is measured, and it is not acceptance
+
+**Owner instruction, verbatim:** *"The work isn't done until we can verify that the haze vpk reaches
+the shiv vpk"*, then *"Are you seriously about to push a version without seeing if her body looks
+right in game"*.
+
+- **The verifier exists.** `tools/vpk_parity.py` reads both paks' own entry lists (S2V `--vpk_list`)
+  and refuses by name: `reference-not-pinned`, `candidate-missing`, `model-not-shipped`,
+  `skeleton-not-shipped`, `clip-count-below-reference`, `sources-shipped`,
+  `materials-shadow-game`, `clip-document-uncompiled`, `gate-not-admitted`,
+  `mesh-joint-not-in-skeleton`, `mesh-joint-order-differs`, `proof-not-verified`. A dimension with no
+  input is `unchecked`, never a pass. `tools/port_gate.py` runs it for any pin carrying a `parity`
+  block (`ledger/pins/haze_parity.json`), so it cannot be a note that was true once.
+- **What the reference is.** `ledger/pins/shiv.json` → `artifacts/oldviper/shiv_tail_all.vpk`,
+  sha256 `0a966d90…`: **267 entries — 206 compiled clips (182 documents + 24 `+non_additive`),
+  2 `vmdl_c`, 1 `vnmskel_c`, 58 materials, 0 sources**. That zero settles the older note that read the
+  pinned pak's `.dmx`/`.vnmclip` as a requirement: they were a leftover of how the older builds were
+  packed, and `--include-sources` is what made `haze_tail_signed.vpk` ship 394 of them.
+- **`haze_tail_v3.vpk` reaches it** (`artifacts/receipts/parity-haze-v3.json`, exit 0): 230 entries,
+  1 model, 1 skeleton, 228 clips (197 documents + 31 non-additive), 0 sources, 0 shadowing materials,
+  197/197 documents compiled, gate admitted with model 131 = skeleton 131, and the BLAKE3 proof
+  verifies over those bytes. `haze_noskel.vpk` (the working reference build) is 2 entries and refuses
+  three dimensions, which is why it is a reference and not a release.
+- **A check of mine that was wrong, fixed before it was trusted.** The first version compared the gate's
+  `model_joints` with `skeleton_joints` (144 against 131) and refused a correct tree.
+  `model_joints` is the union of every render mesh **plus** the object-like entries `_joint_table`
+  walks; `skeleton_joints` is the bone tree. The sound property is what `tools/dmx_joint_sets.py`
+  measures: every render mesh is a subsequence of the document the skeleton is compiled from — here
+  120 and 129 joints inside 131, no extras, no reordering. Same one-reading bug the file records twice.
+- **Parity is necessary and not sufficient, measured the same hour.** `haze_tail_v3.vpk` passes every
+  dimension above and is the exact build the owner refuted in game (tail curling into itself, head and
+  arms rotated). So nothing here is in-game acceptance, the installed slot stays the 01:23 reference
+  (`haze_noskel.vpk`, sha256 `b849c6bf…`), and `ledger/pins/haze_parity.json` says so in its own note.
+- **What parity cannot see, and the measurement that does.** Decompiled with S2V and compared to the
+  game's own compiled skeleton (`artifacts/receipts/skeleton-ours-vs-game.json`):
+  ours **131** joints, game **98**, `missing_from_ours 0`, **33 extras** (`head_end`, every
+  `*_end` leaf, `weaponHand_L/R`, the tail chain), and **`order_subsequence False`** — the shared
+  joints sit at different indices. That is the same relation the pinned Shiv pak has (168 against the
+  stock 140, extra joints bound over a shorter animation skeleton), so it is not by itself the defect;
+  it is the reason a clip authored on the mesh document is read through a different frame than one
+  authored on the game's animation skeleton. Both arrangements have now shipped and failed: 131-joint
+  mesh-document clips rotate the body, and the 107-joint game-skeleton-plus-tail build
+  (`haze_set_gameskel.vpk`) access-violated on the first animation.
+- **Collision recorded.** `artifacts/` is git-ignored, so `artifacts/golden/tail-vnmclip-gate/` was
+  absent on this tree and both `tools/tail_vnmclip_gate.py` and the Shiv pin's bespoke audit were red
+  for a missing *input*, not a wrong build. Restored from the live pinned addon
+  (`shiv_tail_anim`), whose bytes hash to the gate's frozen values (`3451df89…` clip,
+  `c2f1e243…` skeleton); a gate whose evidence is untracked is red on every clean copy and says
+  nothing about the build.
+- **Not checked.** Her body in game on any build after the 01:23 reference — v3 is refuted, and the
+  next candidate has not been built. The owner's look is the acceptance surface.
+
+### The body defect, measured: 99 of 120 model slots move under our skeleton
+
+**Owner question, verbatim:** *"Are you seriously about to push a version without seeing if her body
+looks right in game"*.  No.  v3 is refuted in game and stays refuted; what follows is the measurement
+that was never run, and it is the reason every bundled-skeleton build looked wrong.
+
+`tools/skeleton_model_order_probe.py` reads the compiled model's own `Skeleton` section out of the
+text `Source2Viewer-CLI -d` writes (`artifacts/probes/haze-model-game/.../haze.vmdl`) and compares it
+with the skeleton we ship, using the release gate's own `_joint_table`:
+
+| | value |
+|---|---|
+| model bones the client binds against | **120** |
+| joints in our shipped skeleton | **131** |
+| model joints with no slot in ours | **0** |
+| **shared joints at a different slot** | **99 of 120** |
+| first divergence | `weapon_hand_L` — model 21, skeleton 23 |
+
+The model's 120 does not include the 11 we add (nine tail joints, `weaponHand_L/R`); it does include
+`weapon_hand_L/R`, so the mismatch is not "extras at the end".  Our document's tree order interleaves
+them, and a skeleton replaces `m_modelSkeleton`, so the client binds her meshes into an order that has
+moved: that is the head and arms rotating and the tail curling into itself, and it is why the no-skeleton
+reference build is the only one whose body is right — it leaves the model's own order alone.
+
+**What that fixes, stated as a build rule.**  A bundled skeleton must keep the model's 120 joints at
+the model's slots (0..119) and may append extras only after slot 119.  `tools/skeleton_union.py`
+already appends rather than inserts; the missing half is that its *base* must be the model's declared
+order, not the mesh document's 131-joint tree.  That changes the joint list every clip must match, so
+it is a clip rebuild plus compile plus pack, not a repack — and the gate's `skeleton-slots-differ-from-
+model` does not catch it because it compares the skeleton with the mesh document, which shares the same
+wrong order.
+
+**Refusals added.**  `model-skeleton-order-diverges` and `model-joint-absent-from-skeleton`, both
+proven firing on the shipped v3 skeleton (`REFUSE … 99 of 120 shared joints sit at a different slot`).
+
+**Not checked.** The rebuild that follows this rule, and her body in game on it.  The installed slot is
+still the 01:23 reference (`haze_noskel.vpk`, `b849c6bf…`).

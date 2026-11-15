@@ -135,6 +135,32 @@ def gate_pin(pin_path: Path, *, skip_installed: bool = False) -> dict:
             if (result.stdout or result.stderr)
             else f"exit {result.returncode}",
         )
+    # Parity: the owner's bar is *"The work isn't done until we can verify that the haze
+    # vpk reaches the shiv vpk"*.  A pin may declare the comparison, and the gate runs it
+    # rather than trusting a note that it was run once: `vpk_parity.py` reads both paks'
+    # own entry lists and refuses by name where the candidate falls short.
+    parity = pin.get("parity")
+    if parity and parity.get("candidate"):
+        command = [
+            sys.executable,
+            str(ROOT / "tools" / "vpk_parity.py"),
+            "--candidate",
+            str(_resolve(parity["candidate"])),
+            "--report",
+            str(ROOT / "artifacts" / "receipts" / f"parity-{pin_path.stem}.json"),
+        ]
+        for flag, key in (("--clips", "clips"), ("--joint-sets", "joint_sets"), ("--reference", "reference")):
+            if parity.get(key):
+                command += [flag, str(_resolve(parity[key]))]
+        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+        lines = (result.stdout or "").splitlines()
+        summary = next((line.strip() for line in lines if line.startswith("PARITY")), f"exit {result.returncode}")
+        refused = [line.strip() for line in lines if line.strip().startswith("REFUSE")]
+        check(
+            f"{addon}: the pak reaches the reference pak",
+            result.returncode == 0 and not refused,
+            summary + (" | " + "; ".join(refused[:3]) if refused else ""),
+        )
     if not skip_installed and pin.get("installed") and not pin.get("legacy_gate"):
         installed = _resolve(pin["installed"])
         installed_sha = sha256(installed) if installed.is_file() else ""
