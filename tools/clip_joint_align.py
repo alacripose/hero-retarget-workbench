@@ -132,7 +132,7 @@ def _reorder(element, siblings: list[str], ref_children: dict) -> None:
             _reorder(kid, ref_children.get(kid.name, []), ref_children)
 
 
-def _align(datamodel, reference: Path, clip_path: Path, out: Path) -> dict:
+def _align(datamodel, reference: Path, clip_path: Path, out: Path, match_rest: bool = False) -> dict:
     ref = datamodel.load(str(reference)).root
     _, order, parents, ref_children = _order(ref)
     ref_joints: dict = {}
@@ -166,11 +166,15 @@ def _align(datamodel, reference: Path, clip_path: Path, out: Path) -> dict:
         grafted.append(name)
 
     # The clip's own joint transforms are the rest the channel samples are expressed
-    # against.  Leaving the game body's rest in place while the pak ships the model
-    # export's rest is what put "many bones orientations wrong" in game: every joint
-    # is read through a different frame than the one it was authored in.
+    # against, and they are left exactly as the game authored them. Rewriting them to
+    # the reference's rest while the channels stay the game's own is what folded the
+    # body over in game (2026-11-15, 03:54 build); the gate refuses that pairing as
+    # `clip-rest-moved-without-rebake`. A rest may differ from the reference and still
+    # be right: the shipping Shiv clips differ from their skeleton by up to 179 deg.
+    # `--match-rest` exists only to reproduce that experiment, and its output is
+    # refused unless the channels are re-expressed in the new frame.
     rest_changed = 0
-    for name in order:
+    for name in order if match_rest else []:
         joint = present.get(name)
         source = ref_joints.get(name)
         if joint is None or source is None:
@@ -218,6 +222,11 @@ def _arguments() -> argparse.Namespace:
     parser.add_argument("--clips", required=True)
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--report", default="")
+    parser.add_argument(
+        "--match-rest",
+        action="store_true",
+        help="also rewrite every joint's rest to the reference's (experiment only; refused without a channel rebake)",
+    )
     return parser.parse_args(argv)
 
 
@@ -238,7 +247,7 @@ def main() -> int:
     rows, failed = [], []
     for clip in sorted(Path(args.clips).glob("*.dmx")):
         try:
-            rows.append(_align(datamodel, reference, clip, out_dir / clip.name))
+            rows.append(_align(datamodel, reference, clip, out_dir / clip.name, match_rest=args.match_rest))
         except SystemExit as error:
             failed.append({"clip": clip.name, "error": str(error)})
         except Exception as error:  # noqa: BLE001 - report the clip, keep the batch

@@ -76,6 +76,21 @@ def main() -> int:
     parser.add_argument("--skip-gate", action="store_true", help="diagnostics only; never for a release")
     parser.add_argument("--clips", default="", help="merged clip DMX the gate reads; needs a DmeModel per clip")
     parser.add_argument("--include-sources", action="store_true", help="ship .dmx/.vnmclip like the pinned pak")
+    parser.add_argument(
+        "--game-skeleton",
+        default="",
+        help="the game's own skeleton DMX; the gate then requires every shared joint to keep its parent",
+    )
+    parser.add_argument(
+        "--game-model",
+        default="",
+        help="the game's own mesh DMX; the gate then requires the shipped bind not to move",
+    )
+    parser.add_argument(
+        "--proof",
+        default="",
+        help="where to write the BLAKE3 Axis proof binding the pak to the gated bytes (default artifacts/proofs/<pak>.proof.json)",
+    )
     args = parser.parse_args()
 
     root = Path(args.addon_game)
@@ -85,11 +100,26 @@ def main() -> int:
     # Refuse before packing, not after a crash in game.  A pak whose skeleton cannot
     # render its model (missing tail joints, mask bones, divergent joint order) must
     # not exist: see tools/tail_release_gate.py for the three checks.
+    # A release build must have been compared to the game's own skeleton. The pak
+    # shipped on 2026-11-15 carried `pelvis` as a root, `weaponHand_L/R` under
+    # `hand_L/hand_R` and a flat tail chain, and every one of those is only visible
+    # against the game's document: refusing here is what makes the comparison
+    # happen instead of being remembered.
+    if not args.skip_gate and not args.game_skeleton:
+        raise SystemExit(
+            "refused gate-needs-game-skeleton: pass the game's own skeleton DMX "
+            "(<hero>.vnmskel's m_sourceFilename, extracted from pak01); without it the "
+            "gate cannot check parents, rests or the tail chain against what the client plays"
+        )
+    gate_report = REPO / "artifacts" / "receipts" / f"{out.stem}-gate.json"
     if not args.skip_gate:
         content = Path(str(root).replace("game/citadel_addons", "content/citadel_addons").replace("game\\citadel_addons", "content\\citadel_addons"))
-        gate_report = REPO / "artifacts" / "receipts" / f"{out.stem}-gate.json"
         probe = subprocess.run(
-            [str(BLENDER), "-b", "--python", str(GATE), "--", "--addon-content", str(content), "--report", str(gate_report)] + (["--clips", args.clips] if args.clips else []),
+            [str(BLENDER), "-b", "--python", str(GATE), "--", "--addon-content", str(content), "--report", str(gate_report)]
+            + (["--clips", args.clips] if args.clips else [])
+            + (["--game-skeleton", args.game_skeleton] if args.game_skeleton else [])
+            + (["--game-model", args.game_model] if args.game_model else []),
+
             capture_output=True,
             text=True,
         )
@@ -112,7 +142,15 @@ def main() -> int:
     # pak reaches the game with clips authored against a rig nobody gated.
     if args.clips:
         merged = {path.stem for path in Path(args.clips).glob("*.dmx")}
-        compiled = {path.stem for path in root.rglob("*.vnmclip_c")}
+        # The compiler generates a `<clip>.vnmclip+non_additive_c` beside the base
+        # clip's own output; it has no merged document because it is derived, so
+        # counting it as an orphan refused a correct build (31 of them, written by
+        # the same compile run). Everything else must still be accounted for.
+        compiled = {
+            path.name[: -len(".vnmclip_c")]
+            for path in root.rglob("*.vnmclip_c")
+            if "+non_additive" not in path.name
+        }
         extra = sorted(compiled - merged)
         absent = sorted(merged - compiled)
         if extra or absent:
@@ -178,6 +216,29 @@ def main() -> int:
         },
         "files": packed[:12],
     }
+    # Sign what was packed, with the family's BLAKE3 Axis proof instead of a receipt
+    # line. The proof binds the pak bytes to the skeleton, the model, the whole
+    # compiled-clip manifest and the gate's verdict: a pak recompiled after the gate
+    # ran, or one clip swapped in, cannot present a passing proof for those bytes.
+    proof_path = Path(args.proof) if args.proof else REPO / "artifacts" / "proofs" / f"{out.stem}.proof.json"
+    sign = subprocess.run(
+        [
+            sys.executable,
+            str(REPO / "tools" / "tail_proof.py"),
+            "--addon-game", str(root),
+            "--pak", str(out.resolve()),
+            "--game-skeleton", str(Path(args.game_skeleton).resolve() if args.game_skeleton else Path("missing")),
+            "--gate", str(gate_report),
+            "--proof", str(proof_path),
+        ],
+        capture_output=True,
+        text=True,
+    )
+    verdict_lines = [line for line in (sign.stdout or "").splitlines() if line.startswith("PROOF ")]
+    print(verdict_lines[-1] if verdict_lines else f"PROOF (no verdict) {(sign.stdout or '')[-300:]}{(sign.stderr or '')[-300:]}")
+    receipt["proof"] = str(proof_path)
+    if sign.returncode != 0 and not args.skip_gate:
+        raise SystemExit(f"refused proof-not-verified: the pak cannot be signed against the gated bytes; see {proof_path}")
     if args.report:
         target = Path(args.report)
         target.parent.mkdir(parents=True, exist_ok=True)
