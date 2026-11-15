@@ -103,6 +103,9 @@ the accepted state. It must not be published as the target surface on the streng
    stays as the record of a measured dead end, and nothing calls it.
 2. `forge/port_target.py` becomes the only way a tool names a hero. A new hero is then a parameter,
    which is the property the addon already had.
-3. `tail_release_pack.py` keeps its refusals and gains the missing one this audit surfaced: it must
-   refuse a pak whose skeleton convention disagrees with the pin it claims (`clip-inventory-partial`
-   already landed for the hand-picked clip set).
+3. `tail_release_pack.py` keeps its refusals and gained the missing one this audit surfaced: a pak
+   must now **declare** its skeleton convention. `--skeleton-convention shipped` requires a compiled
+   `.vnmskel_c`; `in-model` requires none and refuses `skeleton-convention-conflict` if one ships.
+   Two competing rigs for one model is no longer a pak that can be built, and neither is a pak with no
+   stated rig. Verified: all three declarations refuse on the hand-built trees and no pak is written.
+   (`clip-inventory-partial` landed earlier for the hand-picked clip set.)

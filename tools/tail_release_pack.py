@@ -99,6 +99,16 @@ def main() -> int:
         default="",
         help="the hero's extracted clips folder (*.vnmclip); a shipped skeleton must carry this whole inventory",
     )
+    parser.add_argument(
+        "--skeleton-convention",
+        choices=("shipped", "in-model"),
+        default="shipped",
+        help=(
+            "which rule this pak follows: 'shipped' carries a compiled .vnmskel_c beside the model "
+            "(the pinned Shiv pak), 'in-model' carries the tail joints inside the model's own "
+            "skeleton and ships no .vnmskel_c (the addon's tail path). The two cannot both hold."
+        ),
+    )
     args = parser.parse_args()
 
     root = Path(args.addon_game)
@@ -187,13 +197,26 @@ def main() -> int:
     # frames disagree with the model — the gate refuses that as `skeleton-slots-differ-from-model`
     # and `skeleton-rest-differs-from-model`, which is how the 15:18/15:36 builds became impossible.
     skeleton_shipped = any(path.name.endswith(".vnmskel_c") for path in files)
-    if not skeleton_shipped:
+    # Two shipped conventions exist and they are mutually exclusive.  The pinned Shiv pak carries a
+    # compiled `.vnmskel_c` beside its model; the addon's tail path appends the tail joints to the
+    # model's own skeleton and ships none.  A pak that does both ships two competing rigs, and one
+    # that states neither is the ambiguity the Haze and Shiv builds were stuck in, so the convention
+    # is declared on the command line and checked against what is actually in the tree.
+    if args.skeleton_convention == "in-model" and skeleton_shipped:
         raise SystemExit(
-            "refused skeleton-not-shipped: the addon has no compiled *.vnmskel_c. The pinned Shiv pak "
-            "ships its skeleton and so does a Haze release; without one the client animates the model "
-            "with the game's own rig and the tail never moves."
+            "refused skeleton-convention-conflict: --skeleton-convention in-model means the tail "
+            "joints live in the model's own skeleton, but a compiled *.vnmskel_c is in this addon; "
+            "the pak would ship two competing rigs for the same model"
         )
-    print("SKELETON shipped", flush=True)
+    if args.skeleton_convention == "shipped" and not skeleton_shipped:
+        raise SystemExit(
+            "refused skeleton-not-shipped: the addon has no compiled *.vnmskel_c and the declared "
+            "convention is 'shipped'. The pinned Shiv pak ships its skeleton and so does a Haze "
+            "release; without one the client animates the model with the game's own rig and the tail "
+            "never moves. If the tail joints are inside the model's own skeleton, declare "
+            "--skeleton-convention in-model instead of packing a pak with no stated rig."
+        )
+    print(f"SKELETON {args.skeleton_convention}", flush=True)
 
     # A pak that ships a skeleton replaces the rig the client animates this model with, so every
     # clip the client can play has to be present or the model is bound to a rig whose clips are
@@ -269,6 +292,7 @@ def main() -> int:
         "sha256": hashlib.sha256(out.read_bytes()).hexdigest(),
         "file_count": len(packed),
         "include_materials": args.include_materials,
+        "skeleton_convention": args.skeleton_convention,
         "kinds": {
             "models": sum(name.endswith(".vmdl_c") for name in packed),
             "skeletons": sum(name.endswith(".vnmskel_c") for name in packed),
