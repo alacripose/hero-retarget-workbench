@@ -664,6 +664,21 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
             # leaving the authored channels in place; 6d above is that check and it stays.
             if drifted:
                 report.setdefault("rest_drift_observed", {})[clip.name] = len(drifted)
+    # A drift recorded but not explained is a check that did not fire.  The explanation
+    # above needs the game's own body DMX per clip (``--bodies``); without it this loop
+    # could only note the drift and admit the pak, which is exactly how the 2026-11-15
+    # build shipped every clip with a moved rest and folded the body over in game.
+    drifted_clips = report.get("rest_drift_observed") or {}
+    if drifted_clips and not bodies:
+        first = sorted(drifted_clips)[0]
+        raise Refused(
+            "clip-rest-drift-unverified",
+            f"{len(drifted_clips)} clips declare a rest that differs from the skeleton "
+            f"({first}: {drifted_clips[first]} joints) and no --bodies was passed, so the gate "
+            "cannot tell an authored rebake from a moved rest with the game's channels left in "
+            "place. Pass the per-clip game body DMX, or fix the clips; an observed drift is not "
+            "a pass.",
+        )
     report.update(
         {
             "tail_chain": skeleton_tail,
