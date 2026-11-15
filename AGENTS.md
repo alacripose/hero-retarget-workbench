@@ -2836,3 +2836,36 @@ vpk in its slot"*.
   was installed: the gate refuses every combination produced so far, and shipping another one would repeat
   the failure the owner is looking at.
 - **Not checked.** The restored pak in game this session; the union/skeleton candidate in game.
+
+## 2026-11-15 — two defects, both measured, and the reference is back in the game
+
+**Owner report, verbatim:** *"tail visible but curls in on itself, head and arm rotated wrong, a refusal
+should have fired for these things"*, then the correction *"No, there is a rule that says not to infer your
+assumptions from screenshots, only what I say verbaitm. she's not laying on the ground I said her tial
+curls in on itself and the head and arms are rotated wrong. everything else is fine"*.
+
+- **Scope, as stated and not inferred.** She stands. The pelvis, the spine and the legs are correct. The
+  defects are the tail curling into itself and the head and arms rotating wrong. A screenshot is not
+  evidence for anything not said out loud; the previous entry's reading of the same image was wrong.
+- **A refutation that matters.** `tools/clip_retarget_frames.py` re-expresses every clip's local
+  rotations from the authored bones' frames into the shipped skeleton's, with the bind-relative mapping
+  `world_target = world_source * inv(rest_source) * rest_target`. On `item_stand_idle` it rewrote all 106
+  orientation channels and the measured change was **0.00° at the first sample for `pelvis`, `spine_1`,
+  `head` and `hand_R`, and 0.04° for `tail_3`**. So our skeleton's rests already equal the source's: the
+  head/arm rotation and the tail curl are **not** a rest-frame mismatch, and the frame retarget is not
+  the fix. That tool stays because the mapping is right and one clip proves the frames agree; it must not
+  be run as a cure.
+- **What the two defects therefore point at.** The shipped skeleton differs from the game's own only in
+  the structure this session added: `weaponHand_L/R` grafted into `hand_L/hand_R`'s children (which moves
+  it to tree slot ~50 and shifts every joint after it), and the tail chain re-parented from `pelvis` to a
+  chain. The reference build the owner accepted has **no** such skeleton: the client used `pak01`'s own
+  `haze.vnmskel` and `haze_skel.dmx`, which is why the body, the head and the arms were right and the
+  tail was visible and still.
+- **Restored.** `pak97_dir.vpk` is `artifacts/haze-tail/haze_noskel.vpk` again (`b849c6bf…`,
+  4,274,141 bytes) after the v3 build (`haze_tail_v3.vpk`, 6,639,247 bytes, skeleton shipped) reproduced
+  the two defects in game.
+- **The mask is stricter than assumed.** `haze.vnmskel`'s `m_highLODBones` and its bone masks name
+  `weapon_hand_L` (underscore) **and** `weaponHand_L`; a skeleton missing either makes the client log
+  `Couldn't find bone … while serializing bone mask` and crash. Any skeleton work must satisfy both
+  spellings, which the game's own skeleton does and our grafts did not.
+- **Not checked.** The next build: none was produced or installed after the restore.
