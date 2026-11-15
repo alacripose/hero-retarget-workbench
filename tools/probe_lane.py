@@ -71,6 +71,14 @@ PROBES: tuple[ProbeSpec, ...] = (
         gui=True,
     ),
     ProbeSpec(
+        "probe: tail auto",
+        "tools/blender_tail_auto_probe.py",
+        "artifacts/receipts/probe-tail-auto.json",
+        ("--extraction", "{extraction:shiv}", "--report", "artifacts/receipts/probe-tail-auto.json"),
+        requires=("blender", "extraction:shiv"),
+        factory_startup=True,
+    ),
+    ProbeSpec(
         "probe: tail live roster",
         "tools/blender_tail_live_probe.py",
         "artifacts/receipts/tail-live.json",

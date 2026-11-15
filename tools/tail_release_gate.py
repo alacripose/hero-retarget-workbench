@@ -1,0 +1,461 @@
+"""Refuse a tail port whose shipped skeleton cannot render the shipped model.
+
+The Haze release failed four times in the same way, and each failure was visible
+in the sources before anything was packed:
+
+* the game logged ``Couldn't find bone (weaponHand_L) in skeleton ... while
+  serializing bone mask`` -- a mask naming a bone the shipped skeleton does not
+  have;
+* the tail was invisible -- the shipped skeleton had tail joints the model's own
+  mesh skeleton did not, so nothing skinned to them;
+* head and arms rotated -- the shared joints of the shipped skeleton and the
+  model's mesh skeleton were not in the same order.
+
+This gate reads the three sources a port ships (the model vmdl, the skeleton
+document and the DMX each of them names) and refuses rather than packing.  It
+exists so the code path that produced those paks cannot be run again.
+
+  blender -b --python tools/tail_release_gate.py -- \
+      --addon-content <csdk>/content/citadel_addons/<addon> \
+      --report artifacts/receipts/<hero>-gate.json
+
+Exit 0 admits the port.  Exit 2 refuses it and names the check that refused.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from pathlib import Path
+
+PULSE_DIR = Path("C:/Users/ala/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+
+
+class Refused(RuntimeError):
+    """A check that must stop the port."""
+
+    def __init__(self, code: str, detail: str) -> None:
+        super().__init__(f"{code}: {detail}")
+        self.code = code
+        self.detail = detail
+
+
+def _datamodel():
+    if str(PULSE_DIR) not in sys.path:
+        sys.path.insert(0, str(PULSE_DIR))
+    try:
+        from pulse_src_ops import datamodel  # noqa: WPS433
+    except Exception as error:  # pragma: no cover - environment guard
+        raise Refused("gate-needs-blender", f"PulseSrcOps datamodel unavailable: {error}") from error
+    return datamodel
+
+
+def _arguments() -> argparse.Namespace:
+    argv = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--addon-content", required=True)
+    parser.add_argument("--report", default="")
+    parser.add_argument("--clips", default="", help="clip DMX folder; defaults to <model folder>/clips")
+    parser.add_argument("--bodies", default="", help="the game's own body DMX per clip, for the rebake check")
+    return parser.parse_args(argv)
+
+
+def _joint_names(datamodel, path: Path) -> list[str]:
+    model = datamodel.load(str(path))
+    skeleton = model.root["skeleton"]
+    joints = skeleton["jointList"] if "jointList" in skeleton else skeleton["children"]
+    return [joint.name for joint in joints]
+
+
+def _joint_table(datamodel, path: Path) -> dict[str, dict]:
+    """Joint name -> parent/rest, using the audit's element walker.
+
+    Reading `joint["parent"]` returns nothing on this DMX flavour; the audit tool
+    walks the element tree instead and that is the only reader that has ever
+    produced real parents.
+    """
+    tools = Path(__file__).resolve().parent
+    if str(tools) not in sys.path:
+        sys.path.insert(0, str(tools))
+    from tail_release_audit import _joint_table as walk  # noqa: WPS433
+
+    return walk(datamodel, str(path))
+
+
+def _roots_and_reachability(datamodel, path: Path) -> tuple[list[str], set[str], dict[str, str]]:
+    """The skeleton's roots and every joint reachable from them.
+
+    A joint appended to the joint array without being attached under a parent is a
+    second root.  The compiler leaves it out of the bone table, the client logs
+    "Couldn't find bone (...) while serializing bone mask" for any mask naming it,
+    and then crashes -- the exact failure this gate exists to prevent.
+    """
+    table = _joint_table(datamodel, path)
+    parents = {
+        name: (row.get("parent") or None)
+        for name, row in table.items()
+        if name != "__order__"  # the audit's own ordering pseudo-entry
+    }
+    children: dict[str, list[str]] = {name: [] for name in parents}
+    for name, parent in parents.items():
+        if parent in children:
+            children[parent].append(name)
+    roots = [name for name, parent in parents.items() if not parent]
+    seen: set[str] = set()
+    stack = list(roots)
+    while stack:
+        name = stack.pop()
+        if name in seen:
+            continue
+        seen.add(name)
+        stack.extend(children.get(name, []))
+    return roots, seen, parents
+
+
+def _parents(datamodel, path: Path) -> dict[str, str]:
+    model = datamodel.load(str(path))
+    skeleton = model.root["skeleton"]
+    joints = skeleton["jointList"] if "jointList" in skeleton else skeleton["children"]
+    found: dict[str, str] = {}
+    for joint in joints:
+        parent = ""
+        for key in ("parent", "parentName"):
+            try:
+                value = joint[key]
+            except Exception:
+                continue
+            parent = value if isinstance(value, str) else getattr(value, "name", "") or ""
+            break
+        found[joint.name] = parent
+    return found
+
+
+def _model_mesh_dmx(root: Path, vmdl: Path) -> Path:
+    """The first RenderMeshFile of the model, which carries the model skeleton."""
+    entries = _render_meshes(root, vmdl)
+    preferred = [path for name, path in entries if name in {"body", "Body"}] or [entries[0][1]]
+    return preferred[0]
+
+
+def _render_meshes(root: Path, vmdl: Path) -> list[tuple[str, Path]]:
+    """Every RenderMeshFile, because the model skeleton is the union of them.
+
+    The pinned Shiv build renders the tail from its own mesh dmx (`shiv_tail15.dmx`)
+    beside the body, so the tail joints reach the model through that file rather
+    than through `shiv_body.dmx`.  Reading only `body` made the gate refuse a build
+    that is shaped exactly like the pinned one.
+    """
+    text = vmdl.read_text(encoding="utf-8", errors="replace")
+    entries = re.findall(r'_class = "RenderMeshFile"\s*\n\s*name = "([^"]+)"\s*\n\s*filename = "([^"]+)"', text)
+    if not entries:
+        raise Refused("model-no-render-mesh", f"{vmdl.name} declares no RenderMeshFile")
+    resolved: list[tuple[str, Path]] = []
+    missing: list[str] = []
+    for name, declared in entries:
+        path = root / declared
+        if path.is_file():
+            resolved.append((name, path))
+        else:
+            missing.append(declared)
+    if not resolved:
+        raise Refused("model-mesh-missing", f"none of {vmdl.name}'s meshes are in the addon: {missing[:4]}")
+    return resolved
+
+
+def _skeleton_dmx(root: Path, document: Path) -> Path:
+    text = document.read_text(encoding="utf-8", errors="replace")
+    match = re.search(r'm_sourceFilename = "([^"]+)"', text)
+    if not match:
+        raise Refused("skeleton-no-source", f"{document.name} declares no m_sourceFilename")
+    declared = match.group(1)
+    seen = []
+    for candidate in (root / declared, root / "models" / "heroes_staging" / declared):
+        seen.append(candidate)
+        if candidate.is_file():
+            return candidate
+    raise Refused("skeleton-source-missing", f"{declared} is not in the addon (looked in {[str(p) for p in seen]})")
+
+
+def _mask_bones(document: Path) -> list[str]:
+    text = document.read_text(encoding="utf-8", errors="replace")
+    names: list[str] = []
+    for block in re.finditer(r'm_ID = "([^"]+)"', text):
+        tail = text[block.end() : text.find("\n\t\t},", block.end()) if text.find("\n\t\t},", block.end()) > 0 else len(text)]
+        ids = re.search(r"m_boneIDs = \s*\[(.*?)\]", tail, re.S)
+        if ids:
+            names.extend(re.findall(r'"([^"]+)"', ids.group(1)))
+    return names
+
+
+def _subsequence(small: list[str], large: list[str]) -> list[str]:
+    """Names of `small` that appear in `large` in a different relative order."""
+    position = {name: index for index, name in enumerate(large)}
+    order = [position[name] for name in small if name in position]
+    return [small[index] for index in range(1, len(order)) if order[index] < order[index - 1]]
+
+
+def _tail_chain(joints: list[str]) -> list[str]:
+    chain = [name for name in joints if re.fullmatch(r"tail_\d+", name)]
+    return chain + [name for name in joints if name == "tail_end"]
+
+
+def _channel_values_equal(datamodel, left: Path, right: Path) -> bool:
+    """True when both documents carry byte-identical channel sample values."""
+    def samples(path: Path) -> dict:
+        root = datamodel.load(str(path)).root
+        try:
+            clip = root["animationList"]["animations"][0]
+        except Exception:  # noqa: BLE001 - a document without channels is not a clip
+            return {}
+        out = {}
+        for channel in clip["channels"]:
+            element = channel.get("toElement")
+            key = (getattr(element, "name", ""), str(channel.get("toAttribute", "")))
+            for layer in channel["log"]["layers"]:
+                values = tuple(tuple(round(float(v), 6) for v in value) if isinstance(value, (list, tuple)) else round(float(value), 6) for value in layer["values"])
+                out[key] = out.get(key, ()) + (values,)
+        return out
+
+    left_samples, right_samples = samples(left), samples(right)
+    shared = set(left_samples) & set(right_samples)
+    # Only the channels both documents carry can be compared: the merge adds
+    # tail channels, and a whole-dict comparison would call every clip different
+    # and never refuse the one that matters.
+    return bool(shared) and all(left_samples[key] == right_samples[key] for key in shared)
+
+
+def run(root: Path, clips: str = "", bodies: str = "") -> dict:
+    datamodel = _datamodel()
+    vmdl = next(iter(sorted(root.rglob("*.vmdl"))), None)
+    if vmdl is None:
+        raise Refused("model-missing", f"no .vmdl in {root}")
+    document = next(iter(sorted(root.rglob("*.vnmskel"))), None)
+    model_dmx = _model_mesh_dmx(root, vmdl)
+    model_joints = _joint_names(datamodel, model_dmx)
+    for name, mesh in _render_meshes(root, vmdl):
+        if mesh == model_dmx:
+            continue
+        for joint in _joint_names(datamodel, mesh):
+            if joint not in model_joints:
+                model_joints.append(joint)
+
+    report: dict = {
+        "addon_content": str(root),
+        "model": str(vmdl),
+        "model_mesh_dmx": str(model_dmx),
+        "model_joints": len(model_joints),
+    }
+
+    if document is None:
+        # No shipped skeleton: the game keeps its own, so only the model's own
+        # tail has to exist.  This is the admitted state of the visible build.
+        chain = _tail_chain(model_joints)
+        if len(chain) < 3:
+            raise Refused(
+                "model-has-no-tail",
+                f"{model_dmx.name} carries {len(chain)} tail joints; the tail mesh would render with nothing to move it",
+            )
+        report.update({"skeleton": None, "tail_chain": chain, "admitted": True})
+        return report
+
+    clip_dir = Path(clips) if clips else ((vmdl.parent / "clips") if (vmdl.parent / "clips").is_dir() else None)
+    skeleton_dmx = _skeleton_dmx(root, document)
+    # Count the joints the way the clip side is counted: unique names, in file
+    # order.  `_joint_names` counts elements, and a mesh export can declare the same
+    # joint more than once (this hero's export: 167 elements for 131 bones), so the
+    # two sides of the comparison must share one measurement or the refusal is noise.
+    skeleton_order = _joint_table(datamodel, skeleton_dmx)["__order__"]["order"]
+    skeleton_joints = list(dict.fromkeys(skeleton_order))
+    skeleton_duplicates = len(skeleton_order) - len(skeleton_joints)
+    report.update({"skeleton": str(document), "skeleton_dmx": str(skeleton_dmx), "skeleton_joints": len(skeleton_joints),
+
+        "skeleton_duplicate_elements": skeleton_duplicates})
+
+    # 1. A mask must not name a bone the skeleton cannot resolve.  The client logs
+    #    "Couldn't find bone ... while serializing bone mask" and then crashes.
+    roots, reachable, parents = _roots_and_reachability(datamodel, skeleton_dmx)
+    # The mesh skeleton legitimately has several roots (root_motion, the IK targets
+    # and pelvis as the extraction writes them).  What must not happen is the
+    # shipped skeleton inventing a root of its own: an appended joint with no parent
+    # is dropped by the compiler and crashes the client through its mask.
+    model_roots, _, _ = _roots_and_reachability(datamodel, model_dmx)
+    invented = [name for name in roots if name not in set(model_roots)]
+    if invented:
+        raise Refused(
+            "skeleton-invented-root",
+            f"{skeleton_dmx.name} adds root joints {invented} that {model_dmx.name} does not have; "
+            "they hang off nothing, are dropped by the compiler, and every mask naming one crashes the client",
+        )
+    unreachable = [name for name in skeleton_joints if name not in reachable]
+    # Only an unreachable joint that a mask names is fatal: the client resolves the
+    # mask, fails to find the bone and crashes.  The extraction's own mesh dmx keeps
+    # its armature object joint unreferenced, and that has always been harmless.
+    masked_unreachable = sorted({name for name in _mask_bones(document) if name in set(unreachable)})
+    if masked_unreachable:
+        raise Refused(
+            "mask-bone-unreachable",
+            f"{masked_unreachable} hang off nothing in {skeleton_dmx.name} (compiler drops them) and are named by masks; "
+            "the client logs \"Couldn't find bone ... while serializing bone mask\" and crashes",
+        )
+    report["skeleton_roots"] = roots
+    unknown = [name for name in _mask_bones(document) if name not in reachable]
+    if unknown:
+        raise Refused(
+            "mask-names-missing-bone",
+            f"{len(unknown)} mask entries name bones the compiled skeleton cannot resolve: {sorted(set(unknown))}",
+        )
+
+    # 2. The tail has to exist on both sides: the skeleton animates it, the model
+    #    skins it.  Either alone is the invisible-tail failure.
+    if skeleton_duplicates:
+        raise Refused(
+            "skeleton-duplicate-joints",
+            f"{skeleton_dmx.name} declares {len(skeleton_order)} joint elements for {len(skeleton_joints)} bones; "
+            "a joint declared twice is written twice by the compiler and the mask and clip bind by index into it",
+        )
+    skeleton_tail = _tail_chain(skeleton_joints)
+    if len(skeleton_tail) < 3:
+        raise Refused("skeleton-has-no-tail", f"{skeleton_dmx.name} carries {skeleton_tail} as a tail chain")
+    model_tail = _tail_chain(model_joints)
+    orphaned = [name for name in skeleton_tail if name not in set(model_joints)]
+    if orphaned:
+        raise Refused(
+            "tail-not-on-model",
+            f"{orphaned} are animated but absent from {model_dmx.name}; the tail has no skinning",
+        )
+
+    # 3. Shared joints must keep their relative order, or the engine binds the
+    #    model's skeleton by position and the head and arms rotate.
+    # 6. Shared joints must keep their relative order between the model's own mesh
+    #    skeleton and the shipped skeleton.  Exact equality is NOT required and was
+    #    my invention: the accepted Shiv build ships a 171-joint skeleton over a
+    #    168-joint model (see AGENTS.md 2026-11-14, "the bake is faithful, its track
+    #    set is not").  What the client does bind by index is the clip against the
+    #    skeleton, which 6b covers.
+    # An object-like joint is the armature object the extraction writes beside the
+    # bones ("haze_body", "DMF Tail"); the client does not bind it.
+    object_like = lambda name: " " in name or name.startswith("DMF ")
+    model_game = [name for name in model_joints if not object_like(name)]
+    skeleton_game = [name for name in skeleton_joints if not object_like(name)]
+    shared = [name for name in model_game if name in set(skeleton_game)]
+    out_of_order = _subsequence(shared, skeleton_game)
+    if out_of_order:
+        raise Refused(
+            "joint-order-diverges",
+            f"{len(out_of_order)} model joints appear in a different order in {skeleton_dmx.name}: {out_of_order[:8]}",
+        )
+
+    # 6b. Every shipped clip must carry the shipped skeleton's own track count.  A
+    #     clip authored on another skeleton is bound by index, so the head and arms
+    #     rotate and whatever the skeleton has and the clip lacks (the tail) drops
+    #     out of the pose.  Measured in AGENTS.md (2026-11-15): the 10:06 pak ships
+    #     147-track clips under a 171-joint skeleton and draws no tail, while every
+    #     build accepted as tail-animating carries 168 tracks on a 168-joint rig.
+    #     Track count is a binding fact, not a detail.
+    if clip_dir is not None and clip_dir.is_dir():
+        skeleton_table = _joint_table(datamodel, skeleton_dmx)
+        skeleton_names = [name for name in dict.fromkeys(skeleton_table["__order__"]["order"]) if not object_like(name)]
+        wanted = set(skeleton_names)
+        for clip in sorted(clip_dir.glob("*.dmx")):
+            table = _joint_table(datamodel, clip)
+            names = [name for name in dict.fromkeys(table["__order__"]["order"]) if not object_like(name)]
+            if not names:
+                continue
+            if set(names) != wanted or len(names) != len(wanted):
+                missing = sorted(wanted - set(names))
+                extra = sorted(set(names) - wanted)
+                raise Refused(
+                    "clip-joint-list-differs",
+                    f"{clip.name} declares {len(names)} joints against the {len(wanted)}-joint skeleton "
+                    f"(missing {missing[:4]}, extra {extra[:4]}); the client binds a clip by index, so the pose is wrong and the tail drops",
+                )
+            # The joint transform a clip declares is the rest its samples are read
+            # against.  A clip whose rest differs from the shipped skeleton's reads
+            # every bone through a different frame: in game that shows as many bone
+            # orientations wrong, with the mesh intact.
+            drifted = []
+            for name in skeleton_names:
+                here, there = table.get(name), skeleton_table.get(name)
+                if not here or not there:
+                    continue
+                delta = max(abs(a - b) for a, b in zip(here["head"], there["head"]))
+                dot = abs(sum(a * b for a, b in zip(here["orientation"], there["orientation"])))
+                if delta > 0.01 or (1.0 - dot) > 2e-3:  # 2e-3 is ~3.6deg: 4dp-rounded unit quaternions read 1e-4 apart
+                    drifted.append((name, round(delta, 4), round(1.0 - dot, 6)))
+            # 6d. A clip may only disagree with the skeleton about a joint's rest if
+            #     its channel data was re-expressed in that frame.  Rewriting the rest
+            #     and leaving the game's own channel values in place reads every sample
+            #     through a different frame: in game the body folds over (measured on
+            #     the 03:54 Haze build).  The comparison is exact equality of values,
+            #     because "approximately the same channels" is exactly the failure.
+            if bodies:
+                origin = Path(bodies) / clip.name
+                if origin.is_file():
+                    origin_table = _joint_table(datamodel, origin)
+                    moved = []
+                    for name in skeleton_names:
+                        here, base = table.get(name), origin_table.get(name)
+                        if not here or not base:
+                            continue
+                        if max(abs(a - b) for a, b in zip(here["head"], base["head"])) > 0.01:
+                            moved.append(name)
+                    if moved and _channel_values_equal(datamodel, origin, clip):
+                        raise Refused(
+                            "clip-rest-moved-without-rebake",
+                            f"{clip.name} declares a rest moved for {len(moved)} joints ({moved[:4]}) but carries {origin.name}'s own channel values; "
+                            "the samples are then read in a frame they were not authored in and the body folds over",
+                        )
+            if drifted:
+                raise Refused(
+                    "clip-rest-differs",
+                    f"{clip.name} declares a different rest for {len(drifted)} joints than {skeleton_dmx.name} "
+                    f"(e.g. {drifted[:3]}); every bone whose rest disagrees is read through the wrong frame, which is bone orientations wrong in game",
+                )
+    report.update(
+        {
+            "tail_chain": skeleton_tail,
+            "shared_joints": len(model_game),
+            "admitted": True,
+        }
+    )
+    return report
+
+
+def main() -> int:
+    args = _arguments()
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from work_record import finish, refuse_ephemeral_paths
+
+    # A report written to a temp directory is work that vanishes; refuse it here so
+    # the gate cannot be run in a way nobody can reproduce.
+    refuse_ephemeral_paths([args.report])
+    root = Path(args.addon_content)
+    report: dict = {"addon_content": str(root)}
+    try:
+        if not root.is_dir():
+            raise Refused("addon-missing", str(root))
+        report.update(run(root, args.clips, args.bodies))
+        print(f"GATE ADMIT {root.name}: model {report['model_joints']} joints, "
+              f"skeleton {report.get('skeleton_joints', 'game')}, tail {len(report['tail_chain'])}", flush=True)
+        code = 0
+    except Refused as refusal:
+        report.update({"admitted": False, "refused": refusal.code, "detail": refusal.detail})
+        print(f"GATE REFUSE {refusal.code}: {refusal.detail}", flush=True)
+        code = 2
+    if args.report:
+        target = Path(args.report)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    finish(
+        "tail_release_gate",
+        [args.report],
+        f"GATE {'ADMIT' if code == 0 else 'REFUSE'} {root.name}: {report.get('refused') or 'admitted'}",
+        "pass" if code == 0 else "refuse",
+        {"verdict": report.get("refused"), "clips": args.clips, "bodies": args.bodies},
+    )
+    return code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
