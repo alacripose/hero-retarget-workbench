@@ -146,6 +146,32 @@ def current_state(rows: list[dict], text: str) -> dict:
     }
 
 
+GENDERED = re.compile(r"\b(he|him|his|she|her|hers)\b", re.IGNORECASE)
+
+
+def owner_gendering(text: str) -> list[dict]:
+    """A7: the owner is addressed, not assigned a gender.
+
+    The file legitimately contains `his jacket`, `he stands`, `her pelvis`: those sentences describe a
+    hero, and the pronouns are the character's. What is not allowed is the file — or a message written
+    from it — calling *the owner* `he`. The distinction is the noun: a gendered pronoun in the same
+    sentence as the word `owner` is the failure, except inside a verbatim quote of the owner, whose
+    words are never edited.
+    """
+    violations = []
+    for number, line in enumerate(text.splitlines(), 1):
+        lowered = line.lower()
+        if "owner" not in lowered or "verbatim" in lowered:
+            continue
+        if line.lstrip().startswith(">"):  # a block quote is the owner's words
+            continue
+        for sentence in re.split(r"(?<=[.!?])\s+", line):
+            if "owner" in sentence.lower() and GENDERED.search(sentence):
+                violations.append({"line": number, "sentence": sentence.strip()[:120]})
+                break
+    return violations
+
+
 def section_flags(row: dict) -> list[str]:
     body = row["body"].lower()
     flags = []
@@ -335,7 +361,10 @@ def audit(text: str) -> tuple[list[dict], dict]:
         for row in rows
         if row["lines"] > COST_BUDGET and not {"refusal", "receipt"} & set(section_flags(row))
     ]
+    gendered = owner_gendering(text)
     checks = [
+        {"name": "A7 owner addressed, not gendered", "pass": not gendered,
+         "detail": f"{len(gendered)} sentences gender the owner" + (f": {gendered[0]['sentence']}" if gendered else "")},
         {"name": "A1 one copy of a rule", "pass": not dups,
          "detail": f"{len(dups)} duplicated line runs" + (f", first at {dups[0]['first']} again {dups[0]['again']}" if dups else "")},
         {"name": "A2 current state first", "pass": bool(state["early"]) and state["installed_named_within_150_lines"],
@@ -443,6 +472,7 @@ def digest_payload(payload: dict) -> str:
 def selftest() -> int:
     """Negative cases, in the family's `selftest` shape: each refusal must fire on planted text."""
     cases = [
+        ("A7 owner addressed, not gendered", "## a\nthe owner said he wanted it shipped\n"),
         ("A1 one copy of a rule", "## a\nx\ny\nz\n## b\nx\ny\nz\n"),
         ("A3 evidence path exists", "## a\nsee `artifacts/does-not-exist-anywhere.vpk`\n"),
         ("A5 bounded cost", "## a\n" + ("filler narrative line\n" * (COST_BUDGET + 5))),

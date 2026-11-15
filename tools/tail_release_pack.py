@@ -94,6 +94,11 @@ def main() -> int:
         default="",
         help="where to write the BLAKE3 Axis proof binding the pak to the gated bytes (default artifacts/proofs/<pak>.proof.json)",
     )
+    parser.add_argument(
+        "--game-clips",
+        default="",
+        help="the hero's extracted clips folder (*.vnmclip); a shipped skeleton must carry this whole inventory",
+    )
     args = parser.parse_args()
 
     root = Path(args.addon_game)
@@ -189,6 +194,44 @@ def main() -> int:
             "with the game's own rig and the tail never moves."
         )
     print("SKELETON shipped", flush=True)
+
+    # A pak that ships a skeleton replaces the rig the client animates this model with, so every
+    # clip the client can play has to be present or the model is bound to a rig whose clips are
+    # missing -- the 2026-11-15 refuted builds.  Picking a subset by hand is exactly how a pak
+    # ships a model and skeleton with one clip and goes invisible: the refusal is that a shipped
+    # skeleton requires the *whole* clip inventory, not that a subset looks plausible.
+    if args.game_clips:
+        inventory = {
+            path.stem
+            for path in Path(args.game_clips).rglob("*.vnmclip")
+            if not path.stem.endswith("+non_additive")
+        }
+        shipped = {
+            path.name[: -len(".vnmclip_c")]
+            for path in files
+            if path.name.endswith(".vnmclip_c") and "+non_additive" not in path.name
+        }
+        if not inventory:
+            raise SystemExit(
+                f"refused clip-inventory-empty: {args.game_clips} holds no *.vnmclip documents, so "
+                "the pak cannot be checked against what the game plays"
+            )
+        missing = sorted(inventory - shipped)
+        if missing:
+            raise SystemExit(
+                f"refused clip-inventory-partial: a skeleton ships, so the pak must carry the game's "
+                f"whole clip inventory, but {len(missing)} of {len(inventory)} are absent "
+                f"({missing[:4]}). The client binds the model to this skeleton and plays the game's "
+                "own missing clips against it, which is how a port goes invisible after a frame. "
+                "Ship every clip or ship no skeleton."
+            )
+        print(f"CLIP-INVENTORY complete {len(inventory)} of {len(inventory)}", flush=True)
+    else:
+        raise SystemExit(
+            "refused clip-inventory-missing: pass --game-clips <the hero's extracted clips folder>; "
+            "a pak that ships a skeleton without proving it carries the game's whole clip inventory "
+            "is a hand-picked clip set, and that is the failure this refusal exists for"
+        )
 
     # Materials the game already provides are never shipped: they shadow pak01
     # with a half-compiled copy and cost a port its surfaces.
