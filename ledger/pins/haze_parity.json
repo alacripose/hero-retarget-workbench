@@ -1,0 +1,17 @@
+{
+  "addon": "haze_parity",
+  "hero": "haze",
+  "status": "parity",
+  "pak": "artifacts/haze-tail/haze_tail_v3.vpk",
+  "sha256": "50e1c8b139a79749942d2e23a3ba8ce1882f0c8312606013a7ee335499acd080",
+  "bytes": 6639247,
+  "parity": {
+    "candidate": "artifacts/haze-tail/haze_tail_v3.vpk",
+    "clips": "C:/Users/ala/Downloads/Reduced_CSDK_13/content/citadel_addons/haze_tail/models/heroes_staging/haze/clips",
+    "joint_sets": "artifacts/receipts/haze-mesh-joint-sets.json"
+  },
+  "gate": "artifacts/receipts/haze_tail_v3-gate.json",
+  "proof": "artifacts/proofs/haze_tail_v3.proof.json",
+  "parity_receipt": "artifacts/receipts/parity-haze-v3.json",
+  "note": "Verifies the owner's bar (\"the work isn't done until we can verify that the haze vpk reaches the shiv vpk\") for this pak, and nothing more. Every measurable dimension of the pinned Shiv release is met: skeleton shipped, 197/197 clip documents compiled, 0 uncompiled sources, no material pak01 already provides, gate admitted with model 131 = skeleton 131, every render mesh a subsequence of the document the skeleton is compiled from, and the BLAKE3 proof verifies over these bytes. This is NOT in-game acceptance: the same pak is the build the owner refuted on 2026-11-15 (tail curling into itself, head and arms rotated), so parity is necessary and not sufficient and the installed slot stays the 01:23 reference."
+}
