@@ -40,7 +40,7 @@ SOURCE_SUFFIXES = (".dmx", ".vnmclip", ".vnmskel", ".vmdl")
 NEVER = ("tools_asset_info.bin",)
 
 
-def _selected(root: Path, include_materials: bool, include_sources: bool = False) -> list[Path]:
+def _selected(root: Path, include_materials: bool) -> list[Path]:
     files = []
     for path in sorted(root.rglob("*")):
         if not path.is_file():
@@ -48,23 +48,27 @@ def _selected(root: Path, include_materials: bool, include_sources: bool = False
         name = path.name
         if name in NEVER or name.endswith((".vmat", ".png", ".jpg", ".tga")):
             continue
-        # The pinned Shiv pak carries its DMX sources and decompiled .vnmclip text
-        # beside the compiled files, and that build runs in game.  Stripping them is
-        # a difference from the only pak known to work, so it is opt-in rather than
-        # the default.
-        if not include_sources and name.endswith((".dmx", ".vnmclip", ".vnmskel", ".vmdl")):
+        # Sources are never shipped.  The 15:18 Haze pak carried every clip's DMX and
+        # every decompiled .vnmclip text beside the compiled files (427 .dmx / 197
+        # .vnmclip, ~30 MB of the 54 MB pak) and the client reads none of it: the
+        # compiled *.vnmclip_c holds the sampled tracks (decompiled and checked:
+        # tail_0..tail_end position and orientation tracks are in there).  The pinned
+        # Shiv pak's own sources are a leftover of how it was built, not a requirement.
+        if name.endswith((".dmx", ".vnmclip", ".vnmskel", ".vmdl")):
             continue
         if name.endswith(MODEL_SUFFIXES):
-            files.append(path)
-            continue
-        # Sources are a separate decision: only their own suffixes qualify, so
-        # `--include-sources` cannot silently start shipping a .vmat or a thumbnail.
-        if include_sources and name.endswith(SOURCE_SUFFIXES):
             files.append(path)
             continue
         if include_materials and name.endswith(MATERIAL_SUFFIXES):
             files.append(path)
     return files
+
+
+def _sources_under(root: Path) -> list[Path]:
+    return [
+        path for path in sorted(root.rglob("*"))
+        if path.is_file() and path.name.endswith((".dmx", ".vnmclip"))
+    ]
 
 
 def main() -> int:
@@ -75,7 +79,6 @@ def main() -> int:
     parser.add_argument("--include-materials", action="store_true")
     parser.add_argument("--skip-gate", action="store_true", help="diagnostics only; never for a release")
     parser.add_argument("--clips", default="", help="merged clip DMX the gate reads; needs a DmeModel per clip")
-    parser.add_argument("--include-sources", action="store_true", help="ship .dmx/.vnmclip like the pinned pak")
     parser.add_argument(
         "--game-skeleton",
         default="",
@@ -160,17 +163,32 @@ def main() -> int:
                 "the pak would ship clips the gate never read",
             )
 
-    files = _selected(root, args.include_materials, args.include_sources)
+    files = _selected(root, args.include_materials)
     if not files:
         raise SystemExit(f"nothing to pack under {root}")
+    excluded_sources = _sources_under(root)
+    if excluded_sources:
+        print(f"SOURCES-EXCLUDED {len(excluded_sources)} uncompiled .dmx/.vnmclip are not packed", flush=True)
 
-    # A pak must carry the compiled skeleton.  Without it the client animates a
-    # tailed model with the game's own rig and the tail never moves.
-    if not any(path.name.endswith(".vnmskel_c") for path in files):
+    # Whether a skeleton ships is a measured decision, not a preference.  The structure the
+    # owner accepted on 2026-11-15 01:19/01:26 (`haze_noskel.vpk`, sha256 b849c6bf…, visible
+    # tail and cloth chain, no tail motion) ships NO skeleton: the client keeps the game's own
+    # rig, which is why the body was coherent everywhere.  Bundling one is only allowed when
+    # the gate proves it is slot- and frame-identical to the model (skeleton-slots-differ-
+    # from-model / skeleton-rest-differs-from-model); it can never be assumed.
+    # The pinned Shiv pak ships its skeleton (`shiv_tailbones.dmx` + `.vnmskel_c`), and the owner's
+    # correction is explicit: "we can have the fucking vnmskeleton included literally look at the shiv
+    # vpk in its slot".  So a release ships one.  What is not allowed is a skeleton whose slots or
+    # frames disagree with the model — the gate refuses that as `skeleton-slots-differ-from-model`
+    # and `skeleton-rest-differs-from-model`, which is how the 15:18/15:36 builds became impossible.
+    skeleton_shipped = any(path.name.endswith(".vnmskel_c") for path in files)
+    if not skeleton_shipped:
         raise SystemExit(
-            "refused skeleton-not-shipped: the addon has no compiled *.vnmskel_c; "
-            "a tailed model without its skeleton is animated by the game's own rig"
+            "refused skeleton-not-shipped: the addon has no compiled *.vnmskel_c. The pinned Shiv pak "
+            "ships its skeleton and so does a Haze release; without one the client animates the model "
+            "with the game's own rig and the tail never moves."
         )
+    print("SKELETON shipped", flush=True)
 
     # Materials the game already provides are never shipped: they shadow pak01
     # with a half-compiled copy and cost a port its surfaces.

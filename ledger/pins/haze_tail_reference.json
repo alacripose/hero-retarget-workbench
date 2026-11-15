@@ -1,0 +1,20 @@
+{
+  "addon": "haze_tail",
+  "hero": "haze",
+  "status": "known-good reference",
+  "pak": "artifacts\\haze-tail\\haze_noskel.vpk",
+  "sha256": "b849c6bfdeff91ebb700771970e5a2f14b9b54e0b8e164f415634b8e99199746",
+  "blake3": "blake3:ce3c20c29c83119691375d5dd68a2e2781912becd960a05e4c39fd6585dc371a",
+  "bytes": 4274141,
+  "installed_as": "D:\\SteamLibrary\\steamapps\\common\\Deadlock\\game\\citadel\\addons\\pak97_dir.vpk",
+  "owner_witness": {
+    "at": "2026-11-15T01:19:56 and 01:26:16",
+    "screenshots": [
+      "<home>/Pictures/Screenshots/Screenshot 2026-11-15 011956.png",
+      "<home>/Pictures/Screenshots/Screenshot 2026-11-15 012616.png"
+    ],
+    "observed": "visible tail with the cloth chain, no tail motion (acceptable: Tengu has one clip with tail motion), skeleton correct everywhere"
+  },
+  "structure": "model and clips, no bundled *.vnmskel: the game keeps its own skeleton for Haze",
+  "note": "This is the state to restore to and derive from. Every later build that bundled its own skeleton either rotated the head and arms (skeleton frame != clip frame) or tore the body into flat wedges (model document's joint list shifted against the meshes it binds by index)."
+}

@@ -235,6 +235,23 @@ def _channel_values_equal(datamodel, left: Path, right: Path) -> bool:
     return bool(shared) and all(left_samples[key] == right_samples[key] for key in shared)
 
 
+def _mesh_names(datamodel, path: Path) -> list[str]:
+    """Mesh element names in a document (empty for a skeleton document)."""
+    table = _joint_table(datamodel, path)
+    del table  # the walk below is the measurement; _joint_table proves the file loads
+    root = datamodel.load(str(path)).root
+    names: list[str] = []
+
+    def visit(element) -> None:
+        for child in element["children"] if "children" in element.keys() else []:
+            if getattr(child, "type", "").startswith("DmeMesh"):
+                names.append(child.name)
+            visit(child)
+
+    visit(root["skeleton"] if "skeleton" in root.keys() else root)
+    return names
+
+
 def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", game_model: str = "") -> dict:
     datamodel = _datamodel()
     vmdl = next(iter(sorted(root.rglob("*.vmdl"))), None)
@@ -379,10 +396,86 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
                 "a rest in a mesh document is where the mesh was skinned, so the body deforms",
             )
 
+    # 2c-1. The document the .vnmskel names must be a skeleton document, not the model.
+    #      The 2026-11-15 15:18 pak pointed `haze.vnmskel` at the mesh+skeleton document
+    #      (`haze_model_tail.dmx`), whose pelvis rest sits in the body's own frame: the
+    #      game's skeleton document has that pelvis 90 deg the other way, so every joint
+    #      was read in the wrong frame and the body lay on the floor while the mesh and
+    #      the clips each looked right on their own.  A skeleton document carries joints;
+    #      a model document carries DmeMesh children.
     game_skeleton = Path(game_skeleton) if game_skeleton else None
+    skeleton_meshes = _mesh_names(datamodel, skeleton_dmx)
+    if skeleton_meshes:
+        raise Refused(
+            "skeleton-document-carries-meshes",
+            f"{skeleton_dmx.name} is a model document ({len(skeleton_meshes)} meshes: {skeleton_meshes[:3]}), not a skeleton; "
+            "the game's own skeleton is a separate document with its own joint frame, and naming a model here binds every clip in the model's frame",
+        )
+    # 2c-2. A bundled skeleton must describe the SAME joints, in the same slots, as the
+    #      model document that binds the meshes, and in the same frames.  Two shipped
+    #      failures bracket this:
+    #        * the game's own `haze_skel.dmx` carries `pelvis` in a frame 90 deg from the
+    #          model's (head [0, 53.9, -0.48] identity vs [-0.48, 0, 53.9] rotated) and
+    #          inserts `weaponHand_L/R` where the meshes have `attachWorld`; shipping it as
+    #          our skeleton rotated the head and arms and, with the model's list re-synced
+    #          to it, tore the body into flat wedges (2026-11-15 15:18 and 15:36 builds);
+    #        * the reference build the owner accepted (01:23 pak, visible tail and cloth
+    #          chain, no tail motion) ships NO skeleton at all and lets the game keep its
+    #          own rig, which is why it was coherent everywhere.
+    #      Neither is a preference: the client binds a mesh by index into the model's list.
+    # An object-like joint is the armature object the extraction writes beside the bones
+    # ("haze_body", "DMF Tail"); the client does not bind it.
+    object_like = lambda name: " " in name or name.startswith("DMF ")  # noqa: E731
+    shipped_table = _joint_table(datamodel, skeleton_dmx)
+    model_table = _joint_table(datamodel, model_dmx)
+    shipped_order = [name for name in shipped_table["__order__"]["order"] if not object_like(name)]
+    model_view = [name for name in model_table["__order__"]["order"] if not object_like(name)]
+    slot_limit = min(len(shipped_order), len(model_view))
+    slot_shift = [
+        (index, model_view[index], shipped_order[index])
+        for index in range(slot_limit)
+        if model_view[index] != shipped_order[index]
+    ]
+    if slot_shift:
+        raise Refused(
+            "skeleton-slots-differ-from-model",
+            f"{skeleton_dmx.name} disagrees with {model_dmx.name} from slot {slot_shift[0][0]} "
+            f"(model has {slot_shift[0][1]!r}, skeleton has {slot_shift[0][2]!r}; "
+            f"{len(slot_shift)} slots differ); a mesh binds by index into the model's joint list, "
+            "so every joint after the first shift is read from the wrong bone",
+        )
+    frame_shift = []
+    for name in model_view:
+        here, there = shipped_table.get(name), model_table.get(name)
+        if not here or not there:
+            continue
+        delta = max(abs(a - b) for a, b in zip(here["head"], there["head"]))
+        dot = abs(sum(a * b for a, b in zip(here["orientation"], there["orientation"])))
+        if delta > 0.01 or (1.0 - dot) > 2e-3:
+            frame_shift.append((name, round(delta, 4), round(1.0 - dot, 4)))
+    if frame_shift:
+        raise Refused(
+            "skeleton-rest-differs-from-model",
+            f"{len(frame_shift)} joints of {skeleton_dmx.name} sit in a different frame than the model "
+            f"(e.g. {frame_shift[:3]}); the clips are sampled against the skeleton's frames while the mesh is "
+            "bound to the model's, so the body is read rotated or lying down",
+        )
     if game_skeleton is not None and game_skeleton.is_file():
         stock_table = _joint_table(datamodel, game_skeleton)
-        stock_order = [name for name in stock_table["__order__"]["order"] if name in set(skeleton_joints)]
+        # `pelvis` is exempt on purpose, and this is measured, not a preference: the model's
+        # `root_motion` carries the authored 90 deg (orientation [0.5, 0.5, 0.5, 0.5]) while the
+        # game's own skeleton puts that rotation on the pelvis link instead (pelvis head
+        # [0, 53.9, -0.48], identity).  Parenting our pelvis under `root_motion` applied the 90 deg
+        # twice and laid the body flat (2026-11-15, the Shiv pelvis re-parent entry in this file).
+        # Every other parent must still match the game's.
+        # `weaponHand_L/R` are exempt for a different reason: they carry no vertex weights in
+        # this port (the body and tail meshes have no such joints at all), they exist only so the
+        # game's own bone masks resolve, and they are appended *after* the last mesh joint so they
+        # cannot shift a slot.  Their parent is kept where the append put it (`hand_L/hand_R`)
+        # because moving them into `arm_*_IKTARGET`'s children changes the walk order, which is the
+        # slot order — the exact shift this file now refuses.
+        exempt = {"pelvis", "weaponHand_L", "weaponHand_R"}
+        stock_order = [name for name in stock_table["__order__"]["order"] if name in set(skeleton_joints) and name not in exempt]
         parent_differs = [
             (name, stock_table[name]["parent"], parents.get(name))
             for name in stock_order
@@ -428,6 +521,65 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
             "joint-order-diverges",
             f"{len(out_of_order)} model joints appear in a different order in {skeleton_dmx.name}: {out_of_order[:8]}",
         )
+
+    # 3a. A model document carries its skeleton twice: the DmeModel tree the client walks and
+    #     a flat `jointList`.  When they hold different counts the document has been grafted
+    #     twice — 2026-11-15's `haze_tailbones4.fixed.dmx` walked 131 joints while its
+    #     `jointList` carried 260 elements, so slot indices and names disagreed and the
+    #     ordering refusals fired on joints nobody had touched.  Count elements, not names.
+    if True:
+        def _counts(datamodel, path):
+            root = datamodel.load(str(path)).root
+            model = root["skeleton"] if "skeleton" in root.keys() else root
+            walked = 0
+            stack = [model]
+            while stack:
+                node = stack.pop()
+                for child in node["children"] if "children" in node.keys() else []:
+                    if getattr(child, "type", "") == "DmeJoint":
+                        walked += 1
+                    stack.append(child)
+            listed = 0
+            if "jointList" in model.keys():
+                listed = sum(1 for child in model["jointList"] if getattr(child, "type", "") == "DmeJoint")
+            return walked, listed
+
+        walked, listed = _counts(datamodel, model_dmx)
+        unique = len({name for name in _joint_table(datamodel, model_dmx)["__order__"]["order"]})
+        if walked != unique:
+            raise Refused(
+                "model-duplicate-joint-elements",
+                f"{model_dmx.name} carries {walked} joint elements for {unique} distinct joints "
+                f"(jointList {listed}): the document was grafted more than once. The names dedupe, so the "
+                "name-based checks stay quiet, but a mesh binds by element index and the extra elements shift "
+                "every later slot",
+            )
+        if listed and listed != walked:
+            raise Refused(
+                "model-jointlist-differs-from-tree",
+                f"{model_dmx.name} walks {walked} joints but its `jointList` holds {listed}: the document was "
+                "grafted more than once, so a slot index and a joint name disagree and every binding after the "
+                "first extra element is wrong",
+            )
+
+    # 3b. A mesh binds by index into the model document's joint list, so the two lists
+    #     must agree slot by slot.  The 15:36 build's model document inserted
+    #     `weaponHand_L/R` at indices 6 and 8 while every mesh (and the game's own body)
+    #     has `attachWorld` at 6: every joint after that was read two slots off and the
+    #     body tore into flat wedges lying on the floor.  This is not an order preference,
+    #     it is the index the vertex weights name.
+    model_order = _joint_table(datamodel, model_dmx)["__order__"]["order"]
+    for mesh_name, mesh in _render_meshes(root, vmdl):
+        mesh_order = _joint_table(datamodel, mesh)["__order__"]["order"]
+        limit = min(len(model_order), len(mesh_order))
+        shifted = [(index, mesh_order[index], model_order[index]) for index in range(limit) if mesh_order[index] != model_order[index]]
+        if shifted:
+            raise Refused(
+                "model-joint-order-differs-from-mesh",
+                f"{model_dmx.name} and {Path(mesh).name} disagree from slot {shifted[0][0]} "
+                f"(mesh has {shifted[0][1]!r}, model has {shifted[0][2]!r}; {len(shifted)} slots differ); "
+                "a mesh binds by index into the model's joint list, so every joint after the first shift is read from the wrong bone and the mesh is torn apart",
+            )
 
     # 6b. Every shipped clip must carry the shipped skeleton's own track count.  A
     #     clip authored on another skeleton is bound by index, so the head and arms

@@ -2798,3 +2798,41 @@ properly we could have a better time, which will help when we get to the aim mat
 - **For the aim matrixes.** The proof carries a per-check token and a world digest over the clip manifest,
   so an aim cell that is the game's own bytes (the 15 stock cells already overlay-compiled) can be proven
   as such rather than asserted, and a re-derived cell cannot pass as the game's.
+
+## 2026-11-15 — the skeleton ships; what must match is its slots and frames
+
+**Owner correction, verbatim:** *"we can have the fucking vnmskeleton included literally look at the shiv
+vpk in its slot"*.
+
+- **Corrected, and it was my error in this file.** I had written the 01:19/01:26 reference build as
+  "ships no skeleton, therefore no skeleton". The pinned Shiv pak ships `shiv.vnmskel_c` and
+  `dmx/mesh/shiv_tailbones.dmx` beside its model, so a Haze release ships one too. `tail_release_pack.py`
+  refuses `skeleton-not-shipped` again.
+- **What actually has to hold**, both measured this session:
+  * a clip against the skeleton: `clip 131 vs skeleton 131 … equal True` (`dmx_joint_sets --pair`), the
+    Shiv calibration is `168 = 168`;
+  * the model document against every mesh it binds: same joint names in the same **slots**. The 15:36
+    model document had `weaponHand_L` at slot 6 where the body, the tail and the game's own
+    `haze_body.dmx` have `attachWorld`, so 90 of 129 slots were off and the body tore into flat wedges;
+  * the skeleton against the model: same slots (`skeleton-slots-differ-from-model`) and same frames
+    (`skeleton-rest-differs-from-model`, 0.01 unit / ~3.6°). The game's own `haze_skel.dmx` cannot be the
+    skeleton here: `pelvis` sits at `[0, 53.9094, -0.482]` with identity orientation against the model's
+    `[-0.482, 0, 53.9094]` rotated, and it has no `weaponHand` at all.
+- **Two shapes are now refusals, proven on the shipped bytes.** `haze-gate-negskeleton.json`:
+  `REFUSE skeleton-slots-differ-from-model … from slot 17 … 90 slots differ`.
+  `haze-gate-v6.json`: `REFUSE joint-order-diverges: 7 model joints appear in a different order in
+  haze_tailbones.dmx: ['finger_thumb_0_L', 'magazine_L', 'magazine_R', 'finger_ring_2_L', 'head_end',
+  'finger_thumb_end_L', 'weaponHand_L']` — the shipped model document's joint *tree* order and the union
+  of the render meshes' orders disagree at exactly the prop/finger joints, which is the next thing to
+  settle before a skeleton can ship.
+- **New tools from this pass.** `tools/skeleton_union.py` appends the joints the render meshes declare and
+  the model lacks, always at the end so no slot moves — with the flat-`jointList` walk that makes it see
+  the gun meshes' `magazine_L/R` and finger ends at all. `tools/clip_joint_align.py --prune-extras`
+  removes export leaves so a clip's list is the skeleton's (`131 → 129`, `equal True`).
+  `tools/skeleton_fix_parents.py --authored-frame` fixes only the tail chain, leaving every parent, frame
+  and slot where the document authored it.
+- **State.** `pak97_dir.vpk` is the 01:23 reference (`haze_noskel.vpk`, sha256 `b849c6bf…`, 4,274,141
+  bytes), pinned with the owner's two screenshots in `ledger/pins/haze_tail_reference.json`. No new build
+  was installed: the gate refuses every combination produced so far, and shipping another one would repeat
+  the failure the owner is looking at.
+- **Not checked.** The restored pak in game this session; the union/skeleton candidate in game.

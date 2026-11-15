@@ -66,8 +66,21 @@ def main() -> int:
         action="store_true",
         help="also copy the stock document's rest for shared joints (experiment only: a mesh document's rest is its bind)",
     )
+    parser.add_argument(
+        "--authored-frame",
+        action="store_true",
+        help=(
+            "keep the document's own frames and joint order: only the tail chain is fixed. "
+            "Copying the game skeleton's parents put `pelvis` under `root_motion` (a 90 deg "
+            "root) so the body lay down, and re-syncing `jointList` inserted `weaponHand_L/R` "
+            "at indices 6 and 8 while every mesh has `attachWorld` there: a mesh binds by index "
+            "into the model document, so every joint after 6 was read two slots off and the "
+            "body tore apart (2026-11-15 15:18 and 15:36 builds)"
+        ),
+    )
     args = parser.parse_args(argv)
     fix_rest = bool(args.fix_rest)
+    authored = bool(args.authored_frame)
 
     datamodel = _datamodel()
     from tail_release_audit import _joint_table  # noqa: WPS433
@@ -104,13 +117,14 @@ def main() -> int:
     # name (a leaf this port added, `head_end`, `ball_end_L`) keeps its place; only
     # the joints with a measured defect are re-pointed.
     wanted: dict[str, str | None] = dict(parents)
-    for name in order:
-        if name in stock["__order__"]["order"]:
-            wanted[name] = stock[name]["parent"]
+    if not authored:
+        for name in order:
+            if name in stock["__order__"]["order"]:
+                wanted[name] = stock[name]["parent"]
     for index_, name in enumerate(tail_order):
         if name in elements:
             wanted[name] = tail_order[index_ - 1] if index_ else "pelvis"
-    if "pelvis" in stock["__order__"]["order"]:
+    if not authored and "pelvis" in stock["__order__"]["order"]:
         wanted["pelvis"] = stock["pelvis"]["parent"]
 
     changed = [
@@ -148,38 +162,55 @@ def main() -> int:
     # this port added. Re-parenting weaponHand under arm_*_IKTARGET without the
     # sibling order made the gate's `joint-order-diverges` fire: two joints in the
     # wrong place in a list the client binds by index.
-    ordered_names: list[str] = [name for name in stock["__order__"]["order"] if name in elements]
-    ordered_names += [name for name in tail_order if name in elements and name not in set(ordered_names)]
-    ordered_names += [name for name in order if name not in set(ordered_names)]
-    rank = {name: place for place, name in enumerate(ordered_names)}
-    for element in [model, *elements.values()]:
-        if "children" not in element.keys():
-            continue
-        # The model element is a root: joints whose parent is None hang off it.
-        owner = None if element is model else getattr(element, "name", None)
-        kept = [child for child in element["children"] if getattr(child, "type", "") != "DmeJoint"]
-        attached = [
-            elements[name]
-            for name in sorted(elements, key=lambda key: rank.get(key, 10_000))
-            if wanted.get(name) == owner
-        ]
-        element["children"] = datamodel.make_array(kept + attached, datamodel.Element)
-
-    # The document carries the skeleton twice: the DmeModel tree the client walks and
-    # a flat `jointList` under `root["skeleton"]`. Rebuilding only the tree left the
-    # list in the old order and the gate saw an order divergence between the model's
-    # list and the skeleton's tree. Both views must be the same order.
+    if authored:
+        # Only the tail chain moves.  Every joint keeps the slot it already held, so a
+        # mesh that binds by index into this list is untouched (see --authored-frame).
+        parented = 0
+        for element in [model, *elements.values()]:
+            if "children" not in element.keys():
+                continue
+            owner = None if element is model else getattr(element, "name", None)
+            kept = [child for child in element["children"] if getattr(child, "type", "") != "DmeJoint"]
+            mine = [
+                child
+                for child in element["children"]
+                if getattr(child, "type", "") == "DmeJoint" and wanted.get(child.name) == owner
+            ]
+            parented += len(mine)
+            element["children"] = datamodel.make_array(kept + mine, datamodel.Element)
     joint_list_synced = False
-    walk_order: list[str] = []
-    walk_parents: dict[str, str | None] = {}
-    _walk(model, None, walk_order, walk_parents)
-    skeleton_element = document.root["skeleton"] if "skeleton" in document.root.keys() else None
-    if skeleton_element is not None and "jointList" in skeleton_element.keys():
-        existing = list(skeleton_element["jointList"])
-        flat = [elements[name] for name in walk_order if name in elements]
-        if len(flat) == len(existing):
-            skeleton_element["jointList"] = datamodel.make_array(flat, datamodel.Element)
-            joint_list_synced = True
+    if not authored:
+        ordered_names: list[str] = [name for name in stock["__order__"]["order"] if name in elements]
+        ordered_names += [name for name in tail_order if name in elements and name not in set(ordered_names)]
+        ordered_names += [name for name in order if name not in set(ordered_names)]
+        rank = {name: place for place, name in enumerate(ordered_names)}
+        for element in [model, *elements.values()]:
+            if "children" not in element.keys():
+                continue
+            # The model element is a root: joints whose parent is None hang off it.
+            owner = None if element is model else getattr(element, "name", None)
+            kept = [child for child in element["children"] if getattr(child, "type", "") != "DmeJoint"]
+            attached = [
+                elements[name]
+                for name in sorted(elements, key=lambda key: rank.get(key, 10_000))
+                if wanted.get(name) == owner
+            ]
+            element["children"] = datamodel.make_array(kept + attached, datamodel.Element)
+
+        # The document carries the skeleton twice: the DmeModel tree the client walks and
+        # a flat `jointList` under `root["skeleton"]`. Rebuilding only the tree left the
+        # list in the old order and the gate saw an order divergence between the model's
+        # list and the skeleton's tree. Both views must be the same order.
+        walk_order: list[str] = []
+        walk_parents: dict[str, str | None] = {}
+        _walk(model, None, walk_order, walk_parents)
+        skeleton_element = document.root["skeleton"] if "skeleton" in document.root.keys() else None
+        if skeleton_element is not None and "jointList" in skeleton_element.keys():
+            existing = list(skeleton_element["jointList"])
+            flat = [elements[name] for name in walk_order if name in elements]
+            if len(flat) == len(existing):
+                skeleton_element["jointList"] = datamodel.make_array(flat, datamodel.Element)
+                joint_list_synced = True
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
