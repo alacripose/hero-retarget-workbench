@@ -42,7 +42,16 @@ def test_clip_header_scan_finds_tail_bones_without_opening_the_dmx(tmp_path):
     path = tmp_path / "aim_idle.dmx"
     path.write_bytes(
         b"<!-- dmx encoding binary 9 format model 22 -->\0"
-        b'"DmeJoint"\0"tail_0"\0"tail_1"\0"tail_end"\0"weapon_target_tail"\0"pelvis"\0'
+        b"DmeJoint\0tail_0\0tail_1\0tail_end\0weapon_target_tail\0pelvis\0"
+    )
+    assert tails.dmx_bone_names(path) == ["tail_0", "tail_1", "tail_end"]
+
+
+def test_quoted_text_dmx_still_finds_tail_bones(tmp_path):
+    path = tmp_path / "aim_idle.dmx"
+    path.write_bytes(
+        b"<!-- dmx encoding text format model 22 -->\0"
+        b'"DmeJoint"\0"tail_0"\0"tail_1"\0"tail_end"\0"pelvis"\0'
     )
     assert tails.dmx_bone_names(path) == ["tail_0", "tail_1", "tail_end"]
 
@@ -77,7 +86,7 @@ class TailClipScanTests(unittest.TestCase):
             target = Path(folder) / "aim_idle.dmx"
             target.write_bytes(
                 b"<!-- dmx encoding binary 9 format model 22 -->\0"
-                b'"DmeJoint"\0"tail_0"\0"tail_1"\0"tail_end"\0"weapon_target_tail"\0"pelvis"\0'
+                b"DmeJoint\0tail_0\0tail_1\0tail_end\0weapon_target_tail\0pelvis\0"
             )
             self.assertEqual(tails.dmx_bone_names(target), ["tail_0", "tail_1", "tail_end"])
 

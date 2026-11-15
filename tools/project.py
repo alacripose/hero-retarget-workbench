@@ -140,6 +140,56 @@ def gate_checks(
         == "3ae7d805f6789a6402acb70ad4096a85a56bf6804eaf25c0493ac697548d30b5",
         (dependency.stdout + dependency.stderr).strip()[-2000:],
     ))
+    # The owner's refusal: no durable record may name a budget, context window,
+    # session length or elapsed time as a reason work stopped, shrank or was called
+    # done.  The check runs the scanner; the selftest proves each refusal fires, in
+    # the family convention (openlock_modern capability/parity refusals).
+    effort = subprocess.run(
+        [sys.executable, "tools/effort_refusals.py", "check"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    checks.append(_check("no effort caveats", effort.returncode == 0, (effort.stdout + effort.stderr).strip()[-2000:]))
+    effort_selftest = subprocess.run(
+        [sys.executable, "tools/effort_refusals.py", "selftest"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    checks.append(_check(
+        "effort refusal selftest",
+        effort_selftest.returncode == 0,
+        (effort_selftest.stdout + effort_selftest.stderr).strip()[-2000:],
+    ))
+    tail_gate = subprocess.run(
+        [sys.executable, "tools/tail_vnmclip_gate.py"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if tail_gate.returncode == 2:
+        checks.append(Check("tail vnmclip gate", "skip", (tail_gate.stdout + tail_gate.stderr).strip()[-2000:]))
+    else:
+        checks.append(_check("tail vnmclip gate", tail_gate.returncode == 0, (tail_gate.stdout + tail_gate.stderr).strip()[-2000:]))
+    # The gate proves whatever ports are pinned, not one hero's pak.  A pin under
+    # ledger/pins/ carries the pak, its bytes, the port receipt and optionally a
+    # bespoke audit; the Shiv release audit is just one pin now.
+    pins = sorted((ROOT / "ledger" / "pins").glob("*.json"))
+    if not pins:
+        checks.append(Check("port gate", "skip", "no pins under ledger/pins"))
+    for pin in pins:
+        port = subprocess.run(
+            [sys.executable, "tools/port_gate.py", "--pin", str(pin)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        label = f"port gate {pin.stem}"
+        if port.returncode == 2:
+            checks.append(Check(label, "skip", (port.stdout + port.stderr).strip()[-2000:]))
+        else:
+            checks.append(_check(label, port.returncode == 0, (port.stdout + port.stderr).strip()[-2000:]))
     checks.extend(
         run_lane(
             blender=blender,

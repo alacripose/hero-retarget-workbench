@@ -113,9 +113,9 @@ def main() -> int:
         if "hero_retarget_workbench.forge.paths" not in bundled["paths"].__name__:
             raise RuntimeError(f"core imported the stale forge module: {bundled['paths'].__name__}")
 
-        panels = len(dmf.ui.CLASSES)
-        if panels != 17:
-            raise RuntimeError(f"expected 17 panel classes, found {panels}")
+        panels = len(dmf.ui.CLASSES) + len(dmf.ui_mods.CLASSES)
+        if panels != 20:
+            raise RuntimeError(f"expected 20 panel classes, found {panels}")
         # Every sidebar page panel gets a properties twin, under one root. The
         # sidebar's own root has no page, so the twins count is one less than the
         # panel count, not one more.

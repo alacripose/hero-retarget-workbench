@@ -1,0 +1,24 @@
+{
+  "addon": "haze_tail",
+  "hero": "haze",
+  "status": "candidate",
+  "pak": "artifacts/haze-tail/haze_tail.vpk",
+  "sha256": "b0eb8dcbf2f865727f64d3423f84b3d95ff94ab4bf4ff504d1b213c02e543181",
+  "bytes": 15238292,
+  "receipt": "artifacts/receipts/tail-port-haze-build.json",
+  "skeleton": "artifacts/haze-tail/build/models/heroes_staging/haze/dmx/mesh/haze_tailbones.dmx",
+  "tail_bones": [
+    "tail_0",
+    "tail_1",
+    "tail_2",
+    "tail_3",
+    "tail_4",
+    "tail_5",
+    "tail_6",
+    "tail_7"
+  ],
+  "moving_clips": [
+    "item_stand_idle"
+  ],
+  "note": "Haze + Tengu tail, compiled. Candidate: the client crashes after the hero loads with a tailed skeleton, so nothing is installed from it."
+}
