@@ -151,6 +151,12 @@ def _import_one(settings, entry) -> str:
     bpy.context.view_layer.objects.active = armature
     if bpy.context.object is not None and bpy.context.object.mode != "OBJECT":
         bpy.ops.object.mode_set(mode="OBJECT")
+    # PulseSrcOps 5.4 appends an animation to the active action by adding a
+    # slot.  Leaving the previous clip active therefore folded every later
+    # clip into it and created no new action.  Detach it so Pulse starts a new
+    # action for this clip.
+    if armature.animation_data is not None:
+        armature.animation_data.action = None
     source2.import_dmx(path, append="APPEND")
     created = [action for action in bpy.data.actions if action.name not in before]
     if not created:
@@ -313,8 +319,14 @@ def _dmx_files(root: Path) -> dict[Path, int]:
     return found
 
 
-def write_action(settings, entry, destination: Path) -> Path:
-    """Write one imported action back under its animgraph's source folder."""
+def write_action(settings, entry, destination: Path, *, target: Path | None = None) -> Path:
+    """Write one imported action back under its animgraph's source folder.
+
+    ``target`` names an exact file when an AnimGraph 2 document already points at
+    a source DMX elsewhere (``dmx/animation/primary_idle.dmx`` instead of the
+    preview clip in ``clips/``).  Without it the historical ``clips/<label>.dmx``
+    layout is used.
+    """
     armature = _armature(settings)
     from . import ikops
 
@@ -330,7 +342,8 @@ def write_action(settings, entry, destination: Path) -> Path:
     scene = bpy.context.scene
     if not hasattr(armature, "vs") or not hasattr(scene, "vs"):
         raise RuntimeError("clip-export-needs-pulsesrcops: enable the PulseSrcOps extension")
-    target = clipscan.written_path(destination, entry.label, entry.ag)
+    target = Path(target) if target is not None else clipscan.written_path(destination, entry.label, entry.ag)
+    export_root = target.parent.parent if target is not None else Path(destination)
     target.parent.mkdir(parents=True, exist_ok=True)
     before = _dmx_files(target.parent)
     saved = _snapshot(scene, armature)
@@ -346,7 +359,7 @@ def write_action(settings, entry, destination: Path) -> Path:
         data.action = action
         if getattr(action, "slots", None):
             data.action_slot = action.slots[0]
-        scene.vs.export_path = str(destination) + os.sep
+        scene.vs.export_path = str(export_root) + os.sep
         scene.vs.export_format = "DMX"
         scene.vs.engine = "SOURCE"
         scene.vs.dmx_format = "22_modeldoc"

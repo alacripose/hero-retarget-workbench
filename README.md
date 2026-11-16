@@ -158,13 +158,32 @@ tails and for the live heroes the first extracted-folder scan never reached.
 
 Each discovered chain is a tile with a generated preview of its rest shape, in a
 three-column grid of small previews rather than two stretched panes. Select a tile
-to load that skeleton as the tail rig, then press **Pair hero tail bones**. The
-page keeps the selected source visible and has two named writes: **Write selected
-clip to tail** uses the **Source clip** picker, and **Write every <hero> clip to
-tail** only includes clips tagged with the current hero. Loading a tile before the
-hero is imported is allowed: the preview is available immediately and the channel
-map waits for the hero. The pairing is still experimental local-space transfer,
-and the page says so.
+and press **Add tail to N clips**. The automatic pass appends that source's tail
+rest bones to the current hero skeleton, imports every gameplay `clips/*.vnmclip`
+whose source DMX exists, matches the source extraction's own clips by label, and
+keys the source tail bones into each hero action. It runs one clip per timer step,
+so a long clip list does not freeze the window. Clips without a same-named source
+clip are counted and left alone rather than guessed.
+
+This is the normal path for a hero that has no tail of its own, such as Werewolf's
+tail on Shiv. The source's clips stay inside that source's extraction; the pass
+does not take a same-named clip from an unrelated hero. **Manual channel map**
+keeps the old per-bone pairing and single-clip writes as an advanced fallback,
+not as a required sequence. Loading a tile before the hero is imported is allowed:
+the preview is available immediately and the automatic pass waits for the hero and
+its imported clips.
+
+The pass also prepares the compile skeleton from the body armature **with its
+skinned mesh**, so the appended tail keeps the body's rest orientation. It
+preserves the authored `root_motion` rotation: the body curves are relative to
+it, and stripping it puts the model on its side. When the pass finishes it
+writes each edited DMX over the path its `.vnmclip` names, then invokes the
+CSDK13 `resourcecompiler` for the whole set in one batch. The compiled
+`.vnmskel_c` stays beside the clips in the CSDK game addon so ModelDoc's clip
+preview can resolve the tail tracks; it is deliberately excluded from the packed
+VPK. The model's own skeleton already has the appended tail bones, so the
+shipped addon contains only the model and clips. The working 03:50 clip is
+pinned by `tools/tail_vnmclip_gate.py` and `python tools/project.py gate`.
 
 ### One clip list per hero
 

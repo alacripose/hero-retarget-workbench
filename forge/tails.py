@@ -56,12 +56,13 @@ def is_tail_bone(name: str) -> bool:
     return _tail_word(tokens)
 
 
-def dmx_bone_names(path: Path | str) -> list[str]:
-    """Tail-looking bone names from a binary or text DMX without importing it.
+def dmx_joint_names(path: Path | str) -> list[str]:
+    """Every name-table token in a binary or text DMX, without importing it.
 
     Source 2 DMX stores its element name table as NUL-separated ASCII before the
-    binary payload. Reading those tokens is enough to answer "does this clip
-    carry a tail?" even when the file is AG2 and no vnmskel was emitted.
+    binary payload, so the joint names a document carries can be read without a
+    Blender session.  This is the single reader; the tail filter is applied on
+    top of it below.
     """
     try:
         data = Path(path).read_bytes()
@@ -69,22 +70,21 @@ def dmx_bone_names(path: Path | str) -> list[str]:
         return []
     if not data.startswith(b"<!-- dmx"):
         return []
-    # The string table stores each element/bone name as one quoted token.  The
-    # old printable-run scan returned whole structural runs such as
-    # ``"name" "string" "owl_tail_0"``, which then became the chain label.
-    tokens = re.findall(rb'"([^"\r\n]{1,160})"', data)
+    tokens = re.findall(rb"[A-Za-z0-9_.\-]{1,160}", data)
     found: list[str] = []
     seen: set[str] = set()
     for raw in tokens:
         text = raw.decode("ascii", errors="ignore").strip()
-        if not text or not is_tail_bone(text):
+        if not text or text in seen:
             continue
-        key = text.lower()
-        if key in seen:
-            continue
-        seen.add(key)
+        seen.add(text)
         found.append(text)
     return found
+
+
+def dmx_bone_names(path: Path | str) -> list[str]:
+    """Tail-looking bone names from a binary or text DMX without importing it."""
+    return [name for name in dmx_joint_names(path) if is_tail_bone(name)]
 
 
 @dataclass(frozen=True)

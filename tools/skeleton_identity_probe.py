@@ -94,6 +94,7 @@ def main() -> int:
     )
     parser.add_argument("--keys", action="store_true", help="print a joint element's field names and exit")
     parser.add_argument("--walk", action="store_true", help="compare each document's tree walk with its own jointList")
+    parser.add_argument("--world-diff", action="store_true", help="every shared joint's world pose, reference vs candidate")
     parser.add_argument(
         "--world",
         default="",
@@ -118,6 +119,27 @@ def main() -> int:
         transform = joint["transform"]
         print(f"TRANSFORM type={type(transform).__name__} repr={repr(transform)[:300]}", flush=True)
         return 0
+    if args.world_diff:
+        from tail_release_gate import _joint_world_map  # noqa: WPS433
+
+        reference_world = _joint_world_map(module, Path(args.reference))
+        candidate_world = _joint_world_map(module, Path(args.candidate))
+        moved = []
+        for name, here in candidate_world.items():
+            there = reference_world.get(name)
+            if there is None:
+                continue
+            delta = max(abs(a - b) for row_a, row_b in zip(here, there) for a, b in zip(row_a, row_b))
+            if delta > 0.01:
+                moved.append((name, round(delta, 3)))
+        moved.sort(key=lambda item: -item[1])
+        print(
+            f"WORLD-DIFF {len(moved)} of {len(candidate_world)} joints differ "
+            f"(worst {moved[:6]})",
+            flush=True,
+        )
+        return 0
+
     if args.walk:
         from tail_release_gate import _joint_list_order, _joint_tree_order, _subsequence  # noqa: WPS433
 

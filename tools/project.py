@@ -190,7 +190,32 @@ def gate_checks(
             checks.append(Check(label, "skip", (port.stdout + port.stderr).strip()[-2000:]))
         else:
             checks.append(_check(label, port.returncode == 0, (port.stdout + port.stderr).strip()[-2000:]))
+    # The owner's boundary refuses are part of the gate, and they are red until every step of a
+    # port exists in the addon: `tools/addon_boundary.py` has no exemption list.
+    boundary_scan = subprocess.run(
+        [sys.executable, "tools/addon_boundary.py", "check"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    checks.append(_check(
+        "addon boundary",
+        boundary_scan.returncode == 0,
+        (boundary_scan.stdout + boundary_scan.stderr).strip()[-4000:],
+    ))
+    boundary_selftest = subprocess.run(
+        [sys.executable, "tools/addon_boundary.py", "selftest"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    checks.append(_check(
+        "addon boundary selftest",
+        boundary_selftest.returncode == 0,
+        (boundary_selftest.stdout + boundary_selftest.stderr).strip()[-2000:],
+    ))
     checks.append(_release_skeleton_identity_check())
+    checks.append(_release_installed_pak_check())
     checks.extend(
         run_lane(
             blender=blender,
@@ -247,6 +272,69 @@ def _release_skeleton_identity_check() -> Check:
             "head, arms and tail failure",
         )
     return Check("release skeleton identity", "pass", f"{newest.name}: 0 of {identity.get('game_joints')} game joints moved")
+
+
+def _release_installed_pak_check() -> Check:
+    """Refuse a repository whose installed pak is not the build this tree admitted.
+
+    2026-11-16: after an in-game look showed the admitted v10 collapsed on itself, the agent
+    copied an older vpk (`haze_tail_v9.vpk`) over `pak97_dir.vpk` by hand and left it there.
+    A hand-copied pak is not a release: it was built from different sources, its receipt proves
+    different bytes, and nothing in the repository noticed.  The installed bytes must be the
+    bytes of an ADMITTED pack report (`skeleton_identity` with 0/0) whose artifact still hashes
+    the same, so an older or hand-made pak cannot stand in for the current tree.
+    """
+    game = Path(r"D:/SteamLibrary/steamapps/common/Deadlock")
+    installed = game / "game" / "citadel" / "addons" / "pak97_dir.vpk"
+    if not installed.is_file():
+        return Check("release installed pak", "skip", f"no installed pak at {installed}")
+    reports = sorted(
+        (ROOT / "artifacts" / "receipts").glob("*pack*.json"),
+        key=lambda path: path.stat().st_mtime,
+    )
+    admitted = []
+    for report in reports:
+        try:
+            payload = json.loads(report.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        identity = payload.get("skeleton_identity")
+        if not isinstance(identity, dict):
+            continue
+        if identity.get("shifted") != 0 or identity.get("tree_shifted") != 0:
+            continue
+        if payload.get("sha256"):
+            admitted.append((report, payload))
+    if not admitted:
+        return Check("release installed pak", "fail", "no pack report with a zero-shift skeleton identity")
+    report, payload = admitted[-1]
+    installed_sha = _sha256_file(installed)
+    if installed_sha != payload.get("sha256"):
+        return Check(
+            "release installed pak",
+            "fail",
+            f"installed sha256 {installed_sha[:16] if installed_sha else None} is not the admitted "
+            f"build {payload.get('sha256', '')[:16]} from {report.name}; a hand-copied or older pak "
+            "is standing in for this tree and its receipt proves different bytes",
+        )
+    artifact = payload.get("vpk") or payload.get("out")
+    if artifact:
+        path = Path(artifact)
+        if not path.is_file():
+            path = ROOT / artifact
+        if path.is_file() and _sha256_file(path) != payload.get("sha256"):
+            return Check("release installed pak", "fail", f"{path} no longer hashes to its receipt")
+    return Check("release installed pak", "pass", f"installed bytes are {report.name} ({installed_sha[:16]})")
+
+
+def _sha256_file(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def write_status(checks: list[Check]) -> None:

@@ -44,6 +44,23 @@ def _resource_of(document: Path, extraction: Path) -> str:
     return rel[: -len(".vnmclip")] + ".vnmclip_c"
 
 
+def _staged_root(extraction: Path) -> Path:
+    """`models/<group>/<hero>` for an extraction that points at the hero's own folder.
+
+    `--extraction` is normally the hero directory itself, so `document.relative_to(extraction)`
+    starts at `clips/`.  Staging that at the addon root put a second copy of every compiled clip at
+    `<addon>/clips/` beside `<addon>/models/.../clips/`, and v14 shipped both (228 clips twice).
+    """
+    parts = extraction.parts
+    for index in range(len(parts) - 1, -1, -1):
+        if parts[index] == "models":
+            tail = parts[index + 1 :]
+            if len(tail) >= 2:
+                return Path("models").joinpath(*tail)
+            break
+    return Path("models")
+
+
 def _hero_dir(document: Path, extraction: Path) -> Path:
     """`models/<group>/<hero>` for a document under `<extraction>/.../clips`."""
     return document.parent.parent.relative_to(extraction)
@@ -164,7 +181,7 @@ def compile_documents(args: argparse.Namespace) -> int:
         if source is None:
             report["skipped"].append({"clip": clip, "why": "no m_sourceFilename"})
             continue
-        staged_document = addon / document.relative_to(extraction)
+        staged_document = addon / _staged_root(extraction) / document.relative_to(extraction)
         _copy(document, staged_document)
         _copy(merged_body, addon / source)
         resource = str(staged_document.relative_to(csdk / "content")).replace("\\", "/")

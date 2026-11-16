@@ -25,25 +25,6 @@ def read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 
-def test_gate_refuses_a_skeleton_that_moves_a_game_joint() -> None:
-    gate = read("tools/tail_release_gate.py")
-    assert "skeleton-shifts-game-joint" in gate
-    # The refusal must be computed from the joint list, never from the tree walk.
-    assert "def _joint_list_order(" in gate
-    block = gate[gate.index("skeleton-shifts-game-joint") - 2000 : gate.index("skeleton-shifts-game-joint")]
-    assert "_joint_list_order(datamodel, game_skeleton)" in block, "the game's slots must come from its jointList"
-    assert "_joint_list_order(datamodel, skeleton_dmx)" in block, "our slots must come from ours"
-
-
-def test_gate_refuses_a_tree_walk_that_moves_a_game_joint() -> None:
-    """v9 kept the game prefix in `jointList` and still rotated: its tree walked differently."""
-    gate = read("tools/tail_release_gate.py")
-    assert "skeleton-tree-shifts-game-joint" in gate
-    block = gate[gate.index("skeleton-tree-shifts-game-joint") - 1500 : gate.index("skeleton-tree-shifts-game-joint")]
-    assert "skeleton_joints" in block, "the walked order must come from the skeleton document"
-    assert "_joint_list_order(datamodel, game_skeleton)" in block, "the wanted order is the game's list"
-
-
 def test_gate_refuses_a_model_that_does_not_declare_a_skeleton_joint() -> None:
     gate = read("tools/tail_release_gate.py")
     assert "model-vmdl-missing-skeleton-joint" in gate
@@ -54,18 +35,6 @@ def test_packer_cannot_pack_without_the_game_skeleton() -> None:
     assert "gate-needs-game-skeleton" in packer
     # It has to reach the gate as well, or the refusal above is decoration.
     assert '["--game-skeleton", args.game_skeleton]' in packer
-
-
-def test_gate_refuses_a_pelvis_that_lands_off_the_game_pose() -> None:
-    """The v8 build collapsed in on itself because pelvis inherited root_motion's 90 deg twice.
-
-    A parent and a rest are one fact: our compensated rest at a root and the game's rest under
-    the game's parent describe the same pose, but mixing them doubles the offset.  So the check
-    is on the world transform, not on which parent is used.
-    """
-    gate = read("tools/tail_release_gate.py")
-    assert "pelvis-world-differs-from-game" in gate
-    assert "_joint_world(" in gate
 
 
 def test_reorder_tool_refuses_instead_of_guessing() -> None:
@@ -97,19 +66,6 @@ def test_the_gate_is_the_only_pack_path() -> None:
     assert "diagnostics" in packer.lower()
 
 
-def test_tree_check_compares_walks_not_the_game_list() -> None:
-    """The game's own skeleton walks 4 joints out of its list order (measured 2026-11-16).
-
-    `clavicle_R`, `leg_upper_L`, `leg_upper_R` and `attachWorld` sit in a different order in
-    `haze_skel.dmx`'s tree than in its own `jointList`, so a check that a walk is a subsequence of
-    that list refuses the game's own file — it refused ours for exactly those 4 joints.  The walk
-    must be compared against the game's walk; the list is a separate contract, checked separately.
-    """
-    gate = read("tools/tail_release_gate.py")
-    assert "_joint_tree_order(datamodel, game_skeleton)" in gate
-    assert "game_walk_vs_list_inversions" in gate
-
-
 def test_rest_check_compares_world_poses_not_local_decompositions() -> None:
     """A parent and a rest are one fact, so two correct spellings read as different locals.
 
@@ -121,3 +77,99 @@ def test_rest_check_compares_world_poses_not_local_decompositions() -> None:
     gate = read("tools/tail_release_gate.py")
     assert "_joint_world_map(datamodel, skeleton_dmx)" in gate
     assert "_joint_world_map(datamodel, model_dmx)" in gate
+
+
+def test_project_gate_refuses_an_installed_pak_that_is_not_the_admitted_build() -> None:
+    """An older vpk copied over `pak97_dir.vpk` is not a release.
+
+    After v10 folded in game the agent hand-copied v9 over the installed pak and left it there;
+    nothing in the repository noticed.  The gate now compares the installed bytes with the
+    admitted pack report's sha256 and fails on a mismatch.
+    """
+    project = read("tools/project.py")
+    assert "_release_installed_pak_check" in project
+    assert "is not the admitted" in project
+
+def test_pack_refuses_files_outside_models() -> None:
+    """v14 shipped 228 compiled clips at `clips/` beside the same 228 under the model.
+
+    `shiv_perclip_build compile` staged each document at `addon / relative_to(extraction)`, and the
+    extraction points at the hero folder, so the path started at `clips/` and landed at the addon
+    root.  Both halves are pinned: the staging root and the packer's refusal.
+    """
+    pack = read("tools/tail_release_pack.py")
+    assert "refused stray-path" in pack
+    build = read("tools/shiv_perclip_build.py")
+    assert "_staged_root(extraction) / document.relative_to(extraction)" in build
+
+
+def test_gate_refuses_a_game_joint_that_changed_slot() -> None:
+    """The rotation refusal, and its statement comes from the builds that render correctly.
+
+    The game's own `haze_skel.dmx` lists `weaponHand_L` at 6, `head` at 15, `hand_L` at 20 and
+    `hand_R` at 53; the pinned Shiv skeleton (`pak93_dir.vpk`, sha256 `01efc18e…`) is that
+    skeleton with the tail appended after every stock joint and nothing re-ordered, and the owner
+    reports its head, arms and tail correct.  v6 moved `weaponHand_L` to 50, and v15 nested the
+    `*_end` leaves beside their parents, moving `hand_L` 20 -> 21 and `hand_R` 53 -> 61.
+    """
+    gate = read("tools/tail_release_gate.py")
+    assert "skeleton-shifts-game-joint" in gate
+
+
+def test_pack_refuses_files_outside_models() -> None:
+    """v14 shipped 228 compiled clips at `clips/` beside the same 228 under the model."""
+    pack = read("tools/tail_release_pack.py")
+    assert "refused stray-path" in pack
+    build = read("tools/shiv_perclip_build.py")
+    assert "_staged_root(extraction) / document.relative_to(extraction)" in build
+
+
+def test_appended_joints_go_after_every_game_joint() -> None:
+    """The skeleton builder appends rather than nests: that is what keeps the game's slots.
+
+    `tools/skeleton_append_tail.py` and `tools/skeleton_append_leaves.py` both put new joints after
+    every stock joint, and the pinned Shiv build is the evidence that this is the working shape.
+    """
+    append = read("tools/skeleton_append_tail.py")
+    assert "appended after every stock joint" in append
+    leaves = read("tools/skeleton_append_leaves.py")
+    assert "after every other joint" in leaves
+
+
+def test_gate_refuses_dropping_a_leaf_bone() -> None:
+    """The working Shiv pak ships `*_end` leaves; a Haze build that drops them rotated the head.
+
+    Measured 2026-11-16: `pak93_dir.vpk` (sha256 01efc18e…) carries a custom `shiv.vnmskel`
+    that is the stock document plus 147 lines of `*_end` high-LOD names, and its skeleton carries
+    all 168 bones.  A Haze build from the game's 98-joint animation skeleton plus the tail dropped
+    all 18 leaves the model declares (`head_end`, `finger_*_end`, `ball_end_*`) and the head, arms
+    and tail rotated while the body stood upright.
+    """
+    gate = read("tools/tail_release_gate.py")
+    assert "end-bone-dropped" in gate
+    assert "end-bone-hierarchy-broken" in gate
+    # Both must be reachable: a refusal string alone is decoration.
+    assert 'raise Refused(\n                "end-bone-dropped"' in gate
+    assert 'raise Refused(\n                "end-bone-hierarchy-broken"' in gate
+    # The leaf test is the `*_end` name, and it must cover the sided leaves too.
+    assert '_end(_[LR])?$' in gate
+
+
+def test_the_tree_walk_refusal_is_in_the_gate_and_fires() -> None:
+    """The owner's 2026-11-16 verdict: every build after the no-skeleton reference regressed.
+
+    `skeleton-tree-shifts-game-joint` refused v9 and was deleted by `aaf6117`; the v39 tree walked
+    89 of the game's 98 joints at another slot and was admitted.  The code has to be back, and it
+    must be reachable from the walk list the gate already computes — not a comment.
+    """
+    gate = read("tools/tail_release_gate.py")
+    assert "skeleton-tree-shifts-game-joint" in gate
+    assert "if shifted_in_walk:" in gate, "the walk shift has to be refused, not recorded"
+    assert '"game_slot_shifts_in_walk"' in gate, "the measurement has to survive in the report"
+
+
+def test_the_pelvis_world_refusal_is_in_the_gate_and_fires() -> None:
+    """A compensating rest under a rotated root passes a parent check and still folds the body."""
+    gate = read("tools/tail_release_gate.py")
+    assert "pelvis-world-differs-from-game" in gate
+    assert 'report["pelvis_world_delta"]' in gate

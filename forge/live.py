@@ -121,7 +121,7 @@ def parse_hero_roster(text: str) -> list[Hero]:
     return sorted((hero for hero in heroes if hero.slug != "base"), key=lambda hero: (hero.title.lower(), hero.slug.lower()))
 
 
-_MODEL_ROOTS = ("models/heroes_wip", "models/heroes_staging", "models/npc")
+_MODEL_ROOTS = ("models/heroes_wip", "models/heroes_staging", "models/npc", "models/hideout")
 _MODEL_EXCLUDE = (
     "_gun",
     "_weapon",
@@ -197,6 +197,10 @@ def _is_character_model(path: str, roster_paths: set[str]) -> bool:
     if "npc" in parts:
         npc_root = parts[parts.index("npc") + 1] if parts.index("npc") + 1 < len(parts) else ""
         return any(token in npc_root for token in _NPC_ROOTS)
+    if "hideout" in parts:
+        # Hideout NPCs are full character models -- the Inferno bartender carries the only inferno
+        # tail mesh in the game -- and they live outside the hero and npc roots.
+        return True
     return False
 
 
@@ -313,6 +317,23 @@ def augment_roster(roster: list[Hero], model_paths: list[str]) -> list[Hero]:
     return sorted([*roster, *found], key=lambda hero: (hero.title.lower(), hero.slug.lower()))
 
 
+def list_assets(env: Environment, prefix: str, suffix: str) -> list[str]:
+    """Every live asset under `prefix` with `suffix`, read through S2V's own listing.
+
+    The model roots are not the whole game: a hero's bartender variant, an NPC's props and a
+    component's meshes live outside `models/heroes_*`, and a listing that only walks those roots
+    cannot see them.  This asks the pak itself, so "does the game have it" is answered by the game.
+    """
+    result = _run(env, ["-l", "-f", prefix, "-e", suffix], timeout=300)
+    if result.returncode != 0:
+        raise LiveError(f"s2v-listing-failed: {result.stderr.strip() or result.stdout.strip()}")
+    return [
+        line.split(" CRC:", 1)[0].strip().replace("\\", "/")
+        for line in result.stdout.splitlines()
+        if line.split(" CRC:", 1)[0].strip().lower().endswith(suffix.lower())
+    ]
+
+
 def list_models(env: Environment) -> list[str]:
     """List character model paths from the live VPK, tolerating a failed root."""
     paths: list[str] = []
@@ -407,16 +428,128 @@ def _body_score(path: Path) -> int:
     return score
 
 
-def choose_body(paths: list[Path] | tuple[Path, ...]) -> Path | None:
-    """Choose the body DMX from an extraction by name, not by file size.
+def render_mesh_files(vmdl_text: str) -> list[str]:
+    """The DMX paths a hero's own vmdl declares in its `RenderMeshList`.
+
+    This is the model's own answer to "which meshes are this hero", and it is the
+    only list a body may be chosen from.  Seven is why: its render meshes are
+    `outer_costume`, `gun1`, `skeleton2`, `shirt_backfaces3` and `headgear4` -- no
+    part is called a body at all -- so a name score over every DMX in the folder
+    picked `gigawatt_prisoner_lightning_ball_upper_body.dmx`, an ability clip.
+    """
+    # The addon already reads this list (`forge/modeldoc.render_mesh_files`), so this is a
+    # delegation, not a second parser.  A document-wide `filename = "*.dmx"` scan is what went
+    # wrong: the vmdl names 251 DMX paths, animation clips among them, and the body pick chose
+    # `gigawatt_prisoner_lightning_ball_upper_body.dmx` -- an ability animation.
+    from . import modeldoc
+
+    return [
+        row.filename.replace("\\\\", "/")
+        for row in modeldoc.render_mesh_files(vmdl_text)
+        if row.filename.lower().endswith(".dmx")
+    ]
+
+
+def model_bone_names(vmdl_text: str) -> list[str]:
+    """The bone nodes of the model's own built-in `Skeleton` section.
+
+    This is the model's skeleton, not the animation skeleton: a `.vnmskel` is a separate
+    document that names a DMX, and the two are not interchangeable.  The `Skeleton`
+    section is the hierarchy every render mesh in the model is skinned to, and it is what
+    a body has to name when the pick is "which RenderMeshFile is the body".
+    """
+    marker = re.search(r'_class\s*=\s*"Skeleton"', vmdl_text)
+    if marker is None:
+        return []
+    depth = 0
+    opened = False
+    end = len(vmdl_text)
+    for index in range(marker.end(), len(vmdl_text)):
+        character = vmdl_text[index]
+        if character == "[":
+            depth += 1
+            opened = True
+        elif character == "]":
+            depth -= 1
+            if opened and depth == 0:
+                end = index
+                break
+    text = vmdl_text[marker.end() : end]
+    names: list[str] = []
+    seen: set[str] = set()
+    for value in re.findall(r'\bname\s*=\s*"([^"]+)"', text):
+        if value in seen:
+            continue
+        seen.add(value)
+        names.append(value)
+    return names
+
+
+def choose_body(
+    paths: list[Path] | tuple[Path, ...],
+    *,
+    render_meshes: list[str] | tuple[str, ...] | None = None,
+    model_bones: set[str] | None = None,
+    body_meshes: list[str] | tuple[str, ...] | None = None,
+) -> Path | None:
+    """Choose the body DMX from the meshes the hero's own model renders.
 
     File size is the wrong signal: a detailed head can be larger than the body.
-    Prefer a declared body token, ignore known part words, then use the largest
-    remaining file only as a last resort.
+    When the vmdl's `RenderMeshList` is known, the body must be one of its
+    entries -- a pick that is not rendered by the model is refused by name,
+    because that is how an ability clip became "the body" on Seven.
     """
     candidates = [Path(path) for path in paths if Path(path).suffix.lower() == ".dmx"]
     if not candidates:
         return None
+    if model_bones:
+        # The body is a mesh the model renders that is skinned to the model's own `Skeleton`
+        # bone nodes.  The document that *is* the skeleton names every one of them and is not
+        # a body; a prop or an animation clip names none.
+        from .tails import dmx_joint_names
+
+        wanted = {Path(entry).stem.lower() for entry in (render_meshes or ())}
+
+        def _in_body_group(stem: str) -> bool:
+            if not body_meshes:
+                return True
+            return any(stem == mesh.lower() or stem.endswith(f"_{mesh.lower()}") for mesh in body_meshes)
+
+        pool = [
+            path
+            for path in candidates
+            if (not wanted or path.stem.lower() in wanted)
+            and "lod" not in path.stem.lower()
+            and _in_body_group(path.stem.lower())
+        ]
+        scored: list[tuple[int, int, Path]] = []
+        for path in pool:
+            # Every S2V mesh export carries the model's whole joint table, so "names a bone"
+            # is the gate and the body is the largest mesh the body group actually shows.
+            overlap = len(set(dmx_joint_names(path)) & model_bones)
+            if not overlap:
+                continue
+            scored.append((overlap, path.stat().st_size, path))
+        if not scored:
+            raise LiveError(
+                "body-has-no-model-joints: "
+                f"none of {len(pool)} render meshes in {Path(render_meshes[0]).parent.name} "
+                "names a bone of the model's own Skeleton section; the body is a mesh "
+                "skinned to those bone nodes, not an animation document"
+            )
+        scored.sort(key=lambda row: (row[0], row[1]), reverse=True)
+        return scored[0][2]
+    declared: list[Path] = []
+    if render_meshes:
+        wanted = {Path(entry).stem.lower() for entry in render_meshes}
+        declared = [path for path in candidates if path.stem.lower() in wanted]
+        lod0 = [path for path in declared if "lod" not in path.stem.lower()]
+        pool = lod0 or declared
+        scored = [path for path in pool if _body_score(path) > 0]
+        if scored:
+            return max(scored, key=lambda path: (_body_score(path), path.stat().st_size))
+        # No part word at all (Seven): the largest LOD0 render mesh is the body.
+        return max(pool, key=lambda path: path.stat().st_size)
     strong = [path for path in candidates if _body_score(path) >= 100]
     if strong:
         return max(strong, key=lambda path: (_body_score(path), path.stat().st_size))
@@ -448,13 +581,59 @@ def extract(env: Environment, hero: Hero, destination: Path, *, force: bool = Fa
     return inventory(root, hero, log=log)
 
 
+def body_for_hero_folder(vmdl: Path, dmx: list[Path] | None = None) -> Path | None:
+    """The hero's body, chosen the only way the model allows (one copy of the rule).
+
+    The vmdl's own `Skeleton` bone nodes decide what a body is, its `BodyGroupList`
+    decides which meshes the model shows, and its `RenderMeshList` is the closed set.  A
+    caller that re-picks with filenames alone -- the hero import's body repair did -- can
+    swap the body for an ability clip, which is how Seven's import opened an animation
+    document and reported no armature.
+    """
+    dmx = dmx if dmx is not None else sorted(vmdl.parent.glob("*.dmx"))
+    if not dmx:
+        return None
+    text = vmdl.read_text(encoding="utf-8", errors="replace")
+    bones = set(model_bone_names(text))
+    render = render_mesh_files(text)
+    group_meshes: list[str] = []
+    try:
+        from . import modeldoc
+
+        for group in modeldoc.body_groups(text):
+            group_meshes.extend(group.meshes)
+            break
+    except Exception:
+        group_meshes = []
+    return choose_body(
+        dmx,
+        render_meshes=render or None,
+        model_bones=bones or None,
+        body_meshes=group_meshes or None,
+    )
+
+
 def inventory(root: Path, hero: Hero, *, log: Path | None = None) -> Extraction:
     files = [path for path in root.rglob("*") if path.is_file()]
     vmdls = sorted((path for path in files if path.suffix.lower() == ".vmdl"), key=lambda p: (len(p.parts), str(p).lower()))
     dmx = sorted(path for path in files if path.suffix.lower() == ".dmx")
     gltf = sorted(path for path in files if path.suffix.lower() in (".gltf", ".glb"))
     materials = sorted(path for path in files if path.suffix.lower() == ".vmat")
-    body = choose_body(dmx)
+    render: list[str] = []
+    if vmdls:
+        try:
+            render = render_mesh_files(vmdls[0].read_text(encoding="utf-8", errors="replace"))
+        except OSError:
+            render = []
+    body = body_for_hero_folder(vmdls[0], dmx) if vmdls else None
+    if body is not None and render:
+        declared = {Path(entry).stem.lower() for entry in render}
+        if body.stem.lower() not in declared:
+            raise LiveError(
+                "body-not-a-render-mesh: "
+                f"{body.name} is not in {vmdls[0].name}'s RenderMeshList; the body is a mesh "
+                "the model renders, never an animation document"
+            )
     return Extraction(
         hero=hero,
         root=root,

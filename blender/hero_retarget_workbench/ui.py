@@ -820,7 +820,7 @@ def _draw_ik(layout, settings) -> None:
 
 
 def _draw_tail(layout, settings) -> None:
-    """Pick a tail rig, pair it, then write one named clip or the hero's clips."""
+    """Pick a tail source, then add its tail to every imported hero clip."""
     options = settings.tail_options
     live = sum(1 for option in options if option.source == "LIVE")
     box = ui_popit.title(
@@ -867,49 +867,73 @@ def _draw_tail(layout, settings) -> None:
             choice.index = tile_index
             tile.label(text=f"{option.count} bones · {option.source.lower()}", icon="BLANK1")
 
-    ui_popit.micro(box, "1 · Pair the hero tail to this rig")
-    box.prop(settings, "tail_armature", text="Tail rig")
-    pair = box.row(align=True)
-    pair.operator("dmf.scan_tail", text="Pair hero tail bones", icon="LINKED")
     box.prop(settings, "tail_weight", text="Tail influence", slider=True)
-    if settings.tail_bones:
-        index = max(0, min(settings.tail_index, len(settings.tail_bones) - 1))
-        row = settings.tail_bones[index]
-        box.template_list(
-            "DMF_UL_tail",
-            "",
-            settings,
-            "tail_bones",
-            settings,
-            "tail_index",
-            rows=4,
-        )
-        if settings.tail_armature is not None:
-            box.prop_search(
-                row,
-                "target",
-                settings.tail_armature.data,
-                "bones",
-                text="Tail bone",
-            )
-        else:
-            box.prop(row, "target", text="Tail bone")
-
-    ui_popit.micro(box, "2 · Choose what to write")
-    box.prop(settings, "tail_clip", text="Source clip")
-    source = tailops.source_row(settings)
-    if source is not None:
-        box.label(text=f"Action {_short(source.action, 30)}", icon="ACTION")
-    else:
-        _hint(box, "Import a clip on this page, then choose it as the source clip.", "INFO", width=34)
-    write = box.column(align=True)
-    write.operator("dmf.blend_tail", text="Write selected clip to tail", icon="PLAY")
+    imported = [
+        row for row in settings.clips
+        if row.action and row.state in ("IMPORTED", "WRITTEN")
+    ]
     hero = clipops.hero_source(settings)
-    write.operator(
-        "dmf.blend_tail_all",
-        text=f"Write every {hero} clip to tail" if hero else "Write every clip for this hero to tail",
+    primary = box.row(align=True)
+    primary.scale_y = 1.5
+    primary.enabled = bool(options) and not settings.job_running and not tailops.auto_running()
+    primary.operator(
+        "dmf.build_tail_animation",
+        text=f"Add tail and compile {len(imported)} clips" if imported else "Add tail and compile all clips",
         icon="ACTION",
     )
+    box.operator("dmf.publish_tail_anims", text="Compile already-tailed clips", icon="FILE_REFRESH")
+    _hint(
+        box,
+        "Adds the selected tail's bones, imports this hero's gameplay clips, copies the "
+        "matching source motion into every clip, writes each source DMX, and compiles the "
+        "paired vnmclips against the hero's original skeleton. The vnmskel is not shipped.",
+        "INFO",
+        width=34,
+    )
+    if not imported:
+        _hint(
+            box,
+            f"The clip importer will add {hero or 'this hero'}'s clips automatically when you press the action.",
+            "QUESTION",
+            width=34,
+        )
+
+    box.prop(settings, "tail_manual", text="Manual channel map")
+    if settings.tail_manual:
+        ui_popit.micro(box, "Pair or write one clip")
+        box.prop(settings, "tail_armature", text="Tail rig")
+        pair = box.row(align=True)
+        pair.operator("dmf.scan_tail", text="Pair hero tail bones", icon="LINKED")
+        if settings.tail_bones:
+            index = max(0, min(settings.tail_index, len(settings.tail_bones) - 1))
+            row = settings.tail_bones[index]
+            box.template_list(
+                "DMF_UL_tail",
+                "",
+                settings,
+                "tail_bones",
+                settings,
+                "tail_index",
+                rows=4,
+            )
+            if settings.tail_armature is not None:
+                box.prop_search(
+                    row,
+                    "target",
+                    settings.tail_armature.data,
+                    "bones",
+                    text="Tail bone",
+                )
+            else:
+                box.prop(row, "target", text="Tail bone")
+        box.prop(settings, "tail_clip", text="Source clip")
+        write = box.column(align=True)
+        write.operator("dmf.blend_tail", text="Write selected clip to tail", icon="PLAY")
+        write.operator(
+            "dmf.blend_tail_all",
+            text=f"Write every {hero} clip to tail" if hero else "Write every clip for this hero to tail",
+            icon="ACTION",
+        )
 
     message = settings.tail_note or settings.tail_option_note
     if message:
@@ -932,6 +956,10 @@ class DMF_PT_animations(Panel):
         layout.use_property_decorate = False
 
         ui_popit.job(layout, settings)
+        layout.label(
+            text="Animations and animation blending is still largely unfinished",
+            icon="INFO",
+        )
         imported = sum(1 for row in settings.clips if row.state == "IMPORTED")
         box = ui_popit.title(
             layout,
@@ -1407,6 +1435,44 @@ class DMF_PT_handoff_paths(Panel):
             _hint(lod, "Weights or fit changed; rebuild so the LODs match.", "STATUS_WARNING", alert=True, width=30)
 
 
+class DMF_PT_release(Panel):
+    bl_label = "Release"
+    bl_idname = "DMF_PT_release"
+    bl_parent_id = "DMF_PT_main"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        settings = context.scene.dmf
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+        ui_popit.job(layout, settings)
+        pak = Path(bpy.path.abspath(settings.release_pak)) if settings.release_pak else None
+        state = "packed" if pak is not None and pak.is_file() else "no pak"
+        icon = "CHECKMARK" if pak is not None and pak.is_file() else "PACKAGE"
+        ui_popit.title(layout, "Addon release", state, icon)
+        layout.label(text="Any staged addon: pack, install, launch", icon="INFO")
+        column = layout.column(align=True)
+        column.operator("dmf.write_model", icon="ARMATURE_DATA", text="Write model from armature")
+        column.operator("dmf.compile", icon="FILE_REFRESH", text="Compile staged addon")
+        column.operator("dmf.pack_vpk", icon="PACKAGE", text="Pack VPK")
+        column.operator("dmf.install_pak", icon="IMPORT", text="Install into addon slot")
+        column.operator("dmf.launch_game", icon="PLAY", text="Launch game")
+        layout.prop(settings, "release_slot_number")
+        layout.prop(settings, "release_pak")
+        try:
+            from . import release
+
+            layout.label(text=f"slot: {release.slot(settings).name}", icon="FILEBROWSER")
+        except Exception as error:
+            layout.label(text=f"slot: {error}", icon="ERROR")
+        if settings.release_note:
+            layout.label(text=settings.release_note, icon="INFO")
+
+
 CLASSES = (
     DMF_PT_main,
     DMF_PT_setup,
@@ -1425,6 +1491,7 @@ CLASSES = (
     DMF_PT_handoff,
     DMF_PT_handoff_paths,
     DMF_PT_update,
+    DMF_PT_release,
 )
 
 

@@ -7,7 +7,13 @@
   "no effort caveats": "pass",
   "effort refusal selftest": "pass",
   "tail vnmclip gate": "pass",
+  "port gate haze_parity": "pass",
   "port gate haze_tail": "pass",
-  "port gate shiv": "pass",
+  "port gate haze_tail_reference": "pass",
+  "port gate shiv": "fail",
+  "addon boundary": "fail",
+  "addon boundary selftest": "pass",
+  "release skeleton identity": "pass",
+  "release installed pak": "fail",
   "probe lane": "skip"
 }

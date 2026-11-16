@@ -46,48 +46,71 @@ BONE = re.compile(r'^\s*_class = "Bone"\s*$')
 SKELETON = re.compile(r'^\s*_class = "Skeleton"\s*$')
 
 
-def model_bone_order(vmdl: Path) -> list[str]:
-    """The `Skeleton` section's bones, in the order the model declares them."""
+def model_bone_tree(vmdl: Path) -> tuple[list[str], dict[str, str | None]]:
+    """The `Skeleton` section's bones in declared order, plus each bone's parent.
+
+    The order is the slot order the client binds meshes against; the parents decide
+    whether a disagreement can be fixed by reordering at all.  Reordering siblings is
+    a slot change; a different parent is a different frame, and no reorder repairs it.
+    """
     lines = vmdl.read_text(encoding="utf-8", errors="replace").splitlines()
     start = next((index for index, line in enumerate(lines) if SKELETON.match(line)), None)
     if start is None:
         raise SystemExit(f"model-vmdl-has-no-skeleton: {vmdl} has no `_class = \"Skeleton\"` section")
     indent = len(lines[start]) - len(lines[start].lstrip())
     order: list[str] = []
+    parents: dict[str, str | None] = {}
+    # Braces delimit a bone, and a bone's `{` sits at its *parent's* indentation, so
+    # indentation cannot track the nesting: keying the stack on indentation popped the
+    # parent as soon as a child's brace appeared and reported every bone as a root.
+    # Frames are pushed on `{` and popped on `}`; the parent is the nearest enclosing
+    # frame that named a bone.
+    frames: list[str | None] = [None]
     pending = False
     for line in lines[start + 1 :]:
-        if not line.strip():
+        stripped = line.strip()
+        if not stripped:
             continue
         depth = len(line) - len(line.lstrip())
         # The section's own `children = [` sits at the same indentation as its
         # `_class` line, so an equal-depth line is only the end of the section when
         # it closes it.  Breaking on any equal-depth line stopped at `children = [`
         # and reported "declares no Bone names" on a model that declares 98.
-        if depth < indent or (depth == indent and line.strip() == "}"):
+        if depth < indent or (depth == indent and stripped == "}"):
             break
         if BONE.match(line):
             pending = True
             continue
         match = NAME.match(line)
         if match and pending:
-            order.append(match.group(1))
+            name = match.group(1)
+            parents[name] = next((frame for frame in reversed(frames) if frame), None)
+            order.append(name)
+            frames[-1] = name
             pending = False
+        if "{" in stripped:
+            frames.append(None)
+        if "}" in stripped:
+            if len(frames) > 1:
+                frames.pop()
     if not order:
         raise SystemExit(f"model-vmdl-has-no-bones: {vmdl} Skeleton section declared no Bone names")
-    return order
+    return order, parents
 
 
-def skeleton_order(dmx: Path) -> list[str]:
+def skeleton_order(dmx: Path) -> tuple[list[str], dict[str, str | None]]:
     if str(PULSE_DIR) not in sys.path:
         sys.path.insert(0, str(PULSE_DIR))
     from pulse_src_ops import datamodel  # noqa: WPS433
     from tail_release_audit import _joint_table  # noqa: WPS433
 
     table = _joint_table(datamodel, str(dmx))
-    return list(dict.fromkeys(table["__order__"]["order"]))
+    order = list(dict.fromkeys(table["__order__"]["order"]))
+    parents = {name: table[name]["parent"] for name in order if name in table}
+    return order, parents
 
 
-def compare(model: list[str], skeleton: list[str]) -> dict:
+def compare(model: list[str], skeleton: list[str], model_parents=None, skeleton_parents=None) -> dict:
     slots = {name: index for index, name in enumerate(skeleton)}
     absent = [name for name in model if name not in slots]
     moved = [
@@ -96,6 +119,13 @@ def compare(model: list[str], skeleton: list[str]) -> dict:
         if name in slots and slots[name] != index
     ]
     first = moved[0] if moved else None
+    reparented = []
+    if model_parents and skeleton_parents:
+        reparented = [
+            {"joint": name, "model_parent": model_parents.get(name), "skeleton_parent": skeleton_parents.get(name)}
+            for name in model
+            if name in slots and model_parents.get(name) != skeleton_parents.get(name)
+        ]
     return {
         "model_joints": len(model),
         "skeleton_joints": len(skeleton),
@@ -104,6 +134,7 @@ def compare(model: list[str], skeleton: list[str]) -> dict:
         "moved": moved,
         "first_divergence": first,
         "order_identical_for_shared": not moved,
+        "reparented": reparented,
     }
 
 
@@ -115,9 +146,9 @@ def main() -> int:
     parser.add_argument("--report", default="")
     args = parser.parse_args(argv)
 
-    model = model_bone_order(Path(args.vmdl))
-    skeleton = skeleton_order(Path(args.skeleton))
-    result = compare(model, skeleton)
+    model, model_parents = model_bone_tree(Path(args.vmdl))
+    skeleton, skeleton_parents = skeleton_order(Path(args.skeleton))
+    result = compare(model, skeleton, model_parents, skeleton_parents)
     result.update({"vmdl": args.vmdl, "skeleton": args.skeleton})
 
     if result["absent_from_skeleton"]:
@@ -142,6 +173,11 @@ def main() -> int:
             f"every shared joint keeps its slot ({result['shared']} shared)",
             flush=True,
         )
+    print(
+        f"PARENTS {len(result['reparented'])} of {result['shared']} shared joints have a different parent "
+        + (f"(first {result['reparented'][0]})" if result["reparented"] else ""),
+        flush=True,
+    )
     if args.report:
         target = Path(args.report)
         target.parent.mkdir(parents=True, exist_ok=True)

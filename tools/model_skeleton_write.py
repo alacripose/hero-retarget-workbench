@@ -145,12 +145,10 @@ def main() -> int:
             "do_not_discard = true",
         ]
 
-    # `pelvis` is written as a root even when the document nests it elsewhere.  The model's
-    # `root_motion` carries the authored 90 deg (orientation [0.5, 0.5, 0.5, 0.5]); a pelvis
-    # parented under it receives that rotation twice and the body collapses in on itself, which
-    # is the 2026-11-16 v8 failure and the 2026-11-15 re-parent failure recorded in AGENTS.md.
-    if "pelvis" in parents:
-        parents["pelvis"] = None
+    # `pelvis` keeps the parent the skeleton gives it.  The game's own `haze_skel.dmx` nests it
+    # under `root_motion`, and our leaves and tail ride a skeleton whose 98 animated joints were
+    # measured identical to that file (`skeleton_delta` moved=0); writing the model with a
+    # different parent made the client bind the pelvis chain to a frame the clips never pose.
 
     updated = modeldoc.rewrite_skeleton_bones(text, parents, order, extra)
     result = migrate.write_model_text(vmdl, updated)

@@ -177,6 +177,7 @@ def stage(
     extraction_root: Path | None = None,
     vmdl: Path | None = None,
     bodygroup: str = "",
+    choice: str = "",
 ) -> Path:
     """Copy component files and, when a vmdl is given, register their meshes.
 
@@ -222,6 +223,7 @@ def stage(
                     mesh_name=stem,
                     dmx_relative=component.relative,
                     bodygroup=bodygroup,
+                    choice=choice,
                 )
             )
     manifest = root / "components.json"
@@ -236,6 +238,7 @@ def stage(
                 "files": records,
                 "vmdl": str(vmdl) if vmdl else "",
                 "bodygroup": bodygroup,
+                "choice": choice,
                 "merged": merged,
                 "vmdl_merge": "written" if merged else "not-written",
                 "note": (

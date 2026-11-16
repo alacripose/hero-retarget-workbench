@@ -42,7 +42,17 @@ def datamodel():
 def _find(element, element_type: str):
     if getattr(element, "type", "") == element_type:
         return element
-    for child in element["children"] if "children" in element.keys() else []:
+    # A DMX document's root is a bare `DmElement` whose one child sits under the attribute the file
+    # itself names (`model`, `skeleton`, ...), not under `children`; probing only `children` made this
+    # tool answer `skeleton-no-dme-model` for every real skeleton document.
+    children = element["children"] if "children" in element.keys() else []
+    if not children:
+        children = [
+            element[key]
+            for key in element.keys()
+            if getattr(element[key], "type", "") in ("DmeModel", "DmeDag", "DmeJoint", "DmeShape")
+        ]
+    for child in children:
         found = _find(child, element_type)
         if found is not None:
             return found
