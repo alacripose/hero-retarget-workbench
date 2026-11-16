@@ -36,7 +36,12 @@ def _arguments() -> argparse.Namespace:
 
 
 def _joints(skeleton):
-    return skeleton["jointList"] if "jointList" in skeleton else skeleton["children"]
+    """The joint ELEMENTS, from the children tree.
+
+    A clip document's `skeleton.jointList` is a string array of names, not elements, so reading it
+    here made every rebase fail with `'str' object has no attribute 'name'`.
+    """
+    return list(skeleton["children"]) if "children" in skeleton.keys() else []
 
 
 def _rebase(datamodel, skeleton_model, clip_path: Path, out: Path) -> dict:
@@ -51,38 +56,36 @@ def _rebase(datamodel, skeleton_model, clip_path: Path, out: Path) -> dict:
     root = clip.root
     old_skeleton = root["skeleton"]
     old_joints = list(_joints(old_skeleton))
-    old_by_name = {joint.name: joint for joint in old_joints}
 
     remap: dict = {}
     source_skeleton = skeleton_model.root["skeleton"]
     source_joints = list(_joints(source_skeleton))
 
-    # Clone the shipped skeleton's tree, joint for joint, keeping its names.
     clones: dict[str, object] = {}
     for joint in source_joints:
         clones[joint.name] = _clone(clip, joint, remap)
-
-    # Rebuild the children arrays from the source tree, in the source order.
     for joint in source_joints:
-        clone = clones[joint.name]
-        try:
-            kids = list(joint["children"])
-        except Exception:
-            kids = []
-        clone["children"] = datamodel.make_array("element", len(kids))
-        for index, child in enumerate(kids):
-            clone["children"][index] = clones.get(child.name, child)
+        kids = list(joint["children"]) if "children" in joint.keys() else []
+        clones[joint.name]["children"] = datamodel.make_array(
+            [clones[child.name] for child in kids if child.name in clones], datamodel.Element
+        )
 
-    # Anything the source skeleton does not carry is dropped; the jointList is
-    # replaced wholesale, which is the point.
-    try:
-        old_skeleton["jointList"] = datamodel.make_array("string", len(source_joints))
-        for index, joint in enumerate(source_joints):
-            old_skeleton["jointList"][index] = joint.name
-    except Exception:
-        old_skeleton["children"] = datamodel.make_array("element", 0)
+    # The clip's own skeleton becomes the shipped skeleton: same joints, same order, same names.
+    # Only the ROOTS go in `children`; listing every joint there made a flat tree and the
+    # compiler answered `No animation data present` for all 197 clips.
+    child_names = set()
+    for joint in source_joints:
+        for child in joint["children"] if "children" in joint.keys() else []:
+            child_names.add(child.name)
+    roots = [joint.name for joint in source_joints if joint.name not in child_names]
+    old_skeleton["children"] = datamodel.make_array(
+        [clones[name] for name in roots if name in clones], datamodel.Element
+    )
+    if "jointList" in old_skeleton.keys():
+        old_skeleton["jointList"] = datamodel.make_array(
+            [joint.name for joint in source_joints], str
+        )
 
-    # Point channels at the cloned joints (by name), keeping their logs.
     channels = 0
     animation = root["animation"] if "animation" in root else None
     if animation is not None:

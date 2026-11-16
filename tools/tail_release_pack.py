@@ -282,6 +282,19 @@ def main() -> int:
                 f"refused materials-shadow-game: {len(shadowed)} compiled materials in this addon "
                 f"already exist in pak01 ({[path.name for path in shadowed[:4]]})"
             )
+    # Nothing outside `models/` belongs in the pak, and this is measured: v14 shipped 228 clips at
+    # `clips/` beside the same 228 at `models/heroes_staging/haze/clips/` because the addon folder
+    # carried a stray compiled `clips/` at its root, and the packer copied it without a word.
+    stray = [
+        path.relative_to(root).as_posix()
+        for path in files
+        if not path.relative_to(root).as_posix().startswith("models/")
+    ]
+    if stray:
+        raise SystemExit(
+            f"refused stray-path: {len(stray)} packed files sit outside models/ "
+            f"({stray[:4]}); a pak is the model tree, not whatever else the addon folder holds"
+        )
     for path in files:
         destination = staging / path.relative_to(root)
         destination.parent.mkdir(parents=True, exist_ok=True)

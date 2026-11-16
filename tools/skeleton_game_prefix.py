@@ -78,7 +78,17 @@ def main() -> int:
     parser.add_argument("--game", required=True, help="the game's own skeleton DMX")
     parser.add_argument("--skeleton", required=True, help="our skeleton DMX")
     parser.add_argument("--out", required=True)
+    parser.add_argument(
+        "--bind",
+        default="",
+        help="the mesh bind DMX whose hierarchy the vertices were authored in (ours is flat)",
+    )
     parser.add_argument("--report", default="")
+    parser.add_argument(
+        "--keep-our-parents",
+        action="store_true",
+        help="keep our own nesting (the tree the mesh bind was authored against) and order siblings by the game's list",
+    )
     args = parser.parse_args(argv)
 
     module = datamodel()
@@ -116,6 +126,11 @@ def main() -> int:
         raise SystemExit(f"skeleton-missing-game-joint: {len(missing)} of the game's joints are absent ({missing[:6]})")
 
     extras = [name for name in our_names if name not in set(game_names)]
+    # The `jointList` is written at the end, as the walk's own order, when our nesting is kept:
+    # the game's list is 4 joints out of its own walk's order (`WALK-ORDER haze_skel.dmx ...
+    # inversions=4`), so copying it as a prefix guarantees the list and the walk disagree — the
+    # state in which a clip bone index lands on another bone.  Here the list only has to name
+    # every joint once, so the parents below can be resolved.
     order = game_names + extras
 
     # Parents: the game's own for its joints, ours for the appended ones.
@@ -130,6 +145,23 @@ def main() -> int:
     for joint in _joints(our_model):
         for child in _children(joint):
             our_parents[child.name] = joint.name
+    print(
+        f"GAME-ORDER source-hierarchy joints={len(_joints(our_model))} parents={len(our_parents)}",
+        flush=True,
+    )
+    if args.bind:
+        # Our skeleton document is FLAT: every joint hangs off the model, so it states no
+        # hierarchy at all (`skeleton-invented-root` reports 130 of them).  The hierarchy the
+        # vertices were actually bound in is the mesh bind's, so that is the tree to present.
+        bind_model = _model(module.load(args.bind).root)
+        if bind_model is None:
+            raise SystemExit(f"skeleton-bind-has-no-model: {args.bind}")
+        bind_parents = {}
+        for joint in _joints(bind_model):
+            for child in _children(joint):
+                bind_parents[child.name] = joint.name
+        our_parents.update(bind_parents)
+        print(f"GAME-ORDER bind-hierarchy {args.bind} joints={len(bind_parents)}", flush=True)
     # Our own hierarchy is kept.  Only the list order comes from the game; adopting its parents
     # as well re-parented `pelvis` under `root_motion`, whose rest carries the authored 90 deg,
     # so the body applied it twice and collapsed in on itself (2026-11-16, the v8 build).  Order
@@ -141,14 +173,25 @@ def main() -> int:
     # and the body collapses in on itself (v8).  Those two failures are why order and hierarchy
     # are both taken from the game except for that single edge.
     parents = {}
-    for name in order:
-        parents[name] = game_parents.get(name) if name in game_parents else our_parents.get(name)
-    # Now that the game's own rests are copied, the game's parent is correct for pelvis as well:
-    # the compensation that made it a root is gone with the old rest, so copying the pair keeps
-    # the same world pose the game ships.  (Forcing a root here was the v9 mistake, solved the
-    # wrong way; the pair, not the parent alone, is what holds the pose.)
-    if "pelvis" in parents and game_parents.get("pelvis"):
-        parents["pelvis"] = game_parents.get("pelvis")
+    if args.keep_our_parents:
+        # The mesh bind is ours, and the model and the skeleton must present the tree it was
+        # authored against: measured in game, a model built on the game's own tree rendered the
+        # body flat (v11) and one folded into itself with the game's tree and rests (v10), while
+        # our tree rendered upright (v9).  Nesting is therefore not negotiable; the ordering of
+        # siblings is, and it is what the client numbers bones by.
+        for name in our_names:
+            parents[name] = our_parents.get(name)
+    else:
+        for name in order:
+            parents[name] = game_parents.get(name) if name in game_parents else our_parents.get(name)
+    # `pelvis` stays a root, and its rest stays ours.  This cost two in-game failures to learn
+    # and is not a preference: the model's `root_motion` carries the authored 90 deg and the
+    # engine applies it to the body, so a pelvis under it takes that rotation twice and the body
+    # folds (v8, and again v10 which copied the game's own pair).  The swap below is also why
+    # the game's rest must not be copied for this one joint: ours is the value that compensates
+    # the missing parent, and the pair is what holds the pose.
+    if "pelvis" in parents and not args.keep_our_parents:
+        parents["pelvis"] = None
     for name in order:
         parent = parents.get(name)
         if parent and parent not in by_name:
@@ -160,7 +203,17 @@ def main() -> int:
     # `clavicle_R`, `leg_upper_L` and `leg_upper_R` out of step with the game's walk and the gate
     # refused it.
     game_walk = [joint.name for joint in _joints(game_model)]
-    walk_order = [name for name in game_walk if name in set(order)] + extras
+    if args.keep_our_parents:
+        order = [name for name in our_names]
+        # Order every sibling group by where the game's list puts it, so a depth-first walk lands
+        # as close to the game's own numbering as our nesting allows.
+        rank = {name: index for index, name in enumerate(game_names)}
+        walk_order = sorted(
+            order,
+            key=lambda name: rank.get(name, len(game_names)),
+        )
+    else:
+        walk_order = [name for name in game_walk if name in set(order)] + extras
     children: dict[str, list[str]] = {name: [] for name in order}
     roots: list[str] = []
     for name in walk_order:
@@ -179,6 +232,13 @@ def main() -> int:
     game_joints_by_name = {joint.name: joint for joint in _joints(game_model)}
     rest_copied = 0
     for name in game_names:
+        # With our own nesting the game's rests do not belong here at all: a rest is relative to
+        # its parent, so copying the game's values under our parents moved 112 of 128 joints
+        # against the mesh bind the vertices were authored in.
+        if args.keep_our_parents:
+            break
+        if name == "pelvis":
+            continue
         source = game_joints_by_name.get(name)
         target = by_name.get(name)
         if source is None or target is None:
@@ -187,6 +247,26 @@ def main() -> int:
         if "transform" in source.keys() and "transform" in target.keys():
             target["transform"] = source["transform"]
             rest_copied += 1
+
+    if args.keep_our_parents:
+        # The `jointList` is the walk's own order, computed from the tree that is about to be
+        # written.  Anything else leaves the list and the walk disagreeing, and that is the state
+        # in which a clip bone index lands on another bone and the head, arms and tail rotate.
+        walked: list[str] = []
+
+        def emit(name: str) -> None:
+            walked.append(name)
+            for child in children[name]:
+                emit(child)
+
+        for name in roots:
+            emit(name)
+        if sorted(walked) != sorted(order):
+            raise SystemExit(
+                f"skeleton-walk-incomplete: walked {len(walked)} of {len(order)} joints; "
+                "a name would be dropped from `jointList`"
+            )
+        order = walked
 
     element_type = type(_joints(our_model)[0])
     for name in order:

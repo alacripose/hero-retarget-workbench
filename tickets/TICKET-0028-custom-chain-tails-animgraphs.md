@@ -74,18 +74,23 @@ folder.
    on a timer, bakes `only_selected=False` with visual keying over the action's
    own range, clears only the addon's IK constraints, then writes a Model 22 DMX.
    The original scene FPS and frame count are the inputs to that bake.
-10. **Tail transfer is explicitly experimental.** The tail section selects an
-    armature, scans its bones against the hero's source tail, and blends the
-    hero action onto that armature in local space with an editable weight. It
-    writes one action per tail rig; it is not a claim about engine tail physics.
-11. **The compiled clip is still ModelDoc's job.** The addon writes DMX. It does
-    not claim to compile `.vnmclip_c`, and the UI says to use ModelDoc's
-    **Make Default Animgraph2** and pack the clip, never the `.vnmskel`.
+10. **Tail transfer is automatic for a hero without a tail.** The tail section
+    selects any discovered source chain; **Add Tail To Every Clip** appends that
+    source's rest tail bones to the hero, reads matching clips from that source's
+    own extraction, and keys the source tail motion into every imported hero
+    action. Clips with no same-named source clip are reported, not guessed.
+    Manual per-bone pairing and single-clip writes remain an advanced fallback.
+11. **CSDK13 owns the vnmclip compile.** The addon writes animation DMX and does
+    not invoke the compiler itself. CSDK13 includes the vnmclip toolchain; the
+    compile handoff is ModelDoc/CSDK13's step, not an addon limitation. The UI
+    still says to pack clips through ModelDoc and never pack the `.vnmskel`.
 
 ## Out of scope
 
 - Creating ModelDoc ClothChain or Skeleton node text, or editing the opaque vmdl.
-- Compiling `.vnmclip`/`vnmclip_c` or running an animgraph compile.
+- Invoking `.vnmclip`/`vnmclip_c` compilation from the addon; CSDK13/ModelDoc
+  performs that handoff. The older guide's claim that the project cannot use the
+  vnmclip pipeline is stale.
 - In-engine cloth behaviour, tail physics, or a real game compile.
 - Changing the hero's existing bone transforms during a chain join.
 
@@ -101,11 +106,14 @@ folder.
   138 paired, all AG2, without a clips folder being entered.
 - PulseSrcOps proxy probe: `CLOTHPROXY`, `cloth_enable`, remap `0..1`.
 - Installed 0.9.0 zip: 10/10 install/enable/surface/open checks.
+- Automatic tail probe: Shiv imports four clips, Werewolf's seven tail bones are
+  appended, and all four hero actions gain tail fcurves; `in_air_loop_apex`
+  changes between its first, middle and last frame. Receipt:
+  `artifacts/receipts/probe-tail-auto.json`.
 
 ## Not checked
 
-- ModelDoc Skeleton/ClothChain nodes, `.vnmclip_c` conversion, and in-game cloth
-  or tail behaviour.
+- ModelDoc Skeleton/ClothChain nodes and in-game cloth or tail behaviour.
 - A real hero rig with a custom chain: the chain/join/cloth/tail probe is a
   synthetic custom rig with a two-bone chain and a two-bone tail.
 - The GUI page draw probe did not execute its page draws in this headless run;

@@ -324,6 +324,7 @@ class DMF_ClipRow(PropertyGroup):
     state: EnumProperty(
         name="State",
         items=[
+            ("NEW", "New", "A gameplay clip queued by the automatic tail pass"),
             ("EDITABLE", "Editable", "A decompiled DMX that can be imported"),
             ("IMPORTED", "Imported", "Imported onto the hero rig as an action"),
             ("WRITTEN", "Written", "The action was written back out as an animation DMX"),
@@ -469,8 +470,11 @@ class DMF_Settings(PropertyGroup):
     )
     vmdl_relative: StringProperty(
         name="vmdl path in content",
-        description="Logical path for the vmdl copy. It must match the target DMX path",
-        default="models/heroes_staging/haze/haze.vmdl",
+        description=(
+            "Logical path for the vmdl copy. It must match the target DMX path; the hero "
+            "selection fills it from the live model path so no hero is baked in here"
+        ),
+        default="",
     )
     body_dmx: StringProperty(
         name="Hero body DMX",
@@ -497,7 +501,7 @@ class DMF_Settings(PropertyGroup):
     target_dmx_relative: StringProperty(
         name="DMX path in content",
         description="Logical path of the DMX that the hero vmdl references",
-        default="models/heroes_staging/haze/haze_body.dmx",
+        default="",
     )
     custom_model: StringProperty(
         name="Custom model",
@@ -543,6 +547,26 @@ class DMF_Settings(PropertyGroup):
         description="Chains the last import could not build cloth for, and why",
         default="",
     )
+    release_pak: StringProperty(
+        name="Port pak",
+        description="Where the packed VPK is written and read back for install",
+        subtype="FILE_PATH",
+        default="",
+    )
+    release_note: StringProperty(name="Release note", default="")
+    release_model: StringProperty(
+        name="Written vmdl",
+        description="The model release.write_model produced, and the one staging copies",
+        subtype="FILE_PATH",
+        default="",
+    )
+    release_slot_number: IntProperty(
+        name="Addon pak number",
+        description="Which pakNN_dir.vpk to install into; 0 reuses the newest pak already in addons/",
+        default=0,
+        min=0,
+    )
+
     props_page: EnumProperty(
         name="Page",
         description="Which page the Hero Retarget properties tab shows",
@@ -559,6 +583,7 @@ class DMF_Settings(PropertyGroup):
             ("HANDOFF", "Handoff", "Export, stage and compile"),
             ("MODS", "Mods", "Scan older packages, update them, or backport them"),
             ("COMPONENTS", "Components", "Stage live cosmetic parts beside a mod"),
+            ("RELEASE", "Release", "Write the model, compile, pack, install and launch"),
         ],
         default="CLOTH",
     )
@@ -753,10 +778,15 @@ class DMF_Settings(PropertyGroup):
     tail_scanned: IntProperty(name="Tail bones", default=0)
     tail_weight: FloatProperty(
         name="Blend",
-        description="How much of the hero tail motion reaches the custom tail rig",
+        description="How much of the source tail motion reaches the hero tail bones",
         default=1.0,
         min=0.0,
         max=1.0,
+    )
+    tail_manual: BoolProperty(
+        name="Manual channel map",
+        description="Show the per-bone pairing and single-clip writes; the automatic pass does not need them",
+        default=False,
     )
     tail_note: StringProperty(name="Tail note", default="")
     tail_options: CollectionProperty(type=DMF_TailOption, description="Tail skeletons found in the hero, custom rig, extractions and clips")

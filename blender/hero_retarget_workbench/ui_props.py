@@ -59,6 +59,7 @@ PAGE_BY_ID = {
     "DMF_PT_setup_tools": "SETUP",
     "DMF_PT_mods": "MODS",
     "DMF_PT_components": "COMPONENTS",
+    "DMF_PT_release": "RELEASE",
 }
 
 PAGES = (
@@ -74,6 +75,7 @@ PAGES = (
     "HANDOFF",
     "MODS",
     "COMPONENTS",
+    "RELEASE",
 )
 
 # Small icon buttons, the way the Properties editor's own tabs read, instead of a
@@ -91,6 +93,7 @@ PAGE_ICONS = {
     "HANDOFF": "EXPORT",
     "MODS": "PACKAGE",
     "COMPONENTS": "MODIFIER",
+    "RELEASE": "PACKAGE",
 }
 
 

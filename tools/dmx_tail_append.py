@@ -325,6 +325,29 @@ def _run(datamodel, args) -> dict:
         bone, attribute = _channel_target(channel)
         if bone in chain and attribute in CHANNEL_ATTRS:
             tail_channels[(bone, attribute)] = channel
+    # A clip may stop one bone short of the chain: the authored tails carry 8 bones and 16 channels
+    # while the tail MESH is skinned to 9 (`tail_end` is the tip).  Dropping the tip is not an
+    # option — the owner's rule is that nothing the game binds may be dropped — so the tip inherits
+    # the last segment's channels and is recorded in the receipt.
+    inherited_tip: list[str] = []
+    authored_attrs = {
+        attribute for (bone, attribute) in tail_channels if bone in chain
+    }
+    for index, name in enumerate(chain):
+        missing = [attr for attr in authored_attrs if (name, attr) not in tail_channels]
+        if not missing:
+            continue
+        if index != len(chain) - 1:
+            raise RuntimeError(
+                f"tail clip authored no {missing} channel for {name}, which is not the chain tip"
+            )
+        donor = chain[index - 1]
+        for attr in missing:
+            source_channel = tail_channels.get((donor, attr))
+            if source_channel is None:
+                raise RuntimeError(f"tail clip authored no {attr} channel for {donor} to inherit")
+            tail_channels[(name, attr)] = source_channel
+        inherited_tip.append(name)
     if len(tail_channels) < len(chain) * 2:
         raise RuntimeError(f"tail clip authored only {len(tail_channels)} tail channels")
 
@@ -406,6 +429,7 @@ def _run(datamodel, args) -> dict:
         "joints": len(_joints(datamodel.load(str(out)).root)),
         "added": added,
         "channels_copied": copied,
+        "inherited_tip": inherited_tip,
     }
     print(
         f"APPEND {out.name} {report['bytes']}b joints={report['joints']} "

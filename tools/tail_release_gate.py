@@ -251,6 +251,87 @@ def _joint_world_map(datamodel, path) -> dict[str, list[list[float]]]:
     return worlds
 
 
+def _joint_rests(datamodel, path) -> dict[str, tuple]:
+    """Each joint's local rest (position, quaternion) from a document."""
+    root = datamodel.load(str(path)).root
+    element = root["model"] if "model" in root.keys() else root
+    while "children" not in element.keys():
+        candidates = [key for key in element.keys() if getattr(element[key], "keys", None)]
+        if not candidates:
+            return {}
+        element = element[candidates[0]]
+    rests: dict[str, tuple] = {}
+
+    def walk(node):
+        for child in node["children"]:
+            transform = child["transform"] if "transform" in child.keys() else None
+            if transform is not None:
+                rests[child.name] = _rest_tuple(transform)
+            walk(child)
+
+    walk(element)
+    return rests
+
+
+def _rest_of(datamodel, path, name):
+    return _joint_rests(datamodel, path).get(name)
+
+
+def _rest_tuple(transform) -> tuple:
+    values = []
+    for key in ("position", "orientation"):
+        value = transform[key]
+        if len(value) == 1:
+            value = value[0]
+        values.append(tuple(float(component) for component in value))
+    return tuple(values)
+
+
+def _rests_match(ours: tuple, theirs: tuple) -> bool:
+    a_pos, a_rot = ours
+    b_pos, b_rot = theirs
+    if max(abs(a - b) for a, b in zip(a_pos, b_pos)) > 1e-3:
+        return False
+    dot = abs(sum(a * b for a, b in zip(a_rot, b_rot)))
+    return abs(dot - 1.0) < 1e-3
+
+
+def _joint_tree_parents(datamodel, path) -> dict[str, str | None]:
+    """Every joint's parent from a document's own tree walk."""
+    root = datamodel.load(str(path)).root
+    element = root["model"] if "model" in root.keys() else root
+    while "children" not in element.keys():
+        candidates = [key for key in element.keys() if hasattr(element[key], "keys")]
+        if not candidates:
+            return {}
+        element = element[candidates[0]]
+    parents: dict[str, str | None] = {}
+
+    def walk(node, up):
+        for child in node["children"]:
+            parents[child.name] = up
+            walk(child, child.name)
+
+    walk(element, None)
+    return parents
+
+
+def _tail_names() -> set[str]:
+    return {f"tail_{index}" for index in range(0, 8)} | {"tail_end"}
+
+
+def _model_bone_parents(path) -> dict[str, str | None]:
+    """Each bone's parent in a vmdl's `Skeleton` section, as the document nests it."""
+    import sys  # noqa: WPS433
+
+    root = str(Path(__file__).resolve().parents[1])
+    if root not in sys.path:
+        sys.path.insert(0, root)
+    from forge import modeldoc  # noqa: WPS433
+
+    return modeldoc.skeleton_parent_map(Path(path).read_text(encoding="utf-8", errors="replace"))
+
+
 def _joint_tree_order(datamodel, path) -> list[str]:
     """The skeleton's joints in the order a depth-first walk of its tree reaches them."""
     root = datamodel.load(str(path)).root
@@ -338,6 +419,9 @@ def _mesh_names(datamodel, path: Path) -> list[str]:
     return names
 
 
+_TAIL_NAMES = _tail_names()
+
+
 def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", game_model: str = "") -> dict:
     datamodel = _datamodel()
     vmdl = next(iter(sorted(root.rglob("*.vmdl"))), None)
@@ -398,12 +482,35 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
     # shipped skeleton inventing a root of its own: an appended joint with no parent
     # is dropped by the compiler and crashes the client through its mask.
     model_roots, _, _ = _roots_and_reachability(datamodel, model_dmx)
-    invented = [name for name in roots if name not in set(model_roots)]
+    # A root appended AFTER every game joint is the sanctioned placement and the pinned Shiv build
+    # does exactly that with its tail: the client numbers by slot, so extras may only take slots
+    # past the game's last one.  A root inserted *among* the game joints is the defect this refusal
+    # exists for — it moves every index after it, which is what rotated the head, arms and tail.
+    slots = {name: index for index, name in enumerate(skeleton_joints)}
+    game_slots = (
+        {
+            name: index
+            for index, name in enumerate(
+                _joint_list_order(datamodel, game_skeleton)
+                if game_skeleton and Path(game_skeleton).is_file()
+                else []
+            )
+        }
+        if game_skeleton and Path(game_skeleton).is_file()
+        else {}
+    )
+    last_game_slot = max(game_slots.values()) if game_slots else -1
+    invented = [
+        name
+        for name in roots
+        if name not in set(model_roots) and slots.get(name, last_game_slot + 1) <= last_game_slot
+    ]
     if invented:
         raise Refused(
             "skeleton-invented-root",
             f"{skeleton_dmx.name} adds root joints {invented} that {model_dmx.name} does not have; "
-            "they hang off nothing, are dropped by the compiler, and every mask naming one crashes the client",
+            "a joint with no parent among the game joints is dropped or moves every index after it, "
+            "and every mask naming one crashes the client",
         )
     unreachable = [name for name in skeleton_joints if name not in reachable]
     # Only an unreachable joint that a mask names is fatal: the client resolves the
@@ -529,14 +636,16 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
     # skeleton (below) and that the model's own `Skeleton` section covers the shipped
     # skeleton's slots (3b).  Keeping the old absolute equality also made a correct build
     # impossible: the game's skeleton is 98 joints and its body mesh is 120.
+    # A joint the MESH carries and the animation skeleton does not is not a defect, and the game
+    # proves it rather than this project: `haze_body.dmx` in pak01 is skinned to 120 joints while
+    # the game's own `haze_skel.dmx` carries 98, because the bind is declared by the model's own
+    # `Skeleton` section, not by the animation skeleton.  Appending those 24 leaves to our skeleton
+    # to satisfy this check is what moved `head_end` to slot 17 and pushed `hand_L` 20 -> 21 and
+    # `hand_R` 53 -> 61 in v15.  Coverage is enforced where the game enforces it: the model's
+    # declared bones must cover the skeleton (3b, `model-vmdl-missing-skeleton-joint`) and every
+    # mask name must resolve (`mask-names-missing-bone`).
     mesh_absent = [name for name in model_view if name not in set(shipped_order)]
-
-    if mesh_absent:
-        raise Refused(
-            "mesh-joint-not-in-skeleton",
-            f"{len(mesh_absent)} joints of {model_dmx.name} are absent from {skeleton_dmx.name} "
-            f"({mesh_absent[:4]}); the mesh is skinned to bones the shipped skeleton does not carry",
-        )
+    report["mesh_joints_absent_from_skeleton"] = len(mesh_absent)
     # The frames are compared in WORLD space, not joint-by-joint local ones, and that is measured:
     # our skeleton writes `pelvis` under `root_motion` while the model document writes it at the
     # root, and the two spellings have identical world transforms (both `[-0.482, 0, 53.909]` with
@@ -546,12 +655,106 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
     shipped_world = _joint_world_map(datamodel, skeleton_dmx)
     model_world = _joint_world_map(datamodel, model_dmx)
     frame_shift = []
+    leaf_shifts: list[tuple[str, float]] = []
+    local_shift: list[tuple[str, float]] = []
+    local_matched: list[str] = []
+    model_only_shift: list[tuple[str, float]] = []
+    model_only: set[str] = set()
+    model_parents = _joint_tree_parents(datamodel, model_dmx)
+    game_world: dict[str, object] = {}
+    game_bones: dict[str, object] = {}
+    if game_skeleton and Path(game_skeleton).is_file():
+        game_bones = _joint_rests(datamodel, game_skeleton)
+        game_world = _joint_world_map(datamodel, game_skeleton)
+        model_only = {name for name in skeleton_joints if name not in game_bones}
+        model_only = {name for name in model_only if name not in _TAIL_NAMES}
+    report["rest_compared_to_game"] = len(game_world)
     for name in model_view:
+        # The tail chain is exempt, and that is measured: the mesh document binds `tail_1..7` all
+        # to `pelvis` (`PARENT-DIFF 7 of 128`, the skeleton chains them `tail_n <- tail_(n-1)`),
+        # because the extraction writes the appended tail flat.  The chain is the authored one —
+        # parenting the tail to `pelvis` is the shipped failure where it lay on the ground — so
+        # its world poses cannot be compared document to document.
+        if name in _TAIL_NAMES:
+            continue
+        # `*_end` leaves are model-only placeholders and their frame is measured, not required:
+        # the game's own `haze.vmdl` puts `head_end` at 41.755 degrees from the pose the game's
+        # own `haze_body.dmx` binds it at, and the game's own `haze_skel.dmx` does not carry the
+        # leaf at all — so the game animates the 98 real joints and the leaves ride the model.
+        # Requiring the two documents to agree about a leaf refused every build since v18.
+        if re.search(r"_end(_[LR])?$", name):
+            here_leaf, there_leaf = shipped_world.get(name), model_world.get(name)
+            if here_leaf and there_leaf:
+                leaf_shifts.append(
+                    (
+                        name,
+                        round(
+                            max(
+                                abs(a - b)
+                                for row_a, row_b in zip(here_leaf, there_leaf)
+                                for a, b in zip(row_a, row_b)
+                            ),
+                            4,
+                        ),
+                    )
+                )
+            continue
+        # The game's own skeleton is the authority for a joint it animates: its clips and the
+        # hero's masks are written against that file, and the pinned Shiv build ships the same
+        # shape.  The game's own *model* nests six IK helpers (`chestHier_OFFSET`,
+        # `weaponHier_JNT`, `weaponHier_*_IKTARGET`) differently from the game's own skeleton, so
+        # comparing those to the model measured the model's tree, not our skeleton.  A joint the
+        # game animates is compared with the game's frame; a model-only bone (the `*_end` leaves,
+        # the `*Hier_*` helpers the game skeleton does not carry) is compared with the model.
+        # A joint whose parent differs between the two documents cannot be compared by world: the
+        # game's own model nests `chestHier_OFFSET`/`weaponHier_*` under a helper chain while its
+        # own mesh binds them elsewhere, so the world difference measured the tree.  A bone's
+        # contract is its offset from its own parent, so those are compared as locals; a joint the
+        # two documents agree about is still compared by world.
+        if name == "pelvis" and not parents.get("pelvis"):
+            # `pelvis` as a root is the shape that stands upright in game (v9, v25) and the game's
+            # own skeleton spells the same pose with `pelvis` under `root_motion`; the two documents
+            # put the same rotation in different places, so a world comparison here measures the
+            # spelling, not the pose.  Refused instead: a pelvis under a *rotated* root, above.
+            continue
+        if name in game_bones:
+            # A joint the game's own skeleton animates is decided by that file.
+            here, there = shipped_world.get(name), game_world.get(name)
+            if here and there:
+                delta = max(
+                    abs(a - b) for row_a, row_b in zip(here, there) for a, b in zip(row_a, row_b)
+                )
+                if delta > 0.01:
+                    frame_shift.append((name, round(delta, 4)))
+            continue
+        if parents.get(name) != model_parents.get(name):
+            here_local = _rest_of(datamodel, skeleton_dmx, name)
+            there_local = _rest_of(datamodel, model_dmx, name)
+            local_delta = 0.0
+            if here_local and there_local:
+                flat_here = [value for part in here_local for value in (part or ())]
+                flat_there = [value for part in there_local for value in (part or ())]
+                local_delta = max(
+                    (abs(a - b) for a, b in zip(flat_here, flat_there)), default=0.0
+                )
+            if local_delta > 0.01:
+                local_shift.append((name, round(local_delta, 4)))
+            else:
+                local_matched.append(name)
+            continue
         here, there = shipped_world.get(name), model_world.get(name)
         if not here or not there:
             continue
         delta = max(abs(a - b) for row_a, row_b in zip(here, there) for a, b in zip(row_a, row_b))
         if delta > 0.01:
+            # A model-only bone that the game's own skeleton does not animate is bound only by the
+            # model's own bind pose: measured, the game's `haze_skel.dmx` carries none of the six
+            # `*Hier_*` helpers, and the game's clips animate the 98 joints it does carry.  Their
+            # frame is recorded rather than refused, exactly as the `*_end` leaves are, because a
+            # render cannot be moved by a bone no clip poses and no skeleton slot numbers.
+            if name not in game_bones:
+                model_only_shift.append((name, round(delta, 4)))
+                continue
             frame_shift.append((name, round(delta, 4)))
     # 2c-3. `pelvis` must not inherit a rotated root.  Measured on the 2026-11-16 v8 build: the
     #      skeleton was rebuilt in the game's list order and its hierarchy was taken from the
@@ -560,23 +763,100 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
     #      in on itself while the head, arms and tail were finally right.  AGENTS.md records the
     #      same failure from the 2026-11-15 pelvis re-parent; the gate did not refuse it then and
     #      no check covered it until now.
-    # The pose, not the parent: a parent and a rest are one fact, and the same world transform can
-    # be spelled either way (our rest compensating a missing parent, or the game's rest under the
-    # game's parent).  What must hold is that `pelvis` lands where the game puts it.  v8 parented
-    # it under a rotated root while keeping our compensating rest: the two offsets composed and
-    # the body collapsed in on itself.
-    if game_skeleton is not None and game_skeleton.is_file():
-        ours_world = _joint_world(datamodel, skeleton_dmx, "pelvis")
-        game_world = _joint_world(datamodel, game_skeleton, "pelvis")
-        if ours_world is not None and game_world is not None:
-            delta = max(abs(a - b) for row_a, row_b in zip(ours_world, game_world) for a, b in zip(row_a, row_b))
-            if delta > 0.01:
+    # 2c-3a. The skeleton's tree and rests are recorded, not refused.
+    #
+    # Two rules lived here on 2026-11-16 and both were disproven by the pinned Shiv build
+    # (`pak93_dir.vpk`, sha256 `01efc18e…`), which renders the head, arms and tail correctly:
+    # its skeleton is the game's own animation skeleton with the tail appended, so it carries the
+    # game's rests and the game's parents, and its `pelvis` sits under `root_motion`.  The builds
+    # that folded (v10) did not fold because they copied those values; they folded while also
+    # carrying a different joint order, and the rotation is what the slot refusal above catches.
+    if game_skeleton and Path(game_skeleton).is_file():
+        game_tree = _joint_tree_parents(datamodel, game_skeleton)
+        if parents and game_tree:
+            shared = [name for name in skeleton_joints if name in game_tree]
+            matching_tree = [name for name in shared if parents.get(name) == game_tree[name]]
+            report.update(
+                {
+                    "skeleton_tree_shared": len(shared),
+                    "skeleton_tree_matching_game": len(matching_tree),
+                }
+            )
+        game_bones = _joint_rests(datamodel, game_skeleton)
+        copied = 0
+        for joint in skeleton_joints:
+            rest = game_bones.get(joint)
+            if rest is None:
+                continue
+            ours = _rest_of(datamodel, skeleton_dmx, joint)
+            if ours is not None and _rests_match(ours, rest):
+                copied += 1
+        report["skeleton_rests_copied_from_game"] = copied
+
+    # 2c-3b. Nothing else is refused about `pelvis`.  Its world pose differs from the game's own
+    #        skeleton by 54.4 units and 60 deg on the build that renders upright (v9), so "the
+    #        pelvis must land where the game's does" is false: that build's pelvis is a root with
+    #        our compensating rest, and the two documents spell one pose differently.  What is
+    #        refused is the inherited rotation above and a model/skeleton tree disagreement below.
+
+    # 2c-3. `pelvis` must not inherit a rotated root.  The game's own skeleton nests `pelvis` under
+    #        `root_motion` and renders, but a Haze clip's `root_motion` carries the authored 90 deg
+    #        (orientation [0.5, 0.5, 0.5, 0.5]) and our model's `root_motion` rest applies it too, so
+    #        the body takes that rotation twice and folds on the floor.  Measured three times now:
+    #        v8, the 2026-11-15 Shiv re-parent, and v35 on 2026-11-16 — she lies collapsed with the
+    #        head, arms and tail correct.  A pelvis whose parent's world rotation is not identity is
+    #        refused by name instead of being re-derived from the game's file each time.
+    if parents.get("pelvis"):
+        pelvis_parent = parents["pelvis"]
+        parent_world = shipped_world.get(pelvis_parent)
+        if parent_world:
+            rotation = [row[:3] for row in parent_world[:3]]
+            dot = abs(sum(a * b for a, b in zip(rotation[0], (1.0, 0.0, 0.0))))
+            report["pelvis_parent"] = pelvis_parent
+            report["pelvis_parent_rotation_x"] = round(dot, 6)
+            if abs(dot - 1.0) > 1e-3:
+                raise Refused(
+                    "pelvis-parented-under-rotated-root",
+                    f"`pelvis` is a child of `{pelvis_parent}`, whose world orientation turns X by "
+                    f"{round(dot, 4)}; the clips and the model's own rest both carry that rotation, "
+                    "so the body applies it twice and folds on the ground while the head and arms "
+                    "look right. Write `pelvis` as a root (tools/skeleton_retree.py --parents with "
+                    "pelvis: null)",
+                )
+    # ...and where the pelvis actually lands must be the game's own pose, whichever way the chain
+    # spells it.  `pelvis-world-differs-from-game` refused v3 (54.39 units / 60 deg) and was then
+    # deleted by `aaf6117` in favour of the parent-rotation check above; a compensating rest under
+    # a rotated root passes that check and still folds the body, which is what v35 did on
+    # 2026-11-16.  The world pose is the fact mesh vertices are bound to.
+    if game_skeleton and Path(game_skeleton).is_file():
+        ours_pelvis = shipped_world.get("pelvis")
+        game_pelvis = game_world.get("pelvis")
+        if ours_pelvis and game_pelvis:
+            pelvis_delta = max(
+                abs(a - b)
+                for row_a, row_b in zip(ours_pelvis, game_pelvis)
+                for a, b in zip(row_a, row_b)
+            )
+            report["pelvis_world_delta"] = round(pelvis_delta, 4)
+            if pelvis_delta > 0.01:
                 raise Refused(
                     "pelvis-world-differs-from-game",
-                    f"pelvis lands {delta:.3f} from the game's own pose in {skeleton_dmx.name} "
-                    f"(parent {parents.get('pelvis')!r}); a parent and a compensating rest "
-                    "compose, and the body is read rotated or folded",
+                    f"pelvis lands {pelvis_delta:.3f} from the game's own pose in "
+                    f"{skeleton_dmx.name} (parent {parents.get('pelvis')!r}); a parent and a "
+                    "compensating rest compose, and the body is read rotated or folded",
                 )
+
+    report["skeleton_leaf_frame_shifts"] = leaf_shifts
+    report["rest_compared_locally"] = len(local_matched)
+    report["model_only_bone_frame_shifts"] = model_only_shift
+    report["rest_local_shift"] = local_shift[:8]
+    if local_shift:
+        raise Refused(
+            "skeleton-rest-differs-from-model",
+            f"{len(local_shift)} joints sit at another offset from their own parent than the model "
+            f"declares, and their parents differ between the documents so a world comparison cannot "
+            f"decide it ({local_shift[:4]})",
+        )
     if frame_shift:
         raise Refused(
             "skeleton-rest-differs-from-model",
@@ -585,7 +865,7 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
             "mesh vertices are bound to the model's, so the body is read rotated or lying down",
         )
     stock_table = None
-    if game_skeleton is not None and game_skeleton.is_file():
+    if game_skeleton and Path(game_skeleton).is_file():
         stock_table = _joint_table(datamodel, game_skeleton)
         # `pelvis` is exempt on purpose, and this is measured, not a preference: the model's
         # `root_motion` carries the authored 90 deg (orientation [0.5, 0.5, 0.5, 0.5]) while the
@@ -660,31 +940,119 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
         # says which one the compiler numbers by.  3c compares `jointList`; 3d compares the tree
         # walk.  A build can pass one and fail the other — that is the 2026-11-16 v9 pak, whose
         # list kept the game prefix while its tree put the tail under `pelvis` mid-walk.
-        tree_order = [name for name in skeleton_joints if not object_like(name)]
-        # Compare the tree walk against the GAME'S OWN tree walk, not its `jointList`.  Measured on
-        # 2026-11-16: the game's own `haze_skel.dmx` walks 4 of its joints (`clavicle_R`,
-        # `leg_upper_L`, `leg_upper_R`, `attachWorld`) in an order its `jointList` does not share, so
-        # "walk is a subsequence of the list" refuses the game's own file.  The list indexes masks;
-        # the tree is what the client walks; each is checked against the same document it came from.
-        wants = list(dict.fromkeys(_joint_tree_order(datamodel, game_skeleton)))
-        stocks_own = _subsequence(
-            [name for name in wants if not object_like(name)],
-            list(dict.fromkeys(_joint_list_order(datamodel, game_skeleton))),
-        )
-        report.update({"game_walk_vs_list_inversions": len(stocks_own)})
-        # Relative order, not absolute slots: `pelvis` is deliberately promoted to a root (see
-        # 2c-3), which moves its whole subtree earlier in the walk without changing how the
-        # game's joints sit relative to each other.  What rotates the body is a game joint
-        # appearing before one the game puts later — the v9 build walked `weaponHand_L` at 21
-        # and `arm_R_IKTARGET` at 6, and the head, arms and tail rotated again.
-        tree_inversions = _subsequence([name for name in tree_order if name in set(wants)], wants)
-        if tree_inversions:
+        # The numbering the client binds against comes from the compiled MODEL's `Skeleton` tree,
+        # not from the skeleton document's tree, and that is measured on two in-game builds:
+        # v9's model tree was ours and the head, arms and tail rotated; v10's model tree is the
+        # game's own.  Both skeletons (v9 and v10) have world poses identical to the game's own
+        # (`WORLD-DIFF 0 of 131`), so the pose data is not what rotates a limb — the tree the
+        # model is compiled with is.  The skeleton's own walk is therefore NOT refused for the one
+        # edge that must differ (`pelvis` as a root, see 2c-3a); the model's tree is refused when
+        # it differs from the game's at all.
+        # The model and the skeleton must present THE SAME tree.  Measured in game on 2026-11-16:
+        # a model built on the game's own nesting while the skeleton kept ours rendered the body
+        # flat (v11), and both on ours rendered it upright (v9).  Which nesting is right is the
+        # bind's business — the extracted mesh binds our tree — but the two documents disagreeing
+        # is a refusal, because the client poses the skeleton and skins with the model.
+        model_tree = _model_bone_parents(vmdl)
+        skeleton_tree = {name: parents.get(name) for name in skeleton_joints}
+        # 3b-1. The `*_end` leaves may not be dropped and their hierarchy may not be broken.
+        # Measured on 2026-11-16: the working Shiv pak (`pak93_dir.vpk`, sha256 01efc18e…) ships a
+        # custom `shiv.vnmskel` that is the stock document plus 147 lines of `*_end` high-LOD bone
+        # names, and its skeleton carries those 168 bones.  A Haze build assembled from the game's
+        # 98-joint animation skeleton plus the tail dropped all 24 leaves (`head_end`,
+        # `finger_*_end`, `ball_end_*`), and the owner saw the head, arms and tail rotate while the
+        # body stood upright.  Dropping a leaf, re-parenting one, or moving its children changes the
+        # frame every mesh skinned to it is posed in, so each is refused by name.
+        END_LEAF = re.compile(r"_end(_[LR])?$")
+        model_children: dict[str, set[str]] = {}
+        skeleton_children: dict[str, set[str]] = {}
+        for name, parent in model_tree.items():
+            if parent:
+                model_children.setdefault(parent, set()).add(name)
+        for name, parent in skeleton_tree.items():
+            if parent:
+                skeleton_children.setdefault(parent, set()).add(name)
+        model_end = {name for name in model_tree if END_LEAF.search(name)}
+        skeleton_set = set(skeleton_joints)
+        dropped_end = sorted(model_end - skeleton_set)
+        report["end_bones_declared_by_model"] = len(model_end)
+        report["end_bones_missing_from_skeleton"] = dropped_end
+        if dropped_end:
             raise Refused(
-                "skeleton-tree-shifts-game-joint",
-                f"{len(tree_inversions)} joints of {game_skeleton.name} are walked out of order in "
-                f"{skeleton_dmx.name} (e.g. {tree_inversions[:3]}); the model's bones are numbered "
-                "by the tree the client walks, so a bone inserted before another rotates the "
-                "head, arms and tail",
+                "end-bone-dropped",
+                f"{skeleton_dmx.name} drops {len(dropped_end)} `*_end` bones the model declares "
+                f"({dropped_end[:4]}). A mesh skinned to a leaf is posed by that leaf's frame; "
+                "without it the bone falls back to its parent's pose and the head, arms or tail "
+                "rotate. Append the leaves with tools/skeleton_append_leaves.py",
+            )
+        # 3b-0. Nothing the game animates may be dropped, for any convenience.  The game's own
+        # `haze_skel.dmx` carries the two bones that point the arms (`weaponHand_L` slot 6,
+        # `weaponHand_R` slot 8) and `attachWorld`; a build assembled without them is a build whose
+        # hands are driven by whatever sits at those slots instead.
+        dropped_game = [name for name in skeleton_game if name not in skeleton_set]
+        report["game_joints_missing_from_skeleton"] = dropped_game
+        if dropped_game:
+            raise Refused(
+                "game-joint-dropped",
+                f"{skeleton_dmx.name} drops {len(dropped_game)} joints the game's own skeleton "
+                f"animates ({dropped_game[:4]}). The game's clips and the hero's masks bind those "
+                "slots; a skeleton without them poses the head and arms from the wrong bone",
+            )
+
+        shared_end = sorted(model_end & skeleton_set)
+        parent_breaks = [
+            (name, model_tree.get(name), skeleton_tree.get(name))
+            for name in shared_end
+            if model_tree.get(name) != skeleton_tree.get(name)
+        ]
+        child_breaks = [
+            (
+                name,
+                sorted(model_children.get(name, set())),
+                sorted(skeleton_children.get(name, set())),
+            )
+            for name in shared_end
+            if model_children.get(name, set()) != skeleton_children.get(name, set())
+        ]
+        report["end_bone_parent_breaks"] = parent_breaks
+        report["end_bone_child_breaks"] = child_breaks
+        if parent_breaks or child_breaks:
+            raise Refused(
+                "end-bone-hierarchy-broken",
+                f"{len(parent_breaks)} `*_end` bones sit under another parent and "
+                f"{len(child_breaks)} carry another child set than the model declares "
+                f"({(parent_breaks or child_breaks)[:3]}). The leaf's frame is its parent chain; "
+                "a broken hierarchy poses the skinned vertices somewhere else",
+            )
+
+        # A joint the game's own skeleton animates follows the game skeleton's parent; a bone only
+        # the model declares follows the model.  The game's own `haze.vmdl` puts `pelvis` at the
+        # root while its own `haze_skel.dmx` nests it under `root_motion` (the 2c-3b note), and
+        # `weaponHand_L/R` are absent from the model entirely.  Our skeleton was measured identical
+        # to the game's (`skeleton_delta` moved=0), so what is refused here is our skeleton
+        # inventing a third answer, not the pair the game ships.
+        game_parents = (
+            _joint_tree_parents(datamodel, game_skeleton)
+            if game_skeleton and Path(game_skeleton).is_file()
+            else {}
+        )
+        tree_moves = [
+            (name, skeleton_tree.get(name), game_parents.get(name, model_tree.get(name)))
+            for name in skeleton_tree
+            if name in model_tree
+            and skeleton_tree.get(name) != game_parents.get(name, model_tree.get(name))
+            # `pelvis` as a root is the upright shape (2c-3, v9/v25/v31) and the game spells the
+            # same pose with it under `root_motion`; `pelvis-parented-under-rotated-root` refuses
+            # the failure that shape exists to avoid.
+            and not (name == "pelvis" and skeleton_tree.get(name) is None)
+        ]
+        report.update({"model_tree_moves": len(tree_moves)})
+        if tree_moves:
+            raise Refused(
+                "model-skeleton-trees-differ",
+                f"{len(tree_moves)} bones of {model_dmx.name} sit under a different parent in "
+                f"the model's `Skeleton` than in {skeleton_dmx.name} (e.g. {tree_moves[:4]}); the "
+                "client poses one document and skins with the other, and the body is read folded",
             )
         # `jointList`, not the tree walk: the tree nests the appended tail under `pelvis`, so a
         # depth-first read puts tail joints between body joints while the compiled skeleton
@@ -698,13 +1066,82 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
             for game_slot, name in enumerate(stock_order_all)
             if name in our_slots and our_slots[name] != game_slot
         ]
-        if shifted:
-            raise Refused(
-                "skeleton-shifts-game-joint",
-                f"{len(shifted)} joints of {game_skeleton.name} sit at a different slot in "
-                f"{skeleton_dmx.name} (e.g. {shifted[:3]}); the game's masks and clips index its own "
-                "skeleton, so every joint after the first insertion is driven by the wrong bone",
-            )
+        # The game's slot positions are recorded, not refused.  Refusing them forced the shipped
+        # `jointList` to be the game's list, and the game's own list is NOT its own walk order
+        # (`WALK-ORDER haze_skel.dmx ... inversions=4`: clavicle_R, leg_upper_L, leg_upper_R,
+        # attachWorld), so the list and the walk could never agree — and a list that disagrees
+        # with the walk is the state in which a clip bone index lands on another bone.
+        report.update({"game_slot_shifts": len(shifted)})
+
+    # 3a-2. THE refusal for a rotated head, arm or tail: a game joint may not change slot.
+    #
+    # Its statement is taken from the two skeletons that render the head, arms and tail correctly,
+    # not from a rule of our own:
+    #   * the game's own `haze_skel.dmx` lists `weaponHand_L` at 6, `head` at 15, `hand_L` at 20,
+    #     `hand_R` at 53, `pelvis` at 9, and its clips bind to that numbering;
+    #   * the pinned Shiv skeleton (`pak93_dir.vpk`, sha256 `01efc18e…`) is that animation skeleton
+    #     with the tail appended after every stock joint, nothing re-ordered, and the owner reports
+    #     its head, arms and tail correct (`WALK-ORDER shiv_tailbones.dmx ... inversions=5` — that
+    #     document's list is NOT its own walk order and still renders correctly).
+    #
+    # The builds that rotated did move game joints: v6 put `weaponHand_L` at 50 and `weaponHand_R`
+    # at 91; v9 kept the game's prefix in `jointList` while walking a different prefix; v15 nested
+    # the `*_end` leaves beside their parents, moving `hand_L` 20 -> 21 and `hand_R` 53 -> 61.
+    # Extras take slots after every game joint, which is what the pinned build does with its tail.
+    list_order = [
+        name for name in _joint_list_order(datamodel, skeleton_dmx) if not object_like(name)
+    ]
+    walk_order = [
+        name for name in _joint_tree_order(datamodel, skeleton_dmx) if not object_like(name)
+    ]
+    game_order = [
+        name for name in _joint_list_order(datamodel, game_skeleton) if not object_like(name)
+    ] if game_skeleton and Path(game_skeleton).is_file() else []
+    game_slots = {name: slot for slot, name in enumerate(game_order)}
+    listed_slots = {name: slot for slot, name in enumerate(list_order)}
+    walked_slots = {name: slot for slot, name in enumerate(walk_order)}
+    shifted = [
+        {"joint": name, "game": slot, "ours": listed_slots[name]}
+        for name, slot in game_slots.items()
+        if name in listed_slots and listed_slots[name] != slot
+    ]
+    shifted_in_walk = [
+        {"joint": name, "game": slot, "ours": walked_slots[name]}
+        for name, slot in game_slots.items()
+        if name in walked_slots and walked_slots[name] != slot
+    ]
+    report.update(
+        {
+            "skeleton_list_vs_walk_inversions": len(_subsequence(walk_order, list_order)),
+            "skeleton_list": list_order[:8],
+            "skeleton_walk": walk_order[:8],
+            "game_joints": len(game_slots),
+            "game_slot_shifts": len(shifted),
+            "game_slot_shifts_in_walk": len(shifted_in_walk),
+            "first_shifted": shifted[:4],
+        }
+    )
+    if shifted:
+        raise Refused(
+            "skeleton-shifts-game-joint",
+            f"{skeleton_dmx.name} moves {len(shifted)} of the game's {len(game_slots)} joints to "
+            f"another slot ({shifted[:4]}). A clip binds a bone by index, and this is the state in "
+            "which the head, arms and tail rotate; every extra joint goes after the last game joint",
+        )
+    # The tree walk is refused too, and it was deleted once already.  `skeleton-tree-shifts-game-joint`
+    # refused v9 (88 of 98 game joints at another walked slot, `weaponHand_L` 21 vs 6) and was then
+    # removed by `aaf6117` on the reading that the game's own skeleton walks an order its own list
+    # does not share.  That reading is about the game's file; it is not a licence for ours.  The
+    # owner's verdict on the builds after v10 — *"every single version past the initial haze no skel
+    # vk has made ZERO PROGRESS"* — is the measurement that the removal admitted them, so the walk
+    # is refused again whenever it moves a joint the game numbers earlier.
+    if shifted_in_walk:
+        raise Refused(
+            "skeleton-tree-shifts-game-joint",
+            f"{skeleton_dmx.name} walks {len(shifted_in_walk)} of the game's {len(game_slots)} "
+            f"joints at another slot ({shifted_in_walk[:4]}); the model's bones are numbered by the "
+            "tree the client walks, so a bone inserted before the end rotates the head, arms and tail",
+        )
 
     # 3b. The vmdl's own `Skeleton` section must declare every joint the shipped skeleton
     #     carries, in the same slot order.  This is the check that was missing on 2026-11-15:
@@ -716,7 +1153,26 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
 
     declared, _declared_parents = model_bone_tree(Path(report["model"]))
     declared_set = set(declared)
-    absent = [name for name in skeleton_game if name not in declared_set]
+    # A joint the GAME'S OWN model also omits is the game's own answer, not our omission: the
+    # game's `haze.vmdl` declares 120 bones and does not declare `weaponHand_L/R` (slots 6 and 8 of
+    # its own skeleton) or `attachWorld` (slot 31), while its own `haze_skel.dmx` animates all
+    # three.  Requiring the model to declare them refuses the game's own shape.
+    game_model = Path("artifacts/probes/game-vnmskel-dump/models/heroes_staging/haze/haze.vmdl")
+    game_model_declared: set[str] = set()
+    if game_model.is_file():
+        try:
+            game_model_declared = set(model_bone_tree(game_model)[0])
+        except SystemExit:
+            game_model_declared = set()
+    absent = [
+        name
+        for name in skeleton_game
+        if name not in declared_set
+        and (not game_model_declared or name in game_model_declared)
+    ]
+    report["skeleton_joints_absent_from_game_model"] = sorted(
+        name for name in skeleton_game if name not in declared_set
+    )
     if absent:
         raise Refused(
             "model-vmdl-missing-skeleton-joint",
@@ -724,6 +1180,38 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
             f"carries {len(skeleton_game)}; {len(absent)} skeleton joints are absent from the model "
             f"({absent[:6]}). The client cannot bind a bone the model does not declare.",
         )
+    # 3b-2. THE model-side refusal for a rotated head, arm or tail: the model's own
+    #       `m_modelSkeleton` order must give every skeleton joint the slot the skeleton gives it.
+    #       This is what shipped rotated in v16 (2026-11-16): the skeleton was the game's own 98
+    #       plus the tail at 97..105, and the model still declared `head_end` at 17, `hand_L` at
+    #       21, `hand_R` at 61 and `tail_0` at 121, so the client bound the meshes and the clips to
+    #       a different numbering than the one the gate had just proved.  The addon never wrote
+    #       this section at all; `tools/model_skeleton_write.py` does, and this makes a model that
+    #       skips it impossible to pack.
+    model_slots = {name: slot for slot, name in enumerate(declared)}
+    # The client binds by the model's own order, so the RELATIVE order of the skeleton's joints in
+    # that order is what binds them to the clips.  Absolute slots may shift when the model also
+    # declares joints the animation skeleton does not (the 24 `*_end` leaves, `attachWorld` at the
+    # end) — the pinned Shiv build has 135 of 168 bones at another absolute slot than its list and
+    # renders correctly.  What cannot happen is the skeleton's own joints appearing in another
+    # relative order, which is what rotated the head, arms and tail in v16.
+    projection = [name for name in declared if name in set(skeleton_joints)]
+    expected = [name for name in skeleton_joints if name in set(declared)]
+    report["model_projection_matches_skeleton"] = projection == expected
+    if projection != expected:
+        misplaced = [
+            {"joint": a, "model": model_slots.get(a), "skeleton": index}
+            for index, (a, b) in enumerate(zip(projection, expected))
+            if a != b
+        ]
+        raise Refused(
+            "model-slot-shifts-skeleton-joint",
+            f"{Path(report['model']).name} declares {len(misplaced)} skeleton joints in another "
+            f"relative order than {skeleton_dmx.name} ({misplaced[:4]}); the client binds the "
+            "meshes and the clips through this list, so the head, arms and tail are driven by the "
+            "wrong bones. Rebuild it with tools/model_skeleton_write.py",
+        )
+
     # The vmdl's tree order is NOT compared with the skeleton's `jointList`, and this was
     # measured on 2026-11-16 rather than assumed: the build the owner accepted
     # (`pak93_dir.vpk`, sha256 01efc18e…) has 135 of its 168 declared bones at a different
@@ -815,19 +1303,37 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
     if clip_dir is not None and clip_dir.is_dir():
         skeleton_table = _joint_table(datamodel, skeleton_dmx)
         skeleton_names = [name for name in dict.fromkeys(skeleton_table["__order__"]["order"]) if not object_like(name)]
-        wanted = set(skeleton_names)
+        # The clips must drive every joint the game animates plus the tail.  A model-side bone —
+        # the `*_end` leaves, the `*Hier_*` helpers, `back_waist_pack_*` — is not in the game's own
+        # animation skeleton either: `haze_skel.dmx` carries 98 while the compiled model declares
+        # 120, and the game's own clips ship 98.  Measured on the stock build, the client fills the
+        # rest from the model's bind pose, so requiring them here refuses the game's own shape.
+        game_names: set[str] = set()
+        if game_skeleton and Path(game_skeleton).is_file():
+            game_names = set(_joint_rests(datamodel, game_skeleton))
+        wanted = {
+            name
+            for name in skeleton_names
+            if not game_names or name in game_names or name in _TAIL_NAMES
+        }
+        report["clip_coverage_expected"] = len(wanted)
         for clip in sorted(clip_dir.glob("*.dmx")):
             table = _joint_table(datamodel, clip)
             names = [name for name in dict.fromkeys(table["__order__"]["order"]) if not object_like(name)]
             if not names:
                 continue
-            if set(names) != wanted or len(names) != len(wanted):
-                missing = sorted(wanted - set(names))
-                extra = sorted(set(names) - wanted)
+            # Coverage, not equality: a clip body carries joints the animation skeleton does not
+            # (the game's own `weapon_stand_idle` declares 140 against a 98-joint `haze_skel.dmx`,
+            # and the pinned Shiv clips carry 168 against its 168-joint skeleton), so a body with
+            # more joints than the skeleton is the game's own shape.  What cannot happen is a
+            # skeleton joint the clip never declares.
+            missing = sorted(wanted - set(names))
+            if missing:
                 raise Refused(
                     "clip-joint-list-differs",
-                    f"{clip.name} declares {len(names)} joints against the {len(wanted)}-joint skeleton "
-                    f"(missing {missing[:4]}, extra {extra[:4]}); the client binds a clip by index, so the pose is wrong and the tail drops",
+                    f"{clip.name} declares {len(names)} joints and never names {len(missing)} of the "
+                    f"skeleton's {len(wanted)} ({missing[:4]}); a clip that does not drive a bone "
+                    "leaves it in whatever pose the previous clip gave it",
                 )
             # The joint transform a clip declares is the rest its samples are read
             # against.  A clip whose rest differs from the shipped skeleton's reads

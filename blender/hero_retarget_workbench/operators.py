@@ -306,10 +306,15 @@ class DMF_OT_import_hero(Operator):
         swapped_body = ""
         # An extraction written before body detection understood numbered body
         # variants can have a head saved as the body. Repair it from the same
-        # hero folder before the import opens the wrong DMX.
+        # hero folder before the import opens the wrong DMX -- and repair it to the
+        # model's own answer, never to a filename score: `live.choose_body` alone
+        # picked `gigawatt_prisoner_lightning_ball_upper_body.dmx` for Seven, an
+        # ability clip, and the import then reported no armature.  The model's
+        # `Skeleton` bone nodes and `BodyGroupList` decide the body.
         siblings = sorted(path.parent.glob("*.dmx"))
-        chosen = live.choose_body(siblings) if siblings else None
-        if chosen is not None and chosen != path and live.looks_like_body(chosen):
+        model_vmdl = next(iter(sorted(path.parent.glob("*.vmdl"))), None)
+        chosen = live.body_for_hero_folder(model_vmdl, siblings) if model_vmdl else None
+        if chosen is not None and chosen != path:
             swapped_body = path.name
             path = chosen
             settings.body_dmx = str(path)
@@ -1449,6 +1454,92 @@ class DMF_OT_pick_vmdl(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_write_model(Operator):
+    bl_idname = "dmf.write_model"
+    bl_label = "Write Model Skeleton"
+    bl_description = "Rewrite the hero vmdl's Skeleton from the imported armature, tail bones included"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        from . import release
+
+        try:
+            result = release.write_model(settings, name=settings.addon_name or "")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        _status(settings, f"model written with {result['bones']} bones: {result['vmdl']}", "OK")
+        return {"FINISHED"}
+
+
+class DMF_OT_pack_vpk(Operator):
+    bl_idname = "dmf.pack_vpk"
+    bl_label = "Pack VPK"
+    bl_description = "Pack the compiled addon with Source 2 Viewer's own --vpk_create"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        from . import release
+
+        out = Path(bpy.path.abspath(settings.release_pak)) if settings.release_pak else None
+        if out is None or not str(out):
+            out = Path(core.project_root(settings)) / "artifacts" / "ports" / f"{settings.addon_name or 'port'}.vpk"
+        try:
+            receipt = release.pack(settings, out, name=settings.addon_name or "")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        settings.release_pak = receipt["pak"]
+        settings.release_note = f"packed {receipt['bytes']} bytes, {len(receipt['files'])} files"
+        _status(settings, f"packed {receipt['pak']}", "OK")
+        return {"FINISHED"}
+
+
+class DMF_OT_install_pak(Operator):
+    bl_idname = "dmf.install_pak"
+    bl_label = "Install Pak"
+    bl_description = "Back up the addon slot and copy the packed VPK into it"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        from . import release
+
+        pak = Path(bpy.path.abspath(settings.release_pak)) if settings.release_pak else None
+        if pak is None or not pak.is_file():
+            self.report({"ERROR"}, "Pack a VPK first")
+            return {"CANCELLED"}
+        try:
+            result = release.install(settings, pak)
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        settings.release_note = f"installed {result['bytes']} bytes, previous kept at {result['backup']}"
+        _status(settings, settings.release_note, "OK")
+        return {"FINISHED"}
+
+
+class DMF_OT_launch_game(Operator):
+    bl_idname = "dmf.launch_game"
+    bl_label = "Launch Game"
+    bl_description = "Start the game the installed pak belongs to"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        from . import release
+
+        try:
+            result = release.launch(settings)
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        _status(settings, f"game started, pid {result['pid']}", "OK")
+        return {"FINISHED"}
+
+
 CLASSES = (
     DMF_OT_detect_paths,
     DMF_OT_clear_job,
@@ -1474,6 +1565,10 @@ CLASSES = (
     DMF_OT_pick_old_vmdl,
     DMF_OT_update_old_addon,
     DMF_OT_pick_vmdl,
+    DMF_OT_write_model,
+    DMF_OT_pack_vpk,
+    DMF_OT_install_pak,
+    DMF_OT_launch_game,
 )
 
 

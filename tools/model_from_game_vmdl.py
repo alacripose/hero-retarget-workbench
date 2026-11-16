@@ -20,7 +20,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import re
 from pathlib import Path
+
+TAIL_PREFIX = re.compile(r"^tail_[0-9]+$")
 
 ROOT = Path(__file__).resolve().parents[1]
 for entry in (str(ROOT), str(ROOT / "tools")):
@@ -44,6 +47,16 @@ def main() -> int:
     parser.add_argument("--game-vmdl", required=True)
     parser.add_argument("--vmdl", required=True)
     parser.add_argument("--skeleton", required=True)
+    parser.add_argument(
+        "--pelvis-block-from",
+        default="",
+        help="a vmdl whose `pelvis` bone block is authoritative (the rest that compensates the root)",
+    )
+    parser.add_argument(
+        "--tree-from-skeleton",
+        action="store_true",
+        help="nest the bones with the skeleton DMX's own parents instead of the game model's",
+    )
     parser.add_argument("--report", default="")
     args = parser.parse_args(argv)
 
@@ -68,12 +81,14 @@ def main() -> int:
     skeleton_order = [name for name in skeleton_order if not object_like(name)]
     skeleton_parents = {name: table[name]["parent"] for name in skeleton_order if name in table}
 
+    # A game bone the skeleton does not carry is kept in the model and recorded, not refused.
+    # Measured: the game's own pair ships this way — `haze.vmdl` declares 120 bones and
+    # `haze_skel.dmx` carries 98, so all 22 `*_end` leaves ride the model and the game renders the
+    # head, arms and tail correctly.  The skeleton only has to carry what the clips animate.
     lost = [name for name in game_fields if name not in set(skeleton_order)]
     if lost:
-        raise SystemExit(
-            f"model-rebuild-drops-game-bone: the shipped skeleton does not carry {lost[:6]}; "
-            "a model cannot bind a bone the skeleton lost"
-        )
+        print(f"MODEL-FROM-GAME keeps {len(lost)} model-only bones the skeleton does not carry: {lost[:6]}", flush=True)
+
     appended = [name for name in skeleton_order if name not in game_fields]
     missing_blocks = [name for name in appended if name not in our_fields]
     if missing_blocks:
@@ -83,9 +98,24 @@ def main() -> int:
     # take the skeleton's parent, which is the only fact about them that can be derived.
     fields = {name: game_fields[name] for name in game_fields}
     parents = {name: game_parents.get(name) for name in game_fields}
+    if args.tree_from_skeleton:
+        # The mesh bind is ours, so the model must present the tree the bind was authored
+        # against.  Measured in game: the game's tree rendered the body flat (v11), our tree
+        # rendered it upright (v9).  Only the nesting changes here; every bone keeps its block.
+        parents = {name: skeleton_parents.get(name) for name in fields}
     for name in appended:
         fields[name] = our_fields[name]
         parents[name] = skeleton_parents.get(name)
+
+    # `pelvis` is the one bone the game's own model cannot supply: it sits at the root in our
+    # model, carrying the rest that compensates the authored `root_motion` rotation.  Copying the
+    # game's block puts the pelvis under that rotation and the body folds (v8 and v10 in game).
+    if args.pelvis_block_from:
+        source = Path(args.pelvis_block_from)
+        blocks = modeldoc.skeleton_bone_blocks(source.read_text(encoding="utf-8", errors="replace"))
+        if "pelvis" not in blocks:
+            raise SystemExit(f"model-rebuild-no-pelvis-rest: {source} carries no pelvis bone block")
+        fields["pelvis"] = blocks["pelvis"]
 
     order = [name for name in skeleton_order if name in fields]
     updated = modeldoc.rewrite_skeleton_bones(our_text, parents, order, fields)

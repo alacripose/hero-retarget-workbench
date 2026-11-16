@@ -80,17 +80,19 @@ already answered — which skeleton, which track set, whose `root_motion`. That 
 questions were re-litigated across Haze, Shiv and Werewolf entries and why the accepted 06:47 recipe
 had to be rediscovered twice.
 
-## The contradiction this audit found
+## The divergence this audit found, and its resolution
 
 `tools/tail_release_pack.py` refuses `skeleton-not-shipped`, and `tools/vpk_parity.py` scores
 `skeleton-not-shipped` as a parity dimension. `tailops.publish_tail_anims` (0.13.1/0.13.2) instead
 appends the tail bones to **the model's own skeleton** and deliberately ships no `vnmskel_c`.
 
-Both cannot be the rule. This document does not pick one — the accepted-state entries and the pinned
-pak resolve it (`artifacts/oldviper/shiv_merge_pak.vpk` ships the 06:47 `shiv.vnmskel`, and the
-accepted Haze reference `haze_noskel.vpk` ships none because it also ships no tail bones in the
-model). What is recorded here is that a shipped refusal and a shipped addon currently disagree, and
-that the next pak must state which convention it follows in its pin.
+**The rule is the first one.** Owner correction, verbatim: *"We ship the nmskeleton for the
+animations"*. The compiled `vnmskel_c` carries the tail chain the clips are authored against, the
+pinned Shiv pak ships exactly that, and the pak exists — so this is not an open question to be
+arbitrated by a flag. A first attempt to settle it with `--skeleton-convention in-model` was wrong
+for the reason above: a flag that can express the unshipped convention is a way to ship it. The
+option was removed, not defaulted; the packer refuses a pak with no compiled `vnmskel_c` and the
+addon's in-model branch is the branch recorded as not accepted.
 
 **Also recorded:** the 0.13.1/0.13.2 tailops work is uncommitted in the working tree and is **not**
 the accepted state. It must not be published as the target surface on the strength of its tests
@@ -103,9 +105,7 @@ the accepted state. It must not be published as the target surface on the streng
    stays as the record of a measured dead end, and nothing calls it.
 2. `forge/port_target.py` becomes the only way a tool names a hero. A new hero is then a parameter,
    which is the property the addon already had.
-3. `tail_release_pack.py` keeps its refusals and gained the missing one this audit surfaced: a pak
-   must now **declare** its skeleton convention. `--skeleton-convention shipped` requires a compiled
-   `.vnmskel_c`; `in-model` requires none and refuses `skeleton-convention-conflict` if one ships.
-   Two competing rigs for one model is no longer a pak that can be built, and neither is a pak with no
-   stated rig. Verified: all three declarations refuse on the hand-built trees and no pak is written.
-   (`clip-inventory-partial` landed earlier for the hand-picked clip set.)
+3. `tail_release_pack.py` keeps one skeleton rule with no alternative: a pak ships its compiled
+   `.vnmskel_c` (`skeleton-not-shipped` otherwise), and it refuses a hand-picked clip subset
+   (`clip-inventory-partial`, `clip-inventory-missing`). Verified on the hand-built trees: every one
+   refuses and no pak is written.
