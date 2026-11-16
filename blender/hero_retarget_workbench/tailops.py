@@ -1650,7 +1650,44 @@ def _schedule_scan(settings, files: list[Path]) -> None:
     global _SCAN_TIMER
     if _SCAN_TIMER is not None:
         return
-    _SCAN_TIMER = _TailScanJob(settings, files)
+    try:
+        job = _TailScanJob(settings, files)
+    except Exception:
+        # Construction settles the failed job before re-raising. Keep the
+        # callback quiet so a S2V completion cannot leave a red traceback in
+        # Blender while the page still shows the failure.
+        return
+    _SCAN_TIMER = job
+
+
+def _release_scan_job(job=None) -> None:
+    """Clear the module guard for this job, or for a setup failure."""
+    global _SCAN_TIMER
+    if job is None or _SCAN_TIMER is job:
+        _SCAN_TIMER = None
+
+
+def _settle_scan_failure(settings, error, job=None) -> None:
+    """Always leave a failed scan with job_running false.
+
+    A constructor or first timer tick can fail before the normal tick
+    exception path exists.  Setting job_running first is deliberate: even if
+    one of the later display fields is gone, the UI must not stay locked.
+    """
+    try:
+        settings.job_running = False
+    except Exception:
+        pass
+    try:
+        settings.tail_option_note = f"Tail scan failed: {error}"
+        settings.job_state = "FAILED"
+        settings.job_message = str(error)
+        lines = settings.job_log.splitlines()[-6:]
+        settings.job_log = "\n".join([*lines, f"failed: {error}"])
+    except Exception:
+        pass
+    finally:
+        _release_scan_job(job)
 
 
 class _TailScanJob:
@@ -1665,10 +1702,10 @@ class _TailScanJob:
 
     def __init__(self, settings, files):
         self.settings = settings
-        self.live_files = [Path(path) for path in (files or [])]
+        self.live_files = []
         self.live_index = 0
         self.live_found = 0
-        self.roots = _candidate_roots(settings)
+        self.roots = []
         self.root_index = 0
         self.files = None
         self.best: dict[Path, dict[str, tuple[Path, list[str]]]] = {}
@@ -1676,18 +1713,25 @@ class _TailScanJob:
         self.import_index = 0
         self.scanned = 0
         self.imported = 0
-        settings.tail_options.clear()
-        settings.tail_option_index = 0
-        settings.job_running = True
-        settings.job_kind = "TAIL_SCAN"
-        settings.job_label = "Scanning tail sources"
-        settings.job_message = "reading local rigs"
-        settings.job_progress = 0.02
-        settings.job_state = "RUNNING"
-        settings.job_cancellable = False
-        settings.job_log = "Scanning tail sources: reading local rigs"
-        self._known_rigs()
-        self._timer = bpy.app.timers.register(self.tick, first_interval=0.02, persistent=True)
+        self._timer = None
+        try:
+            self.live_files = [Path(path) for path in (files or [])]
+            settings.tail_options.clear()
+            settings.tail_option_index = 0
+            settings.job_running = True
+            settings.job_kind = "TAIL_SCAN"
+            settings.job_label = "Scanning tail sources"
+            settings.job_message = "reading local rigs"
+            settings.job_progress = 0.02
+            settings.job_state = "RUNNING"
+            settings.job_cancellable = False
+            settings.job_log = "Scanning tail sources: reading local rigs"
+            self.roots = _candidate_roots(settings)
+            self._known_rigs()
+            self._timer = bpy.app.timers.register(self.tick, first_interval=0.02, persistent=True)
+        except Exception as error:
+            _settle_scan_failure(settings, error, self)
+            raise
 
     def _known_rigs(self) -> None:
         settings = self.settings
@@ -1799,29 +1843,25 @@ class _TailScanJob:
     def _finish(self) -> None:
         global _SCAN_TIMER
         settings = self.settings
-        found = len(settings.tail_options)
-        settings.tail_option_index = 0
-        settings.tail_option_note = (
-            f"{found} tail chain(s): {self.live_found} from the live roster, "
-            f"{self.imported}/{self.scanned} extracted skeletons opened across "
-            f"{len(self.roots)} folder(s)"
-        )
-        settings.job_progress = 1.0
-        settings.job_message = "done"
-        settings.job_state = "DONE"
-        settings.job_running = False
-        lines = settings.job_log.splitlines()[-6:]
-        settings.job_log = "\n".join([*lines, f"done: {settings.tail_option_note}"])
-        _SCAN_TIMER = None
+        try:
+            settings.job_running = False
+            found = len(settings.tail_options)
+            settings.tail_option_index = 0
+            settings.tail_option_note = (
+                f"{found} tail chain(s): {self.live_found} from the live roster, "
+                f"{self.imported}/{self.scanned} extracted skeletons opened across "
+                f"{len(self.roots)} folder(s)"
+            )
+            settings.job_progress = 1.0
+            settings.job_message = "done"
+            settings.job_state = "DONE"
+            lines = settings.job_log.splitlines()[-6:]
+            settings.job_log = "\n".join([*lines, f"done: {settings.tail_option_note}"])
+        finally:
+            _release_scan_job(self)
 
     def _fail(self, error) -> None:
-        global _SCAN_TIMER
-        settings = self.settings
-        settings.tail_option_note = f"Tail scan failed: {error}"
-        settings.job_state = "FAILED"
-        settings.job_message = str(error)
-        settings.job_running = False
-        _SCAN_TIMER = None
+        _settle_scan_failure(self.settings, error, self)
 
 
 def load_option(settings, index: int) -> str:

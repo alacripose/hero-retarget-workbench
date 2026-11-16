@@ -1,4 +1,4 @@
-# UI pass 0.16.5
+# UI pass 0.16.6
 
 The Workbench pages were built one at a time, and the check that every action has one home did not
 exist. This pass adds the check, moves staging and compiling onto the Release page, replaces the hero
@@ -40,6 +40,21 @@ two, chips are real buttons, and advanced panels stay folded. The full checklist
 
 `python tools/ui_parity.py --check` fails on an action drawn on two pages, a page with no panel, or an
 action drawn that no operator declares. `tests/test_ui_parity.py` pins the same result.
+
+## 0.16.6 — a failed tail scan always releases the job guard
+
+- `_TailScanJob` now settles construction and first-tick failures before the
+  timer can disappear. `_settle_scan_failure` sets `job_running = False` first,
+  writes the failed state and note defensively, and clears `_SCAN_TIMER` in a
+  `finally`. A constructor error is caught by `_schedule_scan`; a first tick is
+  caught by the normal tick path. Neither can leave the scan button disabled or
+  the next scan blocked by a stale guard.
+- Measured: `208` tests pass, `ui_parity --check` and `ui_prose --check` are
+  zero, and compileall is clean. A temporary Blender probe forced both a setup
+  failure and a first-tick failure; both left `job_running=False`,
+  `job_state=FAILED` and `_SCAN_TIMER=None` (3/3 checks).
+- Zip probe: `0.16.6`, 68 files, 479,207 bytes, sha256
+  `db83cfeccfaa2a85140a41a083925e8f11e7b7d52dd5deb6093aa8cc5c9a71f0`.
 
 ## 0.16.5 — the Parts collection is a table, and tail scanning yields
 
