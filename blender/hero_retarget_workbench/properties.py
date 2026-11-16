@@ -793,7 +793,6 @@ class DMF_Settings(PropertyGroup):
             ("ANIMATIONS", "Animations", "Clip import and write-back"),
             ("COMPARE", "Compare", "Split view and preview action"),
             ("WEIGHTS", "Weights", "Weight solve and the proof gate"),
-            ("HANDOFF", "Handoff", "Export, stage and compile"),
             ("MODS", "Mods", "Scan older packages, update them, or backport them"),
             ("COMPONENTS", "Components", "Stage live cosmetic parts beside a mod"),
             ("RELEASE", "Release", "Write the model, compile, pack, install and launch"),
