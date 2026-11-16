@@ -42,7 +42,7 @@ def record_part(settings, obj) -> bool:
 def import_companions(context, settings) -> dict:
     """Import every other mesh DMX in the hero's folder onto the hero armature.
 
-    A file only counts as a part when importing it actually produces a mesh, so a
+    A file only counts as a part when importing it produces a mesh, so a
     clip that shares the hero's prefix is skipped rather than guessed away.
     """
     armature = settings.target_armature
@@ -475,7 +475,7 @@ def build_chain_cloth(
     """Turn one discovered chain into vertex groups, a chain and a cloth modifier.
 
     Everything comes from the imported data: the mesh is the hero part that is
-    actually skinned to the chain's bones, the vertex groups are those bones (a
+    skinned to the chain's bones, the vertex groups are those bones (a
     missing one is created empty, never filled with invented weights), the pin
     group is the vertices the first bone already drives, and the cloth modifier
     keeps the pin group at those vertices. The mesh keeps its armature modifier

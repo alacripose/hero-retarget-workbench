@@ -2,7 +2,7 @@
 
 Blender addons cannot add a new editor type, so the closest real thing to a
 viewport type of its own is a tab in the Properties editor. Every page here is a
-mirror of the matching sidebar panel — the same draw body, the same operators —
+mirror of the matching sidebar panel, the same draw body, the same operators,
 but only the selected page's panels exist while it is selected.
 
 The mirrors are subclasses, so nothing is duplicated: a fix in ``ui.py`` reaches
@@ -54,8 +54,10 @@ PAGE_BY_ID = {
     "DMF_PT_compare": "COMPARE",
     "DMF_PT_weights": "WEIGHTS",
     "DMF_PT_weights_manual": "WEIGHTS",
-    "DMF_PT_handoff": "HANDOFF",
-    "DMF_PT_handoff_paths": "HANDOFF",
+    # Staging and compiling live on the Release page: one page owns the whole
+    # export -> compile -> pack -> install chain, so the compile button has one home.
+    "DMF_PT_handoff": "RELEASE",
+    "DMF_PT_handoff_paths": "RELEASE",
     "DMF_PT_setup_tools": "SETUP",
     "DMF_PT_mods": "MODS",
     "DMF_PT_components": "COMPONENTS",
@@ -72,7 +74,6 @@ PAGES = (
     "ANIMATIONS",
     "COMPARE",
     "WEIGHTS",
-    "HANDOFF",
     "MODS",
     "COMPONENTS",
     "RELEASE",
@@ -90,7 +91,7 @@ PAGE_ICONS = {
     "ANIMATIONS": "ACTION",
     "COMPARE": "SPLIT_VERTICAL",
     "WEIGHTS": "MOD_VERTEX_WEIGHT",
-    "HANDOFF": "EXPORT",
+
     "MODS": "PACKAGE",
     "COMPONENTS": "MODIFIER",
     "RELEASE": "PACKAGE",
@@ -137,7 +138,10 @@ def draw_page_grid(layout, settings) -> None:
 def current_page(context) -> str:
     scene = getattr(context, "scene", None)
     settings = getattr(scene, "dmf", None) if scene is not None else None
-    return getattr(settings, "props_page", "") if settings is not None else ""
+    page = getattr(settings, "props_page", "") if settings is not None else ""
+    # A file saved before the merge still carries HANDOFF; it opens the page that
+    # now owns staging and compiling instead of an empty one.
+    return "RELEASE" if page == "HANDOFF" else page
 
 
 def mirror_id(panel_idname: str) -> str:

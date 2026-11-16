@@ -19,7 +19,7 @@ import bpy
 from bpy.types import Panel
 from forge import bonerules, paths, stageflow
 
-from . import clipops, core, rules, tailops, tailpreview, ui_popit, workbench
+from . import clipops, core, heropick, rules, tailops, tailpreview, ui_popit, workbench
 
 
 _STATUS_ICONS = {
@@ -83,6 +83,33 @@ def _hero_state(settings) -> str:
     if settings.target_body is None or settings.target_armature is None:
         return "import needed"
     return "imported"
+
+
+def _hero_picker(layout, settings) -> None:
+    """Search, kind filter, a short list and one confirm; no roster dropdown."""
+    search = layout.row(align=True)
+    search.prop(settings, "hero_query", text="", icon="VIEWZOOM")
+    search.operator("dmf.refresh_heroes", text="", icon="FILE_REFRESH")
+    layout.prop(settings, "hero_kind", text="")
+    try:
+        shown = heropick.ensure(settings)
+    except Exception:
+        shown = len(settings.hero_rows)
+    layout.template_list(
+        "DMF_UL_heroes",
+        "source",
+        settings,
+        "hero_rows",
+        settings,
+        "hero_index",
+        rows=7,
+    )
+    row = layout.row(align=True)
+    row.enabled = bool(shown) and not settings.job_running
+    row.operator("dmf.choose_hero", text="Use hero", icon="CHECKMARK")
+    right = row.row(align=True)
+    right.alignment = "RIGHT"
+    right.label(text=f"{shown} shown")
 
 
 def _mesh_state(settings) -> str:
@@ -318,11 +345,6 @@ class DMF_PT_setup(Panel):
             "PACKAGE",
             f"{len(settings.scan_roots)} roots, {settings.mods_scanned} found",
         )
-        mods.operator(
-            "dmf.scan_mods",
-            text="Scan folders",
-            icon="VIEWZOOM",
-        )
         row = mods.row(align=True)
         row.enabled = not settings.job_running
         row.prop_enum(settings, "props_page", "MODS", text="Open Mods", icon="PACKAGE")
@@ -351,7 +373,7 @@ class DMF_PT_source(Panel):
 
         ui_popit.job(layout, settings)
         hero = ui_popit.title(layout, "Hero", _hero_state(settings), "WORLD")
-        hero.prop(settings, "hero_slug", text="")
+        _hero_picker(hero, settings)
         ui_popit.glyphs(
             hero,
             ["dmf.detect", "dmf.extract", "dmf.import_hero"],
@@ -466,7 +488,11 @@ class DMF_PT_parts(Panel):
             "GROUP",
         )
         collection_box.prop(settings, "custom_collection", text="")
-        ui_popit.glyphs(collection_box, ["dmf.scan_parts"], labels={"dmf.scan_parts": "Scan"})
+        ui_popit.glyphs(
+            collection_box,
+            ["dmf.use_active_collection", "dmf.scan_parts"],
+            labels={"dmf.use_active_collection": "Active", "dmf.scan_parts": "Scan"},
+        )
         if not settings.parts:
             _hint(collection_box, "Choose a collection and scan it.", "QUESTION", width=28)
         else:
@@ -1346,7 +1372,7 @@ class DMF_PT_weights_manual(Panel):
 
 
 class DMF_PT_handoff(Panel):
-    bl_label = "CSDK Addon"
+    bl_label = "Stage & compile"
     bl_idname = "DMF_PT_handoff"
     bl_parent_id = "DMF_PT_main"
     bl_space_type = "VIEW_3D"
@@ -1398,6 +1424,12 @@ class DMF_PT_handoff(Panel):
         glyph.operator("dmf.export_stage", text="Export & stage", icon="EXPORT")
         glyph.operator("dmf.compile", text="Compile", icon="PLAY")
         addon.enabled = not settings.job_running
+        _hint(
+            addon,
+            "This is the only compile button. Release packs what it produces.",
+            "INFO",
+            width=30,
+        )
 
 
 class DMF_PT_handoff_paths(Panel):
@@ -1462,7 +1494,6 @@ class DMF_PT_release(Panel):
         layout.label(text="Any staged addon: pack, install, launch", icon="INFO")
         column = layout.column(align=True)
         column.operator("dmf.write_model", icon="ARMATURE_DATA", text="Write model from armature")
-        column.operator("dmf.compile", icon="FILE_REFRESH", text="Compile staged addon")
         column.operator("dmf.pack_vpk", icon="PACKAGE", text="Pack VPK")
         column.operator("dmf.install_pak", icon="IMPORT", text="Install into addon slot")
         column.operator("dmf.launch_game", icon="PLAY", text="Launch game")

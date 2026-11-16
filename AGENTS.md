@@ -100,6 +100,22 @@ ability to detect other installs"*.
   stop there: no clips are authored, no `.vnmskel` is written or compiled, and nothing is blended.
   The owner's correction is the spec: *"it has to literally just be the tail it's bones attached to
   the hero"*, and haze_noskel-without-clips is the shape -- not a partial animation build.
+- **The UI pass has its own refusals, and they read the source.** `tools/ui_parity.py` maps panel
+  classes to `ui_props.PAGE_BY_ID` with `ast`, expands module-level draw helpers, and fails on an
+  action drawn on two pages, a page with no panel, or an action no operator declares.
+  `tools/ui_prose.py` applies the stop-slop and declauding bans to every string the addon shows and
+  `tests/test_ui_parity.py` pins both. The first run found `dmf.compile` drawn on both Handoff and
+  Release: staging and compiling now live on RELEASE only (`DMF_PT_handoff` keeps its draw body and
+  is mapped there), a saved `HANDOFF` page opens RELEASE, and Setup no longer repeats Mods' scan.
+  `dmf.toggle_bone_map` was declared and never drawn, so it is gone; `dmf.use_active_collection` is
+  drawn on Parts.
+- **Heroes are a filtered list, not a native dropdown of every model.** `heropick.py` classifies the
+  roster (HERO, HIDEOUT, OTHER), applies `hero_query` and `hero_kind`, and fills `settings.hero_rows`
+  for `DMF_UL_heroes`; `dmf.choose_hero` writes `hero_slug`. The probe prints four rows, one after
+  the hideout filter, one after the search, and the chosen slug.
+- **The family writing rules are checked, not remembered.** No em dash, no "not just" staging, no
+  intensifier adverbs, no stock marketing words in addon strings; the pass removed the hits and
+  `python tools/ui_prose.py --check` reports zero across the addon.
 - **A pak number cannot go past the game's own pak count unless its folder is a search path.**
   `release.pak_numbers` counts `game/citadel/pakNN_dir.vpk` (this install: 1) and
   `release.search_paths` reads the `SearchPaths` block of the selected install's `gameinfo.gi`,

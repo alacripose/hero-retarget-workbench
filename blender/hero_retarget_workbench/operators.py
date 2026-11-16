@@ -152,6 +152,39 @@ class DMF_OT_clear_job(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_refresh_heroes(Operator):
+    bl_idname = "dmf.refresh_heroes"
+    bl_label = "Refresh Hero List"
+    bl_description = "Rebuild the hero list from the roster, the search text and the kind filter"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        from . import heropick
+
+        shown = heropick.refresh(settings)
+        _status(settings, f"{shown} models shown", "OK" if shown else "WARN")
+        return {"FINISHED"}
+
+
+class DMF_OT_choose_hero(Operator):
+    bl_idname = "dmf.choose_hero"
+    bl_label = "Use Hero"
+    bl_description = "Use the selected hero list row as the port's target"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        from . import heropick
+
+        try:
+            title = heropick.choose(settings, settings.hero_index)
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        _status(settings, f"Hero: {title}", "OK")
+        return {"FINISHED"}
+
+
 class DMF_OT_detect(Operator):
     bl_idname = "dmf.detect"
     bl_label = "Detect Live Build"
@@ -191,6 +224,9 @@ class DMF_OT_detect(Operator):
                 settings.s2v_cli = str(env.s2v) if env.s2v else settings.s2v_cli
                 settings.csdk_root = str(env.csdk_root) if env.csdk_root else settings.csdk_root
                 settings.project_root = str(root)
+                from . import heropick
+
+                heropick.refresh(settings)
                 _status(settings, f"{len(heroes)} live models · build {settings.build}", "OK")
 
             def failed(error):
@@ -1544,6 +1580,8 @@ CLASSES = (
     DMF_OT_detect_paths,
     DMF_OT_clear_job,
     DMF_OT_detect,
+    DMF_OT_refresh_heroes,
+    DMF_OT_choose_hero,
     DMF_OT_extract,
     DMF_OT_import_hero,
     DMF_OT_import_custom,

@@ -387,11 +387,11 @@ def _transfer_body_action(target, source, source_action, label: str):
     **Measured, not assumed:** the two rigs share a rest basis bone for bone
     (``root_motion``, ``pelvis``, ``head``, ``clavicle_*``, ``arm_upper_*``,
     ``hand_*``, ``leg_upper_*`` all 0.0000 deg; 115 of 138 bit-exact, worst
-    0.14 deg on a gun joint) — yet copying the local values verbatim lands the
+    0.14 deg on a gun joint), yet copying the local values verbatim lands the
     whole pose 120 deg off in Blender, because the animation DMX and the skeleton
     DMX get different root_motion axis fixups on import.  This transfer is
     therefore **not a fix** and must not be published as one until the offset is
-    resolved against the convention the engine actually reads.
+    resolved against the convention the engine reads.
     """
     scene = bpy.context.scene
     target.animation_data_create()
