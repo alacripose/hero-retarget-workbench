@@ -130,7 +130,7 @@ def is_csdk_install(path) -> bool:
 def csdk_addon_root(settings) -> Path | None:
     """The CSDK13 install that holds this addon.
 
-    A configured Install root wins only when it is really a CSDK13 install; a
+    A configured Install root wins only when it is a CSDK13 install; a
     leftover stage folder is ignored so the addon cannot land where the
     compiler and modeldoc never look.
     """

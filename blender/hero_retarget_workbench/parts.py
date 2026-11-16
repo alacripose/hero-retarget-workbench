@@ -163,7 +163,7 @@ def capture_import(
 
     A port that follows another port arrives carrying the previous rig's names.
     ``prefixes`` are the stale ones (this hero's body, the addon, the vmdl); a
-    part keeps its own word — body, head, hair — and loses the old owner.
+    part keeps its own word, body, head, hair, and loses the old owner.
     """
     from forge import naming
 

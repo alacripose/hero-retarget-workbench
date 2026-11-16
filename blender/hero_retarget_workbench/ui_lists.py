@@ -1,8 +1,8 @@
 """Native UI lists for the workbench.
 
 Every list implements ``filter_items`` through ``_filter``, so the native header
-Blender shows above it — the search field, the invert toggle, the A-Z button and
-its reverse — actually changes the view. A list that returns a fixed selection
+Blender shows above it, the search field, the invert toggle, the A-Z button and
+its reverse, changes the view. A list that returns a fixed selection
 makes those controls look available while doing nothing.
 """
 from __future__ import annotations
@@ -47,6 +47,31 @@ def _rules_text(entry) -> str:
     state = "extra" if entry.state == "EXTRA" else "ignore" if entry.state == "IGNORED" else "mapped"
     origin = "learned" if entry.origin == "learned" else "user"
     return f"{entry.source} {entry.target} {state} {origin}"
+
+
+class DMF_UL_heroes(UIList):
+    bl_idname = "DMF_UL_heroes"
+
+    _ROWS = {"HERO": "hero", "HIDEOUT": "hideout", "OTHER": "model"}
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        # The page's own search and kind filter already narrowed the rows; the
+        # native header narrows them once more without a second source of truth.
+        return _filter(self, [f"{row.title} {row.kind} {row.model}" for row in rows])
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        settings = getattr(context.scene, "dmf", None)
+        chosen = settings is not None and settings.hero_slug == item.slug
+        row = layout.row(align=True)
+        row.alert = chosen
+        row.label(
+            text=_short(item.title, 30) or item.slug,
+            icon="RADIOBUT_ON" if chosen else "RADIOBUT_OFF",
+        )
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=self._ROWS.get(item.kind, "model"))
 
 
 class DMF_UL_bone_map(UIList):
@@ -386,6 +411,7 @@ class DMF_UL_components(UIList):
 
 
 CLASSES = (
+    DMF_UL_heroes,
     DMF_UL_bone_map,
     DMF_UL_mods,
     DMF_UL_clients,

@@ -4,8 +4,8 @@ A custom model usually arrives in a T-pose or an A-pose while the hero rig rests
 in its own reference stance. The preview writes the hero's rest orientation onto
 every mapped custom bone (keeping each bone's own head position), so the mesh
 visibly moves into the hero's stance as rows get mapped and the split compare
-shows both models in the same pose. It writes pose transforms only — no rest
-edit, no keys — so clearing it restores the model exactly.
+shows both models in the same pose. It writes pose transforms only, no rest
+edit, no keys, so clearing it restores the model exactly.
 """
 from __future__ import annotations
 

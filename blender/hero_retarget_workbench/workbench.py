@@ -969,33 +969,6 @@ class DMF_OT_select_hierarchy_bone(Operator):
         return {"FINISHED"}
 
 
-class DMF_OT_toggle_bone_map(Operator):
-    bl_idname = "dmf.toggle_bone_map"
-    bl_label = "Bone Map"
-    bl_description = "Show the hero skeleton in the 3D viewport as a projected map of bone positions"
-
-    def execute(self, context):
-        settings = context.scene.dmf
-        if not settings.show_bone_map and settings.target_armature is None:
-            message = "Import the hero skeleton before showing its map"
-            _status(settings, message, "ERROR")
-            self.report({"ERROR"}, message)
-            return {"CANCELLED"}
-        settings.show_bone_map = not settings.show_bone_map
-        hierarchy_view.invalidate()
-        if settings.show_bone_map and not settings.hierarchy:
-            build_hierarchy(settings)
-        if context.area is not None:
-            context.area.tag_redraw()
-        _status(
-            settings,
-            f"Bone map {'on' if settings.show_bone_map else 'off'}; "
-            f"{settings.bone_map_plane.lower()} plane, {len(settings.hierarchy)} bones",
-            "INFO",
-        )
-        return {"FINISHED"}
-
-
 class DMF_OT_pick_bone_map(Operator):
     bl_idname = "dmf.pick_bone_map"
     bl_label = "Pick Bone in Map"
@@ -1053,7 +1026,6 @@ CLASSES = (
     DMF_OT_scan_bones,
     DMF_OT_refresh_hierarchy,
     DMF_OT_select_hierarchy_bone,
-    DMF_OT_toggle_bone_map,
     DMF_OT_pick_bone_map,
     DMF_OT_add_bone_entry,
     DMF_OT_remove_bone_entry,

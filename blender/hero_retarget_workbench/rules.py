@@ -2,7 +2,7 @@
 
 A rule is written by the user: a pattern, a target and the state the answered row
 gets. The only rule this addon adds on its own is the one implied by a row the
-user just typed — ``elbow_L`` to ``arm_lower_L`` — which is their own mapping, not
+user just typed, ``elbow_L`` to ``arm_lower_L``, which is their own mapping, not
 a guess about the hero. ``suppressed()`` keeps programmatic batches from looking
 like that.
 """
@@ -341,7 +341,7 @@ def _cancel_request() -> None:
 
 
 def flush_fill(settings) -> dict:
-    """Run a scheduled fill to completion now — headless probes and tests."""
+    """Run a scheduled fill to completion now, headless probes and tests."""
     _cancel_request()
     if _FILL.get("settings") is not settings or (not _FILL.get("plan") and _FILL.get("timer") is None):
         start_fill(settings)

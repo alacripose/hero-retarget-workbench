@@ -20,15 +20,35 @@ HERO_ITEMS: list[tuple[str, str, str]] = [
     ("NONE", "Detect live heroes", "Find the current live hero models through Source 2 Viewer"),
 ]
 
+# Bumped whenever the roster changes, so the picker rebuilds its visible rows
+# without the panel draw comparing hundreds of entries.
+ROSTER_SERIAL = 0
+
 
 def hero_items(self, context):
     return HERO_ITEMS
 
 
 def set_hero_items(heroes) -> None:
-    global HERO_ITEMS
+    global HERO_ITEMS, ROSTER_SERIAL
     HERO_ITEMS = [("NONE", "Choose a hero", "Select a live hero from the current build")]
     HERO_ITEMS.extend((hero.slug, hero.title, hero.model_path) for hero in heroes)
+    ROSTER_SERIAL += 1
+
+
+class DMF_HeroRow(PropertyGroup):
+    """One visible row of the Source page's hero picker."""
+
+    slug: StringProperty()
+    title: StringProperty()
+    kind: StringProperty()
+    model: StringProperty()
+
+
+def _hero_filter_changed(self, context) -> None:
+    from . import heropick
+
+    heropick.refresh(self)
 
 
 def tail_clip_items(self, context):
@@ -456,6 +476,26 @@ class DMF_Settings(PropertyGroup):
         update=_paths_edited,
     )
     hero_slug: EnumProperty(name="Hero", items=hero_items)
+    hero_rows: CollectionProperty(type=DMF_HeroRow, description="Heroes the picker shows after the search and kind filter")
+    hero_index: IntProperty(name="Hero row", default=0)
+    hero_query: StringProperty(
+        name="Search heroes",
+        description="Narrow the hero list by title or model path",
+        default="",
+        update=_hero_filter_changed,
+    )
+    hero_kind: EnumProperty(
+        name="Show",
+        description="Restrict the hero list to one kind of live model",
+        items=[
+            ("ALL", "All", "Every model the live build lists"),
+            ("HERO", "Heroes", "Playable heroes under models/heroes_staging"),
+            ("HIDEOUT", "Hideout", "Hideout NPCs and props"),
+            ("OTHER", "Other", "Models outside the hero and hideout roots"),
+        ],
+        default="ALL",
+        update=_hero_filter_changed,
+    )
     build: StringProperty(name="Build", default="")
     hero_model_path: StringProperty(name="Live model", default="")
     extraction_dir: StringProperty(
@@ -798,7 +838,7 @@ class DMF_Settings(PropertyGroup):
     tail_bare_only: BoolProperty(
         name="Tail only (no clips, no skeleton doc)",
         description=(
-            "Ship literally the tail: its bones attached to the hero and the tail mesh, with no "
+            "Ship only the tail: its bones attached to the hero and the tail mesh, with no "
             "clips, no .vnmskel and no animation blending -- the haze_noskel shape without clips"
         ),
         default=False,
@@ -1144,6 +1184,7 @@ CLASSES = (
     DMF_ModRow,
     DMF_ClientRow,
     DMF_ComponentRow,
+    DMF_HeroRow,
     DMF_Settings,
 )
 
