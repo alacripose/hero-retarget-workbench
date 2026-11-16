@@ -95,6 +95,11 @@ def main() -> int:
         help="where to write the BLAKE3 Axis proof binding the pak to the gated bytes (default artifacts/proofs/<pak>.proof.json)",
     )
     parser.add_argument(
+        "--bodies",
+        default="",
+        help="per-clip game body DMX folder; the gate then explains (or refuses) a rest drift",
+    )
+    parser.add_argument(
         "--parity-report",
         default="",
         help="a vpk_parity report the pak must satisfy: any REFUSE or UNCHECKED refuses the pack",
@@ -131,7 +136,8 @@ def main() -> int:
             [str(BLENDER), "-b", "--python", str(GATE), "--", "--addon-content", str(content), "--report", str(gate_report)]
             + (["--clips", args.clips] if args.clips else [])
             + (["--game-skeleton", args.game_skeleton] if args.game_skeleton else [])
-            + (["--game-model", args.game_model] if args.game_model else []),
+            + (["--game-model", args.game_model] if args.game_model else [])
+            + (["--bodies", args.bodies] if args.bodies else []),
 
             capture_output=True,
             text=True,

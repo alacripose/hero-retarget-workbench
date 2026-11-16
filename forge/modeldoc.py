@@ -275,6 +275,49 @@ def render_mesh_files(text: str) -> list[RenderMeshFile]:
     return found
 
 
+def set_render_mesh_filename(text: str, mesh_name: str, filename: str) -> str:
+    """Point one RenderMeshFile at a different DMX, changing nothing else.
+
+    The model's mesh is the document the client skins, and its joint list has to be the
+    shipped skeleton's joint list.  On the 2026-11-15 Haze port the model rendered
+    `haze_body.dmx` (120 joints, no tail) against a 131-joint skeleton, which shifted 70
+    slots and rotated the arms, head and tail even though a correct 131-joint mesh
+    (`haze_model_tail.dmx`) sat in the same folder.  This is the operation that fixes it;
+    it refuses an unknown or duplicated mesh name rather than guessing which one moves.
+    """
+    matches = [row for row in render_mesh_files(text) if row.name == mesh_name]
+    if not matches:
+        raise MeshListError(f"render-mesh-missing: {mesh_name}")
+    if len(matches) > 1:
+        raise MeshListError(f"render-mesh-ambiguous: {mesh_name} appears {len(matches)} times")
+    row = matches[0]
+    lines = text.splitlines()
+    replaced = False
+    for index in range(row.start, row.end + 1):
+        # Read the line itself.  `_field_value` answers an empty string for a field that is
+        # absent, so testing it for `None` matched the block's opening brace and replaced
+        # that instead of the filename — the write then produced a document no parser could
+        # read (`block-has-no-open`).
+        if not lines[index].lstrip().startswith("filename"):
+            continue
+        indent = _indent(lines[index])
+        # A modeldoc list entry separates its fields with commas.  Dropping the comma when
+        # rewriting the filename produced a document that no longer parses
+        # (`block-has-no-open`), so the separator is preserved exactly as found.
+        comma = "," if lines[index].rstrip().endswith(",") else ""
+        lines[index] = f'{indent}filename = "{filename}"{comma}'
+        replaced = True
+        break
+    if not replaced:
+        raise MeshListError(f"render-mesh-filename-missing: {mesh_name}")
+    updated = "\n".join(lines)
+    # Refuse to hand back a document this module cannot read: a rewrite that breaks the
+    # parse is worse than no rewrite, and the caller would only discover it at compile time.
+    if not any(row.name == mesh_name for row in render_mesh_files(updated)):
+        raise MeshListError(f"render-mesh-rewrite-unreadable: {mesh_name}")
+    return updated
+
+
 def body_groups(text: str) -> list[BodyGroup]:
     """Every BodyGroup, with its choice names and the meshes they show."""
     section = sections(text).get("BodyGroupList")
@@ -398,6 +441,7 @@ def add_render_mesh_file(
     name: str,
     filename: str,
     bodygroup: str = "",
+    choice: str = "",
     replace: bool = False,
 ) -> MeshMerge:
     """Add one DMX-backed render mesh, and optionally a body-group choice.
@@ -445,13 +489,18 @@ def add_render_mesh_file(
         actions["RenderMeshList"] = "inserted"
         text = "\n".join(lines)
 
-    choice = ""
-    if bodygroup:
+    choice_name = ""
+    if bodygroup and choice:
+        result = add_mesh_to_choice(text, bodygroup, choice, name)
+        text = result.text
+        actions["BodyGroupList"] = result.actions.get("BodyGroupList", "")
+        choice_name = result.choice
+    elif bodygroup:
         result = ensure_bodygroup(text, bodygroup, name)
         text = result.text
         actions["BodyGroupList"] = result.actions.get("BodyGroupList", "")
-        choice = result.choice
-    return MeshMerge(text=text, actions=actions, bodygroup=bodygroup, choice=choice)
+        choice_name = result.choice
+    return MeshMerge(text=text, actions=actions, bodygroup=bodygroup, choice=choice_name)
 
 
 def ensure_bodygroup(text: str, group_name: str, mesh_name: str) -> MeshMerge:
@@ -502,6 +551,54 @@ def ensure_bodygroup(text: str, group_name: str, mesh_name: str) -> MeshMerge:
     return MeshMerge(
         text="\n".join(lines),
         actions={"BodyGroupList": "choice-inserted"},
+        bodygroup=group_name,
+        choice=choice_name,
+    )
+
+
+def add_mesh_to_choice(text: str, group_name: str, choice_name: str, mesh_name: str) -> MeshMerge:
+    """Append an always-on mesh to an existing body-group choice.
+
+    A tail is not an alternative to the body: it must draw with the default
+    body and every other part.  ``ensure_bodygroup`` creates a competing choice,
+    which would hide the body when selected, so a component that belongs to the
+    existing look appends to that choice's ``meshes`` list instead.
+    """
+    group_name = (group_name or "").strip()
+    choice_name = (choice_name or "").strip()
+    mesh_name = (mesh_name or "").strip()
+    if not group_name or not choice_name or not mesh_name:
+        raise MeshListError("bodygroup-choice-and-mesh-required")
+    group = next((item for item in body_groups(text) if item.name == group_name), None)
+    if group is None:
+        raise MeshListError(f"bodygroup-missing: {group_name}")
+    lines = text.splitlines()
+    choice = next(
+        (
+            (start, end)
+            for start, end in _choice_blocks(lines, group.start, group.end)
+            if _field_value(lines, start, end, "name") == choice_name
+        ),
+        None,
+    )
+    if choice is None:
+        raise MeshListError(f"bodygroup-choice-missing: {group_name}/{choice_name}")
+    meshes = _mesh_names(lines, choice[0], choice[1])
+    if mesh_name in meshes:
+        return MeshMerge(
+            text=text,
+            actions={"BodyGroupList": "exists"},
+            bodygroup=group_name,
+            choice=choice_name,
+        )
+    open_index = _list_open(lines, choice[0], choice[1], "meshes")
+    if open_index is None:
+        raise MeshListError(f"bodygroup-choice-meshes-missing: {group_name}/{choice_name}")
+    indent = _indent(lines[open_index]) + "\t"
+    _insert_in_list(lines, open_index, [f'{indent}"{mesh_name}",'])
+    return MeshMerge(
+        text="\n".join(lines),
+        actions={"BodyGroupList": "mesh-appended"},
         bodygroup=group_name,
         choice=choice_name,
     )

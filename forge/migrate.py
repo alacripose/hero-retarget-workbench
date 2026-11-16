@@ -370,6 +370,7 @@ def add_component_mesh(
     mesh_name: str,
     dmx_relative: str,
     bodygroup: str = "",
+    choice: str = "",
     replace: bool = False,
 ) -> dict:
     """Add one DMX-backed render mesh to a staged vmdl, plus a body-group choice.
@@ -393,6 +394,7 @@ def add_component_mesh(
             name=mesh_name,
             filename=relative,
             bodygroup=bodygroup,
+            choice=choice,
             replace=replace,
         )
     except modeldoc.ModeldocError as error:
@@ -483,3 +485,24 @@ def update_from_package(
         force=force,
         old_package=package,
     )
+
+
+def repoint_render_mesh(vmdl: str | Path, mesh_name: str, filename: str) -> dict:
+    """Repoint one render mesh at another DMX, through the sanctioned vmdl writer.
+
+    This file is the only module allowed to write a vmdl (see AGENTS.md, 2026-11-13);
+    a mesh repoint is a vmdl write, so it lives here rather than in a tool.
+    """
+    from . import modeldoc
+
+    path = Path(vmdl)
+    text = path.read_text(encoding="utf-8", errors="replace")
+    before = {row.name: row.filename for row in modeldoc.render_mesh_files(text)}
+    if mesh_name not in before:
+        raise modeldoc.MeshListError(f"render-mesh-missing: {mesh_name}")
+    updated = modeldoc.set_render_mesh_filename(text, mesh_name, filename)
+    if updated == text:
+        return {"vmdl": str(path), "mesh": mesh_name, "changed": False, "from": before[mesh_name], "to": filename}
+    path.write_text(updated, encoding="utf-8", newline="\n")
+    after = {row.name: row.filename for row in modeldoc.render_mesh_files(path.read_text(encoding="utf-8", errors="replace"))}
+    return {"vmdl": str(path), "mesh": mesh_name, "changed": True, "from": before[mesh_name], "to": after.get(mesh_name)}
