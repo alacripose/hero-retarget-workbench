@@ -64,6 +64,32 @@ my blender up instead of using async jobs delegation like the other pages"*.
   sha256 `0be6761d6be75ce6964f003974c61811630a4af56d246989e7db94ea2d374e71`;
   `blender_zip_probe` passes, 86 operators and 26 panels registered.
 
+## 2026-11-16 — a failed tail scan settles before the next job
+
+**Owner instruction, verbatim:** *"Harden the tail scan so a setup or first-tick
+failure can't leave `job_running` stuck, then push the updated 16.6 to ci and
+github releases"*.
+
+- **The guard is released before a failure can strand it.** `_TailScanJob.__init__`
+  wraps setup, including `_candidate_roots` and `_known_rigs`, in a `try` that
+  calls `_settle_scan_failure`. That helper sets `job_running=False` first,
+  writes `job_state=FAILED` and the note defensively, and clears `_SCAN_TIMER`
+  in `finally`. `_schedule_scan` swallows the constructor error after the job
+  has settled, so a S2V completion callback cannot leave a traceback or a
+  disabled scan button.
+- **First ticks use the same settlement.** The tick path still catches every
+  exception and calls `_fail`; `_fail` delegates to `_settle_scan_failure`, so a
+  failing first live skeleton or DMX read cannot leave the job card running.
+  `_finish` also clears the guard in `finally`, so a display-field failure after
+  completion is recovered by the same path.
+- **Evidence.** `208` tests pass, `ui_parity --check` and `ui_prose --check` are
+  zero, and compileall is clean. A temporary Blender probe forced a setup
+  failure and a first-tick failure; both ended with `job_running=False`,
+  `job_state=FAILED` and `_SCAN_TIMER=None` (3/3 checks).
+- **Zip.** `dist/hero_retarget_workbench-0.16.6.zip`, 68 files, 479,207 bytes,
+  sha256 `db83cfeccfaa2a85140a41a083925e8f11e7b7d52dd5deb6093aa8cc5c9a71f0`;
+  `blender_zip_probe` passes.
+
 ## 2026-11-16 — every list is a category table with its own width
 
 **Owner instruction, verbatim:** *"here's a big issue, even when the window is allowed to take up more horizontal space the name width sliders aren't per category and there's none for this view either so names get truncated"*, then *"I want it to be eeverywhere don't make it only for one view holy fuck"*, with a Windows Explorer column view as the reference.
