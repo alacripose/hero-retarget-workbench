@@ -11,7 +11,7 @@ from datetime import date
 from pathlib import Path
 
 import bpy
-from bpy.props import BoolProperty, StringProperty
+from bpy.props import BoolProperty, IntProperty, StringProperty
 from bpy.types import Operator
 
 from . import core, jobs
@@ -89,6 +89,7 @@ def refresh_clients(settings, module) -> list[Path]:
         row.can_compile = install.can_compile
         row.can_backport = install.can_backport
         row.active = str(install.root).lower() in (active, target)
+        row.tool_active = str(install.root).lower() == active
         found.append(install.root)
     return found
 
@@ -486,7 +487,7 @@ class DMF_OT_add_client(Operator):
 class DMF_OT_use_client(Operator):
     bl_idname = "dmf.use_client"
     bl_label = "Use this client"
-    bl_description = "Make the selected client the CSDK this file compiles with"
+    bl_description = "Use the selected client's game files for extraction and backporting"
 
     def execute(self, context):
         settings = _settings(context)
@@ -495,22 +496,44 @@ class DMF_OT_use_client(Operator):
         index = min(max(settings.client_index, 0), len(settings.clients) - 1)
         row = settings.clients[index]
         used = []
-        if row.can_compile:
-            settings.csdk_root = row.path
-            used.append("compiler")
         if row.can_backport:
             settings.mod_target_client = row.path
-            used.append("backport target")
+            used.append("game files")
         if not used:
             core.set_status(
                 settings,
-                f"{row.label} is neither a compiler host nor has Citadel VPKs",
+                f"{row.label} carries no Citadel VPKs; choose a compiler row in Compile toolchain",
                 "WARN",
             )
             return {"CANCELLED"}
         for item in settings.clients:
             item.active = item.path == row.path
         core.set_status(settings, f"Using {row.label} for {' and '.join(used)}", "OK")
+        return {"FINISHED"}
+
+
+class DMF_OT_use_toolchain(Operator):
+    bl_idname = "dmf.use_toolchain"
+    bl_label = "Use this toolchain"
+    bl_description = "Compile and pack with the selected install's resourcecompiler, separately from the game files"
+
+    index: IntProperty(name="Toolchain", default=-1)
+
+    def execute(self, context):
+        settings = _settings(context)
+        rows = [row for row in settings.clients if row.can_compile]
+        if not rows:
+            core.set_status(settings, "No install with a resourcecompiler was found", "ERROR")
+            return {"CANCELLED"}
+        index = self.index if self.index >= 0 else settings.toolchain_index
+        index = min(max(index, 0), len(rows) - 1)
+        row = rows[index]
+        settings.csdk_root = row.path
+        settings.toolchain_index = index
+        for item in settings.clients:
+            item.tool_active = item.path == row.path
+        label = row.build or row.label
+        core.set_status(settings, f"Compiling with {row.label} ({label})", "OK")
         return {"FINISHED"}
 
 
@@ -674,6 +697,7 @@ CLASSES = (
     DMF_OT_refresh_clients,
     DMF_OT_add_client,
     DMF_OT_use_client,
+    DMF_OT_use_toolchain,
     DMF_OT_scan_components,
     DMF_OT_pick_component_vmdl,
     DMF_OT_stage_components,

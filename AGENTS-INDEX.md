@@ -95,3 +95,4 @@ audit read from it, so a rule does not have to be found by reading 2,900 lines i
 | 3446 | 2026-11-15 | the pak ships its vnmskeleton, and that is not a choice | refusal, rule |
 | 3471 | 2026-11-15 | `pak93_dir.vpk` is the pinned Shiv build, and a gate is not widened to fit a slot | refusal, receipt, rule |
 | 3492 | — | 2026-11-16 (third pass) — the tree, and two checks that were refusing the game's own file | refusal, receipt |
+| 3536 | 2026-11-16 | every page names its build, the folder picker is real, and sections fold | — |

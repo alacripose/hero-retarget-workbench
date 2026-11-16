@@ -1,4 +1,4 @@
-# UI pass 0.14.0
+# UI pass 0.15.0
 
 The Workbench pages were built one at a time, and the check that every action has one home did not
 exist. This pass adds the check, moves staging and compiling onto the Release page, replaces the hero
@@ -19,21 +19,42 @@ dropdown with a filtered list, and runs the family writing rules over every user
 
 | Page | Panels | Actions |
 |---|---|---|
-| SETUP | DMF_PT_setup, DMF_PT_setup_tools | `dmf.add_client`, `dmf.detect_paths`, `dmf.install_csdk`, `dmf.install_s2v`, `dmf.open_csdk_page`, `dmf.refresh_clients`, `dmf.use_client` |
-| SOURCE | DMF_PT_source, DMF_PT_source_files | `dmf.apply_model_name`, `dmf.choose_hero`, `dmf.detect`, `dmf.extract`, `dmf.fit`, `dmf.import_custom`, `dmf.import_hero`, `dmf.pick_vmdl`, `dmf.refresh_heroes` |
+| SETUP | DMF_PT_setup, DMF_PT_setup_tools, DMF_PT_setup_toolchains | `dmf.add_client`, `dmf.detect_paths`, `dmf.install_csdk`, `dmf.install_s2v`, `dmf.open_csdk_page`, `dmf.refresh_clients`, `dmf.use_client`, `dmf.use_toolchain` |
+| SOURCE | DMF_PT_source, DMF_PT_source_files | `dmf.apply_model_name`, `dmf.browse_folders`, `dmf.choose_hero`, `dmf.detect`, `dmf.extract`, `dmf.fit`, `dmf.import_custom`, `dmf.import_hero`, `dmf.pick_vmdl`, `dmf.refresh_heroes` |
 | PARTS | DMF_PT_parts, DMF_PT_parts_materials | `dmf.append_material`, `dmf.assign_material`, `dmf.clear_part_material`, `dmf.scan_materials`, `dmf.scan_parts`, `dmf.use_active_collection`, `dmf.use_part` |
 | CLOTH | DMF_PT_cloth | `dmf.build_all_cloth`, `dmf.build_chain_cloth`, `dmf.import_hero_parts`, `dmf.join_cloth_chain`, `dmf.mark_cloth_proxy`, `dmf.scan_cloth` |
 | SKELETON | DMF_PT_skeleton, DMF_PT_skeleton_bones | `dmf.add_bone_entry`, `dmf.align_all_bones`, `dmf.align_bone`, `dmf.clear_target`, `dmf.copy_pose`, `dmf.ignore_entry`, `dmf.mark_extra`, `dmf.nudge_bone`, `dmf.pick_bone_map`, `dmf.pose_clear`, `dmf.pose_preview`, `dmf.refresh_hierarchy`, `dmf.remove_bone_entry`, `dmf.rename_bones`, `dmf.scan_bones`, `dmf.select_hierarchy_bone`, `dmf.stop_rules` |
 | RULES | DMF_PT_rules | `dmf.add_rule`, `dmf.apply_ik`, `dmf.apply_rules`, `dmf.bake_ik`, `dmf.blend_tail`, `dmf.blend_tail_all`, `dmf.build_tail_animation`, `dmf.clear_ik`, `dmf.clear_rules`, `dmf.learn_rules`, `dmf.load_tail_option`, `dmf.preview_tail`, `dmf.publish_tail_anims`, `dmf.remove_rule`, `dmf.rule_from_row`, `dmf.scan_ik`, `dmf.scan_tail`, `dmf.scan_tails` |
-| ANIMATIONS | DMF_PT_animations | `dmf.apply_ik`, `dmf.bake_clip`, `dmf.bake_clips`, `dmf.bake_ik`, `dmf.blend_tail`, `dmf.blend_tail_all`, `dmf.build_tail_animation`, `dmf.cancel_clips`, `dmf.clear_clips`, `dmf.clear_ik`, `dmf.export_clip`, `dmf.export_clips`, `dmf.import_clip`, `dmf.import_clips`, `dmf.load_tail_option`, `dmf.prefix_clips`, `dmf.preview_clip`, `dmf.preview_tail`, `dmf.publish_tail_anims`, `dmf.scan_clips`, `dmf.scan_ik`, `dmf.scan_tail`, `dmf.scan_tails` |
+| ANIMATIONS | DMF_PT_animations, DMF_PT_animation_ik, DMF_PT_animation_tail, DMF_PT_animation_write | `dmf.apply_ik`, `dmf.bake_clip`, `dmf.bake_clips`, `dmf.bake_ik`, `dmf.blend_tail`, `dmf.blend_tail_all`, `dmf.build_tail_animation`, `dmf.cancel_clips`, `dmf.clear_clips`, `dmf.clear_ik`, `dmf.export_clip`, `dmf.export_clips`, `dmf.import_clip`, `dmf.import_clips`, `dmf.load_tail_option`, `dmf.prefix_clips`, `dmf.preview_clip`, `dmf.preview_tail`, `dmf.publish_tail_anims`, `dmf.scan_clips`, `dmf.scan_ik`, `dmf.scan_tail`, `dmf.scan_tails` |
 | COMPARE | DMF_PT_compare | `dmf.apply_compare_action`, `dmf.compare_clear`, `dmf.compare_split` |
 | WEIGHTS | DMF_PT_weights, DMF_PT_weights_manual | `dmf.assign_active_bone`, `dmf.limit_influences`, `dmf.mint_proof`, `dmf.mirror_weights`, `dmf.normalize_weights`, `dmf.remove_zero_weights`, `dmf.retarget`, `dmf.select_unweighted`, `dmf.smooth_active_group`, `dmf.verify_proof` |
 | MODS | DMF_PT_mods, DMF_PT_update | `dmf.add_scan_root`, `dmf.backport_mod`, `dmf.pick_old_vmdl`, `dmf.pick_old_vpk`, `dmf.port_mod`, `dmf.remove_scan_root`, `dmf.scan_mods`, `dmf.update_old_addon` |
 | COMPONENTS | DMF_PT_components | `dmf.pick_component_vmdl`, `dmf.scan_components`, `dmf.stage_components` |
-| RELEASE | DMF_PT_handoff, DMF_PT_handoff_paths, DMF_PT_release | `dmf.build_lods`, `dmf.clear_lods`, `dmf.compile`, `dmf.export_stage`, `dmf.install_pak`, `dmf.launch_game`, `dmf.pack_vpk`, `dmf.write_model` |
+| RELEASE | DMF_PT_handoff, DMF_PT_handoff_paths, DMF_PT_release, DMF_PT_release_slot | `dmf.build_lods`, `dmf.clear_lods`, `dmf.compile`, `dmf.export_stage`, `dmf.install_pak`, `dmf.launch_game`, `dmf.pack_vpk`, `dmf.write_model` |
 
 `python tools/ui_parity.py --check` fails on an action drawn on two pages, a page with no panel, or an
 action drawn that no operator declares. `tests/test_ui_parity.py` pins the same result.
+
+## 0.15.0 — build markers, a folder browser, and folded sections
+
+- Every page card now names the game build its inputs come from and the compiler build its output
+  targets, read from each install's own `steam.inf`. The values follow the client and toolchain the
+  owner selects, not a remembered version.
+- The VPK folder control is a searchable list of real pak directories with a model count per folder,
+  backed by `DMF_UL_model_folders` and `dmf.browse_folders`. The 6,537-model roster reports 76
+  folders; a file that sits directly in `models/` groups under `models` instead of becoming a
+  folder named after the file.
+- Setup separates the compile toolchain from the game client. `dmf.use_client` selects game files
+  only; `dmf.use_toolchain` selects the compiler and build, and the Tools & clients panel lists every
+  compiler host with its own version. A compiler-only install is no longer treated as a game client.
+- The default page is Setup.
+- Animations folds Clips, IK, Tail and Write back into child panels; Release folds the addon slot.
+  Each has its own collapse control, so a long page is navigable without one flat scroll.
+- Filters are visible chips: the VPK folder browser, the clip graph filter, the bone-map state filter
+  and the cloth source. No filter is a native dropdown that hides its current value.
+- `artifacts/probes/ui_visual_probe.py` opens the Workbench editor in a real Blender window, captures
+  every page to `artifacts/visual/ui-pass/`, and the pages were inspected for clipping. `ui_parity`
+  and `ui_prose` remain at zero.
 
 ## What moved
 

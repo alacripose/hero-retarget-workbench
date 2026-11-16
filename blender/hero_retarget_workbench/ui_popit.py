@@ -28,6 +28,58 @@ def title(layout, name: str, detail: str = "", icon: str = "NONE", alert: bool =
     return box
 
 
+def page(layout, settings, name: str, detail: str = "", icon: str = "NONE", alert: bool = False):
+    """A page card that also names the builds it reads from and compiles for.
+
+    The addon can hold several game and tools installs at once, so every page
+    says which build its inputs come from and which build its output targets.
+    """
+    box = title(layout, name, detail, icon, alert)
+    source = tools = ""
+    try:
+        from . import core
+
+        source = core.source_build(settings)
+        tools = core.tools_build(settings)
+    except Exception:
+        pass
+    for label, value, marker in (
+        ("Game", source or "no build", "WORLD"),
+        ("Compile", tools or "no build", "TOOL_SETTINGS"),
+    ):
+        row = box.row(align=True)
+        row.scale_y = 0.7
+        row.label(text=label, icon=marker)
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=value)
+    return box
+
+
+def section(layout, name: str, icon: str = "NONE", detail: str = "", alert: bool = False):
+    """A card for one group inside a page, the Popit's folded property block."""
+    box = layout.box()
+    head = box.row(align=True)
+    head.alert = alert
+    head.scale_y = 0.95
+    head.label(text=name.upper(), icon=icon)
+    if detail:
+        right = head.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=detail)
+    return box
+
+
+def stat(layout, label: str, value: str, icon: str = "BLANK1") -> None:
+    """One muted fact: the label on the left, the value against the right edge."""
+    row = layout.row(align=True)
+    row.scale_y = 0.8
+    row.label(text=label, icon=icon)
+    right = row.row(align=True)
+    right.alignment = "RIGHT"
+    right.label(text=value)
+
+
 def micro(layout, text: str, icon: str = "NONE") -> None:
     """An uppercase group label, the Popit's PROPERTIES / MOVEMENT line."""
     row = layout.row(align=True)

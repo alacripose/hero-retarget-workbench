@@ -23,7 +23,7 @@ def _short(value: str, limit: int = 34) -> str:
 
 
 def _section(layout, title: str, icon: str, detail: str = ""):
-    return ui_popit.title(layout, title, _short(detail, 26) if detail else "", icon)
+    return ui_popit.section(layout, title, icon, _short(detail, 26) if detail else "")
 
 
 def _hint(layout, text: str, icon: str = "INFO") -> None:
@@ -44,6 +44,13 @@ class DMF_PT_setup_tools(Panel):
         settings = context.scene.dmf
         layout = self.layout
 
+        ui_popit.title(
+            layout,
+            "Tools & clients",
+            settings.s2v_version or ("S2V installed" if settings.s2v_cli else "S2V missing"),
+            "TOOL_SETTINGS" if settings.s2v_cli else "QUESTION",
+            alert=not settings.s2v_cli,
+        )
         tools = _section(
             layout,
             "Source 2 Viewer",
@@ -59,14 +66,10 @@ class DMF_PT_setup_tools(Panel):
 
         csdk = _section(
             layout,
-            "Clients & installs",
+            "Game clients",
             "PACKAGE",
-            Path(settings.csdk_root).name if settings.csdk_root else "choose one",
+            Path(settings.mod_target_client).name if settings.mod_target_client else "choose one",
         )
-        csdk.prop(settings, "csdk_root", text="Active")
-        row = csdk.row(align=True)
-        row.operator("dmf.open_csdk_page", text="Get CSDK 13", icon="URL")
-        row.operator("dmf.install_csdk", text="Install zip", icon="FILEBROWSER")
         csdk.prop(settings, "clients_folder", text="Clients")
         row = csdk.row(align=True)
         row.operator("dmf.refresh_clients", text="Find clients", icon="FILE_REFRESH")
@@ -87,9 +90,15 @@ class DMF_PT_setup_tools(Panel):
                 rows=5,
             )
             csdk.prop(settings, "list_name_width", text="Name width", slider=True)
+            picked = settings.clients[min(settings.client_index, len(settings.clients) - 1)]
+            ui_popit.stat(csdk, "build", picked.build or "unknown", "INFO")
+            ui_popit.stat(csdk, "path", _short(picked.path, 42), "FILE_FOLDER")
+            roles = csdk.row(align=True)
+            roles.label(text="Game files", icon="CHECKMARK" if picked.can_backport else "X")
+            roles.label(text="Compiler", icon="CHECKMARK" if picked.can_compile else "X")
             use = csdk.row(align=True)
             use.alignment = "RIGHT"
-            use.operator("dmf.use_client", text="Use this client", icon="CHECKMARK")
+            use.operator("dmf.use_client", text="Use for game files", icon="CHECKMARK")
         else:
             _hint(
                 csdk,
@@ -101,6 +110,55 @@ class DMF_PT_setup_tools(Panel):
                 "A compiler host builds the handoff; a game with Citadel VPKs is a backport target.",
                 "INFO",
             )
+
+
+class DMF_PT_setup_toolchains(Panel):
+    bl_label = "Compile toolchains"
+    bl_idname = "DMF_PT_setup_toolchains"
+    bl_parent_id = "DMF_PT_setup_tools"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+
+    def draw(self, context):
+        settings = context.scene.dmf
+        layout = self.layout
+        from . import core
+
+        chain = _section(
+            layout,
+            "Compile toolchains",
+            "TOOL_SETTINGS",
+            core.tools_build(settings) or "choose one",
+        )
+        chain.prop(settings, "csdk_root", text="Active")
+        toolchains = [row for row in settings.clients if row.can_compile]
+        if toolchains:
+            ui_popit.micro(chain, "Versions found", "PACKAGE")
+            for index, row in enumerate(toolchains[:10]):
+                line = chain.row(align=True)
+                line.alert = not row.tool_active
+                line.label(
+                    text=_short(row.label, 18),
+                    icon="CHECKMARK" if row.tool_active else "TOOL_SETTINGS",
+                )
+                right = line.row(align=True)
+                right.alignment = "RIGHT"
+                right.label(text=_short(row.build or row.kind, 22))
+                button = right.operator("dmf.use_toolchain", text="", icon="PLAY")
+                button.index = index
+                if row.tool_active:
+                    chain.label(text=_short(row.path, 42), icon="FILE_FOLDER")
+        else:
+            _hint(
+                chain,
+                "Find clients lists every compiler host with its own build; choose one here.",
+                "INFO",
+            )
+        row = chain.row(align=True)
+        row.operator("dmf.open_csdk_page", text="Get CSDK", icon="URL")
+        row.operator("dmf.install_csdk", text="Install zip", icon="FILEBROWSER")
+        row.operator("dmf.refresh_clients", text="Find", icon="FILE_REFRESH")
 
 
 class DMF_PT_mods(Panel):
@@ -116,6 +174,12 @@ class DMF_PT_mods(Panel):
         layout = self.layout
 
         ui_popit.job(layout, settings)
+        ui_popit.section(
+            layout,
+            "Find packages",
+            "PACKAGE",
+            f"{settings.mods_scanned} found" if settings.mods_scanned else "not scanned",
+        )
         scan = _section(layout, "Scan folders", "FILE_FOLDER", f"{len(settings.scan_roots)} roots")
         for row in settings.scan_roots:
             line = scan.row(align=True)
@@ -185,8 +249,21 @@ class DMF_PT_components(Panel):
         layout = self.layout
 
         ui_popit.job(layout, settings)
+        ui_popit.page(
+            layout,
+            settings,
+            "Components",
+            f"{len(settings.components)} found" if settings.components else "not scanned",
+            "MODIFIER",
+        )
         model = Path(settings.vmdl).stem if settings.vmdl else (Path(settings.extraction_dir).name if settings.extraction_dir else "no model")
         source = _section(layout, "Live components", "MESH_DATA", model)
+        ui_popit.stat(
+            source,
+            "from",
+            _short(settings.vmdl or settings.extraction_dir, 34) or "extract a model",
+            "FILE_FOLDER",
+        )
         source.operator("dmf.scan_components", text="Find components", icon="VIEWZOOM")
         if settings.components:
             head = source.split(factor=settings.list_name_width, align=True)
@@ -214,6 +291,12 @@ class DMF_PT_components(Panel):
         row = target.row(align=True)
         row.prop(settings, "component_vmdl", text="vmdl")
         row.operator("dmf.pick_component_vmdl", text="", icon="FILEBROWSER")
+        ui_popit.stat(
+            target,
+            "into",
+            _short(settings.component_vmdl or settings.component_addon, 34) or "not set",
+            "FILE",
+        )
         target.prop(settings, "component_merge", text="Register in vmdl")
         target.prop(settings, "component_slot", text="Body group")
         _hint(
@@ -228,7 +311,7 @@ class DMF_PT_components(Panel):
             target.label(text=_short(settings.component_manifest, 44), icon="TEXT")
 
 
-CLASSES = (DMF_PT_setup_tools, DMF_PT_mods, DMF_PT_components)
+CLASSES = (DMF_PT_setup_tools, DMF_PT_setup_toolchains, DMF_PT_mods, DMF_PT_components)
 
 
 def register() -> None:

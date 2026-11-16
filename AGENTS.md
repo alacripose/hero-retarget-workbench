@@ -3531,3 +3531,31 @@ Measured on the built v10, not asserted:
 **Not checked:** no in-game look at v10. The pose is not claimed fixed; the owner's launch is the
 witness. The refusal is in place either way: a build whose tree or list shifts a game joint, or whose
 pelvis lands off the game's pose, cannot be packed.
+
+
+## 2026-11-16 — every page names its build, the folder picker is real, and sections fold
+
+**Owner instruction, verbatim:** *"every page additionally is going to need markers for what version
+of the game something being worked on or extracted from or being compiled for ... the setup page
+needs to seperate out which tools version to use for compiling just like the clients ... every list
+dropdown also needs to be modernized ... the default page needs to be the setup page ... subsectons
+(for example clips in the animations page) needs to have their own sections"*.
+
+- **Build markers are live reads.** `core.source_build` and `core.tools_build` read the selected
+  install's `game/<engine>/steam.inf`; `ui_popit.page` prints `Game <build>` and `Compile <build>` on
+  every page card. No build is remembered or guessed.
+- **The compiler is chosen apart from the client.** Setup's Tools & clients panel has Source 2 Viewer,
+  Game clients and Compile toolchains as separate sections; `dmf.use_client` sets game files only and
+  `dmf.use_toolchain` sets `csdk_root`. `DMF_ClientRow.tool_active` marks the compiling install.
+- **The VPK folder control is a searchable list, not a dropdown.** `dmf.browse_folders` opens a
+  dialog with `DMF_UL_model_folders`; each row is a real pak directory with its model count. The live
+  pak lists 6,537 models in 76 folders. Models directly under `models/` group under `models`.
+- **Filters are chips.** Clip graph, bone-map state and cloth source draw as visible choices;
+  `ui_popit.page` replaces per-panel one-off title cards.
+- **Sections fold.** Animations owns child panels for IK, Tail and Write back; Release owns Addon
+  slot. Setup is the default page. `ui_props.PAGE_BY_ID` maps every child panel, and `ui_parity`
+  reports no duplicate action, no empty page, no unmapped panel, 0 undrawn actions.
+- **The visual probe is real.** `artifacts/probes/ui_visual_probe.py` opens the Workbench editor in a
+  Blender window with splash disabled through a temporary user config, screenshots all 12 pages to
+  `artifacts/visual/ui-pass/`, and the pass found and fixed the broken chip grid, the missing
+  Release page header and the native cloth-source toggle. The 0.15.0 zip is built from this tree.

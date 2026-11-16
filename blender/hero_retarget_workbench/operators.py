@@ -11,7 +11,7 @@ from fractions import Fraction
 from pathlib import Path, PurePosixPath
 
 import bpy
-from bpy.props import StringProperty
+from bpy.props import IntProperty, StringProperty
 from bpy.types import Operator
 
 from forge import live, naming
@@ -166,6 +166,52 @@ class DMF_OT_refresh_heroes(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_browse_folders(Operator):
+    bl_idname = "dmf.browse_folders"
+    bl_label = "VPK folders"
+    bl_description = "Browse the pak's real model directories, with a model count for each"
+
+    def invoke(self, context, event):
+        settings = context.scene.dmf
+        properties.sync_folders(settings)
+        settings.folder_index = next(
+            (index for index, row in enumerate(settings.folder_rows) if row.root == settings.model_root),
+            0,
+        )
+        return context.window_manager.invoke_props_dialog(self, width=420)
+
+    def draw(self, context):
+        settings = context.scene.dmf
+        layout = self.layout
+        layout.label(text="Every folder comes from the detected pak roster.", icon="FILE_FOLDER")
+        layout.template_list(
+            "DMF_UL_model_folders",
+            "folders",
+            settings,
+            "folder_rows",
+            settings,
+            "folder_index",
+            rows=10,
+        )
+        if settings.folder_rows:
+            row = settings.folder_rows[min(settings.folder_index, len(settings.folder_rows) - 1)]
+            layout.label(text=f"models/{row.label}" if row.root != "ALL" else "All folders", icon="FILE")
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        properties.sync_folders(settings)
+        if not settings.folder_rows:
+            _status(settings, "Detect the live build first; the pak lists the folders", "WARN")
+            return {"CANCELLED"}
+        row = settings.folder_rows[min(settings.folder_index, len(settings.folder_rows) - 1)]
+        settings.model_root = row.root
+        from . import heropick
+
+        shown = heropick.refresh(settings)
+        _status(settings, f"{row.label}: {shown} models", "OK")
+        return {"FINISHED"}
+
+
 class DMF_OT_choose_hero(Operator):
     bl_idname = "dmf.choose_hero"
     bl_label = "Use Hero"
@@ -208,17 +254,27 @@ class DMF_OT_detect(Operator):
                 )
 
             def work(progress):
-                progress(0.25, "reading hero table through S2V")
+                progress(0.2, "reading hero table through S2V")
                 heroes = module["live"].list_heroes(env)
-                return env, heroes
+                progress(0.5, "listing every model in the pak")
+                paths = module["live"].list_all_models(env)
+                models = module["live"].roster_for_models(paths, heroes)
+                return env, heroes, models
 
             def done(result):
-                env, heroes = result
+                env, heroes, models = result
                 old = settings.hero_slug
                 properties.set_hero_items(heroes)
+                properties.set_model_items(models)
+                properties.sync_folders(settings, force=True)
+                roots = {root for _slug, _title, _model, root in properties.MODEL_ITEMS}
                 settings.hero_slug = "NONE"
-                if old and old != "NONE" and any(hero.slug == old for hero in heroes):
+                if old and old != "NONE" and any(row[0] == old for row in properties.MODEL_ITEMS):
                     settings.hero_slug = old
+                if "models/heroes_staging" in roots:
+                    settings.model_root = "models/heroes_staging"
+                elif settings.model_root not in roots and settings.model_root != "ALL":
+                    settings.model_root = "ALL"
                 settings.build = f"{env.build} {env.version_date}".strip()
                 settings.deadlock_root = str(env.game_root) if env.game_root else settings.deadlock_root
                 settings.s2v_cli = str(env.s2v) if env.s2v else settings.s2v_cli
@@ -227,7 +283,11 @@ class DMF_OT_detect(Operator):
                 from . import heropick
 
                 heropick.refresh(settings)
-                _status(settings, f"{len(heroes)} live models · build {settings.build}", "OK")
+                _status(
+                    settings,
+                    f"{len(models)} models in {len(roots)} folders, {len(heroes)} heroes · build {settings.build}",
+                    "OK",
+                )
 
             def failed(error):
                 _status(settings, str(error), "ERROR")
@@ -258,10 +318,11 @@ class DMF_OT_extract(Operator):
             root = core.project_root(settings)
             slug = settings.hero_slug
             previous_model = settings.hero_model_path
+            folder = slug.replace("\\", "__").replace("/", "__")
             preferred = (
                 Path(bpy.path.abspath(settings.extraction_dir))
                 if settings.extraction_dir
-                else root / "artifacts" / "extractions" / slug
+                else root / "artifacts" / "extractions" / folder
             )
             env = core.detect_environment(settings, module)
             if env.game_root is None or env.s2v is None:
@@ -272,7 +333,13 @@ class DMF_OT_extract(Operator):
                 heroes = module["live"].list_heroes(env)
                 hero = next((item for item in heroes if item.slug == slug), None)
                 if hero is None:
-                    raise RuntimeError("The selected hero is no longer in the live build. Detect the build again.")
+                    # Every listed model extracts the same way; the hero table only
+                    # supplies nicer titles, not a second extraction route.
+                    found = next((row for row in properties.MODEL_ITEMS if row[0] == slug), None)
+                    if found is not None:
+                        hero = module["live"].Hero(slug=found[0], model_path=found[2], title=found[1])
+                if hero is None:
+                    raise RuntimeError("The selected model is no longer in the live listing. Detect the build again.")
                 destination = preferred
                 if previous_model and previous_model != hero.model_path:
                     destination = root / "artifacts" / "extractions" / hero.slug
@@ -1581,6 +1648,7 @@ CLASSES = (
     DMF_OT_clear_job,
     DMF_OT_detect,
     DMF_OT_refresh_heroes,
+    DMF_OT_browse_folders,
     DMF_OT_choose_hero,
     DMF_OT_extract,
     DMF_OT_import_hero,

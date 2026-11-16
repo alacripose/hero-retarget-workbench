@@ -24,6 +24,65 @@ HERO_ITEMS: list[tuple[str, str, str]] = [
 # without the panel draw comparing hundreds of entries.
 ROSTER_SERIAL = 0
 
+# Every live model the pak lists, as (slug, title, model path, vpk folder). The
+# picker's Show filter is built from the folders this carries, so the choices are
+# the pak's own directories instead of a hand-written category list.
+MODEL_ITEMS: list[tuple[str, str, str, str]] = []
+MODEL_ROOT_ITEMS: list[tuple[str, str, str]] = []
+
+
+def model_root_items(self, context):
+    return MODEL_ROOT_ITEMS
+
+
+def set_model_items(rows) -> None:
+    """Record the full model roster and the folders it came from.
+
+    `rows` are `forge.live.Hero` shaped: slug, title and model path. The folder is
+    the first two path segments under `models/`, which is what a VPK directory is.
+    """
+    global MODEL_ITEMS, MODEL_ROOT_ITEMS
+    MODEL_ITEMS = []
+    roots: set[str] = set()
+    for row in rows:
+        path = str(getattr(row, "model_path", "") or "").replace("\\", "/")
+        parts = [part for part in path.strip("/").split("/") if part]
+        folders = parts[:-1]
+        root = "/".join(folders[:2]) if len(folders) >= 2 else (folders[0] if folders else "")
+        if root:
+            roots.add(root)
+        MODEL_ITEMS.append(
+            (str(getattr(row, "slug", path)), str(getattr(row, "title", path)), path, root)
+        )
+    MODEL_ROOT_ITEMS = [("ALL", "All folders", "Every model the pak lists")] + [
+        (root, root[len("models/"):] if root.startswith("models/") else root, root)
+        for root in sorted(roots)
+    ]
+
+
+def sync_folders(settings, force: bool = False) -> None:
+    """Fill the folder picker with one row per VPK directory and its model count."""
+    roots = tuple(item[0] for item in MODEL_ROOT_ITEMS)
+    signature = "|".join(roots) + f"#{len(MODEL_ITEMS)}"
+    if not force and settings.folder_signature == signature:
+        return
+    current = settings.model_root
+    settings.folder_signature = signature
+    settings.folder_rows.clear()
+    counts: dict[str, int] = {}
+    for *_, root in MODEL_ITEMS:
+        counts[root] = counts.get(root, 0) + 1
+    for value, label, description in MODEL_ROOT_ITEMS:
+        row = settings.folder_rows.add()
+        row.root = value
+        row.label = label
+        row.description = description
+        row.count = len(MODEL_ITEMS) if value == "ALL" else counts.get(value, 0)
+    settings.folder_index = next(
+        (index for index, row in enumerate(settings.folder_rows) if row.root == current),
+        0,
+    )
+
 
 def hero_items(self, context):
     return HERO_ITEMS
@@ -43,6 +102,15 @@ class DMF_HeroRow(PropertyGroup):
     title: StringProperty()
     kind: StringProperty()
     model: StringProperty()
+
+
+class DMF_FolderRow(PropertyGroup):
+    """One VPK directory the model roster came from."""
+
+    root: StringProperty()
+    label: StringProperty()
+    description: StringProperty()
+    count: IntProperty()
 
 
 def _hero_filter_changed(self, context) -> None:
@@ -415,6 +483,7 @@ class DMF_ClientRow(PropertyGroup):
     can_compile: BoolProperty(name="Has compiler", default=False)
     can_backport: BoolProperty(name="Has game VPKs", default=False)
     active: BoolProperty(name="Active", default=False)
+    tool_active: BoolProperty(name="Compiling", default=False)
 
 
 class DMF_ComponentRow(PropertyGroup):
@@ -475,27 +544,32 @@ class DMF_Settings(PropertyGroup):
         subtype="DIR_PATH",
         update=_paths_edited,
     )
-    hero_slug: EnumProperty(name="Hero", items=hero_items)
-    hero_rows: CollectionProperty(type=DMF_HeroRow, description="Heroes the picker shows after the search and kind filter")
-    hero_index: IntProperty(name="Hero row", default=0)
+    hero_slug: StringProperty(
+        name="Hero",
+        description="The chosen live model path, written by the picker",
+        default="NONE",
+    )
+    hero_rows: CollectionProperty(type=DMF_HeroRow, description="Models the picker shows after the search and folder filter")
+    hero_index: IntProperty(name="Model row", default=0)
     hero_query: StringProperty(
-        name="Search heroes",
-        description="Narrow the hero list by title or model path",
+        name="Search models",
+        description="Narrow the model list by title or model path",
         default="",
         update=_hero_filter_changed,
     )
-    hero_kind: EnumProperty(
+    model_root: EnumProperty(
         name="Show",
-        description="Restrict the hero list to one kind of live model",
-        items=[
-            ("ALL", "All", "Every model the live build lists"),
-            ("HERO", "Heroes", "Playable heroes under models/heroes_staging"),
-            ("HIDEOUT", "Hideout", "Hideout NPCs and props"),
-            ("OTHER", "Other", "Models outside the hero and hideout roots"),
-        ],
-        default="ALL",
+        description="Restrict the list to one VPK folder the pak carries",
+        items=model_root_items,
+        default=0,
         update=_hero_filter_changed,
     )
+    folder_rows: CollectionProperty(
+        type=DMF_FolderRow,
+        description="Every VPK directory the detected model roster came from",
+    )
+    folder_index: IntProperty(name="Folder row", default=0)
+    folder_signature: StringProperty(name="Folder signature", default="")
     build: StringProperty(name="Build", default="")
     hero_model_path: StringProperty(name="Live model", default="")
     extraction_dir: StringProperty(
@@ -629,7 +703,7 @@ class DMF_Settings(PropertyGroup):
             ("COMPONENTS", "Components", "Stage live cosmetic parts beside a mod"),
             ("RELEASE", "Release", "Write the model, compile, pack, install and launch"),
         ],
-        default="CLOTH",
+        default="SETUP",
     )
 
     # Mods page: folders to scan, what the scan found, and where a port goes.
@@ -670,6 +744,7 @@ class DMF_Settings(PropertyGroup):
     s2v_version: StringProperty(name="Source 2 Viewer version", default="")
     clients: CollectionProperty(type=DMF_ClientRow, description="CSDK-style installs this file can compile with")
     client_index: IntProperty(name="Client row", default=0)
+    toolchain_index: IntProperty(name="Toolchain row", default=0)
     tools_note: StringProperty(name="Tools note", default="")
 
     # Components page: cosmetic-shaped assets and their staging target.
@@ -1185,6 +1260,7 @@ CLASSES = (
     DMF_ClientRow,
     DMF_ComponentRow,
     DMF_HeroRow,
+    DMF_FolderRow,
     DMF_Settings,
 )
 
