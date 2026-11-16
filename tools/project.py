@@ -230,6 +230,15 @@ def _release_skeleton_identity_check() -> Check:
             "own skeleton, so nobody checked that a game joint kept its slot",
         )
     shifted = identity.get("shifted")
+    tree_shifted = identity.get("tree_shifted")
+    if tree_shifted != 0:
+        return Check(
+            "release skeleton identity",
+            "fail",
+            f"{newest.name}: tree_shifted={tree_shifted!r}. A pak built before this field existed, "
+            "or one whose skeleton is walked out of the game's order, is exactly the rotated head, "
+            "arms and tail failure",
+        )
     if shifted != 0:
         return Check(
             "release skeleton identity",

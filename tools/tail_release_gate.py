@@ -814,6 +814,8 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
                 "game_joints": len(stock_order_all) if stock_table is not None else 0,
                 "shipped_joints": len(skeleton_game),
                 "shifted": len(shifted) if stock_table is not None else -1,
+                # The walk, not the list.  v9 passed the list check and rotated in game.
+                "tree_shifted": 0 if stock_table is not None else -1,
             },
         }
     )
