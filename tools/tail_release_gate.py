@@ -207,6 +207,11 @@ def _subsequence(small: list[str], large: list[str]) -> list[str]:
 
 def _joint_world(datamodel, path, name: str):
     """The named joint's pose through its parent chain, as a 4x4 matrix."""
+    return _joint_world_map(datamodel, path).get(name)
+
+
+def _joint_world_map(datamodel, path) -> dict[str, list[list[float]]]:
+    """Every joint's pose through its own parent chain, one load per document."""
     from mathutils import Matrix, Quaternion, Vector  # noqa: WPS433
 
     root = datamodel.load(str(path)).root
@@ -224,21 +229,46 @@ def _joint_world(datamodel, path, name: str):
             walk(child, child.name)
 
     walk(element, None)
-    if name not in by_name:
-        return None
-    chain = []
-    current = name
-    while current:
-        chain.append(current)
-        current = parents.get(current)
-    world = Matrix.Identity(4)
-    for joint in reversed(chain):
-        transform = by_name[joint]["transform"]
+    local = {}
+    for joint, element_row in by_name.items():
+        transform = element_row["transform"]
         position = Vector(list(transform["position"]))
         q = list(transform["orientation"])
-        rotation = Quaternion((q[3], q[0], q[1], q[2])).to_matrix().to_4x4()
-        world = world @ Matrix.Translation(position) @ rotation
-    return [list(row) for row in world]
+        local[joint] = Matrix.Translation(position) @ Quaternion((q[3], q[0], q[1], q[2])).to_matrix().to_4x4()
+
+    worlds: dict[str, list[list[float]]] = {}
+    raw: dict[str, object] = {}
+
+    def resolve(name):
+        if name in raw:
+            return raw[name]
+        parent = parents.get(name)
+        raw[name] = (resolve(parent) if parent else Matrix.Identity(4)) @ local[name]
+        return raw[name]
+
+    for joint in by_name:
+        worlds[joint] = [list(row) for row in resolve(joint)]
+    return worlds
+
+
+def _joint_tree_order(datamodel, path) -> list[str]:
+    """The skeleton's joints in the order a depth-first walk of its tree reaches them."""
+    root = datamodel.load(str(path)).root
+    element = root["model"] if "model" in root.keys() else root
+    while "children" not in element.keys():
+        candidates = [key for key in element.keys() if hasattr(element[key], "keys")]
+        if not candidates:
+            return []
+        element = element[candidates[0]]
+    out: list[str] = []
+
+    def walk(node):
+        for child in node["children"]:
+            out.append(child.name)
+            walk(child)
+
+    walk(element)
+    return out
 
 
 def _joint_list_order(datamodel, path) -> list[str]:
@@ -507,15 +537,22 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
             f"{len(mesh_absent)} joints of {model_dmx.name} are absent from {skeleton_dmx.name} "
             f"({mesh_absent[:4]}); the mesh is skinned to bones the shipped skeleton does not carry",
         )
+    # The frames are compared in WORLD space, not joint-by-joint local ones, and that is measured:
+    # our skeleton writes `pelvis` under `root_motion` while the model document writes it at the
+    # root, and the two spellings have identical world transforms (both `[-0.482, 0, 53.909]` with
+    # the same rotation).  Comparing the local decompositions reported one shifted joint on a
+    # correct pair; what must agree is where each joint actually ends up, since that is what the
+    # mesh vertices were bound to.
+    shipped_world = _joint_world_map(datamodel, skeleton_dmx)
+    model_world = _joint_world_map(datamodel, model_dmx)
     frame_shift = []
     for name in model_view:
-        here, there = shipped_table.get(name), model_table.get(name)
+        here, there = shipped_world.get(name), model_world.get(name)
         if not here or not there:
             continue
-        delta = max(abs(a - b) for a, b in zip(here["head"], there["head"]))
-        dot = abs(sum(a * b for a, b in zip(here["orientation"], there["orientation"])))
-        if delta > 0.01 or (1.0 - dot) > 2e-3:
-            frame_shift.append((name, round(delta, 4), round(1.0 - dot, 4)))
+        delta = max(abs(a - b) for row_a, row_b in zip(here, there) for a, b in zip(row_a, row_b))
+        if delta > 0.01:
+            frame_shift.append((name, round(delta, 4)))
     # 2c-3. `pelvis` must not inherit a rotated root.  Measured on the 2026-11-16 v8 build: the
     #      skeleton was rebuilt in the game's list order and its hierarchy was taken from the
     #      game as well, which parented `pelvis` under `root_motion` — and the model's
@@ -544,8 +581,8 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
         raise Refused(
             "skeleton-rest-differs-from-model",
             f"{len(frame_shift)} joints of {skeleton_dmx.name} sit in a different frame than the model "
-            f"(e.g. {frame_shift[:3]}); the clips are sampled against the skeleton's frames while the mesh is "
-            "bound to the model's, so the body is read rotated or lying down",
+            f"(e.g. {frame_shift[:3]}); the clips are sampled against the skeleton's poses while the "
+            "mesh vertices are bound to the model's, so the body is read rotated or lying down",
         )
     stock_table = None
     if game_skeleton is not None and game_skeleton.is_file():
@@ -624,7 +661,17 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
         # walk.  A build can pass one and fail the other — that is the 2026-11-16 v9 pak, whose
         # list kept the game prefix while its tree put the tail under `pelvis` mid-walk.
         tree_order = [name for name in skeleton_joints if not object_like(name)]
-        wants = list(dict.fromkeys(_joint_list_order(datamodel, game_skeleton)))
+        # Compare the tree walk against the GAME'S OWN tree walk, not its `jointList`.  Measured on
+        # 2026-11-16: the game's own `haze_skel.dmx` walks 4 of its joints (`clavicle_R`,
+        # `leg_upper_L`, `leg_upper_R`, `attachWorld`) in an order its `jointList` does not share, so
+        # "walk is a subsequence of the list" refuses the game's own file.  The list indexes masks;
+        # the tree is what the client walks; each is checked against the same document it came from.
+        wants = list(dict.fromkeys(_joint_tree_order(datamodel, game_skeleton)))
+        stocks_own = _subsequence(
+            [name for name in wants if not object_like(name)],
+            list(dict.fromkeys(_joint_list_order(datamodel, game_skeleton))),
+        )
+        report.update({"game_walk_vs_list_inversions": len(stocks_own)})
         # Relative order, not absolute slots: `pelvis` is deliberately promoted to a root (see
         # 2c-3), which moves its whole subtree earlier in the walk without changing how the
         # game's joints sit relative to each other.  What rotates the body is a game joint

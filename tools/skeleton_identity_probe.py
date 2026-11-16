@@ -93,6 +93,12 @@ def main() -> int:
         help="also compare each shared joint's rest head/orientation and parent between the two",
     )
     parser.add_argument("--keys", action="store_true", help="print a joint element's field names and exit")
+    parser.add_argument("--walk", action="store_true", help="compare each document's tree walk with its own jointList")
+    parser.add_argument(
+        "--world",
+        default="",
+        help="print the named joint's world transform through its chain, for both documents, and exit",
+    )
     parser.add_argument("--report", default="")
     parser.add_argument(
         "--candidate-vmdl",
@@ -112,6 +118,30 @@ def main() -> int:
         transform = joint["transform"]
         print(f"TRANSFORM type={type(transform).__name__} repr={repr(transform)[:300]}", flush=True)
         return 0
+    if args.walk:
+        from tail_release_gate import _joint_list_order, _joint_tree_order, _subsequence  # noqa: WPS433
+
+        for label, path in (("reference", args.reference), ("candidate", args.candidate)):
+            listed = list(dict.fromkeys(_joint_list_order(module, Path(path))))
+            walked = list(dict.fromkeys(_joint_tree_order(module, Path(path))))
+            walked = [name for name in walked if name in set(listed)]
+            inversions = _subsequence(walked, listed)
+            print(
+                f"WALK-ORDER {label} {Path(path).name}: walked={len(walked)} listed={len(listed)} "
+                f"inversions={len(inversions)} {inversions[:4]}",
+                flush=True,
+            )
+        return 0
+
+    if args.world:
+        from tail_release_gate import _joint_world  # noqa: WPS433
+
+        for label, path in (("reference", args.reference), ("candidate", args.candidate)):
+            world = _joint_world(module, Path(path), args.world)
+            rows = [[round(value, 3) for value in row] for row in (world or [])]
+            print(f"WORLD {label} {args.world}: {rows}", flush=True)
+        return 0
+
     reference = _joint_list(module.load(args.reference).root)
     if args.candidate_vmdl:
         from skeleton_model_order_probe import model_bone_tree  # noqa: WPS433
