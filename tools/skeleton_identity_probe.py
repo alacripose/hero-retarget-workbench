@@ -87,6 +87,11 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--reference", required=True)
     parser.add_argument("--candidate", required=True)
+    parser.add_argument(
+        "--rests",
+        action="store_true",
+        help="also compare each shared joint's rest head/orientation and parent between the two",
+    )
     parser.add_argument("--report", default="")
     parser.add_argument(
         "--candidate-vmdl",
@@ -105,6 +110,26 @@ def main() -> int:
         candidate = _joint_list(module.load(args.candidate).root)
     result = compare(reference, candidate)
     result.update({"reference": args.reference, "candidate": args.candidate})
+    if args.rests:
+        from tail_release_audit import _joint_table  # noqa: WPS433
+
+        here = _joint_table(module, args.reference)
+        there = _joint_table(module, args.candidate)
+        moved = []
+        parent_moved = []
+        for name in reference:
+            if name not in there or name not in here:
+                continue
+            delta = max(abs(a - b) for a, b in zip(here[name]["head"], there[name]["head"]))
+            dot = abs(sum(a * b for a, b in zip(here[name]["orientation"], there[name]["orientation"])))
+            if delta > 0.01 or (1.0 - dot) > 2e-3:
+                moved.append((name, round(delta, 3), round(1.0 - dot, 5)))
+            if here[name]["parent"] != there[name]["parent"]:
+                parent_moved.append((name, here[name]["parent"], there[name]["parent"]))
+        result["rest_moved"] = moved
+        result["parent_moved"] = parent_moved
+        print(f"  rest moved: {len(moved)} {moved[:3]}", flush=True)
+        print(f"  parent moved: {len(parent_moved)} {parent_moved[:3]}", flush=True)
 
     verdict = "PREFIX" if result["prefix_kept"] else "SHIFTED"
     print(

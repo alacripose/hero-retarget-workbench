@@ -97,7 +97,18 @@ refusal"*.
   (`gate-needs-game-skeleton`), carries the gate's `skeleton_identity` into its receipt, and
   `python tools/project.py gate` now fails if the newest pack receipt has no identity record or a
   non-zero shift. `tests/test_tail_skeleton_refusals.py` pins all three.
-- **Not checked:** no in-game look at v8 yet; the head, arms and tail are the owner's witness.
+- **The collapse, and the refusal that was missing.** v8 fixed the head, arms and tail and the
+  body *collapsed in on itself*: the rebuild had taken the game's hierarchy as well as its order,
+  which parented `pelvis` under `root_motion`, whose rest carries the authored 90 deg, so the
+  rotation reached the body twice. `pelvis` is now always written as a root by both writers
+  (`tools/skeleton_game_prefix.py`, `tools/model_skeleton_write.py`), and the gate refuses the
+  alternative by name: `pelvis-parented-under-rotated-root`.
+- **v9.** `haze_tail_v9.vpk`, sha256 `79a07b1f…`, 9,001,355 bytes, gate ADMIT, `skeleton_identity`
+  0 of 98 moved, packed model `131` bones with `pelvis` at the root (extracted from the pak and
+  read back), installed as `pak97_dir.vpk`. 286 tests pass; `tools/project.py gate` reports
+  `PASS release skeleton identity` (the pre-existing `port gate shiv` failure is the deleted
+  baseline named in `tools/shiv_merge_gate.py`, not this change).
+- **Not checked:** no in-game look at v9 yet; the head, arms, tail and body are the owner's witness.
 
 ## 2026-11-15 — the tail port ships only what the gate admits
 

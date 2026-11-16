@@ -771,3 +771,24 @@ def rewrite_skeleton_bones(
 
     rebuilt = lines[: open_index + 1] + emit(roots, 0) + lines[close_index:]
     return "\n".join(rebuilt)
+
+
+def skeleton_parent_map(text: str) -> dict[str, str | None]:
+    """Each bone's parent as the document's own nesting states it, top-down."""
+    section = sections(text).get("Skeleton")
+    if section is None:
+        raise ModeldocError("skeleton-section-missing")
+    lines = text.splitlines()[section.start : section.end + 1]
+    parents: dict[str, str | None] = {}
+    stack: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped == "{":
+            stack.append("")
+        elif stripped == "}" or stripped.startswith("},"):
+            if stack:
+                stack.pop()
+        elif stripped.startswith("name = ") and stack:
+            stack[-1] = stripped.split('"')[1]
+            parents[stack[-1]] = next((name for name in reversed(stack[:-1]) if name), None)
+    return parents
