@@ -75,8 +75,11 @@ def documents(hero_root: Path | str, content_root: Path | str) -> list[ClipDoc]:
         relative = read_source(document)
         if not relative:
             continue
-        source = (base / relative).resolve()
-        if not source.is_file():
+        # Keep the caller's base spelling: resolving here expanded Windows 8.3 temp paths on CI
+        # (`RUNNER~1`) into long names, so the returned source no longer equalled the path the
+        # caller built.  The existence check is the only place the resolved form matters.
+        source = base / relative
+        if not (base / relative).is_file():
             continue
         preview = clip_dir / f"{document.stem}.dmx"
         rows.append(

@@ -1471,7 +1471,16 @@ class DMF_PT_release(Panel):
         try:
             from . import release
 
-            layout.label(text=f"slot: {release.slot(settings).name}", icon="FILEBROWSER")
+            env = core.env(settings)
+            if env.game_dir is not None:
+                layout.label(text=f"game: {env.game_dir}", icon="DISK_DRIVE")
+            slot = release.slot(settings)
+            ceiling, mounted = release.slot_ceiling(settings, slot.parent)
+            layout.label(text=f"slot: {slot}", icon="FILEBROWSER")
+            layout.label(
+                text=f"pak numbers 1..{ceiling}; game/citadel mounts {mounted}",
+                icon="INFO",
+            )
         except Exception as error:
             layout.label(text=f"slot: {error}", icon="ERROR")
         if settings.release_note:
