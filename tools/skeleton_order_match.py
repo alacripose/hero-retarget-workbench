@@ -68,6 +68,12 @@ def main() -> int:
     parser.add_argument("--skeleton", required=True, help="the DMX to rewrite")
     parser.add_argument("--out", required=True)
     parser.add_argument("--report", default="")
+    parser.add_argument(
+        "--append-unlisted",
+        action="store_true",
+        help="keep joints the reference does not carry, appended after its last joint in their own "
+        "document order; inserting them inside the reference's prefix renames every later slot",
+    )
     parser.add_argument("--encoding", default="binary")
     parser.add_argument("--encoding-ver", type=int, default=9)
     args = parser.parse_args(argv)
@@ -105,11 +111,22 @@ def main() -> int:
     model_names = set(order)
     skeleton_names = set(by_name)
     extra = sorted(skeleton_names - model_names)
-    if extra:
+    if extra and not args.append_unlisted:
         raise SystemExit(
             f"skeleton-model-joint-sets-differ: {len(extra)} joints in {Path(args.skeleton).name} "
             f"are absent from the reference ({extra[:4]})"
         )
+    if extra:
+        # Appended, never inserted.  The reference is the document the game's masks and clips
+        # index, so its joints keep slots 0..n-1 and only the extras move to the end.
+        from tail_release_audit import _joint_table as _ours  # noqa: WPS433
+
+        own = _ours(module, args.skeleton)
+        own_order = list(dict.fromkeys(own["__order__"]["order"]))
+        appended = [name for name in own_order if name in set(extra)]
+        for name in appended:
+            parents[name] = own[name]["parent"]
+        order = order + appended
     missing = sorted(model_names - skeleton_names)
     if missing and not subset_ok:
         raise SystemExit(
@@ -118,7 +135,7 @@ def main() -> int:
         )
     # For a mesh, only the joints it actually carries are reordered; the rest of the
     # reference order is irrelevant to it.  `order` is narrowed below.
-    order = [name for name in order if name in skeleton_names]
+    order = list(dict.fromkeys(name for name in order if name in skeleton_names))
 
     children: dict[str, list[str]] = {name: [] for name in order}
     roots: list[str] = []
