@@ -1,4 +1,4 @@
-# UI pass 0.16.6
+# UI pass 0.16.7
 
 The Workbench pages were built one at a time, and the check that every action has one home did not
 exist. This pass adds the check, moves staging and compiling onto the Release page, replaces the hero
@@ -40,6 +40,20 @@ two, chips are real buttons, and advanced panels stay folded. The full checklist
 
 `python tools/ui_parity.py --check` fails on an action drawn on two pages, a page with no panel, or an
 action drawn that no operator declares. `tests/test_ui_parity.py` pins the same result.
+
+## 0.16.7 — Release appears once in the page picker
+
+- The page enum still carried the pre-merge `HANDOFF` value while `PAGES`
+  listed only `RELEASE`; `current_page()` redirected `HANDOFF` to `RELEASE`, so
+  the picker showed two labels for one page. The enum now lists only the twelve
+  live pages, ending in `RELEASE`. The `current_page()` alias stays for files
+  saved before the merge.
+- Measured: `208` tests pass; `ui_parity --check` and `ui_prose --check` are
+  zero; compileall is clean. A Blender probe reads the enum as exactly
+  `SETUP, SOURCE, PARTS, CLOTH, SKELETON, RULES, ANIMATIONS, COMPARE, WEIGHTS,
+  MODS, COMPONENTS, RELEASE`, with no `HANDOFF` entry.
+- Zip probe: `0.16.7`, 68 files, 479,180 bytes, sha256
+  `74c38dc5b5846981ffe922f934bf8ccf02f505145b2e2058df6d6a9d89a544a9`.
 
 ## 0.16.6 — a failed tail scan always releases the job guard
 

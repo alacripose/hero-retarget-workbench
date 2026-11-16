@@ -90,6 +90,25 @@ github releases"*.
   sha256 `db83cfeccfaa2a85140a41a083925e8f11e7b7d52dd5deb6093aa8cc5c9a71f0`;
   `blender_zip_probe` passes.
 
+## 2026-11-16 — one Release page, one picker entry
+
+**Owner instruction, verbatim:** *"why is handoff and release the same page but
+twice can you deduplicate that"*, then *"it needs to be released to ci and
+releases we aren't just fucing around here"*.
+
+- **The duplicate was in the enum, not the panels.** `PAGES` and the page rail
+  listed only `RELEASE`, but `DMF_Settings.props_page` still carried the legacy
+  `HANDOFF` item. `ui_props.current_page()` redirected `HANDOFF` to `RELEASE`,
+  so the raw page dropdown offered two labels for the same page. The legacy item
+  is removed; the alias stays for files saved before the merge.
+- **Evidence.** `208` tests pass; `ui_parity --check` and `ui_prose --check` are
+  zero; compileall is clean. A Blender probe reads the final enum as
+  `SETUP, SOURCE, PARTS, CLOTH, SKELETON, RULES, ANIMATIONS, COMPARE, WEIGHTS,
+  MODS, COMPONENTS, RELEASE`, with `HANDOFF` absent.
+- **Zip.** `dist/hero_retarget_workbench-0.16.7.zip`, 68 files, 479,180 bytes,
+  sha256 `74c38dc5b5846981ffe922f934bf8ccf02f505145b2e2058df6d6a9d89a544a9`;
+  `blender_zip_probe` passes.
+
 ## 2026-11-16 — every list is a category table with its own width
 
 **Owner instruction, verbatim:** *"here's a big issue, even when the window is allowed to take up more horizontal space the name width sliders aren't per category and there's none for this view either so names get truncated"*, then *"I want it to be eeverywhere don't make it only for one view holy fuck"*, with a Windows Explorer column view as the reference.
