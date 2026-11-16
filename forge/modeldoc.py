@@ -668,3 +668,106 @@ def merge(
         if name in final:
             action["output_sha256"] = section_hash(final[name].text)
     return MergeResult(text=output, actions=actions)
+
+
+def skeleton_bone_blocks(text: str) -> dict[str, list[str]]:
+    """Every bone in the `Skeleton` section as `name -> its field lines`, verbatim.
+
+    The skeleton is a nested tree, but a bone's identity for binding is its name plus the
+    origin/angles it carries, so the tree can be rebuilt without touching a single field.
+    Raises when a bone has no name or a name repeats: a tree that cannot say which bone is
+    which cannot be reordered safely.
+    """
+    section = sections(text).get("Skeleton")
+    if section is None:
+        raise ModeldocError("skeleton-section-missing")
+    lines = text.splitlines()[section.start : section.end + 1]
+    bones: dict[str, list[str]] = {}
+    stack: list[dict] = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped == "{":
+            stack.append({"fields": [], "name": None})
+            continue
+        if stripped == "}" or stripped.startswith("},"):
+            if stack:
+                row = stack.pop()
+                if row["name"]:
+                    if row["name"] in bones:
+                        raise ModeldocError(f"skeleton-bone-duplicated: {row['name']}")
+                    bones[row["name"]] = row["fields"]
+            continue
+        if not stack:
+            continue
+        if stripped.startswith("name = "):
+            stack[-1]["name"] = stripped.split('"')[1]
+        elif stripped.startswith(("origin =", "angles =", "do_not_discard =")):
+            stack[-1]["fields"].append(stripped)
+    if not bones:
+        raise ModeldocError("skeleton-has-no-bones")
+    return bones
+
+
+def rewrite_skeleton_bones(
+    text: str,
+    parents: dict[str, str | None],
+    order: list[str],
+    extra_fields: dict[str, list[str]] | None = None,
+) -> str:
+    """Rewrite the `Skeleton` section's nesting so joints sit in `parents` order.
+
+    The game indexes this tree by slot, so a joint that moves inside it renames every joint
+    after it.  Each bone keeps its own `origin`/`angles` text exactly; only the nesting and
+    the order change, which is what `tools/model_skeleton_write.py` is for.
+    """
+    fields = skeleton_bone_blocks(text)
+    for name, block in (extra_fields or {}).items():
+        fields.setdefault(name, block)
+    missing = [name for name in parents if name not in fields]
+    if missing:
+        raise ModeldocError(f"skeleton-write-unknown-bone: {missing[:4]}")
+    unplaced = [name for name in order if name not in fields]
+    if unplaced:
+        raise ModeldocError(f"skeleton-write-unordered-bone: {unplaced[:4]}")
+    children: dict[str, list[str]] = {name: [] for name in fields}
+    roots: list[str] = []
+    for name in order:
+        parent = parents.get(name)
+        if parent and parent in children and parent != name:
+            children[parent].append(name)
+        else:
+            roots.append(name)
+
+    section = sections(text)["Skeleton"]
+    lines = text.splitlines()
+    open_index = _list_open(lines, section.start, section.end, "children")
+    if open_index is None:
+        raise ModeldocError("skeleton-children-missing")
+    close_index = _list_close(lines, open_index)
+    bone_indent = None
+    for index in range(open_index + 1, close_index):
+        if lines[index].strip() == "{":
+            bone_indent = _indent(lines[index])
+            break
+    if bone_indent is None:
+        raise ModeldocError("skeleton-empty")
+
+    def emit(names: list[str], depth: int) -> list[str]:
+        pad = bone_indent + "\t" * depth
+        out: list[str] = []
+        for name in names:
+            out.append(f"{pad}{{")
+            out.append(f"{pad}\t_class = \"Bone\"")
+            out.append(f"{pad}\tname = \"{name}\"")
+            out.extend(f"{pad}\t{field}" for field in fields[name])
+            kids = children[name]
+            if kids:
+                out.append(f"{pad}\tchildren = ")
+                out.append(f"{pad}\t[")
+                out.extend(emit(kids, depth + 2))
+                out.append(f"{pad}\t]")
+            out.append(f"{pad}}},")
+        return out
+
+    rebuilt = lines[: open_index + 1] + emit(roots, 0) + lines[close_index:]
+    return "\n".join(rebuilt)

@@ -60,6 +60,45 @@ Source 2 Viewer output and the CSDK13 compiler.
 
 Read this before changing code, docs, or a ticket.
 
+## 2026-11-16 — the skeleton's `jointList` is the slot order, and the game's own list is the prefix
+
+**Owner instruction, verbatim:** *"how did this pass allow her head and arms and tail to be rotated
+wrong. I just said this should not be possible"*, then *"you need to make it never have the rotated
+head and arms again and every thing in the repo needs to fail LOUDLY when a change would break that
+refusal"*.
+
+- **The measured cause.** The shipped v6 `haze_tailbones.dmx` put `weaponHand_L` at slot 50 and
+  `weaponHand_R` at 91; the game's own `haze_skel.dmx` puts them at 6 and 8. 81 of the game's 98
+  joints therefore sat at a different slot. A `.vnmskel` stores bone masks as names resolved
+  against `jointList`, so every joint after the first insertion was driven by the wrong bone: the
+  head, arms and tail rotated while the model and its skeleton agreed 131/131.
+- **Why nothing fired.** Every ordering check compared our model with our skeleton. Two documents
+  that were written from each other cannot falsify one another about the game. What was never
+  compared was our `jointList` against the game's.
+- **New refusal, `skeleton-shifts-game-joint`.** `tools/tail_release_gate.py` reads the game's own
+  `jointList` and ours and refuses when any game joint changes slot. It is computed from
+  `jointList`, never from the tree walk: the appended tail nests under `pelvis`, so a depth-first
+  read puts tail joints between body joints while the compiled skeleton numbers them last.
+- **Two rules were wrong and were relaxed with measurements, not for convenience.**
+  `skeleton-slots-differ-from-model` and `joint-order-diverges` required a mesh's joint order to
+  equal the skeleton's. The game's own `haze_body.dmx` carries 120 joints with `weaponHand_L` near
+  slot 50 against a 98-joint skeleton with it at 6, and renders correctly; the accepted Shiv build
+  (`pak93_dir.vpk`, `01efc18e…`) has 135 of its 168 declared bones at a different position than its
+  own list. Coverage by name is the contract (`mesh-joint-not-in-skeleton`,
+  `model-vmdl-missing-skeleton-joint`); slot order is only the skeleton's business.
+- **The build now.** `tools/skeleton_game_prefix.py` rewrites a skeleton so the game's 98 joints
+  keep slots 0..97 and our 33 extras start at 98; `tools/model_skeleton_write.py` rebuilds the
+  model's `Skeleton` section to declare exactly those joints, taking rest values from the skeleton
+  for bones the vmdl lacked. Verified: `IDENTITY haze_tailbones.dmx PREFIX: 0 of 98 shared moved,
+  appended=33 first_appended_slot=98`; `haze_tail_v8.vpk`, sha256 `d5f3e66c…`, 8,853,154 bytes,
+  gate ADMIT, parity 11/11, `skeleton_identity {game_joints 98, shipped 131, shifted 0}`,
+  installed as `pak97_dir.vpk`.
+- **Loud failure in the repo.** `tools/tail_release_pack.py` refuses without the game skeleton
+  (`gate-needs-game-skeleton`), carries the gate's `skeleton_identity` into its receipt, and
+  `python tools/project.py gate` now fails if the newest pack receipt has no identity record or a
+  non-zero shift. `tests/test_tail_skeleton_refusals.py` pins all three.
+- **Not checked:** no in-game look at v8 yet; the head, arms and tail are the owner's witness.
+
 ## 2026-11-15 — the tail port ships only what the gate admits
 
 **Owner instruction, verbatim:** *"no fucking tail visible head and arms rotated wrong you need to

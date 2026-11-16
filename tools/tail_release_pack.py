@@ -312,6 +312,13 @@ def main() -> int:
         },
         "files": packed[:12],
     }
+    # Carry the gate's own identity record into the receipt.  `tools/project.py gate` reads the
+    # newest pack receipt and fails when this is missing or non-zero, so a pak built by hand or
+    # by an older checkout cannot pass the repository gate on a shifted skeleton.
+    if gate_report.is_file():
+        gate_payload = json.loads(gate_report.read_text(encoding="utf-8"))
+        if "skeleton_identity" in gate_payload:
+            receipt["skeleton_identity"] = gate_payload["skeleton_identity"]
     # Sign what was packed, with the family's BLAKE3 Axis proof instead of a receipt
     # line. The proof binds the pak bytes to the skeleton, the model, the whole
     # compiled-clip manifest and the gate's verdict: a pak recompiled after the gate

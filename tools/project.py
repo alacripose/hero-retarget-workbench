@@ -190,6 +190,7 @@ def gate_checks(
             checks.append(Check(label, "skip", (port.stdout + port.stderr).strip()[-2000:]))
         else:
             checks.append(_check(label, port.returncode == 0, (port.stdout + port.stderr).strip()[-2000:]))
+    checks.append(_release_skeleton_identity_check())
     checks.extend(
         run_lane(
             blender=blender,
@@ -199,6 +200,44 @@ def gate_checks(
         )
     )
     return checks
+
+
+def _release_skeleton_identity_check() -> Check:
+    """Refuse a repository state whose newest release moved a game joint out of its slot.
+
+    2026-11-16: a Haze pak shipped with 81 of the game's 98 joints at a different slot because
+    `weaponHand_L` was inserted at 50 instead of 6.  The packer now refuses that, but a pak can
+    also be built by hand or by an older checkout, so the repository gate reads the newest
+    pack report and fails loudly when it does not carry a zero-shift identity record.
+    """
+    reports = sorted(
+        (ROOT / "artifacts" / "receipts").glob("*pack*.json"),
+        key=lambda path: path.stat().st_mtime,
+    )
+    if not reports:
+        return Check("release skeleton identity", "skip", "no pack report under artifacts/receipts")
+    newest = reports[-1]
+    try:
+        report = json.loads(newest.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        return Check("release skeleton identity", "fail", f"{newest.name}: {error}")
+    identity = report.get("skeleton_identity")
+    if not isinstance(identity, dict):
+        return Check(
+            "release skeleton identity",
+            "fail",
+            f"{newest.name} carries no skeleton_identity record: it was packed without the game's "
+            "own skeleton, so nobody checked that a game joint kept its slot",
+        )
+    shifted = identity.get("shifted")
+    if shifted != 0:
+        return Check(
+            "release skeleton identity",
+            "fail",
+            f"{newest.name}: {shifted} game joints sit at a different slot; that is the rotated "
+            "head, arms and tail failure",
+        )
+    return Check("release skeleton identity", "pass", f"{newest.name}: 0 of {identity.get('game_joints')} game joints moved")
 
 
 def write_status(checks: list[Check]) -> None:

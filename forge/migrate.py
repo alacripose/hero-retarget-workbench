@@ -506,3 +506,21 @@ def repoint_render_mesh(vmdl: str | Path, mesh_name: str, filename: str) -> dict
     path.write_text(updated, encoding="utf-8", newline="\n")
     after = {row.name: row.filename for row in modeldoc.render_mesh_files(path.read_text(encoding="utf-8", errors="replace"))}
     return {"vmdl": str(path), "mesh": mesh_name, "changed": True, "from": before[mesh_name], "to": after.get(mesh_name)}
+
+
+def write_model_text(vmdl: str | Path, text: str) -> dict:
+    """Replace a vmdl's text with `text`, through the module that owns vmdl writes.
+
+    Returns the digest of what is on disk afterwards, so a caller can record the file it
+    actually produced rather than the string it meant to produce.
+    """
+    import hashlib
+
+    path = Path(vmdl)
+    before = path.read_bytes()
+    data = text.encode("utf-8")
+    if data == before:
+        return {"vmdl": str(path), "changed": False, "sha256": hashlib.sha256(before).hexdigest()}
+    path.write_bytes(data)
+    after = path.read_bytes()
+    return {"vmdl": str(path), "changed": True, "sha256": hashlib.sha256(after).hexdigest()}

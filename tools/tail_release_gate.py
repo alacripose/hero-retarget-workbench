@@ -205,6 +205,26 @@ def _subsequence(small: list[str], large: list[str]) -> list[str]:
     return [small[index] for index in range(1, len(order)) if order[index] < order[index - 1]]
 
 
+def _joint_list_order(datamodel, path) -> list[str]:
+    """The skeleton's explicit joint order, which is what numeric bone ids index."""
+    root = datamodel.load(str(path)).root
+    # `model` first: a skeleton document can carry a second `jointList` on a sibling element
+    # that the model does not bind against, and reading whichever key comes first made a
+    # correct file look shifted by one slot.
+    for key in ("model", "skeleton"):
+        if key in root.keys():
+            child = root[key]
+            if hasattr(child, "keys") and "jointList" in child.keys():
+                return [joint.name for joint in child["jointList"]]
+    if "jointList" in root.keys():
+        return [joint.name for joint in root["jointList"]]
+    for key in root.keys():
+        child = root[key]
+        if hasattr(child, "keys") and "jointList" in child.keys():
+            return [joint.name for joint in child["jointList"]]
+    raise Refused("skeleton-has-no-jointlist", f"{Path(path).name} declares no jointList")
+
+
 def _tail_chain(joints: list[str]) -> list[str]:
     chain = [name for name in joints if re.fullmatch(r"tail_\d+", name)]
     return chain + [name for name in joints if name == "tail_end"]
@@ -435,19 +455,21 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
     model_table = _joint_table(datamodel, model_dmx)
     shipped_order = [name for name in shipped_table["__order__"]["order"] if not object_like(name)]
     model_view = [name for name in model_table["__order__"]["order"] if not object_like(name)]
-    slot_limit = min(len(shipped_order), len(model_view))
-    slot_shift = [
-        (index, model_view[index], shipped_order[index])
-        for index in range(slot_limit)
-        if model_view[index] != shipped_order[index]
-    ]
-    if slot_shift:
+    # Slot equality between a mesh and the skeleton is NOT the game's invariant, and this was
+    # measured on 2026-11-16 before relaxing it: the game's own `haze_body.dmx` carries 120
+    # joints with `weaponHand_L` around slot 50 while the game's own `haze_skel.dmx` carries it
+    # at slot 6, and the shipped hero renders correctly.  A mesh's joint list is resolved by
+    # NAME when the model compiles; what must hold is that every mesh joint exists in the
+    # skeleton (below) and that the model's own `Skeleton` section covers the shipped
+    # skeleton's slots (3b).  Keeping the old absolute equality also made a correct build
+    # impossible: the game's skeleton is 98 joints and its body mesh is 120.
+    mesh_absent = [name for name in model_view if name not in set(shipped_order)]
+
+    if mesh_absent:
         raise Refused(
-            "skeleton-slots-differ-from-model",
-            f"{skeleton_dmx.name} disagrees with {model_dmx.name} from slot {slot_shift[0][0]} "
-            f"(model has {slot_shift[0][1]!r}, skeleton has {slot_shift[0][2]!r}; "
-            f"{len(slot_shift)} slots differ); a mesh binds by index into the model's joint list, "
-            "so every joint after the first shift is read from the wrong bone",
+            "mesh-joint-not-in-skeleton",
+            f"{len(mesh_absent)} joints of {model_dmx.name} are absent from {skeleton_dmx.name} "
+            f"({mesh_absent[:4]}); the mesh is skinned to bones the shipped skeleton does not carry",
         )
     frame_shift = []
     for name in model_view:
@@ -465,6 +487,7 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
             f"(e.g. {frame_shift[:3]}); the clips are sampled against the skeleton's frames while the mesh is "
             "bound to the model's, so the body is read rotated or lying down",
         )
+    stock_table = None
     if game_skeleton is not None and game_skeleton.is_file():
         stock_table = _joint_table(datamodel, game_skeleton)
         # `pelvis` is exempt on purpose, and this is measured, not a preference: the model's
@@ -518,8 +541,43 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
     # bones ("haze_body", "DMF Tail"); the client does not bind it.
     object_like = lambda name: " " in name or name.startswith("DMF ")
     model_game = [name for name in model_joints if not object_like(name)]
-    skeleton_game = [name for name in skeleton_joints if not object_like(name)]
+    # The skeleton's slot order is its `jointList`, not its tree walk: the compiled skeleton
+    # numbers bones from the list, and the tree is hierarchy only (the appended tail nests
+    # under `pelvis`, so a depth-first read would place it between body joints).
+    skeleton_game = [name for name in _joint_list_order(datamodel, skeleton_dmx) if not object_like(name)]
     shared = [name for name in model_game if name in set(skeleton_game)]
+
+    # 3c. Slots are absolute, not relative, and this is the check that was missing on
+    #     2026-11-15 (owner: *"how did this pass allow her head and arms and tail to be
+    #     rotated wrong"*).  Every earlier ordering check compared our skeleton against our
+    #     model, which one document cannot falsify about the other: the shipped v6 model and
+    #     its skeleton agree 131/131 while the game's own skeleton is reordered underneath
+    #     them.  Measured on the installed v6 pak: 88 of the 98 joints `haze_skel.dmx` carries
+    #     sit at a different slot in the shipped skeleton, the first being `weaponHand_L`
+    #     (game slot 6, shipped slot 22).  The game's bone masks and its clips are serialised
+    #     against its own skeleton's indices, so a joint inserted before the end renames every
+    #     bone after it — arms, head and tail read rotated while every document is internally
+    #     consistent.  Extra joints may only be appended after the game's last joint.
+    if stock_table is not None:
+        # `jointList`, not the tree walk: the tree nests the appended tail under `pelvis`, so a
+        # depth-first read puts tail joints between body joints while the compiled skeleton
+        # still numbers them last.  Shiv ships exactly that shape and works; the index base is
+        # the list, and the list is what a `.vnmskel`'s numeric `m_boneIDs` resolve against.
+        stock_order_all = list(dict.fromkeys(_joint_list_order(datamodel, game_skeleton)))
+        ours = list(dict.fromkeys(_joint_list_order(datamodel, skeleton_dmx)))
+        our_slots = {name: index for index, name in enumerate(ours)}
+        shifted = [
+            (name, game_slot, our_slots[name])
+            for game_slot, name in enumerate(stock_order_all)
+            if name in our_slots and our_slots[name] != game_slot
+        ]
+        if shifted:
+            raise Refused(
+                "skeleton-shifts-game-joint",
+                f"{len(shifted)} joints of {game_skeleton.name} sit at a different slot in "
+                f"{skeleton_dmx.name} (e.g. {shifted[:3]}); the game's masks and clips index its own "
+                "skeleton, so every joint after the first insertion is driven by the wrong bone",
+            )
 
     # 3b. The vmdl's own `Skeleton` section must declare every joint the shipped skeleton
     #     carries, in the same slot order.  This is the check that was missing on 2026-11-15:
@@ -539,22 +597,19 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
             f"carries {len(skeleton_game)}; {len(absent)} skeleton joints are absent from the model "
             f"({absent[:6]}). The client cannot bind a bone the model does not declare.",
         )
-    declared_shared = [name for name in declared if name in set(skeleton_game)]
-    if _subsequence(declared_shared, skeleton_game):
-        first = _subsequence(declared_shared, skeleton_game)[0]
-        raise Refused(
-            "model-vmdl-order-diverges",
-            f"{Path(report['model']).name} declares its bones in a different slot order than the "
-            f"shipped skeleton; first divergence at {first!r}. Binds are by slot, so this rotates "
-            "every joint downstream of the first difference.",
-        )
+    # The vmdl's tree order is NOT compared with the skeleton's `jointList`, and this was
+    # measured on 2026-11-16 rather than assumed: the build the owner accepted
+    # (`pak93_dir.vpk`, sha256 01efc18e…) has 135 of its 168 declared bones at a different
+    # position than its own skeleton's list, and it works.  A skeleton is a tree; its list can
+    # order appended joints after every body joint, which no depth-first walk can reproduce.
+    # The `.vnmskel` numbers bones by the list, so coverage is the contract (checked above) and
+    # the tree is hierarchy only.
 
-    out_of_order = _subsequence(shared, skeleton_game)
-    if out_of_order:
-        raise Refused(
-            "joint-order-diverges",
-            f"{len(out_of_order)} model joints appear in a different order in {skeleton_dmx.name}: {out_of_order[:8]}",
-        )
+    # A mesh's joint order is not required to match the skeleton's, and the game itself proves
+    # it: `haze_body.dmx` in pak01 carries 120 joints with `weaponHand_L` near slot 50 while
+    # `haze_skel.dmx` carries it at slot 6, and the hero renders correctly.  A mesh's weights
+    # name their joints; the numbered list that matters is the skeleton's.  Coverage of every
+    # mesh joint by the skeleton is checked above (`mesh-joint-not-in-skeleton`).
 
     # 3a. A model document carries its skeleton twice: the DmeModel tree the client walks and
     #     a flat `jointList`.  When they hold different counts the document has been grafted
@@ -713,6 +768,13 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
             "tail_chain": skeleton_tail,
             "shared_joints": len(model_game),
             "admitted": True,
+            # Recorded in the admitted report so a downstream check (the repository gate)
+            # can refuse a release whose skeleton moved a game joint without re-deriving it.
+            "skeleton_identity": {
+                "game_joints": len(stock_order_all) if stock_table is not None else 0,
+                "shipped_joints": len(skeleton_game),
+                "shifted": len(shifted) if stock_table is not None else -1,
+            },
         }
     )
     return report
