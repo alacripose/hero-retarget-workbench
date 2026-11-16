@@ -3165,3 +3165,46 @@ the pinned version to strive for"*.
 - **The lesson, recorded as a rule.** A gate, a pin or a refusal is changed only when it is *wrong* —
   never when it is inconvenient. When a check fails against the environment, the environment is the
   finding: record it, and name the correct value; do not add alternatives until it passes.
+
+## 2026-11-16 (third pass) — the tree, and two checks that were refusing the game's own file
+
+**What v9 proved was not enough.** v9 kept the game's 98-joint `jointList` prefix and rotated again,
+so the list is not the whole contract: the client numbers bones by walking the tree.
+`skeleton-tree-shifts-game-joint` walks the shipped skeleton and refuses when a game joint appears
+before one the game puts later. It refused v9 with 88 walked joints (`weaponHand_L` 21 vs 6,
+`weaponHand_R` 62 vs 8), the pack receipt carries `tree_shifted`, and `tools/project.py gate` fails
+when it is missing or non-zero, so the repository is loud: `[FAIL] release skeleton identity`.
+
+**Two of my own checks were wrong, and the game's own files prove it.** Measured this session:
+
+* *The tree walk is not a subsequence of the `jointList`.* The game's own `haze_skel.dmx` walks
+  `clavicle_R`, `leg_upper_L`, `leg_upper_R` and `attachWorld` in an order its own list does not
+  share — the check refused 4 joints of a correct skeleton for exactly those names. The walk is now
+  compared with the game's walk (`_joint_tree_order`), and the list with the game's list.
+* *A parent and a rest are one fact.* Our skeleton writes `pelvis` under `root_motion`; the mesh
+  bind writes it at the root. Both land at `[-0.482, 0, 53.909]` with the same rotation, while the
+  local decompositions differ by 54.4 units and 60 deg. `skeleton-rest-differs-from-model` now
+  compares world poses (`_joint_world_map`), which is what mesh vertices are bound to, and
+  `pelvis-world-differs-from-game` refuses a pelvis that lands off the game's own pose regardless of
+  how the chain spells it.
+
+**v10 is the game's own skeleton plus our bones, measured.** `skeleton_game_prefix.py` copies each
+shared joint's `transform` with the game's parent, and writes the tree in the game's walk order
+while `jointList` keeps the game's list prefix. `model_from_game_vmdl.py` then rebuilds the model's
+`Skeleton` from the game's decompiled `haze.vmdl` bone blocks verbatim, so no quaternion→Euler
+conversion is guessed (`model_skeleton_write.py` refuses one: no candidate reading of the skeleton's
+rotation matches the vmdl's declared angles within 2 deg — closest is 129 deg out on `clavicle_L`).
+
+Measured on the built v10, not asserted:
+
+* skeleton 131 joints = the game's 98 (rest moved **0**, parent moved **0**, list prefix kept) + 33
+  appended; model 131 bones = the game's 120 **byte-for-byte modulo 1e-4** + `weaponHand_L/R` and the
+  9 tail bones; parents identical to the game's on all 120;
+* gate `ADMIT`; `PACK haze_tail_v10.vpk 8849354b files=458 sha256=4789d2d9…` with
+  `skeleton_identity {game_joints 98, shipped_joints 131, shifted 0, tree_shifted 0}`;
+* installed as `pak97_dir.vpk` (sha `4789d2d9…`); `python tools/project.py gate` → `[PASS] release
+  skeleton identity`; 289 tests pass; the only failure is the pre-existing `port gate shiv`.
+
+**Not checked:** no in-game look at v10. The pose is not claimed fixed; the owner's launch is the
+witness. The refusal is in place either way: a build whose tree or list shifts a game joint, or whose
+pelvis lands off the game's pose, cannot be packed.
