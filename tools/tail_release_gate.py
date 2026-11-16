@@ -480,6 +480,27 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
         dot = abs(sum(a * b for a, b in zip(here["orientation"], there["orientation"])))
         if delta > 0.01 or (1.0 - dot) > 2e-3:
             frame_shift.append((name, round(delta, 4), round(1.0 - dot, 4)))
+    # 2c-3. `pelvis` must not inherit a rotated root.  Measured on the 2026-11-16 v8 build: the
+    #      skeleton was rebuilt in the game's list order and its hierarchy was taken from the
+    #      game as well, which parented `pelvis` under `root_motion` — and the model's
+    #      `root_motion` carries the authored 90 deg, so the body applied it twice and collapsed
+    #      in on itself while the head, arms and tail were finally right.  AGENTS.md records the
+    #      same failure from the 2026-11-15 pelvis re-parent; the gate did not refuse it then and
+    #      no check covered it until now.
+    root_row = model_table.get("root_motion")
+    if parents.get("pelvis") and root_row:
+        q = list(root_row["orientation"])
+        identity = min(
+            max(abs(a - b) for a, b in zip(q, (0.0, 0.0, 0.0, 1.0))),
+            max(abs(a - b) for a, b in zip(q, (1.0, 0.0, 0.0, 0.0))),
+        )
+        if identity > 2e-3:
+            raise Refused(
+                "pelvis-parented-under-rotated-root",
+                f"{skeleton_dmx.name} parents pelvis under {parents['pelvis']!r} while "
+                f"{model_dmx.name}'s root_motion carries a rotation (q={q}); the authored root "
+                "rotation reaches the body twice and it collapses in on itself",
+            )
     if frame_shift:
         raise Refused(
             "skeleton-rest-differs-from-model",

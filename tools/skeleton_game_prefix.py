@@ -130,9 +130,19 @@ def main() -> int:
     for joint in _joints(our_model):
         for child in _children(joint):
             our_parents[child.name] = joint.name
+    # Our own hierarchy is kept.  Only the list order comes from the game; adopting its parents
+    # as well re-parented `pelvis` under `root_motion`, whose rest carries the authored 90 deg,
+    # so the body applied it twice and collapsed in on itself (2026-11-16, the v8 build).  Order
+    # and hierarchy are separate facts and only the order indexes a mask.
     parents = {}
     for name in order:
-        parents[name] = game_parents.get(name) if name in game_parents else our_parents.get(name)
+        parents[name] = our_parents.get(name) if name in our_parents else game_parents.get(name)
+    # `pelvis` stays a root: the model's `root_motion` carries the authored 90 deg, and a pelvis
+    # under it applies that rotation twice (body collapses in on itself, 2026-11-15 and
+    # 2026-11-16).  The game's own skeleton nests it differently; that is the one parent we do
+    # not copy, and the gate now refuses the alternative by name.
+    if "pelvis" in parents:
+        parents["pelvis"] = None
     for name in order:
         parent = parents.get(name)
         if parent and parent not in by_name:
