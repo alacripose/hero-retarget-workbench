@@ -205,6 +205,42 @@ def _subsequence(small: list[str], large: list[str]) -> list[str]:
     return [small[index] for index in range(1, len(order)) if order[index] < order[index - 1]]
 
 
+def _joint_world(datamodel, path, name: str):
+    """The named joint's pose through its parent chain, as a 4x4 matrix."""
+    from mathutils import Matrix, Quaternion, Vector  # noqa: WPS433
+
+    root = datamodel.load(str(path)).root
+    element = root["model"] if "model" in root.keys() else root
+    while "children" not in element.keys():
+        element = next(element[key] for key in element.keys() if hasattr(element[key], "keys"))
+
+    by_name = {}
+    parents = {}
+
+    def walk(node, parent):
+        for child in node["children"]:
+            by_name[child.name] = child
+            parents[child.name] = parent
+            walk(child, child.name)
+
+    walk(element, None)
+    if name not in by_name:
+        return None
+    chain = []
+    current = name
+    while current:
+        chain.append(current)
+        current = parents.get(current)
+    world = Matrix.Identity(4)
+    for joint in reversed(chain):
+        transform = by_name[joint]["transform"]
+        position = Vector(list(transform["position"]))
+        q = list(transform["orientation"])
+        rotation = Quaternion((q[3], q[0], q[1], q[2])).to_matrix().to_4x4()
+        world = world @ Matrix.Translation(position) @ rotation
+    return [list(row) for row in world]
+
+
 def _joint_list_order(datamodel, path) -> list[str]:
     """The skeleton's explicit joint order, which is what numeric bone ids index."""
     root = datamodel.load(str(path)).root
@@ -487,20 +523,23 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
     #      in on itself while the head, arms and tail were finally right.  AGENTS.md records the
     #      same failure from the 2026-11-15 pelvis re-parent; the gate did not refuse it then and
     #      no check covered it until now.
-    root_row = model_table.get("root_motion")
-    if parents.get("pelvis") and root_row:
-        q = list(root_row["orientation"])
-        identity = min(
-            max(abs(a - b) for a, b in zip(q, (0.0, 0.0, 0.0, 1.0))),
-            max(abs(a - b) for a, b in zip(q, (1.0, 0.0, 0.0, 0.0))),
-        )
-        if identity > 2e-3:
-            raise Refused(
-                "pelvis-parented-under-rotated-root",
-                f"{skeleton_dmx.name} parents pelvis under {parents['pelvis']!r} while "
-                f"{model_dmx.name}'s root_motion carries a rotation (q={q}); the authored root "
-                "rotation reaches the body twice and it collapses in on itself",
-            )
+    # The pose, not the parent: a parent and a rest are one fact, and the same world transform can
+    # be spelled either way (our rest compensating a missing parent, or the game's rest under the
+    # game's parent).  What must hold is that `pelvis` lands where the game puts it.  v8 parented
+    # it under a rotated root while keeping our compensating rest: the two offsets composed and
+    # the body collapsed in on itself.
+    if game_skeleton is not None and game_skeleton.is_file():
+        ours_world = _joint_world(datamodel, skeleton_dmx, "pelvis")
+        game_world = _joint_world(datamodel, game_skeleton, "pelvis")
+        if ours_world is not None and game_world is not None:
+            delta = max(abs(a - b) for row_a, row_b in zip(ours_world, game_world) for a, b in zip(row_a, row_b))
+            if delta > 0.01:
+                raise Refused(
+                    "pelvis-world-differs-from-game",
+                    f"pelvis lands {delta:.3f} from the game's own pose in {skeleton_dmx.name} "
+                    f"(parent {parents.get('pelvis')!r}); a parent and a compensating rest "
+                    "compose, and the body is read rotated or folded",
+                )
     if frame_shift:
         raise Refused(
             "skeleton-rest-differs-from-model",
@@ -586,18 +625,19 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
         # list kept the game prefix while its tree put the tail under `pelvis` mid-walk.
         tree_order = [name for name in skeleton_joints if not object_like(name)]
         wants = list(dict.fromkeys(_joint_list_order(datamodel, game_skeleton)))
-        tree_shift = [
-            (name, game_slot, tree_order.index(name))
-            for game_slot, name in enumerate(wants)
-            if name in tree_order and tree_order.index(name) != game_slot
-        ]
-        if tree_shift:
+        # Relative order, not absolute slots: `pelvis` is deliberately promoted to a root (see
+        # 2c-3), which moves its whole subtree earlier in the walk without changing how the
+        # game's joints sit relative to each other.  What rotates the body is a game joint
+        # appearing before one the game puts later — the v9 build walked `weaponHand_L` at 21
+        # and `arm_R_IKTARGET` at 6, and the head, arms and tail rotated again.
+        tree_inversions = _subsequence([name for name in tree_order if name in set(wants)], wants)
+        if tree_inversions:
             raise Refused(
                 "skeleton-tree-shifts-game-joint",
-                f"{len(tree_shift)} joints of {game_skeleton.name} sit at a different slot when "
-                f"{skeleton_dmx.name}'s tree is walked depth first (e.g. {tree_shift[:3]}); the "
-                "model's bones are numbered by the tree the client walks, so a bone inserted "
-                "before the end rotates the head, arms and tail",
+                f"{len(tree_inversions)} joints of {game_skeleton.name} are walked out of order in "
+                f"{skeleton_dmx.name} (e.g. {tree_inversions[:3]}); the model's bones are numbered "
+                "by the tree the client walks, so a bone inserted before another rotates the "
+                "head, arms and tail",
             )
         # `jointList`, not the tree walk: the tree nests the appended tail under `pelvis`, so a
         # depth-first read puts tail joints between body joints while the compiled skeleton
