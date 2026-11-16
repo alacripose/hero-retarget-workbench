@@ -35,6 +35,15 @@ def test_gate_refuses_a_skeleton_that_moves_a_game_joint() -> None:
     assert "_joint_list_order(datamodel, skeleton_dmx)" in block, "our slots must come from ours"
 
 
+def test_gate_refuses_a_tree_walk_that_moves_a_game_joint() -> None:
+    """v9 kept the game prefix in `jointList` and still rotated: its tree walked differently."""
+    gate = read("tools/tail_release_gate.py")
+    assert "skeleton-tree-shifts-game-joint" in gate
+    block = gate[gate.index("skeleton-tree-shifts-game-joint") - 1500 : gate.index("skeleton-tree-shifts-game-joint")]
+    assert "skeleton_joints" in block, "the walked order must come from the skeleton document"
+    assert "_joint_list_order(datamodel, game_skeleton)" in block, "the wanted order is the game's list"
+
+
 def test_gate_refuses_a_model_that_does_not_declare_a_skeleton_joint() -> None:
     gate = read("tools/tail_release_gate.py")
     assert "model-vmdl-missing-skeleton-joint" in gate

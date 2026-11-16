@@ -580,6 +580,25 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
     #     bone after it — arms, head and tail read rotated while every document is internally
     #     consistent.  Extra joints may only be appended after the game's last joint.
     if stock_table is not None:
+        # Both orders are checked, because they are different documents and only measurement
+        # says which one the compiler numbers by.  3c compares `jointList`; 3d compares the tree
+        # walk.  A build can pass one and fail the other — that is the 2026-11-16 v9 pak, whose
+        # list kept the game prefix while its tree put the tail under `pelvis` mid-walk.
+        tree_order = [name for name in skeleton_joints if not object_like(name)]
+        wants = list(dict.fromkeys(_joint_list_order(datamodel, game_skeleton)))
+        tree_shift = [
+            (name, game_slot, tree_order.index(name))
+            for game_slot, name in enumerate(wants)
+            if name in tree_order and tree_order.index(name) != game_slot
+        ]
+        if tree_shift:
+            raise Refused(
+                "skeleton-tree-shifts-game-joint",
+                f"{len(tree_shift)} joints of {game_skeleton.name} sit at a different slot when "
+                f"{skeleton_dmx.name}'s tree is walked depth first (e.g. {tree_shift[:3]}); the "
+                "model's bones are numbered by the tree the client walks, so a bone inserted "
+                "before the end rotates the head, arms and tail",
+            )
         # `jointList`, not the tree walk: the tree nests the appended tail under `pelvis`, so a
         # depth-first read puts tail joints between body joints while the compiled skeleton
         # still numbers them last.  Shiv ships exactly that shape and works; the index base is
