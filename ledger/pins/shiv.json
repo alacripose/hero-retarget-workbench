@@ -2,10 +2,11 @@
   "addon": "shiv",
   "hero": "shiv",
   "status": "shipped",
-  "pak": "artifacts/oldviper/shiv_tail_all.vpk",
-  "sha256": "0a966d904c9583f3736c42cdc1b91d983919ae00f5619bf9ead81236ed57eb50",
-  "bytes": 95882596,
+  "pak": "artifacts/oldviper/shiv_append.vpk",
+  "sha256": "01efc18ec8d156e9ff3846f17c5b9da06955ae25772031d3e0284c9c130be7f0",
+  "bytes": 95960571,
   "legacy_gate": "tools/shiv_merge_gate.py",
-  "note": "The Shiv release audit, kept behind the generic port gate instead of the gate depending on it. The installed addon slot is environment state: whichever port is installed owns it, so this pin audits the build without requiring the slot.",
-  "skip_installed": true
+  "installed": "D:/SteamLibrary/steamapps/common/Deadlock/game/citadel/addons/pak93_dir.vpk",
+  "skip_installed": false,
+  "note": "Pinned to the bytes that are actually installed. The previous pin named artifacts/oldviper/shiv_tail_all.vpk (sha256 0a966d90..., 95,882,596 bytes), which is a different build: its own gate records it as the clips-only pak that drops shiv.vnmskel_c. The owner asked whether that was the same file as the one in the addons folder; it was not. The installed Shiv is shiv_append.vpk (01efc18e..., 95,960,571 bytes) in pak93_dir.vpk, the append build the owner called the closest one yet. The pin now names it and the project gate compares the installed slot instead of skipping that check."
 }

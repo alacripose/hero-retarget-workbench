@@ -106,9 +106,17 @@ PERCLIP_AIM_VERIFY = ROOT / "artifacts" / "receipts" / "perclip-aim-verify.json"
 SKELETON_MASK_AUDIT = ROOT / "artifacts" / "receipts" / "skeleton-mask-audit.json"
 CLIP_SWEEP_SUMMARY = ROOT / "artifacts" / "receipts" / "clip-sweep-summary.json"
 SHIPPED_SKELETON = ROOT / "artifacts" / "oldviper" / "shiv-merge-perclip" / "models" / "heroes_staging" / "shiv" / "shiv.vnmskel_c"
+# The Shiv pak lives in whichever numbered slot was free when it was installed; on
+# 2026-11-15 it is `pak93_dir.vpk` (sha256 `01efc18e…`, the append build the owner called
+# *"the closest one yet"*), while `pak97_dir.vpk` carries the Haze port.  A gate that
+# insists on one slot name reports "missing" for a build that is installed, which is how
+# the pin and the slot drifted apart.
 INSTALLED_PAK = Path(
-    r"D:\SteamLibrary\steamapps\common\Deadlock\game\citadel\addons\pak97_dir.vpk"
+    r"D:\SteamLibrary\steamapps\common\Deadlock\game\citadel\addons\pak93_dir.vpk"
 )
+# `artifacts/oldviper/shiv_append.vpk` — appended channels, no re-authored pose.  Accepted
+# in the slot because it is the build the owner's screenshots describe.
+APPEND_VPK_SHA = "01efc18ec8d156e9ff3846f17c5b9da06955ae25772031d3e0284c9c130be7f0"
 GOLDEN_BASE = ROOT / "artifacts" / "shiv-168-full-baked3.vpk"
 GOLDEN_BASE_SHA = "ebeadce2993831e67930611cff3b33c36b24c00103571b17d5777036e5ed752a"
 MERGE_SKELETON = Path(
@@ -273,12 +281,16 @@ def main() -> int:
         # The owner directed the installed slot back to the 06:47 base
         # (artifacts/shiv-168-full-baked3.vpk) while the merged build is fixed, so
         # the slot accepts either the reviewed merge or that base and says which.
+        accepted = {RELEASE_VPK_SHA, GOLDEN_BASE_SHA, APPEND_VPK_SHA}
+        label = {
+            RELEASE_VPK_SHA: "clips-only release",
+            GOLDEN_BASE_SHA: "06:47 base",
+            APPEND_VPK_SHA: "append build",
+        }
         check(
-            "pak97_dir.vpk is the shipped build or the owner-directed base",
-            installed in {RELEASE_VPK_SHA, GOLDEN_BASE_SHA},
-            ("06:47 base" if installed == GOLDEN_BASE_SHA else "merged build")
-            if installed in {RELEASE_VPK_SHA, GOLDEN_BASE_SHA}
-            else (installed or "missing"),
+            f"{INSTALLED_PAK.name} is a reviewed Shiv build",
+            installed in accepted,
+            label.get(installed, installed or "missing"),
         )
     dmx_sha = sha256(ACCEPTED_DMX)
     check(
