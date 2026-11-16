@@ -14,7 +14,7 @@ import bpy
 from bpy.props import BoolProperty, IntProperty, StringProperty
 from bpy.types import Operator
 
-from . import core, jobs
+from . import core, jobs, properties
 
 
 def _settings(context):
@@ -184,20 +184,32 @@ class DMF_OT_scan_mods(Operator):
                 row.bytes = mod.bytes
                 row.note = mod.note
                 row.models = "\n".join(mod.models)
+                row.blends = "\n".join(mod.blends)
+                row.files = "\n".join(mod.files)
+                row.counts = " · ".join(
+                    f"{name} {value}" for name, value in mod.counts.items() if value
+                )
+                row.total_files = sum(mod.counts.values())
+            properties.refresh_mod_rows(settings)
             counts = result.counts()
             settings.mods_scanned = counts["packages"]
             settings.mod_report = str(report)
             settings.mod_note = (
-                f"{counts['packages']} packages, {counts['addons']} addons, "
-                f"{counts['vpks']} VPKs, {counts['with_cloth_sections']} with cloth, "
-                f"{counts['skipped_game_paks']} engine paks skipped"
+                f"{counts['packages']} packages: {counts['addons']} folders, "
+                f"{counts['vpks']} VPKs, {counts['blends']} blends, "
+                f"{counts['blend_files']} blend files, {counts['with_cloth_sections']} cloth"
             )
+            if counts["skipped_game_paks"]:
+                settings.mod_note += f", {counts['skipped_game_paks']} engine paks skipped"
             for root_row in settings.scan_roots:
                 base = bpy.path.abspath(root_row.path).replace("\\", "/").lower()
                 matched = [
                     mod for mod in result.mods if Path(mod.path).as_posix().lower().startswith(base)
                 ]
                 root_row.packages = len(matched)
+                root_row.folders = sum(1 for mod in matched if mod.kind == "addon")
+                root_row.vpks = sum(1 for mod in matched if mod.kind == "vpk")
+                root_row.blends = sum(1 for mod in matched if mod.kind == "blend")
                 root_row.with_cloth = sum(1 for mod in matched if mod.cloth_sections)
             core.set_status(settings, f"Scanned {counts['packages']} packages", "OK")
 
@@ -207,10 +219,10 @@ class DMF_OT_scan_mods(Operator):
 
 
 def _selected_mod(settings):
-    if not settings.mods:
+    if not settings.mod_rows:
         return None
-    index = min(max(settings.mod_index, 0), len(settings.mods) - 1)
-    return settings.mods[index]
+    index = min(max(settings.mod_index, 0), len(settings.mod_rows) - 1)
+    return settings.mod_rows[index]
 
 
 def _mod_vmdl(row) -> str:
@@ -353,6 +365,101 @@ class DMF_OT_backport_mod(Operator):
 
         if not _start(settings, f"Backporting {row.addon}", work, done, "Backport failed"):
             return {"CANCELLED"}
+        return {"FINISHED"}
+
+
+def _project_slug(value: str) -> str:
+    slug = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in (value or "mod").strip())
+    return "_".join(part for part in slug.split("_") if part) or "mod"
+
+
+def _mod_blend(row) -> Path | None:
+    """An existing blend inside the selected package, when it has one."""
+    if row.kind == "blend":
+        path = _abspath(row.path)
+        return path if path.is_file() else None
+    if row.kind != "addon":
+        return None
+    for line in (row.blends or "").splitlines():
+        path = _abspath(row.path) / line
+        if path.is_file():
+            return path
+    return None
+
+
+class DMF_OT_create_mod_project(Operator):
+    bl_idname = "dmf.create_mod_project"
+    bl_label = "Create Blender project"
+    bl_description = "Open a blend the mod carries, or save the current scene as a project for it"
+
+    def invoke(self, context, event):
+        row = _selected_mod(_settings(context))
+        if row is not None and _mod_blend(row) is not None and bpy.data.is_dirty:
+            return context.window_manager.invoke_confirm(
+                self,
+                event,
+                title="Open the mod's Blender project?",
+                message="The current file has unsaved changes. Opening the project replaces it.",
+                confirm_text="Open project",
+                icon="WARNING",
+            )
+        return self.execute(context)
+
+    def execute(self, context):
+        settings = _settings(context)
+        row = _selected_mod(settings)
+        if row is None:
+            self.report({"ERROR"}, "Scan for mods and select a package first")
+            return {"CANCELLED"}
+        blend = _mod_blend(row)
+        if blend is not None:
+            try:
+                bpy.ops.wm.open_mainfile(filepath=str(blend))
+            except RuntimeError as error:
+                core.set_status(settings, f"Could not open {blend.name}: {error}", "ERROR")
+                return {"CANCELLED"}
+            # The .blend may predate this addon and carry no project fields, so
+            # point the freshly loaded scene at the file that was just opened.
+            opened = _settings(context)
+            opened.project_root = str(blend.parent)
+            opened.project_file = str(blend)
+            core.set_status(opened, f"Opened project {blend.name}", "OK")
+            return {"FINISHED"}
+
+        base = _workspace(settings) / "projects" / _project_slug(row.addon or Path(row.path).stem)
+        base.mkdir(parents=True, exist_ok=True)
+        target = base / f"{base.name}.blend"
+        suffix = 2
+        while target.exists():
+            target = base / f"{base.name}-{suffix}.blend"
+            suffix += 1
+        # Set the fields before saving the copy, so reopening the project keeps
+        # its own active-project card instead of reverting to no project.
+        previous = (settings.project_root, settings.project_file)
+        settings.project_root = str(base)
+        settings.project_file = str(target)
+        try:
+            bpy.ops.wm.save_as_mainfile(filepath=str(target), copy=True)
+        except RuntimeError as error:
+            settings.project_root, settings.project_file = previous
+            core.set_status(settings, f"Could not create {target.name}: {error}", "ERROR")
+            return {"CANCELLED"}
+        core.set_status(settings, f"Created project {target.name} in {base}", "OK")
+        return {"FINISHED"}
+
+
+class DMF_OT_open_project_folder(Operator):
+    bl_idname = "dmf.open_project_folder"
+    bl_label = "Open project folder"
+    bl_description = "Open the active project folder in the file browser"
+
+    def execute(self, context):
+        settings = _settings(context)
+        folder = Path(settings.project_root) if settings.project_root else _workspace(settings)
+        if not folder.is_dir():
+            self.report({"ERROR"}, f"Project folder does not exist: {folder}")
+            return {"CANCELLED"}
+        bpy.ops.wm.path_open(filepath=str(folder))
         return {"FINISHED"}
 
 
@@ -726,6 +833,8 @@ CLASSES = (
     DMF_OT_scan_mods,
     DMF_OT_port_mod,
     DMF_OT_backport_mod,
+    DMF_OT_create_mod_project,
+    DMF_OT_open_project_folder,
     DMF_OT_install_s2v,
     DMF_OT_open_csdk_page,
     DMF_OT_install_csdk,

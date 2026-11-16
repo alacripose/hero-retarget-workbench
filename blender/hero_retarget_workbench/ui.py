@@ -365,8 +365,30 @@ class DMF_PT_setup(Panel):
         )
         tools.operator("dmf.refresh_clients", text="Find toolchains", icon="FILE_REFRESH")
 
-        workspace = _section(layout, "Workspace", "FILE_FOLDER", "optional")
-        workspace.prop(settings, "project_root", text="Folder")
+        project = Path(settings.project_file) if settings.project_file else None
+        workspace = _section(
+            layout,
+            "Active project",
+            "FILE_BLEND",
+            project.name if project is not None else "none",
+        )
+        if project is not None:
+            workspace.label(text=_tail(str(project), 46), icon="FILE_BLEND")
+            workspace.label(
+                text=_tail(str(Path(settings.project_root) if settings.project_root else project.parent), 46),
+                icon="FILE_FOLDER",
+            )
+            row = workspace.row(align=True)
+            row.operator("dmf.open_project_folder", text="Open folder", icon="FILE_FOLDER")
+            row.prop_enum(settings, "props_page", "MODS", text="Mods", icon="PACKAGE")
+        else:
+            _hint(
+                workspace,
+                "Pick a folder, VPK or blend on Mods and create its Blender project.",
+                "QUESTION",
+                width=32,
+            )
+            workspace.prop_enum(settings, "props_page", "MODS", text="Open Mods", icon="PACKAGE")
 
         # Mods is its own page; Setup names where it is and how much it found so
         # the old "update old addon" corner is not hunted for here.

@@ -1,4 +1,4 @@
-# UI pass 0.15.1
+# UI pass 0.16.0
 
 The Workbench pages were built one at a time, and the check that every action has one home did not
 exist. This pass adds the check, moves staging and compiling onto the Release page, replaces the hero
@@ -19,7 +19,7 @@ dropdown with a filtered list, and runs the family writing rules over every user
 
 | Page | Panels | Actions |
 |---|---|---|
-| SETUP | DMF_PT_setup, DMF_PT_setup_tools, DMF_PT_setup_toolchains | `dmf.add_client`, `dmf.detect_paths`, `dmf.install_csdk`, `dmf.install_s2v`, `dmf.open_csdk_page`, `dmf.refresh_clients`, `dmf.use_backport_client`, `dmf.use_client`, `dmf.use_toolchain` |
+| SETUP | DMF_PT_setup, DMF_PT_setup_tools, DMF_PT_setup_toolchains | `dmf.add_client`, `dmf.detect_paths`, `dmf.install_csdk`, `dmf.install_s2v`, `dmf.open_csdk_page`, `dmf.open_project_folder`, `dmf.refresh_clients`, `dmf.use_backport_client`, `dmf.use_client`, `dmf.use_toolchain` |
 | SOURCE | DMF_PT_source, DMF_PT_source_files | `dmf.apply_model_name`, `dmf.browse_folders`, `dmf.choose_hero`, `dmf.detect`, `dmf.extract`, `dmf.fit`, `dmf.import_custom`, `dmf.import_hero`, `dmf.pick_vmdl`, `dmf.refresh_heroes` |
 | PARTS | DMF_PT_parts, DMF_PT_parts_materials | `dmf.append_material`, `dmf.assign_material`, `dmf.clear_part_material`, `dmf.scan_materials`, `dmf.scan_parts`, `dmf.use_active_collection`, `dmf.use_part` |
 | CLOTH | DMF_PT_cloth | `dmf.build_all_cloth`, `dmf.build_chain_cloth`, `dmf.import_hero_parts`, `dmf.join_cloth_chain`, `dmf.mark_cloth_proxy`, `dmf.scan_cloth` |
@@ -28,12 +28,32 @@ dropdown with a filtered list, and runs the family writing rules over every user
 | ANIMATIONS | DMF_PT_animations, DMF_PT_animation_ik, DMF_PT_animation_tail, DMF_PT_animation_write | `dmf.apply_ik`, `dmf.bake_clip`, `dmf.bake_clips`, `dmf.bake_ik`, `dmf.blend_tail`, `dmf.blend_tail_all`, `dmf.build_tail_animation`, `dmf.cancel_clips`, `dmf.clear_clips`, `dmf.clear_ik`, `dmf.export_clip`, `dmf.export_clips`, `dmf.import_clip`, `dmf.import_clips`, `dmf.load_tail_option`, `dmf.prefix_clips`, `dmf.preview_clip`, `dmf.preview_tail`, `dmf.publish_tail_anims`, `dmf.scan_clips`, `dmf.scan_ik`, `dmf.scan_tail`, `dmf.scan_tails` |
 | COMPARE | DMF_PT_compare | `dmf.apply_compare_action`, `dmf.compare_clear`, `dmf.compare_split` |
 | WEIGHTS | DMF_PT_weights, DMF_PT_weights_manual | `dmf.assign_active_bone`, `dmf.limit_influences`, `dmf.mint_proof`, `dmf.mirror_weights`, `dmf.normalize_weights`, `dmf.remove_zero_weights`, `dmf.retarget`, `dmf.select_unweighted`, `dmf.smooth_active_group`, `dmf.verify_proof` |
-| MODS | DMF_PT_mods, DMF_PT_update | `dmf.add_scan_root`, `dmf.backport_mod`, `dmf.pick_old_vmdl`, `dmf.pick_old_vpk`, `dmf.port_mod`, `dmf.remove_scan_root`, `dmf.scan_mods`, `dmf.update_old_addon` |
+| MODS | DMF_PT_mods, DMF_PT_update | `dmf.add_scan_root`, `dmf.backport_mod`, `dmf.create_mod_project`, `dmf.pick_old_vmdl`, `dmf.pick_old_vpk`, `dmf.port_mod`, `dmf.remove_scan_root`, `dmf.scan_mods`, `dmf.update_old_addon` |
 | COMPONENTS | DMF_PT_components | `dmf.pick_component_vmdl`, `dmf.scan_components`, `dmf.stage_components` |
 | RELEASE | DMF_PT_handoff, DMF_PT_handoff_paths, DMF_PT_release, DMF_PT_release_slot | `dmf.build_lods`, `dmf.clear_lods`, `dmf.compile`, `dmf.export_stage`, `dmf.install_pak`, `dmf.launch_game`, `dmf.pack_vpk`, `dmf.write_model` |
 
 `python tools/ui_parity.py --check` fails on an action drawn on two pages, a page with no panel, or an
 action drawn that no operator declares. `tests/test_ui_parity.py` pins the same result.
+
+## 0.16.0 — Mods is a typed collection, and a mod becomes a Blender project
+
+- The scan records folders, VPKs and standalone `*.blend` files as separate kinds. A VPK without a
+  compiled model is still a package (`no-compiled-model`), rather than disappearing from the list.
+- `ModRecord` carries every listed entry plus counts for models, clips, materials, blends and other
+  files. The scan roots list reports the per-root split, and the page note names both package kinds
+  and blend files inside them.
+- The Mods page has All / Folders / VPKs / Blends chips over a visible `mod_rows` list, a searchable
+  contents list with its own content-type chips, and a selected-package card with path, kind, hero,
+  date, size and the full content summary.
+- `dmf.create_mod_project` opens a blend carried by a folder or a blend record, with an unsaved-file
+  confirm. A VPK or a folder without a blend saves the current scene as
+  `<workspace>/projects/<slug>/<slug>.blend` with `copy=True`, so the current file is not replaced.
+  `project_root` and `project_file` are written before the save, so reopening the project keeps its
+  active-project card. Setup shows that card instead of a raw workspace folder field.
+- Update and backport move under the selected package; blends do not show an update action that does
+  not apply. `tools/blender_mods_gui_probe.py` builds a folder, a VPK and a blend, runs the real scan,
+  checks all four filter states and the content filter, creates a VPK project under a temp workspace,
+  and captures `artifacts/ui-pass/mods-collection.png`.
 
 ## 0.15.1 — build markers follow the selected clients
 

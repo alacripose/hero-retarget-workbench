@@ -29,6 +29,36 @@ https://github.com/oaustegard/claude-skills/releases (declauding)
 https://github.com/hardikpandya/stop-slop
 C:\Users\ala\.agents\skills\ has a ton of skills for agents to use and yet they never use them for some reason. You need to be using these skills and updating/managing them ccording to family project convention.
 
+## 2026-11-16 — Mods is a typed collection, and a package becomes a Blender project
+
+**Owner instruction, verbatim:** *"all list views need to be modernized so backporting and updating
+old mods is better"*, then *"it needs to be updated as well to follow the updated source page so it can
+show everything that a mod contains, splitting the different parts of the search up into different
+types of lists, maybe a mod collection view for folders/vpks/blend files, allowing for creating actual
+blender projects from those instead of the silly folder workspace thing"*.
+
+- **The scan is typed.** `forge.oldmods` records `kind` as `addon`, `vpk` or `blend`; a VPK without a
+  compiled model is kept with `no-compiled-model` instead of being skipped, and standalone `.blend`
+  files are records of their own. `ModRecord` gains `blends`, `files`, `counts` and
+  `content_counts()`/`content_category()` shared by VPK entries and unpacked files.
+- **The page is a collection, not one flat package list.** `DMF_UL_scan_roots` lists the scan folders
+  with per-kind counts and an editable full path; `DMF_UL_mods` draws the visible `mod_rows`;
+  All/Folders/VPKs/Blends chips call `properties.refresh_mod_rows`. The selected package has a
+  searchable `DMF_UL_mod_contents` with All/Models/Clips/Materials/Blends/Other chips.
+- **A project is a real `.blend`.** `dmf.create_mod_project` opens a blend carried by a folder or a
+  blend record (with a dirty-file confirm), otherwise writes
+  `<workspace>/projects/<slug>/<slug>.blend` with `save_as_mainfile(copy=True)` so the current file is
+  not replaced. It sets `project_root` and `project_file` before the save, so reopening the project
+  keeps its active-project card; Setup shows that card instead of a raw workspace folder field.
+- **Measured.** `python -m unittest tests.test_oldmods tests.test_ui_parity tests.test_backport
+  tests.test_port_gate` passes (32 tests); `python tools/ui_parity.py --check` and
+  `python tools/ui_prose.py --check` are zero. `tools/blender_mods_gui_probe.py` scans a temporary
+  folder + VPK + blend, passes `scan-count 3`, all four mod filters, the content filter, and project
+  creation, and writes `artifacts/ui-pass/mods-collection.png` plus
+  `artifacts/ui-pass/mods-scan-folders.png`.
+- **Not checked by me:** the in-game look of anything on this page. The probe checks Blender's data
+  and draw path, not a running client.
+
 ## 2026-11-16 — the boundary got harder, the release end lives in the addon, and Seven ships
 
 **Owner instructions, verbatim:** *"you also almost considered lowering refusals and mentioned how one
@@ -87,7 +117,7 @@ ability to detect other installs"*.
   rendered: inferno_bartender is legacy content that imports at a different scale and rotation than
   modern models, and the rigid + scale retarget that fixed the smear (bbox x -5.7..9.9, y 6.3..34.3,
   z 1.7..58.6 from the pelvis) was not enough to make it visible. `addons/pak97_dir.vpk` is restored
-  to `haze_noskel.vpk` (`b849c6bf�`), the accepted cloth-chain path. The tail code stays in the
+  to `haze_noskel.vpk` (`b849c6bf�`), the accepted cloth-chain path. The tail code stays in the
   addon (`seat_tail_chain`, `lift_tail_mesh`) but is not the shipping route.
 - **A rolling `.prev` backup lost the accepted pak.** Each `release.install` copied the current slot
   to `pakNN_dir.prev.vpk`, so two Seven installs turned that file into a Seven pak; restoring "the
