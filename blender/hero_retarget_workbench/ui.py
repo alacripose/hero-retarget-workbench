@@ -493,14 +493,31 @@ class DMF_PT_parts(Panel):
             f"{len(settings.parts)}" if settings.parts else "not scanned",
             "GROUP",
         )
-        ui_popit.micro(collection_box, "Parts collection", "GROUP")
-        collection_box.prop_search(
-            settings,
-            "custom_collection",
-            bpy.data,
-            "collections",
-            text="",
-        )
+        ui_popit.micro(collection_box, "Parts collection", "FILE_FOLDER")
+        if bpy.data.collections:
+            ui_popit.column_header(
+                collection_box,
+                settings.collection_name_width,
+                ("Collection", "Meshes", "Objects"),
+                (0.2, 0.2),
+            )
+            collection_box.template_list(
+                "DMF_UL_collections",
+                "parts_collections",
+                bpy.data,
+                "collections",
+                settings,
+                "collection_index",
+                rows=min(len(bpy.data.collections), 5),
+            )
+            ui_popit.name_width(collection_box, settings, "collection_name_width")
+            collection_box.operator(
+                "dmf.use_collection",
+                text="Use selected collection",
+                icon="FILE_FOLDER",
+            )
+        else:
+            _hint(collection_box, "No Blender collections in this file.", "QUESTION")
         ui_popit.glyphs(
             collection_box,
             ["dmf.use_active_collection", "dmf.scan_parts"],
