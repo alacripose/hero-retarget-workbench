@@ -38,6 +38,7 @@ _AUTO_SKIPPED = 0
 _AUTO_FAILED = 0
 _AUTO_TAIL_NAMES: list[str] = []
 _AUTO_PUBLISH = False
+_SCAN_TIMER = None
 
 
 def _rigs(settings):
@@ -549,7 +550,7 @@ def start_auto(settings, *, schedule: bool = True, publish: bool = False) -> int
     """Queue every imported hero clip for one automatic tail pass."""
     global _AUTO_QUEUE, _AUTO_TIMER, _AUTO_SOURCE, _AUTO_SETTINGS, _AUTO_CLIPS, _AUTO_SOURCE_ACTIONS
     global _AUTO_UPDATED, _AUTO_SKIPPED, _AUTO_FAILED, _AUTO_TAIL_NAMES, _AUTO_PUBLISH
-    if _AUTO_TIMER is not None or jobs.is_running() or clipops.is_running():
+    if _AUTO_TIMER is not None or _SCAN_TIMER is not None or jobs.is_running() or clipops.is_running():
         raise RuntimeError("tail-auto-busy: another job is already running")
     option = _selected_option(settings)
     if option is None:
@@ -1610,7 +1611,7 @@ def start_discover(settings) -> str:
     so it runs through the existing background job.  The scan itself is scheduled
     as a timer after it returns.  A cached roster is scanned immediately.
     """
-    if jobs.is_running():
+    if jobs.is_running() or _SCAN_TIMER is not None:
         raise RuntimeError("tail-scan-busy: another background job is already running")
     settings.tail_options.clear()
     settings.tail_option_index = 0
@@ -1646,14 +1647,181 @@ def start_discover(settings) -> str:
 
 
 def _schedule_scan(settings, files: list[Path]) -> None:
-    def run():
+    global _SCAN_TIMER
+    if _SCAN_TIMER is not None:
+        return
+    _SCAN_TIMER = _TailScanJob(settings, files)
+
+
+class _TailScanJob:
+    """Chunked scan: one DMX import or live skeleton per timer tick.
+
+    The old path imported every candidate extraction in one timer callback, so
+    Blender stopped drawing until the whole corpus had been opened. The file
+    reads are cheap; the Blender imports are not. This keeps each tick bounded,
+    reports the same job card as the other pages, and lets the viewport breathe
+    between candidates.
+    """
+
+    def __init__(self, settings, files):
+        self.settings = settings
+        self.live_files = [Path(path) for path in (files or [])]
+        self.live_index = 0
+        self.live_found = 0
+        self.roots = _candidate_roots(settings)
+        self.root_index = 0
+        self.files = None
+        self.best: dict[Path, dict[str, tuple[Path, list[str]]]] = {}
+        self.imports: list[tuple[str, Path, list[str]]] = []
+        self.import_index = 0
+        self.scanned = 0
+        self.imported = 0
+        settings.tail_options.clear()
+        settings.tail_option_index = 0
+        settings.job_running = True
+        settings.job_kind = "TAIL_SCAN"
+        settings.job_label = "Scanning tail sources"
+        settings.job_message = "reading local rigs"
+        settings.job_progress = 0.02
+        settings.job_state = "RUNNING"
+        settings.job_cancellable = False
+        settings.job_log = "Scanning tail sources: reading local rigs"
+        self._known_rigs()
+        self._timer = bpy.app.timers.register(self.tick, first_interval=0.02, persistent=True)
+
+    def _known_rigs(self) -> None:
+        settings = self.settings
+        hero = settings.target_armature
+        if hero is not None and hero.type == "ARMATURE":
+            for chain in _chains(hero):
+                _add_option(
+                    settings,
+                    label=f"{hero.name} / {chain.name}",
+                    source="HERO",
+                    path=settings.body_dmx,
+                    chain=chain,
+                    points=_points(hero, chain),
+                )
+        custom = settings.custom_armature
+        if custom is not None and custom.type == "ARMATURE" and custom != hero:
+            for chain in _chains(custom):
+                _add_option(
+                    settings,
+                    label=f"{custom.name} / {chain.name}",
+                    source="CUSTOM",
+                    path="",
+                    chain=chain,
+                    points=_points(custom, chain),
+                    armature=custom,
+                )
+
+    def _progress(self, value: float, message: str) -> None:
+        settings = self.settings
+        settings.job_progress = max(settings.job_progress, min(0.99, value))
+        settings.job_message = message
+        settings.tail_option_note = message
+        lines = settings.job_log.splitlines()[-6:]
+        settings.job_log = "\n".join([*lines, message])
+
+    def tick(self):
         try:
-            count = discover(settings, live_files=files)
-            settings.tail_option_note = settings.tail_option_note or f"{count} tail chains"
+            settings = self.settings
+            if self.live_index < len(self.live_files):
+                path = self.live_files[self.live_index]
+                self.live_found += _add_live_skeletons(settings, [path])
+                self.live_index += 1
+                total = max(1, len(self.live_files))
+                self._progress(0.04 + 0.24 * self.live_index / total, f"reading live skeletons {self.live_index}/{total}")
+                return 0.01
+            if self.root_index < len(self.roots):
+                root = self.roots[self.root_index]
+                if self.files is None:
+                    self.files = root.rglob("*.dmx")
+                try:
+                    path = next(self.files)
+                except StopIteration:
+                    self.files = None
+                    self.root_index += 1
+                    fraction = self.root_index / max(1, len(self.roots))
+                    self._progress(0.28 + 0.22 * fraction, f"scanned {self.root_index}/{len(self.roots)} folders")
+                    return 0.01
+                if not path.name.startswith("_."):
+                    names = tailscan.dmx_bone_names(path)
+                    if len(names) >= 2:
+                        key = _hero_key(root, path)
+                        best = self.best.setdefault(root, {})
+                        if key not in best or _candidate_rank(path, names) > _candidate_rank(*best[key]):
+                            best[key] = (path, names)
+                return 0.005
+            if not self.imports:
+                for root in self.roots:
+                    for key, (path, names) in sorted(self.best.get(root, {}).items()):
+                        self.imports.append((key, path, names))
+                if not self.imports:
+                    self._finish()
+                    return None
+            if self.import_index < len(self.imports):
+                key, path, names = self.imports[self.import_index]
+                self.scanned += 1
+                loaded = _import_candidate(path)
+                if loaded is None:
+                    for chain in tailscan.chains(names):
+                        _add_option(
+                            settings,
+                            label=f"{key} / {chain.name}",
+                            source="CLIP",
+                            path=path,
+                            chain=chain,
+                            points=[(0.0, 0.0, 0.0), (0.0, 0.0, 1.0)],
+                        )
+                else:
+                    armature, chains, points = loaded
+                    self.imported += 1
+                    for chain in chains:
+                        _add_option(
+                            settings,
+                            label=f"{key} / {chain.name}",
+                            source="BODY" if live.looks_like_body(path) else "CLIP",
+                            path=path,
+                            chain=chain,
+                            points=points.get(chain.name, []),
+                        )
+                self.import_index += 1
+                total = max(1, len(self.imports))
+                self._progress(0.52 + 0.45 * self.import_index / total, f"opening {key} ({self.import_index}/{total})")
+                return 0.01
+            self._finish()
+            return None
         except Exception as error:
-            settings.tail_option_note = f"Tail scan failed: {error}"
-        return None
-    bpy.app.timers.register(run, first_interval=0.05)
+            self._fail(error)
+            return None
+
+    def _finish(self) -> None:
+        global _SCAN_TIMER
+        settings = self.settings
+        found = len(settings.tail_options)
+        settings.tail_option_index = 0
+        settings.tail_option_note = (
+            f"{found} tail chain(s): {self.live_found} from the live roster, "
+            f"{self.imported}/{self.scanned} extracted skeletons opened across "
+            f"{len(self.roots)} folder(s)"
+        )
+        settings.job_progress = 1.0
+        settings.job_message = "done"
+        settings.job_state = "DONE"
+        settings.job_running = False
+        lines = settings.job_log.splitlines()[-6:]
+        settings.job_log = "\n".join([*lines, f"done: {settings.tail_option_note}"])
+        _SCAN_TIMER = None
+
+    def _fail(self, error) -> None:
+        global _SCAN_TIMER
+        settings = self.settings
+        settings.tail_option_note = f"Tail scan failed: {error}"
+        settings.job_state = "FAILED"
+        settings.job_message = str(error)
+        settings.job_running = False
+        _SCAN_TIMER = None
 
 
 def load_option(settings, index: int) -> str:

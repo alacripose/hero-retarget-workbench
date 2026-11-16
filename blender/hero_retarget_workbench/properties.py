@@ -731,6 +731,7 @@ class DMF_Settings(PropertyGroup):
         description="Mesh objects found in the selected part collection",
     )
     part_index: IntProperty(name="Part row", default=0)
+    collection_index: IntProperty(name="Collection row", default=0)
     hero_parts: CollectionProperty(
         type=DMF_Part,
         description="Meshes imported from the hero extraction beside the body",
@@ -1291,6 +1292,14 @@ class DMF_Settings(PropertyGroup):
         name="Name width",
         description="Share of a part row given to the object; the rest holds vertices and materials",
         default=0.55,
+        min=0.3,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    collection_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a collection row given to its name; the rest holds mesh and object counts",
+        default=0.58,
         min=0.3,
         max=0.85,
         subtype="FACTOR",

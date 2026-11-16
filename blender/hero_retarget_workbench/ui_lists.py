@@ -12,6 +12,7 @@ from bpy.types import UIList
 from forge import cloth as clothscan
 from forge import uilist
 
+from . import parts as partscan
 from . import ui_popit
 
 _ICONS = {
@@ -149,6 +150,29 @@ class DMF_UL_parts(UIList):
         verts.label(text=f"{len(obj.data.vertices):,}v")
         materials.alignment = "RIGHT"
         materials.label(text=f"{len(obj.data.materials)}m")
+
+
+class DMF_UL_collections(UIList):
+    bl_idname = "DMF_UL_collections"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [row.name for row in rows])
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        settings = getattr(context.scene, "dmf", None)
+        chosen = settings is not None and settings.custom_collection == item
+        width = getattr(settings, "collection_name_width", 0.58)
+        left, meshes, objects = ui_popit.columns(layout, width, (0.2, 0.2))
+        left.label(
+            text=item.name or "collection",
+            icon="RADIOBUT_ON" if chosen else "FILE_FOLDER",
+        )
+        objects_in_collection = partscan.collection_objects(item)
+        meshes.alignment = "RIGHT"
+        meshes.label(text=f"{sum(1 for obj in objects_in_collection if obj.type == 'MESH'):,}m")
+        objects.alignment = "RIGHT"
+        objects.label(text=f"{len(objects_in_collection):,}o")
 
 
 class DMF_UL_materials(UIList):
@@ -484,6 +508,7 @@ CLASSES = (
     DMF_UL_components,
     DMF_UL_hierarchy,
     DMF_UL_parts,
+    DMF_UL_collections,
     DMF_UL_materials,
     DMF_UL_hero_parts,
     DMF_UL_cloth_chains,

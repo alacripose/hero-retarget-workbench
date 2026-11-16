@@ -29,6 +29,41 @@ https://github.com/oaustegard/claude-skills/releases (declauding)
 https://github.com/hardikpandya/stop-slop
 <home>\.agents\skills\ has a ton of skills for agents to use and yet they never use them for some reason. You need to be using these skills and updating/managing them ccording to family project convention.
 
+## 2026-11-16 — Parts is a collection table, and the tail scan yields
+
+**Owner instruction, verbatim:** *"parts page needs to be updated with the modernized
+views instead of a dropdown for collections. also I pressed scan tails and it locked
+my blender up instead of using async jobs delegation like the other pages"*.
+
+- **Parts collection is now a list, not a dropdown.** `DMF_UL_collections`
+  renders `bpy.data.collections` with name, mesh count and object count, native
+  search/sort, its own `collection_name_width` slider, and a radio marker for
+  the active scope. **Use selected collection** is an explicit operator; it
+  syncs `collection_index`, sets `custom_collection`, and runs `parts.scan_parts`.
+  **Use active** and **Scan parts** stay, and the recursive child-collection
+  scope is unchanged.
+- **The tail scan now yields between candidates.** `tailops.start_discover`
+  still returns immediately; S2V extraction still runs through `jobs`. The
+  follow-up `_TailScanJob` scans one live skeleton, one folder iterator step,
+  or opens one candidate DMX per timer tick, then finishes the shared
+  `job_running` / `job_progress` / `job_message` card. The old `_schedule_scan`
+  called the blocking `discover` in one callback, importing every extraction
+  before Blender could draw again.
+- **Guardrails.** `start_discover` and `start_auto` refuse while `_SCAN_TIMER`
+  is active; the timer returns `None` on completion or failure so Blender
+  unregisters it. Imported candidate armatures are still removed by
+  `_import_candidate`, so the job stores only paths and points, never the
+  temporary armature pointer.
+- **Evidence.** `208` tests pass; `ui_parity --check` and `ui_prose --check` are
+  zero; compileall is clean. A temporary Blender probe drove a synthetic
+  two-root scan through five ticks to `DONE` with one option; the collection
+  action probe scoped one mesh in `Collection`. `artifacts/visual/ui-pass/parts.png`
+  at 782 px shows the new table. Not checked: a real multi-hero corpus scan in
+  the GUI and a click on the rendered list row.
+- **Zip.** `dist/hero_retarget_workbench-0.16.5.zip`, 68 files, 478,809 bytes,
+  sha256 `0be6761d6be75ce6964f003974c61811630a4af56d246989e7db94ea2d374e71`;
+  `blender_zip_probe` passes, 86 operators and 26 panels registered.
+
 ## 2026-11-16 — every list is a category table with its own width
 
 **Owner instruction, verbatim:** *"here's a big issue, even when the window is allowed to take up more horizontal space the name width sliders aren't per category and there's none for this view either so names get truncated"*, then *"I want it to be eeverywhere don't make it only for one view holy fuck"*, with a Windows Explorer column view as the reference.

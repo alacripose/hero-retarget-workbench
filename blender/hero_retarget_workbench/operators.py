@@ -622,6 +622,32 @@ class DMF_OT_use_active_collection(Operator):
             if collection is None:
                 raise RuntimeError("part-collection-missing: the active layer has no collection")
             settings.custom_collection = collection
+            settings.collection_index = max(0, bpy.data.collections.find(collection.name))
+            count = parts.scan_parts(settings)
+            active = settings.custom_mesh.name if settings.custom_mesh is not None else "none"
+            _status(settings, f"Scoped {count} parts in {collection.name}; active part {active}", "OK" if count else "WARN")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
+class DMF_OT_use_collection(Operator):
+    bl_idname = "dmf.use_collection"
+    bl_label = "Use Selected Collection"
+    bl_description = "Use the selected collection as the custom part scope and scan its mesh objects"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            collections = bpy.data.collections
+            if not len(collections):
+                raise RuntimeError("part-collection-missing: this file has no collections")
+            index = min(max(settings.collection_index, 0), len(collections) - 1)
+            collection = collections[index]
+            settings.collection_index = index
+            settings.custom_collection = collection
             count = parts.scan_parts(settings)
             active = settings.custom_mesh.name if settings.custom_mesh is not None else "none"
             _status(settings, f"Scoped {count} parts in {collection.name}; active part {active}", "OK" if count else "WARN")
@@ -1662,6 +1688,7 @@ CLASSES = (
     DMF_OT_import_custom,
     DMF_OT_apply_model_name,
     DMF_OT_use_active_collection,
+    DMF_OT_use_collection,
     DMF_OT_scan_parts,
     DMF_OT_use_part,
     DMF_OT_scan_materials,

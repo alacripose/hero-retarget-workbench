@@ -1,4 +1,4 @@
-# UI pass 0.16.4
+# UI pass 0.16.5
 
 The Workbench pages were built one at a time, and the check that every action has one home did not
 exist. This pass adds the check, moves staging and compiling onto the Release page, replaces the hero
@@ -27,7 +27,7 @@ two, chips are real buttons, and advanced panels stay folded. The full checklist
 |---|---|---|
 | SETUP | DMF_PT_setup, DMF_PT_setup_tools, DMF_PT_setup_toolchains | `dmf.add_client`, `dmf.detect_paths`, `dmf.install_csdk`, `dmf.install_s2v`, `dmf.open_csdk_page`, `dmf.open_project_folder`, `dmf.refresh_clients`, `dmf.use_backport_client`, `dmf.use_client`, `dmf.use_toolchain` |
 | SOURCE | DMF_PT_source, DMF_PT_source_files | `dmf.apply_model_name`, `dmf.browse_folders`, `dmf.choose_hero`, `dmf.detect`, `dmf.extract`, `dmf.fit`, `dmf.import_custom`, `dmf.import_hero`, `dmf.pick_vmdl`, `dmf.refresh_heroes` |
-| PARTS | DMF_PT_parts, DMF_PT_parts_materials | `dmf.append_material`, `dmf.assign_material`, `dmf.clear_part_material`, `dmf.scan_materials`, `dmf.scan_parts`, `dmf.use_active_collection`, `dmf.use_part` |
+| PARTS | DMF_PT_parts, DMF_PT_parts_materials | `dmf.append_material`, `dmf.assign_material`, `dmf.clear_part_material`, `dmf.scan_materials`, `dmf.scan_parts`, `dmf.use_active_collection`, `dmf.use_collection`, `dmf.use_part` |
 | CLOTH | DMF_PT_cloth | `dmf.build_all_cloth`, `dmf.build_chain_cloth`, `dmf.import_hero_parts`, `dmf.join_cloth_chain`, `dmf.mark_cloth_proxy`, `dmf.scan_cloth` |
 | SKELETON | DMF_PT_skeleton, DMF_PT_skeleton_bones | `dmf.add_bone_entry`, `dmf.align_all_bones`, `dmf.align_bone`, `dmf.clear_target`, `dmf.copy_pose`, `dmf.ignore_entry`, `dmf.mark_extra`, `dmf.nudge_bone`, `dmf.pick_bone_map`, `dmf.pose_clear`, `dmf.pose_preview`, `dmf.refresh_hierarchy`, `dmf.remove_bone_entry`, `dmf.rename_bones`, `dmf.scan_bones`, `dmf.select_hierarchy_bone`, `dmf.stop_rules` |
 | RULES | DMF_PT_rules | `dmf.add_rule`, `dmf.apply_ik`, `dmf.apply_rules`, `dmf.bake_ik`, `dmf.blend_tail`, `dmf.blend_tail_all`, `dmf.build_tail_animation`, `dmf.clear_ik`, `dmf.clear_rules`, `dmf.learn_rules`, `dmf.load_tail_option`, `dmf.preview_tail`, `dmf.publish_tail_anims`, `dmf.remove_rule`, `dmf.rule_from_row`, `dmf.scan_ik`, `dmf.scan_tail`, `dmf.scan_tails` |
@@ -40,6 +40,29 @@ two, chips are real buttons, and advanced panels stay folded. The full checklist
 
 `python tools/ui_parity.py --check` fails on an action drawn on two pages, a page with no panel, or an
 action drawn that no operator declares. `tests/test_ui_parity.py` pins the same result.
+
+## 0.16.5 — the Parts collection is a table, and tail scanning yields
+
+- Parts no longer opens a collection dropdown. `DMF_UL_collections` lists every
+  `bpy.data.collections` row with its mesh and object counts, the native search /
+  sort header, a per-list name-width slider, and **Use selected collection**.
+  The list keeps the recursive scope and the existing **Use active** and
+  **Scan parts** actions.
+- `tailops.start_discover` still returns immediately and still runs the S2V
+  extraction through `jobs`; the scan that follows is now `_TailScanJob`.
+  It reads one live skeleton, one folder, or opens one candidate DMX per timer
+  tick and reports through the shared `job_*` card. The old callback imported
+  every extraction in one go, which is what froze Blender.
+- Measured: `208` tests pass; `ui_parity --check` and `ui_prose --check` are
+  zero. A temporary Blender probe started a synthetic two-folder scan on a
+  timer, completed in five ticks, and left one tail option. A second probe
+  called the new collection action and scoped one mesh in `Collection`.
+- Visual: `artifacts/visual/ui-pass/parts.png` at 782 px shows the collection
+  row, its counts and headers, the width slider and the explicit action. The
+  visual probe draws every page without a traceback; the screenshot is the
+  Parts page only, not a click-through.
+- Zip probe: `0.16.5`, 68 files, 478,809 bytes, sha256
+  `0be6761d6be75ce6964f003974c61811630a4af56d246989e7db94ea2d374e71`.
 
 ## 0.16.4 — filter chips keep their labels inside
 
