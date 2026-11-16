@@ -562,9 +562,13 @@ class DMF_Settings(PropertyGroup):
     )
     release_slot_number: IntProperty(
         name="Addon pak number",
-        description="Which pakNN_dir.vpk to install into; 0 reuses the newest pak already in addons/",
+        description=(
+            "Which pakNN_dir.vpk to install into (1-99); 0 reuses the newest pak already in the "
+            "selected game's addons folder"
+        ),
         default=0,
         min=0,
+        max=99,
     )
 
     props_page: EnumProperty(

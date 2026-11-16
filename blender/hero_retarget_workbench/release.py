@@ -243,26 +243,92 @@ def pack(settings, out: Path, *, name: str = "") -> dict:
     return receipt
 
 
-def slot(settings) -> Path:
-    """The addon pak the game will load, chosen from the folder instead of a hardcoded number.
+def pak_numbers(directory: Path) -> list[int]:
+    """The `pakNN_dir.vpk` numbers in one folder.  Two digits is the whole range (1..99)."""
+    numbers: list[int] = []
+    for path in Path(directory).glob("pak*_dir.vpk"):
+        stem = path.name[3:-8]
+        if stem.isdigit() and 1 <= int(stem) <= 99:
+            numbers.append(int(stem))
+    return sorted(numbers)
 
-    The game loads addons from `game/citadel/addons`, not from the pak01 directory.  The number is
-    not fixed: `release_slot_number` picks one when set, otherwise the newest `pakNN_dir.vpk` already
-    present is replaced, so a release lands on the slot the client is actually reading instead of a
-    number that only happened to be right once.
+
+def search_paths(game_dir: Path) -> set[str]:
+    """The folders `gameinfo.gi` mounts, resolved the way the engine does (relative to `game/`)."""
+    info = Path(game_dir) / "gameinfo.gi"
+    if not info.is_file():
+        return set()
+    paths: set[str] = set()
+    inside = False
+    for line in info.read_text(encoding="utf-8", errors="replace").splitlines():
+        text = line.strip()
+        if text.startswith("SearchPaths"):
+            inside = True
+            continue
+        if not inside:
+            continue
+        if text.startswith("}"):
+            break
+        if not text or text.startswith("//"):
+            continue
+        parts = text.split(None, 1)
+        if len(parts) != 2 or parts[0] in {"{"}:
+            continue
+        relative = parts[1].split("//", 1)[0].strip()
+        if not relative or "*" in relative:
+            continue
+        paths.add(os.path.normcase(str((Path(game_dir).parent / relative).resolve())))
+    return paths
+
+
+def slot_ceiling(settings, directory: Path) -> tuple[int, int]:
+    """How high a pak number may go in `directory`, and the game's own pak count.
+
+    A pak number may not exceed the number of paks `game/citadel` itself mounts unless its folder
+    is one of the game's search paths -- a higher number needs its own extra search path.  The
+    addons folder already is a search path (`game\tcitadel/addons` in `gameinfo.gi`), so it can use
+    the whole two-digit range; any folder that is not registered stops at the game's own count.
+    """
+    env = core.env(settings)
+    if env.game_dir is None:
+        raise ReleaseError("release-needs-game: set the game root in Setup")
+    # `env.game_dir` is the `game` root; the paks and `gameinfo.gi` live in `game/citadel`.
+    game_dir = Path(env.game_dir)
+    citadel = game_dir / "citadel" if (game_dir / "citadel").is_dir() else game_dir
+    mounted = max(len(pak_numbers(citadel)), 1)
+    registered = os.path.normcase(str(Path(directory).resolve())) in search_paths(citadel)
+    return (99 if registered else mounted), mounted
+
+
+def slot(settings) -> Path:
+    """The addon pak the game will load, chosen from the selected game instead of a hardcoded path.
+
+    The game loads addons from `game/citadel/addons` of the install chosen in Setup, not from
+    `pak01`.  `release_slot_number` picks a slot when set, otherwise the newest `pakNN_dir.vpk`
+    already present is replaced.  A number above the game's own pak count is refused unless the
+    folder is a search path, because only a registered folder can mount an extra pak.
     """
     env = core.env(settings)
     if env.vpk is None:
         raise ReleaseError("release-needs-vpk: the live addon slot is not resolved")
     addons = Path(env.vpk).parent / "addons"
-    number = int(getattr(settings, "release_slot_number", 0) or 0)
-    if not number:
-        existing = sorted(
-            int(path.name[3:5])
-            for path in addons.glob("pak*_dir.vpk")
-            if path.name[3:5].isdigit()
+    requested = int(getattr(settings, "release_slot_number", 0) or 0)
+    if requested and not 1 <= requested <= 99:
+        raise ReleaseError(
+            f"release-slot-out-of-range: pak numbers are 1..99, not {requested}"
         )
+    ceiling, mounted = slot_ceiling(settings, addons)
+    if not requested:
+        existing = pak_numbers(addons)
         number = existing[-1] if existing else 1
+    else:
+        number = requested
+    if number > ceiling:
+        raise ReleaseError(
+            f"release-slot-needs-searchpath: pak{number:02d} is above the {mounted} pak(s) "
+            f"game/citadel mounts and {addons} is not one of the game's search paths; add it to "
+            f"SearchPaths or pick 1..{ceiling}"
+        )
     return addons / f"pak{number:02d}_dir.vpk"
 
 

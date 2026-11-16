@@ -100,6 +100,18 @@ ability to detect other installs"*.
   stop there: no clips are authored, no `.vnmskel` is written or compiled, and nothing is blended.
   The owner's correction is the spec: *"it has to literally just be the tail it's bones attached to
   the hero"*, and haze_noskel-without-clips is the shape -- not a partial animation build.
+- **A pak number cannot go past the game's own pak count unless its folder is a search path.**
+  `release.pak_numbers` counts `game/citadel/pakNN_dir.vpk` (this install: 1) and
+  `release.search_paths` reads the `SearchPaths` block of the selected install's `gameinfo.gi`,
+  which already registers `game citadel/addons`. `release.slot_ceiling` allows `1..99` in
+  `addons/` because it is registered, and only `1..<game pak count>` in any other folder;
+  `release.slot` refuses `release-slot-out-of-range` above 99 and `release-slot-needs-searchpath`
+  above the ceiling, naming the extra search path the folder would need. The Release page prints
+  the selected game, the resolved slot and the ceiling.
+- **The red CI was Windows path spelling, not the test.** `animgraph.documents` resolved
+  `base / relative`, so on the runner's 8.3 temp path (`C:/Users/RUNNER~1/...`) the returned
+  source expanded to a long name and stopped equalling the path the caller built. It keeps the
+  caller's spelling now; the existence check is the only resolved read.
 - **The release page is generic, and the pak number is not written into the code.** `DMF_PT_release`
   packs any staged CSDK addon: write model, compile, pack (`--vpk_create`), install, launch.
   `release.slot` reads `release_slot_number` (0 = replace the newest `pakNN_dir.vpk` already in
