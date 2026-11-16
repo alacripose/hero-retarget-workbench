@@ -1,6 +1,7 @@
 """Bridge between Blender settings and the forge core."""
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -174,14 +175,75 @@ def _steam_build(root) -> str:
     return ""
 
 
+def _norm(path) -> str:
+    return os.path.normcase(os.path.normpath(str(path))) if path else ""
+
+
+def client_row(settings, path):
+    """The detected install row for a selected path, or None."""
+    wanted = _norm(path)
+    if not wanted:
+        return None
+    for row in getattr(settings, "clients", ()):
+        if _norm(row.path) == wanted:
+            return row
+    return None
+
+
+def client_label(settings, path) -> str:
+    """The install's own label when it is in the list, else its folder name."""
+    row = client_row(settings, path)
+    if row is not None and row.label:
+        return row.label
+    return Path(path).name if path else "not set"
+
+
+def client_build(settings, path) -> str:
+    """The selected install's recorded build, or its own steam.inf when unrecorded."""
+    row = client_row(settings, path)
+    if row is not None and row.build:
+        return row.build
+    return _steam_build(path)
+
+
 def source_build(settings) -> str:
     """The build of the install models are extracted from."""
-    return _steam_build(settings.deadlock_root) or str(getattr(settings, "build", "") or "")
+    return client_build(settings, settings.deadlock_root) or str(getattr(settings, "build", "") or "")
 
 
 def tools_build(settings) -> str:
     """The build of the install the compiler and packer run from."""
-    return _steam_build(settings.csdk_root)
+    return client_build(settings, settings.csdk_root)
+
+
+def marker_rows(settings) -> list[tuple[str, str, str]]:
+    """The clients a page's inputs and output follow, as marker rows.
+
+    Extraction and compilation are always named. A backport target is named only
+    when it is a different install from the extraction client, because two rows
+    repeating the same build is noise rather than information.
+    """
+    extraction = getattr(settings, "deadlock_root", "")
+    compile_root = getattr(settings, "csdk_root", "")
+    backport = getattr(settings, "mod_target_client", "")
+    rows = []
+    for label, icon, path in (
+        ("Extract", "IMPORT", extraction),
+        ("Compile", "TOOL_SETTINGS", compile_root),
+    ):
+        if path:
+            rows.append((label, f"{client_label(settings, path)} · {client_build(settings, path) or 'no build'}", icon))
+        else:
+            rows.append((label, "not set", icon))
+    if backport and _norm(backport) != _norm(extraction):
+        rows.append(
+            (
+                "Backport",
+                f"{client_label(settings, backport)} · {client_build(settings, backport) or 'no build'}",
+                "LOOP_BACK",
+            )
+        )
+    return rows
 
 
 def env(settings):

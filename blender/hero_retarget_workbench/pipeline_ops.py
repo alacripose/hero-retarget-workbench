@@ -487,7 +487,7 @@ class DMF_OT_add_client(Operator):
 class DMF_OT_use_client(Operator):
     bl_idname = "dmf.use_client"
     bl_label = "Use this client"
-    bl_description = "Use the selected client's game files for extraction and backporting"
+    bl_description = "Extract from the selected game client and follow its build"
 
     def execute(self, context):
         settings = _settings(context)
@@ -495,20 +495,55 @@ class DMF_OT_use_client(Operator):
             return {"CANCELLED"}
         index = min(max(settings.client_index, 0), len(settings.clients) - 1)
         row = settings.clients[index]
-        used = []
-        if row.can_backport:
-            settings.mod_target_client = row.path
-            used.append("game files")
-        if not used:
+        if not row.can_backport:
             core.set_status(
                 settings,
-                f"{row.label} carries no Citadel VPKs; choose a compiler row in Compile toolchain",
+                f"{row.label} carries no Citadel VPKs; choose a game client here or a compiler row in Compile toolchain",
                 "WARN",
             )
             return {"CANCELLED"}
+        previous = core._norm(settings.deadlock_root)
+        settings.deadlock_root = row.path
+        settings.build = row.build or core.source_build(settings)
+        # Keep the old one-selection workflow: if the backport target was the
+        # extraction client, it follows the new one. A deliberately different
+        # target stays where it is.
+        if not settings.mod_target_client or core._norm(settings.mod_target_client) == previous:
+            settings.mod_target_client = row.path
         for item in settings.clients:
             item.active = item.path == row.path
-        core.set_status(settings, f"Using {row.label} for {' and '.join(used)}", "OK")
+        core.set_status(
+            settings,
+            f"Extracting from {row.label} ({row.build or 'build unknown'})",
+            "OK",
+        )
+        return {"FINISHED"}
+
+
+class DMF_OT_use_backport_client(Operator):
+    bl_idname = "dmf.use_backport_client"
+    bl_label = "Use this backport client"
+    bl_description = "Target the selected game client for a backport, separately from extraction"
+
+    def execute(self, context):
+        settings = _settings(context)
+        if not settings.clients:
+            return {"CANCELLED"}
+        index = min(max(settings.client_index, 0), len(settings.clients) - 1)
+        row = settings.clients[index]
+        if not row.can_backport:
+            core.set_status(
+                settings,
+                f"{row.label} carries no Citadel VPKs and cannot be a backport target",
+                "WARN",
+            )
+            return {"CANCELLED"}
+        settings.mod_target_client = row.path
+        core.set_status(
+            settings,
+            f"Backporting to {row.label} ({row.build or 'build unknown'})",
+            "OK",
+        )
         return {"FINISHED"}
 
 
@@ -698,6 +733,7 @@ CLASSES = (
     DMF_OT_add_client,
     DMF_OT_use_client,
     DMF_OT_use_toolchain,
+    DMF_OT_use_backport_client,
     DMF_OT_scan_components,
     DMF_OT_pick_component_vmdl,
     DMF_OT_stage_components,

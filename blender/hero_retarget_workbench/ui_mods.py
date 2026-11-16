@@ -97,8 +97,8 @@ class DMF_PT_setup_tools(Panel):
             roles.label(text="Game files", icon="CHECKMARK" if picked.can_backport else "X")
             roles.label(text="Compiler", icon="CHECKMARK" if picked.can_compile else "X")
             use = csdk.row(align=True)
-            use.alignment = "RIGHT"
-            use.operator("dmf.use_client", text="Use for game files", icon="CHECKMARK")
+            use.operator("dmf.use_client", text="Use for extraction", icon="CHECKMARK")
+            use.operator("dmf.use_backport_client", text="Use for backport", icon="LOOP_BACK")
         else:
             _hint(
                 csdk,
