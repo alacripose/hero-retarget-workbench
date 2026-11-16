@@ -344,8 +344,59 @@ class DMF_UL_tail(UIList):
             right.label(text="", icon="CHECKMARK")
 
 
+class DMF_UL_scan_roots(UIList):
+    bl_idname = "DMF_UL_scan_roots"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [f"{row.path} {row.note}" for row in rows])
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        row.prop(item, "enabled", text="", emboss=False)
+        name = item.path.rstrip("/\\").split("\\")[-1].split("/")[-1] or item.path or "folder"
+        row.label(text=_short(name, 20), icon="FILE_FOLDER")
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        if item.packages:
+            right.label(text=f"{item.packages}")
+            if item.folders:
+                right.label(text="", icon="FILE_FOLDER")
+            if item.vpks:
+                right.label(text="", icon="PACKAGE")
+            if item.blends:
+                right.label(text="", icon="FILE_BLEND")
+        elif item.note:
+            right.label(text="missing", icon="ERROR")
+
+
+class DMF_UL_mod_contents(UIList):
+    bl_idname = "DMF_UL_mod_contents"
+
+    _ICONS = {
+        "models": "MESH_DATA",
+        "clips": "ACTION",
+        "materials": "MATERIAL",
+        "blends": "FILE_BLEND",
+        "other": "FILE",
+    }
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [f"{row.label} {row.category}" for row in rows])
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        row = layout.row(align=True)
+        row.label(text=_short(item.label, 34), icon=self._ICONS.get(item.category, "FILE"))
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=item.category)
+
+
 class DMF_UL_mods(UIList):
     bl_idname = "DMF_UL_mods"
+
+    _ICONS = {"vpk": "PACKAGE", "addon": "FILE_FOLDER", "blend": "FILE_BLEND"}
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
@@ -358,21 +409,14 @@ class DMF_UL_mods(UIList):
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        width = float(getattr(context.scene.dmf, "list_name_width", 0.5))
-        split = layout.split(factor=width, align=True)
-        left = split.row(align=True)
-        left.label(
-            text=item.addon or "package",
-            icon="PACKAGE" if item.kind == "vpk" else "FILE_FOLDER",
+        row = layout.row(align=True)
+        row.label(
+            text=_short(item.addon or "package", 26),
+            icon=self._ICONS.get(item.kind, "PACKAGE"),
         )
-        right = split.row(align=True)
-        middle = right.row(align=True)
-        middle.label(text=item.hero or "unknown")
-        if item.sections:
-            middle.label(text="", icon="MOD_CLOTH")
-        tail = right.row(align=True)
-        tail.alignment = "RIGHT"
-        tail.label(text=item.modified)
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=item.modified or "unknown")
 
 
 class DMF_UL_clients(UIList):
@@ -430,6 +474,8 @@ class DMF_UL_components(UIList):
 
 CLASSES = (
     DMF_UL_model_folders,
+    DMF_UL_scan_roots,
+    DMF_UL_mod_contents,
     DMF_UL_heroes,
     DMF_UL_bone_map,
     DMF_UL_mods,

@@ -38,6 +38,38 @@ SKIP_DIRS = {
 }
 SKIP_PATH_MARKERS = ("/game/citadel/", "/game/core/", "/game/csgo_imported/", "/dist/")
 MAX_VMDL_PER_ADDON = 24
+MAX_LISTED_FILES = 300
+
+# What a package carries, in the terms the Mods page groups it by. A VPK entry
+# and an unpacked file use the same test, so a folder and a pak describe
+# themselves the same way.
+CONTENT_CATEGORIES = {
+    "models": (".vmdl", ".vmdl_c", ".dmx", ".mesh"),
+    "clips": (".vnmclip", ".vnmclip_c", ".vnm"),
+    "materials": (".vmat", ".vmat_c", ".vtex", ".vtex_c", ".png", ".tga", ".jpg", ".jpeg", ".exr", ".hdr"),
+    "blends": (".blend", ".blend1"),
+}
+
+
+def content_category(path: str) -> str:
+    """One of models, clips, materials, blends or other, from the file's name."""
+    lower = str(path).replace("\\", "/").lower()
+    suffix = PurePosixPath(lower).suffix
+    for category, suffixes in CONTENT_CATEGORIES.items():
+        if suffix in suffixes:
+            return category
+    if "/clips/" in lower:
+        return "clips"
+    if "/materials/" in lower:
+        return "materials"
+    return "other"
+
+
+def content_counts(paths) -> dict[str, int]:
+    counts = {category: 0 for category in (*CONTENT_CATEGORIES, "other")}
+    for path in paths:
+        counts[content_category(path)] += 1
+    return counts
 
 
 class OldModsError(ValueError):
@@ -195,6 +227,9 @@ class ModRecord:
     models: tuple[str, ...] = ()
     cloth_sections: tuple[str, ...] = ()
     per_model: dict[str, list[str]] = field(default_factory=dict)
+    blends: tuple[str, ...] = ()
+    files: tuple[str, ...] = ()
+    counts: dict[str, int] = field(default_factory=dict)
     note: str = ""
 
     def to_dict(self) -> dict:
@@ -208,6 +243,9 @@ class ModRecord:
             "models": list(self.models),
             "cloth_sections": list(self.cloth_sections),
             "per_model": self.per_model,
+            "blends": list(self.blends),
+            "files": list(self.files),
+            "counts": dict(self.counts),
             "note": self.note,
         }
 
@@ -226,6 +264,10 @@ class Inventory:
             "packages": len(self.mods),
             "vpks": sum(1 for mod in self.mods if mod.kind == "vpk"),
             "addons": sum(1 for mod in self.mods if mod.kind == "addon"),
+            "folders": sum(1 for mod in self.mods if mod.kind == "addon"),
+            "blends": sum(1 for mod in self.mods if mod.kind == "blend"),
+            "files": sum(sum(mod.counts.values()) for mod in self.mods),
+            "blend_files": sum(len(mod.blends) for mod in self.mods),
             "with_cloth_sections": sum(1 for mod in self.mods if mod.cloth_sections),
             "without_cloth_sections": sum(1 for mod in self.mods if not mod.cloth_sections),
             "hero_packages": sum(
@@ -303,25 +345,58 @@ def _walk_dirs(root: Path, max_depth: int):
 
 
 def _addon_from_dir(path: Path, since: date | None, until: date | None) -> ModRecord | None:
-    vmdls = sorted(path.rglob("*.vmdl"))[:MAX_VMDL_PER_ADDON]
-    if not vmdls:
+    files = sorted(
+        (item for item in path.rglob("*") if item.is_file()),
+        key=lambda item: str(item).lower(),
+    )
+    vmdls = sorted(item for item in files if item.suffix.lower() == ".vmdl")[:MAX_VMDL_PER_ADDON]
+    blends = tuple(
+        item.relative_to(path).as_posix()
+        for item in files
+        if item.suffix.lower() in (".blend", ".blend1")
+    )
+    if not vmdls and not blends:
         return None
-    newest = max(vmdls, key=lambda item: item.stat().st_mtime)
+    newest = max(files, key=lambda item: item.stat().st_mtime)
     if not _within(newest, since, until):
         return None
     models = [item.relative_to(path).as_posix() for item in vmdls]
     cloth, per_model = cloth_inventory(vmdls)
+    relative_files = tuple(item.relative_to(path).as_posix() for item in files)
+    listed = relative_files[:MAX_LISTED_FILES]
+    counts = content_counts(relative_files)
     return ModRecord(
         path=str(path),
         kind="addon",
         addon=path.name,
-        hero=", ".join(hero_slugs(models)),
-        bytes=sum(item.stat().st_size for item in vmdls),
+        hero=", ".join(hero_slugs(models)) if models else clean_slug(path.name),
+        bytes=sum(item.stat().st_size for item in files),
         modified=_date(newest.stat().st_mtime),
         models=tuple(models),
         cloth_sections=tuple(cloth),
         per_model=per_model,
+        blends=blends,
+        files=listed,
+        counts=counts,
         note="" if cloth else "no-cloth-sections",
+    )
+
+
+def _blend_record(path: Path, since: date | None, until: date | None) -> ModRecord | None:
+    if not _within(path, since, until):
+        return None
+    name = path.stem
+    return ModRecord(
+        path=str(path),
+        kind="blend",
+        addon=name,
+        hero=clean_slug(path.parent.name),
+        bytes=path.stat().st_size,
+        modified=_date(path.stat().st_mtime),
+        blends=(path.name,),
+        files=(path.name,),
+        counts=content_counts((path.name,)),
+        note="blender-project",
     )
 
 
@@ -336,12 +411,13 @@ def _vpk_record(path: Path, since: date | None, until: date | None) -> ModRecord
     ]
     models = sorted(path for path in compiled if "hero" in path.lower())
     chosen = models or compiled
-    slug = ", ".join(hero_slugs(chosen)) if chosen else ""
+    slug = ", ".join(hero_slugs(chosen)) if chosen else clean_slug(path.stem)
+    entries = tuple(entry.path for entry in tree.entries)
     note = ""
     if tree.split:
         note = "split-archives"
     if not compiled:
-        return None
+        note = f"{note}, no-compiled-model".strip(", ")
     return ModRecord(
         path=str(path),
         kind="vpk",
@@ -350,6 +426,9 @@ def _vpk_record(path: Path, since: date | None, until: date | None) -> ModRecord
         bytes=path.stat().st_size,
         modified=_date(path.stat().st_mtime),
         models=tuple(chosen[:MAX_VMDL_PER_ADDON]),
+        blends=tuple(item for item in entries if content_category(item) == "blends"),
+        files=entries[:MAX_LISTED_FILES],
+        counts=content_counts(entries),
         note=note,
     )
 
@@ -370,6 +449,7 @@ def inventory(
     """
     mods: list[ModRecord] = []
     seen: set[str] = set()
+    addon_roots: list[Path] = []
     skipped_game_paks = 0
     skipped_unreadable: list[str] = []
     resolved_roots = [Path(root).expanduser().resolve() for root in roots]
@@ -403,6 +483,20 @@ def inventory(
                     record = _addon_from_dir(child, since, until)
                     if record is not None:
                         mods.append(record)
+                        addon_roots.append(child.resolve())
+            for name in current.glob("*.blend"):
+                if not name.is_file():
+                    continue
+                resolved = name.resolve()
+                if any(parent == resolved.parent or parent in resolved.parents for parent in addon_roots):
+                    continue
+                key = str(resolved).lower()
+                if key in seen:
+                    continue
+                seen.add(key)
+                record = _blend_record(name, since, until)
+                if record is not None:
+                    mods.append(record)
             for name in current.glob("*.vpk"):
                 if not name.is_file():
                     continue

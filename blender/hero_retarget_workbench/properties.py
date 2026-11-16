@@ -454,12 +454,15 @@ class DMF_ScanRoot(PropertyGroup):
     path: StringProperty(name="Folder", subtype="DIR_PATH", default="")
     enabled: BoolProperty(name="On", description="Include this folder in the next scan", default=True)
     packages: IntProperty(name="Packages", default=0)
+    folders: IntProperty(name="Folders", default=0)
+    vpks: IntProperty(name="VPKs", default=0)
+    blends: IntProperty(name="Blends", default=0)
     with_cloth: IntProperty(name="With cloth", default=0)
     note: StringProperty(name="Note", default="")
 
 
 class DMF_ModRow(PropertyGroup):
-    """One old package found on disk."""
+    """One old package found on disk, or one visible row of the filtered list."""
 
     path: StringProperty(name="Path", subtype="FILE_PATH", default="")
     addon: StringProperty(name="Package", default="")
@@ -470,6 +473,85 @@ class DMF_ModRow(PropertyGroup):
     bytes: IntProperty(name="Bytes", default=0)
     note: StringProperty(name="Note", default="")
     models: StringProperty(name="Models", default="")
+    blends: StringProperty(name="Blend files", default="")
+    files: StringProperty(name="Contents", default="")
+    counts: StringProperty(name="Content counts", default="")
+    total_files: IntProperty(name="Files", default=0)
+
+
+class DMF_ModContentRow(PropertyGroup):
+    """One file inside the selected mod."""
+
+    label: StringProperty(name="File", default="")
+    category: StringProperty(name="Type", default="other")
+
+
+def _mod_filter_changed(self, context) -> None:
+    refresh_mod_rows(self)
+
+
+def _mod_index_changed(self, context) -> None:
+    refresh_mod_contents(self)
+
+
+def _mod_content_filter_changed(self, context) -> None:
+    refresh_mod_content_rows(self)
+
+
+def refresh_mod_contents(settings) -> None:
+    """List the selected mod's files, grouped by content type."""
+    settings.mod_contents.clear()
+    if settings.mod_rows:
+        index = min(max(settings.mod_index, 0), len(settings.mod_rows) - 1)
+        files = [
+            line for line in (settings.mod_rows[index].files or "").splitlines() if line.strip()
+        ]
+        from forge import oldmods
+
+        order = {"models": 0, "clips": 1, "materials": 2, "blends": 3, "other": 4}
+        for line in sorted(
+            files, key=lambda item: (order.get(oldmods.content_category(item), 9), item.lower())
+        )[:300]:
+            row = settings.mod_contents.add()
+            row.label = line
+            row.category = oldmods.content_category(line)
+    refresh_mod_content_rows(settings)
+
+
+def refresh_mod_content_rows(settings) -> None:
+    """Copy the selected mod's files into the visible list for the active type."""
+    wanted = getattr(settings, "mod_content_filter", "ALL").lower()
+    settings.mod_content_rows.clear()
+    for row in settings.mod_contents:
+        if wanted != "all" and row.category != wanted:
+            continue
+        copy = settings.mod_content_rows.add()
+        copy.label = row.label
+        copy.category = row.category
+    settings.mod_content_index = min(
+        max(settings.mod_content_index, 0), max(0, len(settings.mod_content_rows) - 1)
+    )
+
+
+def refresh_mod_rows(settings) -> None:
+    """Copy the scanned packages into the visible list for the active type."""
+    wanted = getattr(settings, "mod_filter", "ALL")
+    settings.mod_rows.clear()
+    for row in settings.mods:
+        if wanted == "FOLDER" and row.kind != "addon":
+            continue
+        if wanted == "VPK" and row.kind != "vpk":
+            continue
+        if wanted == "BLEND" and row.kind != "blend":
+            continue
+        copy = settings.mod_rows.add()
+        for field in (
+            "path", "addon", "kind", "hero", "modified", "sections",
+            "bytes", "note", "models", "blends", "files", "counts", "total_files",
+        ):
+            setattr(copy, field, getattr(row, field))
+    settings.mod_index = min(max(settings.mod_index, 0), max(0, len(settings.mod_rows) - 1))
+    refresh_mod_contents(settings)
 
 
 class DMF_ClientRow(PropertyGroup):
@@ -519,9 +601,15 @@ def _paths_edited(self, context=None) -> None:
 
 class DMF_Settings(PropertyGroup):
     project_root: StringProperty(
-        name="Workspace folder",
-        description="Where this addon keeps extractions, proofs and logs when it is not bundled; the addon install itself goes into the CSDK13 root",
+        name="Project folder",
+        description="Folder the active Blender project and its outputs are written under",
         subtype="DIR_PATH",
+    )
+    project_file: StringProperty(
+        name="Project blend",
+        description="The .blend created or opened for the active mod",
+        subtype="FILE_PATH",
+        default="",
     )
     deadlock_root: StringProperty(
         name="Deadlock install",
@@ -712,7 +800,37 @@ class DMF_Settings(PropertyGroup):
     scan_since: StringProperty(name="Since", description="Only packages modified on or after this date", default="2024-01-01")
     scan_until: StringProperty(name="Until", description="Only packages modified on or before this date", default="")
     mods: CollectionProperty(type=DMF_ModRow, description="Old packages found by the last scan")
-    mod_index: IntProperty(name="Package row", default=0)
+    mod_rows: CollectionProperty(type=DMF_ModRow, description="Visible packages after the type filter")
+    mod_index: IntProperty(name="Package row", default=0, update=_mod_index_changed)
+    mod_filter: EnumProperty(
+        name="Package type",
+        description="Show the scanned packages as folders, VPKs, blends or all of them",
+        items=[
+            ("ALL", "All", "Every scanned package"),
+            ("FOLDER", "Folders", "Unpacked addon and project folders"),
+            ("VPK", "VPKs", "Packed addon VPKs"),
+            ("BLEND", "Blends", "Standalone Blender project files"),
+        ],
+        default="ALL",
+        update=_mod_filter_changed,
+    )
+    mod_contents: CollectionProperty(type=DMF_ModContentRow, description="Files in the selected package")
+    mod_content_rows: CollectionProperty(type=DMF_ModContentRow, description="Visible files after the content filter")
+    mod_content_index: IntProperty(name="Content row", default=0)
+    mod_content_filter: EnumProperty(
+        name="Content type",
+        description="Show the selected package's models, clips, materials, blends or other files",
+        items=[
+            ("ALL", "All", "Every file in the package"),
+            ("MODELS", "Models", "Compiled .vmdl models"),
+            ("CLIPS", "Clips", "Animation clip files"),
+            ("MATERIALS", "Materials", "Material files and textures"),
+            ("BLENDS", "Blends", "Blender project files"),
+            ("OTHER", "Other", "Everything else"),
+        ],
+        default="ALL",
+        update=_mod_content_filter_changed,
+    )
     mod_report: StringProperty(name="Corpus receipt", subtype="FILE_PATH", default="")
     mod_note: StringProperty(name="Mods note", default="")
     mods_scanned: IntProperty(name="Packages scanned", default=0)
@@ -1257,6 +1375,7 @@ CLASSES = (
     DMF_HierarchyRow,
     DMF_ScanRoot,
     DMF_ModRow,
+    DMF_ModContentRow,
     DMF_ClientRow,
     DMF_ComponentRow,
     DMF_HeroRow,
@@ -1265,13 +1384,25 @@ CLASSES = (
 )
 
 
+def _refresh_after_load(*_args) -> None:
+    """A project saved with packages opens with its visible collection filled."""
+    scene = getattr(bpy.context, "scene", None)
+    settings = getattr(scene, "dmf", None) if scene is not None else None
+    if settings is not None and settings.mods and not settings.mod_rows:
+        refresh_mod_rows(settings)
+
+
 def register() -> None:
     for cls in CLASSES:
         bpy.utils.register_class(cls)
     bpy.types.Scene.dmf = PointerProperty(type=DMF_Settings)
+    if _refresh_after_load not in bpy.app.handlers.load_post:
+        bpy.app.handlers.load_post.append(_refresh_after_load)
 
 
 def unregister() -> None:
+    if _refresh_after_load in bpy.app.handlers.load_post:
+        bpy.app.handlers.load_post.remove(_refresh_after_load)
     del bpy.types.Scene.dmf
     for cls in reversed(CLASSES):
         bpy.utils.unregister_class(cls)

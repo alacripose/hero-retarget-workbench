@@ -10,6 +10,8 @@ from pathlib import Path
 
 from forge.oldmods import (
     OldModsError,
+    content_category,
+    content_counts,
     hero_slugs,
     inventory,
     parse_tree,
@@ -152,6 +154,52 @@ class OldModsTests(unittest.TestCase):
         self.assertEqual(
             result.cloth_types(), {"PhysicsJointList": 1, "Softbody": 1}
         )
+
+    def test_content_categories_name_every_part_of_a_package(self) -> None:
+        self.assertEqual(content_category("models/heroes_staging/haze/haze.vmdl_c"), "models")
+        self.assertEqual(content_category("clips/haze_idle.vnmclip"), "clips")
+        self.assertEqual(content_category("materials/haze/haze.vmat"), "materials")
+        self.assertEqual(content_category("source.blend"), "blends")
+        self.assertEqual(content_category("readme.txt"), "other")
+        self.assertEqual(
+            content_counts(["a.vmdl", "b.vmdl_c", "c.vmat", "d.blend", "e.txt"]),
+            {"models": 2, "clips": 0, "materials": 1, "blends": 1, "other": 1},
+        )
+
+    def test_inventory_records_a_vpk_without_a_compiled_model(self) -> None:
+        addons = self.tmp_path / "content" / "citadel_addons"
+        addons.mkdir(parents=True)
+        build_vpk(
+            addons / "materials_only.vpk",
+            [("materials/haze/", "haze.vmat_c"), ("clips/", "haze_idle.vnmclip_c")],
+        )
+
+        result = inventory([self.tmp_path], since=date(2024, 1, 1))
+
+        record = next(mod for mod in result.mods if mod.addon == "materials_only")
+        self.assertEqual(record.kind, "vpk")
+        self.assertIn("no-compiled-model", record.note)
+        self.assertEqual(record.counts["materials"], 1)
+        self.assertEqual(record.counts["clips"], 1)
+        self.assertEqual(result.counts()["vpks"], 1)
+
+    def test_inventory_records_standalone_blends_and_blends_inside_addons(self) -> None:
+        addon = self.tmp_path / "content" / "citadel_addons" / "blend_project"
+        addon.mkdir(parents=True)
+        (addon / "source.blend").write_bytes(b"BLENDER")
+        (addon / "notes.txt").write_text("notes", encoding="utf-8")
+        (self.tmp_path / "loose.blend").write_bytes(b"BLENDER")
+
+        result = inventory([self.tmp_path], since=date(2024, 1, 1))
+
+        by_kind = {mod.kind: mod for mod in result.mods}
+        self.assertEqual(set(by_kind), {"addon", "blend"})
+        self.assertEqual(by_kind["addon"].blends, ("source.blend",))
+        self.assertEqual(by_kind["addon"].counts["blends"], 1)
+        self.assertEqual(by_kind["blend"].path, str((self.tmp_path / "loose.blend").resolve()))
+        self.assertEqual(by_kind["blend"].counts["blends"], 1)
+        self.assertEqual(result.counts()["blends"], 1)
+        self.assertEqual(result.counts()["blend_files"], 2)
 
     def test_inventory_reports_progress_for_a_scan(self) -> None:
         addons = self.tmp_path / "content" / "citadel_addons"

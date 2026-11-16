@@ -31,6 +31,33 @@ def _hint(layout, text: str, icon: str = "INFO") -> None:
         layout.label(text=_short(text, 48), icon=icon)
 
 
+def _tail(value: str, limit: int = 48) -> str:
+    text = value or ""
+    return text if len(text) <= limit else "..." + text[-(limit - 3):]
+
+
+def _size(value: int) -> str:
+    size = float(value or 0)
+    for unit in ("B", "KB", "MB", "GB"):
+        if size < 1024 or unit == "GB":
+            return f"{size:.0f} {unit}" if unit == "B" else f"{size:.1f} {unit}"
+        size /= 1024
+    return "0 B"
+
+
+def _chips(layout, settings, prop: str, values) -> None:
+    for start in range(0, len(values), 3):
+        row = layout.row(align=True)
+        row.scale_y = 1.1
+        for value, label in values[start:start + 3]:
+            row.prop_enum(settings, prop, value, text=label)
+
+
+def _project_label(row) -> str:
+    blend = row.kind == "blend" or (row.kind == "addon" and bool(row.blends))
+    return "Open project" if blend else "Create project"
+
+
 class DMF_PT_setup_tools(Panel):
     bl_label = "Tools & clients"
     bl_idname = "DMF_PT_setup_tools"
@@ -174,66 +201,151 @@ class DMF_PT_mods(Panel):
         layout = self.layout
 
         ui_popit.job(layout, settings)
-        ui_popit.section(
+        ui_popit.page(
             layout,
-            "Find packages",
-            "PACKAGE",
+            settings,
+            "Mods",
             f"{settings.mods_scanned} found" if settings.mods_scanned else "not scanned",
+            "PACKAGE",
         )
+
         scan = _section(layout, "Scan folders", "FILE_FOLDER", f"{len(settings.scan_roots)} roots")
-        for row in settings.scan_roots:
-            line = scan.row(align=True)
-            line.prop(row, "enabled", text="")
-            line.label(text=_short(row.path, 36), icon="FILE_FOLDER")
-            right = line.row(align=True)
-            right.alignment = "RIGHT"
-            if row.packages:
-                right.label(text=f"{row.packages}" + (f" / {row.with_cloth} cloth" if row.with_cloth else ""))
+        scan.template_list(
+            "DMF_UL_scan_roots",
+            "",
+            settings,
+            "scan_roots",
+            settings,
+            "scan_root_index",
+            rows=3,
+        )
+        if settings.scan_roots:
+            root = settings.scan_roots[min(settings.scan_root_index, len(settings.scan_roots) - 1)]
+            scan.prop(root, "path", text="Folder")
         row = scan.row(align=True)
         row.operator("dmf.add_scan_root", text="Add folder", icon="ADD")
         row.operator("dmf.remove_scan_root", text="Remove", icon="REMOVE")
-        dates = scan.row(align=True)
-        dates.prop(settings, "scan_since", text="Since")
-        dates.prop(settings, "scan_until", text="Until")
+        scan.prop(settings, "scan_since", text="Since")
+        scan.prop(settings, "scan_until", text="Until")
         scan.operator("dmf.scan_mods", text="Scan for mods", icon="VIEWZOOM")
         if settings.mod_note:
-            _hint(scan, settings.mod_note, "INFO")
+            ui_popit.bubble(scan, settings.mod_note, "INFO", width=30, max_lines=3)
 
-        packages = _section(layout, "Packages", "PACKAGE", f"{settings.mods_scanned} found")
+        found = _section(layout, "Mod collection", "PACKAGE", f"{len(settings.mods)} packages")
         if settings.mods:
-            head = packages.split(factor=settings.list_name_width, align=True)
-            head.label(text="Package")
-            right = head.row(align=True)
-            right.alignment = "RIGHT"
-            right.label(text="Hero · updated")
-            packages.template_list(
+            folders = sum(1 for row in settings.mods if row.kind == "addon")
+            vpks = sum(1 for row in settings.mods if row.kind == "vpk")
+            blends = sum(1 for row in settings.mods if row.kind == "blend")
+            _chips(
+                found,
+                settings,
+                "mod_filter",
+                [
+                    ("ALL", f"All {len(settings.mods)}"),
+                    ("FOLDER", f"Folders {folders}"),
+                    ("VPK", f"VPKs {vpks}"),
+                    ("BLEND", f"Blends {blends}"),
+                ],
+            )
+            found.template_list(
                 "DMF_UL_mods",
                 "",
                 settings,
-                "mods",
+                "mod_rows",
                 settings,
                 "mod_index",
                 rows=6,
             )
-            packages.prop(settings, "list_name_width", text="Name width", slider=True)
-            row = packages.row(align=True)
-            row.operator("dmf.port_mod", text="Update to latest", icon="FILE_REFRESH")
-            row.prop(settings, "backport_experimental", text="Backport")
-            if settings.backport_experimental:
-                packages.prop(settings, "mod_target_client", text="Client")
-                packages.operator(
-                    "dmf.backport_mod",
-                    text="Backport to client (experimental)",
-                    icon="LOOP_BACK",
+            if not settings.mod_rows:
+                _hint(found, "No packages of this type in the last scan.", "INFO")
+        else:
+            _hint(found, "Add a folder and scan for VPKs, addon folders and blends.", "QUESTION")
+
+        if settings.mod_rows:
+            selected = settings.mod_rows[min(settings.mod_index, len(settings.mod_rows) - 1)]
+            icons = {"vpk": "PACKAGE", "addon": "FILE_FOLDER", "blend": "FILE_BLEND"}
+            detail = _section(
+                layout,
+                selected.addon or Path(selected.path).name,
+                icons.get(selected.kind, "PACKAGE"),
+                f"{selected.total_files:,} files" if selected.total_files else selected.kind,
+            )
+            detail.label(text=Path(selected.path).name, icon="FILE")
+            detail.label(text=_tail(str(Path(selected.path).parent), 44), icon="FILE_FOLDER")
+            ui_popit.stat(detail, "Kind", selected.kind)
+            ui_popit.stat(detail, "Hero", selected.hero or "unknown")
+            ui_popit.stat(detail, "Updated", selected.modified or "unknown")
+            ui_popit.stat(detail, "Size", _size(selected.bytes))
+            if selected.counts:
+                _hint(detail, selected.counts, "FILE")
+
+            project = detail.row(align=True)
+            project.scale_y = 1.2
+            project.operator(
+                "dmf.create_mod_project",
+                text=_project_label(selected),
+                icon="FILE_BLEND",
+            )
+            if selected.blends and selected.kind != "blend":
+                detail.label(
+                    text=_short(selected.blends.splitlines()[0], 44),
+                    icon="FILE_BLEND",
                 )
+
+            if settings.mod_content_filter:
+                content_counts = {}
+                for row in settings.mod_contents:
+                    content_counts[row.category] = content_counts.get(row.category, 0) + 1
+                content_chips = [("ALL", f"All {len(settings.mod_contents)}")]
+                for value, label in (
+                    ("MODELS", "Models"),
+                    ("CLIPS", "Clips"),
+                    ("MATERIALS", "Materials"),
+                    ("BLENDS", "Blends"),
+                    ("OTHER", "Other"),
+                ):
+                    count = content_counts.get(value.lower(), 0)
+                    if count:
+                        content_chips.append((value, f"{label} {count}"))
+                contents = _section(
+                    layout,
+                    "Contents",
+                    "FILE",
+                    f"{len(settings.mod_content_rows)} shown",
+                )
+                _chips(contents, settings, "mod_content_filter", content_chips)
+                contents.template_list(
+                    "DMF_UL_mod_contents",
+                    "",
+                    settings,
+                    "mod_content_rows",
+                    settings,
+                    "mod_content_index",
+                    rows=6,
+                )
+                if not settings.mod_content_rows:
+                    _hint(contents, "No files of this type in the package.", "INFO")
+
+            actions = _section(layout, "Update and backport", "FILE_REFRESH")
+            if selected.kind != "blend":
+                row = actions.row(align=True)
+                row.operator("dmf.port_mod", text="Update to latest", icon="FILE_REFRESH")
+                row.prop(settings, "backport_experimental", text="Backport")
+                if settings.backport_experimental:
+                    actions.prop(settings, "mod_target_client", text="Target client")
+                    actions.operator(
+                        "dmf.backport_mod",
+                        text="Backport to client (experimental)",
+                        icon="LOOP_BACK",
+                    )
+            else:
+                _hint(actions, "Blend projects are edited directly; update does not apply.", "INFO")
             _hint(
-                packages,
+                actions,
                 "Update transplants onto today's hero. Backport searches every VPK in the target build and uses the model's path, or the hero if the path moved.",
             )
-        else:
-            _hint(packages, "Add a folder and scan for VPKs and unpacked addons.", "QUESTION")
         if settings.mod_report:
-            packages.label(text=_short(settings.mod_report, 44), icon="TEXT")
+            layout.label(text=_short(settings.mod_report, 44), icon="TEXT")
 
 
 class DMF_PT_components(Panel):

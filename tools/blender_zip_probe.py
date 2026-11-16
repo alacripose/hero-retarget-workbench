@@ -114,8 +114,12 @@ def main() -> int:
             raise RuntimeError(f"core imported the stale forge module: {bundled['paths'].__name__}")
 
         panels = len(dmf.ui.CLASSES) + len(dmf.ui_mods.CLASSES)
-        if panels != 20:
-            raise RuntimeError(f"expected 20 panel classes, found {panels}")
+        # Every page panel has one mapped page, and the sidebar root is the one
+        # panel without a page. Derive the expected count instead of freezing the
+        # day the probe was written.
+        expected_panels = len(dmf.ui_props.PAGE_BY_ID) + 1
+        if panels != expected_panels:
+            raise RuntimeError(f"expected {expected_panels} panel classes, found {panels}")
         # Every sidebar page panel gets a properties twin, under one root. The
         # sidebar's own root has no page, so the twins count is one less than the
         # panel count, not one more.
