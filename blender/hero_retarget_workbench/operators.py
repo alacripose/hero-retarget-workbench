@@ -16,7 +16,7 @@ from bpy.types import Operator
 
 from forge import live, naming
 
-from . import clipops, cloth_ops, core, jobs, parts, properties, proofing, source2, weights
+from . import clipops, cloth_ops, core, jobs, parts, properties, proofing, source2, ui_popit, weights
 
 
 def _status(settings, message: str, kind: str = "INFO") -> None:
@@ -184,6 +184,12 @@ class DMF_OT_browse_folders(Operator):
         settings = context.scene.dmf
         layout = self.layout
         layout.label(text="Every folder comes from the detected pak roster.", icon="FILE_FOLDER")
+        ui_popit.column_header(
+            layout,
+            settings.folder_name_width,
+            ("Folder", "Models"),
+            (1.0,),
+        )
         layout.template_list(
             "DMF_UL_model_folders",
             "folders",
@@ -193,6 +199,7 @@ class DMF_OT_browse_folders(Operator):
             "folder_index",
             rows=10,
         )
+        ui_popit.name_width(layout, settings, "folder_name_width")
         if settings.folder_rows:
             row = settings.folder_rows[min(settings.folder_index, len(settings.folder_rows) - 1)]
             layout.label(text=f"models/{row.label}" if row.root != "ALL" else "All folders", icon="FILE")

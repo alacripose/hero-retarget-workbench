@@ -51,6 +51,11 @@ def _arguments() -> argparse.Namespace:
         help="add representative package rows so the list column split is visible",
     )
     parser.add_argument(
+        "--demo-source",
+        action="store_true",
+        help="add representative hero rows so the Source column split is visible",
+    )
+    parser.add_argument(
         "--list-width",
         type=float,
         default=0.5,
@@ -314,7 +319,36 @@ def main() -> int:
             if args.page:
                 bpy.context.scene.dmf.props_page = args.page
             settings = bpy.context.scene.dmf
-            settings.list_name_width = args.list_width
+            for prop in settings.bl_rna.properties:
+                if prop.identifier.endswith("_name_width"):
+                    setattr(settings, prop.identifier, args.list_width)
+            if args.demo_source:
+                from types import SimpleNamespace
+
+                addon.properties.set_model_items(
+                    [
+                        SimpleNamespace(
+                            slug="abrams",
+                            title="Abrams · Gun",
+                            model_path="models/heroes_staging/abrams/abrams.vmdl_c",
+                        ),
+                        SimpleNamespace(
+                            slug="artists_gesture_paper",
+                            title="Artists Gesture Paper · Long Name",
+                            model_path="models/heroes_wip/artists/gesture_paper.vmdl_c",
+                        ),
+                        SimpleNamespace(
+                            slug="baba_pigeon",
+                            title="Baba Pigeon · Effect",
+                            model_path="models/props/baba/pigeon_effect.vmdl_c",
+                        ),
+                    ]
+                )
+                settings.hero_slug = "artists_gesture_paper"
+                settings.hero_index = 1
+                heropick = importlib.import_module(f"{MODULE}.heropick")
+                heropick.refresh(settings)
+                report["demo_source"] = len(settings.hero_rows)
             if args.demo_mods:
                 for index, (name, hero, kind, date, cloth) in enumerate(
                     (

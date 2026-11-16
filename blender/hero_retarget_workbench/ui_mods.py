@@ -14,26 +14,16 @@ from pathlib import Path
 import bpy
 from bpy.types import Panel
 
-from . import ui_popit
-
-
-def _short(value: str, limit: int = 34) -> str:
-    text = " ".join((value or "").split())
-    return text if len(text) <= limit else text[: limit - 3].rstrip() + "..."
+from . import ui, ui_popit
 
 
 def _section(layout, title: str, icon: str, detail: str = ""):
-    return ui_popit.section(layout, title, icon, _short(detail, 26) if detail else "")
+    return ui_popit.section(layout, title, icon, detail)
 
 
 def _hint(layout, text: str, icon: str = "INFO") -> None:
     if text:
-        layout.label(text=_short(text, 48), icon=icon)
-
-
-def _tail(value: str, limit: int = 48) -> str:
-    text = value or ""
-    return text if len(text) <= limit else "..." + text[-(limit - 3):]
+        ui_popit.hint(layout, text, icon)
 
 
 def _size(value: int) -> str:
@@ -46,11 +36,7 @@ def _size(value: int) -> str:
 
 
 def _chips(layout, settings, prop: str, values) -> None:
-    for start in range(0, len(values), 3):
-        row = layout.row(align=True)
-        row.scale_y = 1.1
-        for value, label in values[start:start + 3]:
-            row.prop_enum(settings, prop, value, text=label)
+    ui_popit.chips(layout, settings, prop, values)
 
 
 def _project_label(row) -> str:
@@ -61,7 +47,7 @@ def _project_label(row) -> str:
 class DMF_PT_setup_tools(Panel):
     bl_label = "Tools & clients"
     bl_idname = "DMF_PT_setup_tools"
-    bl_parent_id = "DMF_PT_main"
+    bl_parent_id = "DMF_PT_setup"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
@@ -71,18 +57,12 @@ class DMF_PT_setup_tools(Panel):
         settings = context.scene.dmf
         layout = self.layout
 
-        ui_popit.title(
-            layout,
-            "Tools & clients",
-            settings.s2v_version or ("S2V installed" if settings.s2v_cli else "S2V missing"),
-            "TOOL_SETTINGS" if settings.s2v_cli else "QUESTION",
-            alert=not settings.s2v_cli,
-        )
-        tools = _section(
+        tools = ui_popit.section(
             layout,
             "Source 2 Viewer",
             "FILEBROWSER",
             settings.s2v_version or ("installed" if settings.s2v_cli else "not installed"),
+            alert=not settings.s2v_cli,
         )
         tools.prop(settings, "s2v_cli", text="CLI")
         row = tools.row(align=True)
@@ -102,11 +82,12 @@ class DMF_PT_setup_tools(Panel):
         row.operator("dmf.refresh_clients", text="Find clients", icon="FILE_REFRESH")
         row.operator("dmf.add_client", text="Add folder", icon="FILE_FOLDER")
         if settings.clients:
-            head = csdk.split(factor=settings.list_name_width, align=True)
-            head.label(text="Install")
-            right = head.row(align=True)
-            right.alignment = "RIGHT"
-            right.label(text="Kind · build")
+            ui_popit.column_header(
+                csdk,
+                settings.clients_name_width,
+                ("Install", "Kind", "Build"),
+                (0.2, 0.25),
+            )
             csdk.template_list(
                 "DMF_UL_clients",
                 "",
@@ -116,10 +97,10 @@ class DMF_PT_setup_tools(Panel):
                 "client_index",
                 rows=5,
             )
-            csdk.prop(settings, "list_name_width", text="Name width", slider=True)
+            ui_popit.name_width(csdk, settings, "clients_name_width")
             picked = settings.clients[min(settings.client_index, len(settings.clients) - 1)]
             ui_popit.stat(csdk, "build", picked.build or "unknown", "INFO")
-            ui_popit.stat(csdk, "path", _short(picked.path, 42), "FILE_FOLDER")
+            ui_popit.stat(csdk, "path", picked.path, "FILE_FOLDER")
             roles = csdk.row(align=True)
             roles.label(text="Game files", icon="CHECKMARK" if picked.can_backport else "X")
             roles.label(text="Compiler", icon="CHECKMARK" if picked.can_compile else "X")
@@ -127,16 +108,8 @@ class DMF_PT_setup_tools(Panel):
             use.operator("dmf.use_client", text="Use for extraction", icon="CHECKMARK")
             use.operator("dmf.use_backport_client", text="Use for backport", icon="LOOP_BACK")
         else:
-            _hint(
-                csdk,
-                "Find clients reads game and tools installs on every Steam library and the standard preview folders.",
-                "QUESTION",
-            )
-            _hint(
-                csdk,
-                "A compiler host builds the handoff; a game with Citadel VPKs is a backport target.",
-                "INFO",
-            )
+            _hint(csdk, "Scan Steam libraries or add a game folder.", "QUESTION")
+            _hint(csdk, "A compiler host builds; a game with Citadel VPKs accepts backports.", "INFO")
 
 
 class DMF_PT_setup_toolchains(Panel):
@@ -154,7 +127,7 @@ class DMF_PT_setup_toolchains(Panel):
 
         chain = _section(
             layout,
-            "Compile toolchains",
+            "Active compiler",
             "TOOL_SETTINGS",
             core.tools_build(settings) or "choose one",
         )
@@ -166,26 +139,21 @@ class DMF_PT_setup_toolchains(Panel):
                 line = chain.row(align=True)
                 line.alert = not row.tool_active
                 line.label(
-                    text=_short(row.label, 18),
+                    text=row.label,
                     icon="CHECKMARK" if row.tool_active else "TOOL_SETTINGS",
                 )
                 right = line.row(align=True)
                 right.alignment = "RIGHT"
-                right.label(text=_short(row.build or row.kind, 22))
-                button = right.operator("dmf.use_toolchain", text="", icon="PLAY")
+                right.label(text=row.build or row.kind)
+                button = right.operator("dmf.use_toolchain", text="Use", icon="PLAY")
                 button.index = index
                 if row.tool_active:
-                    chain.label(text=_short(row.path, 42), icon="FILE_FOLDER")
+                    chain.label(text=row.path, icon="FILE_FOLDER")
         else:
-            _hint(
-                chain,
-                "Find clients lists every compiler host with its own build; choose one here.",
-                "INFO",
-            )
+            _hint(chain, "Find clients lists every compiler host and its build.", "INFO")
         row = chain.row(align=True)
         row.operator("dmf.open_csdk_page", text="Get CSDK", icon="URL")
         row.operator("dmf.install_csdk", text="Install zip", icon="FILEBROWSER")
-        row.operator("dmf.refresh_clients", text="Find", icon="FILE_REFRESH")
 
 
 class DMF_PT_mods(Panel):
@@ -195,6 +163,7 @@ class DMF_PT_mods(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -210,26 +179,39 @@ class DMF_PT_mods(Panel):
         )
 
         scan = _section(layout, "Scan folders", "FILE_FOLDER", f"{len(settings.scan_roots)} roots")
-        scan.template_list(
-            "DMF_UL_scan_roots",
-            "",
-            settings,
-            "scan_roots",
-            settings,
-            "scan_root_index",
-            rows=3,
-        )
         if settings.scan_roots:
+            ui_popit.column_header(
+                scan,
+                settings.scan_name_width,
+                ("Folder", "Packages"),
+                (1.0,),
+            )
+            scan.template_list(
+                "DMF_UL_scan_roots",
+                "",
+                settings,
+                "scan_roots",
+                settings,
+                "scan_root_index",
+                rows=3,
+            )
+            ui_popit.name_width(scan, settings, "scan_name_width")
             root = settings.scan_roots[min(settings.scan_root_index, len(settings.scan_roots) - 1)]
             scan.prop(root, "path", text="Folder")
-        row = scan.row(align=True)
-        row.operator("dmf.add_scan_root", text="Add folder", icon="ADD")
-        row.operator("dmf.remove_scan_root", text="Remove", icon="REMOVE")
-        scan.prop(settings, "scan_since", text="Since")
-        scan.prop(settings, "scan_until", text="Until")
-        scan.operator("dmf.scan_mods", text="Scan for mods", icon="VIEWZOOM")
+            row = scan.row(align=True)
+            row.operator("dmf.add_scan_root", text="Add folder", icon="ADD")
+            remove = row.row(align=True)
+            remove.alert = True
+            remove.operator("dmf.remove_scan_root", text="Remove", icon="REMOVE")
+        else:
+            _hint(scan, "No scan folders yet.", "QUESTION")
+            scan.operator("dmf.add_scan_root", text="Add folder", icon="ADD")
+        if settings.scan_roots:
+            scan.prop(settings, "scan_since", text="Since")
+            scan.prop(settings, "scan_until", text="Until")
+            scan.operator("dmf.scan_mods", text="Scan for mods", icon="VIEWZOOM")
         if settings.mod_note:
-            ui_popit.bubble(scan, settings.mod_note, "INFO", width=30, max_lines=3)
+            ui_popit.bubble(scan, settings.mod_note, "INFO")
 
         found = _section(layout, "Mod collection", "PACKAGE", f"{len(settings.mods)} packages")
         if settings.mods:
@@ -247,6 +229,12 @@ class DMF_PT_mods(Panel):
                     ("BLEND", f"Blends {blends}"),
                 ],
             )
+            ui_popit.column_header(
+                found,
+                settings.mods_name_width,
+                ("Package", "Type", "Hero", "Date"),
+                (0.32, 0.33, 0.35),
+            )
             found.template_list(
                 "DMF_UL_mods",
                 "",
@@ -256,6 +244,7 @@ class DMF_PT_mods(Panel):
                 "mod_index",
                 rows=6,
             )
+            ui_popit.name_width(found, settings, "mods_name_width")
             if not settings.mod_rows:
                 _hint(found, "No packages of this type in the last scan.", "INFO")
         else:
@@ -271,10 +260,11 @@ class DMF_PT_mods(Panel):
                 f"{selected.total_files:,} files" if selected.total_files else selected.kind,
             )
             detail.label(text=Path(selected.path).name, icon="FILE")
-            detail.label(text=_tail(str(Path(selected.path).parent), 44), icon="FILE_FOLDER")
+            detail.label(text=str(Path(selected.path).parent), icon="FILE_FOLDER")
             ui_popit.stat(detail, "Kind", selected.kind)
             ui_popit.stat(detail, "Hero", selected.hero or "unknown")
             ui_popit.stat(detail, "Updated", selected.modified or "unknown")
+            ui_popit.stat(detail, "Toolchain", selected.toolchain or "unknown")
             ui_popit.stat(detail, "Size", _size(selected.bytes))
             if selected.counts:
                 _hint(detail, selected.counts, "FILE")
@@ -288,7 +278,7 @@ class DMF_PT_mods(Panel):
             )
             if selected.blends and selected.kind != "blend":
                 detail.label(
-                    text=_short(selected.blends.splitlines()[0], 44),
+                    text=selected.blends.splitlines()[0],
                     icon="FILE_BLEND",
                 )
 
@@ -314,6 +304,12 @@ class DMF_PT_mods(Panel):
                     f"{len(settings.mod_content_rows)} shown",
                 )
                 _chips(contents, settings, "mod_content_filter", content_chips)
+                ui_popit.column_header(
+                    contents,
+                    settings.mod_contents_name_width,
+                    ("File", "Type"),
+                    (1.0,),
+                )
                 contents.template_list(
                     "DMF_UL_mod_contents",
                     "",
@@ -323,6 +319,7 @@ class DMF_PT_mods(Panel):
                     "mod_content_index",
                     rows=6,
                 )
+                ui_popit.name_width(contents, settings, "mod_contents_name_width")
                 if not settings.mod_content_rows:
                     _hint(contents, "No files of this type in the package.", "INFO")
 
@@ -342,10 +339,10 @@ class DMF_PT_mods(Panel):
                 _hint(actions, "Blend projects are edited directly; update does not apply.", "INFO")
             _hint(
                 actions,
-                "Update transplants onto today's hero. Backport searches every VPK in the target build and uses the model's path, or the hero if the path moved.",
+                "Update moves the mod onto today's hero. Backport resolves the same path in the target build.",
             )
         if settings.mod_report:
-            layout.label(text=_short(settings.mod_report, 44), icon="TEXT")
+            layout.label(text=settings.mod_report, icon="TEXT")
 
 
 class DMF_PT_components(Panel):
@@ -355,6 +352,7 @@ class DMF_PT_components(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -370,19 +368,14 @@ class DMF_PT_components(Panel):
         )
         model = Path(settings.vmdl).stem if settings.vmdl else (Path(settings.extraction_dir).name if settings.extraction_dir else "no model")
         source = _section(layout, "Live components", "MESH_DATA", model)
-        ui_popit.stat(
-            source,
-            "from",
-            _short(settings.vmdl or settings.extraction_dir, 34) or "extract a model",
-            "FILE_FOLDER",
-        )
         source.operator("dmf.scan_components", text="Find components", icon="VIEWZOOM")
         if settings.components:
-            head = source.split(factor=settings.list_name_width, align=True)
-            head.label(text="Component")
-            right = head.row(align=True)
-            right.alignment = "RIGHT"
-            right.label(text="Kind")
+            ui_popit.column_header(
+                source,
+                settings.components_name_width,
+                ("Component", "Kind", "Size"),
+                (0.2, 0.2),
+            )
             source.template_list(
                 "DMF_UL_components",
                 "",
@@ -392,38 +385,35 @@ class DMF_PT_components(Panel):
                 "component_index",
                 rows=6,
             )
-            source.prop(settings, "list_name_width", text="Name width", slider=True)
-            for row in settings.components:
-                _ = row
+            ui_popit.name_width(source, settings, "components_name_width")
         else:
-            _hint(source, "Extract a model first; its vmdl render meshes are listed here, hero or not.", "QUESTION")
+            _hint(source, "Extract a model first; its render meshes appear here.", "QUESTION")
 
         target = _section(layout, "Stage beside a mod", "MODIFIER", settings.component_slot or "no body group")
         target.prop(settings, "component_addon", text="Addon")
-        row = target.row(align=True)
-        row.prop(settings, "component_vmdl", text="vmdl")
-        row.operator("dmf.pick_component_vmdl", text="", icon="FILEBROWSER")
-        ui_popit.stat(
-            target,
-            "into",
-            _short(settings.component_vmdl or settings.component_addon, 34) or "not set",
-            "FILE",
-        )
+        target.prop(settings, "component_vmdl", text="VMDL")
+        target.operator("dmf.pick_component_vmdl", text="Choose VMDL", icon="FILEBROWSER")
         target.prop(settings, "component_merge", text="Register in vmdl")
         target.prop(settings, "component_slot", text="Body group")
         _hint(
             target,
-            "Each selected component DMX becomes a RenderMeshFile and a BodyGroupChoice; the existing body stays.",
+            "Adds selected components as RenderMeshFiles and BodyGroup choices; the body stays.",
             "INFO",
         )
         target.operator("dmf.stage_components", text="Stage selected", icon="IMPORT")
         if settings.component_note:
             _hint(target, settings.component_note, "INFO")
         if settings.component_manifest:
-            target.label(text=_short(settings.component_manifest, 44), icon="TEXT")
+            target.label(text=settings.component_manifest, icon="TEXT")
 
 
-CLASSES = (DMF_PT_setup_tools, DMF_PT_setup_toolchains, DMF_PT_mods, DMF_PT_components)
+CLASSES = (
+    DMF_PT_setup_tools,
+    DMF_PT_setup_toolchains,
+    DMF_PT_mods,
+    ui.DMF_PT_update,
+    DMF_PT_components,
+)
 
 
 def register() -> None:

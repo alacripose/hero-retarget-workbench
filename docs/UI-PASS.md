@@ -1,13 +1,19 @@
-# UI pass 0.16.0
+# UI pass 0.16.4
 
 The Workbench pages were built one at a time, and the check that every action has one home did not
 exist. This pass adds the check, moves staging and compiling onto the Release page, replaces the hero
 dropdown with a filtered list, and runs the family writing rules over every user-facing string.
 
+The HIG sweep then rebuilt the shared page grammar: the panel header is the one page title, the body
+starts with state and build, groups are separated by space, actions are worded buttons in rows of
+two, chips are real buttons, and advanced panels stay folded. The full checklist and evidence live in
+`docs/UI-HIG-SWEEP.md`.
+
 ## References
 
-- Popit surface grammar: one soft card naming the edited thing and its state, uppercase micro-labels,
-  glyph rows, folded advanced groups, one message per page. Implemented in `ui_popit.py`.
+- Popit surface grammar: one named page header, one state/build line, flat labeled groups, text
+  actions in rows of two, folded advanced groups, one message per page. Implemented in
+  `ui_popit.py`.
 - Landing family design: the alacripose landing page supplies the density and the label voice, not a
   palette. Blender's theme owns color.
 - `impeccable` (Operate mode): scanability, native expectations, no wizard.
@@ -34,6 +40,99 @@ dropdown with a filtered list, and runs the family writing rules over every user
 
 `python tools/ui_parity.py --check` fails on an action drawn on two pages, a page with no panel, or an
 action drawn that no operator declares. `tests/test_ui_parity.py` pins the same result.
+
+## 0.16.4 — filter chips keep their labels inside
+
+- The Skeleton, Cloth, Animations and Mods filters now share `ui_popit.chips`.
+  Each value is an enum button in a plain row; the old `grid_flow` inherited
+  the panel's property split and moved the first chip's text into a label
+  column, leaving an empty button beside it.
+- Four choices draw as 2 by 2, five as 3 plus 2, and two as one even row. The
+  labels stay inside their buttons at the narrow 782 px Workbench surface.
+- Measured: `208` tests pass, `ui_parity --check` and `ui_prose --check` are
+  zero; `artifacts/visual/ui-pass/{skeleton,cloth,animations}.png` show the
+  labels inside their buttons at 782 px, and `artifacts/ui-pass/mods-collection.png`
+  shows the same for `All 5`, `Folders 3`, `VPKs 1`, `Blends 1`.
+- Zip probe: `0.16.4`, 68 files, 476,950 bytes, sha256
+  `5ed33bdf15d304f4404dede4571636239319a94116752e1f62c9f781993ec396`.
+
+## 0.16.3 — mods collections, last updated, and tool-release prediction
+
+- **A mods root is a collection.** The scan now inventories immediate top-level package folders as
+  well as unpacked `citadel_addons`. A folder is kept when it has a game content root, a game file
+  suffix, a `.vpk`, or a model/script/sound/particle payload; empty `New Folder` shapes stay out.
+  The live game's `pak01_dir.vpk` supplies the folder names and suffixes, with a bounded built-in
+  fallback when the game is not installed.
+- **Both Documents roots stay separate.** Scan-root rows show the last three path components, so
+  `Documents/mods` and `Documents/Documents/mods` are distinguishable. The real two-root run found
+  325 packages: 78 folders in the first root and 247 packages (229 folders, 18 VPKs) in the second.
+  The 85 and 238 top-level directories include 7 and 9 empty or non-content folders.
+- **Last updated and toolchain are visible.** Each package records its newest file timestamp and a
+  predicted CSDK toolchain. The detail card shows both `Updated` and `Toolchain`; the Mods filter
+  searches the toolchain value. Prediction uses releases of installed tools, not daily game builds.
+- **A game is not a compiler.** `forge.installs.classify` no longer marks a full game with a shipping
+  pak as a compiler host even when `resourcecompiler.exe` files were copied into it; a stale saved
+  client row is cleared on scan. The newer game build `6861` is therefore not a toolchain, while
+  CSDK `4192` and `6836` are.
+- **Measured.** `208` tests pass; `ui_parity --check` and `ui_prose --check` are zero. The synthetic
+  Mods probe passes `scan-count 5`, typed records, `toolchain-predicted {CSDK 6836}`, all filters and
+  project creation. A real Blender scan completed with `325 packages: 307 folders, 18 VPKs, 0 blends,
+  3 blend files, 1 cloth`; a 4.4 GB folder package required widening the row byte field from a
+  32-bit integer.
+- Zip probe: `0.16.3`, 68 files, 476,952 bytes, sha256
+  `81a89ac9f98bcf2f3fecd6b19d8017e6e83068b7db029741e8ad798561601e53`.
+- **Not checked:** the real scan was verified by receipt and log, not by a readable sidebar
+  screenshot. The copied compiler files in the game install were not deleted.
+
+## 0.16.2 — HIG sweep of the whole Workbench surface
+
+- Page roots are the single title. The old page card repeated the header and, when hidden with
+  `HIDE_HEADER`, left a pair of header arrows; it is gone. State and the compact Live/CSDK build line
+  sit directly under the title.
+- Sections are flat columns separated by space, not boxes inside boxes. Advanced Setup/Mods panels
+  are nested under their page root, so `Update old addon` no longer appears above the Mods page.
+- Actions are text buttons, one or two per row. Source's `Use model` no longer shares its row with a
+  count; the skeleton ref-pose controls are two full buttons; odd counts leave a blank cell instead
+  of stretching the last action across the page. `Pack & install` opens on Release.
+- Filters are buttons, not enum labels left outside their value column. They wrap at the measured
+  page width, and Hero/Custom rig are readable at both surfaces.
+- Long lists size to their rows. The Source model list uses the model count instead of seven empty
+  rows. Mods with no scan roots shows one Add folder action and hides date/scan controls.
+- The narrow layout moves a long global status out of the header and into the page body below 650 px;
+  errors stay complete. The toolbar keeps the page menu and version.
+- **Measured.** `202` tests pass; `ui_parity --check` and `ui_prose --check` are zero. The pages
+  probe draws all `26/26` page and child panels with no exceptions and imports a real hero (19 cloth
+  chains, jacket/hair rows). Screenshots: `artifacts/ui-pass/pages/*.png` (960 px) and
+  `artifacts/ui-pass/narrow/*.png` (640 px). Zip probe: `0.16.2`, 68 files, 473,535 bytes,
+  sha256 `139edca2fe66fe42fd63fbf3c06d984a96d24fa46e97f491cac41d2962ad41bc`.
+- **Not checked:** Blender's native file dialogs were not restyled; the native sidebar's minimum
+  width was used for warnings only, not as the final wide review; no in-game client check.
+
+## 0.16.1 — every list has named category columns and its own width
+
+- Every UIList now draws the same kind of row: a name cell followed by the
+  category cells that belong to that list. Headers name those categories above
+  the list, and each list has its own saved **Name width** slider instead of the
+  old shared `list_name_width` value. Source, Mods, Scan folders, Contents,
+  Parts, source and part material slots, Cloth, Rules, Targets, Tail, Clips,
+  Skeleton, bone map, Clients and Components are covered.
+- The Source model list and the VPK folder browser now show **Model / Folder**
+  and **Folder / Models** headers with their own sliders. Names are no longer cut
+  by `_short()` in list rows; Blender clips them to the cell width, so widening
+  the slider or the panel reveals more.
+- The Source draw no longer writes `folder_signature` from `sync_folders`; that
+  write happens from the operator or picker refresh, not from a panel draw. An
+  empty roster keeps the synthetic **All folders** choice instead of leaving the
+  enum at an invalid zero.
+- Blender has no draggable column separators in its UIList API, so the controls
+  are per-list factors. A category table is a native header plus aligned rows.
+- `tests/test_ui_parity.py` now refuses a list that shares another list's width
+  property or has no category split. `202` tests pass, `ui_parity --check` and
+  `ui_prose --check` are zero.
+- GUI evidence: `artifacts/ui-pass/mods-collection.png`,
+  `artifacts/ui-pass/mods-scan-folders.png` and
+  `artifacts/ui-pass/source-columns.png`. The full pages probe fails its own
+  `surface-open-control` check (0/26 draws), so it is not evidence for this pass.
 
 ## 0.16.0 — Mods is a typed collection, and a mod becomes a Blender project
 

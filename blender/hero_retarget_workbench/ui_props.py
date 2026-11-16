@@ -211,11 +211,15 @@ def mirror(
     source_parent = getattr(panel, "bl_parent_id", "") or ""
     if source_parent and source_parent != "DMF_PT_main":
         parent = f"DMF_PT_{prefix}_{source_parent[len('DMF_PT_'):]}"
+    # Page roots are top-level panels in both surfaces. Their headers are the
+    # one page title; the body starts with state and build line, not another
+    # title card. Advanced children keep their own DEFAULT_CLOSED state.
+    options = set(getattr(panel, "bl_options", set()))
     attributes = {
         "bl_idname": idname,
         "bl_space_type": space_type,
         "bl_region_type": region_type,
-        "bl_options": set(),
+        "bl_options": options,
         # In a category tab the sidebar already shows only that page's panels,
         # so the page poll would be a second, conflicting filter.
         "poll": _page_poll(panel, page) if not category else _inherited_poll(panel),

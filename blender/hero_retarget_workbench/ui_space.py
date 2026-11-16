@@ -87,21 +87,10 @@ def _header_draw(self, context) -> None:
     except (AttributeError, TypeError, RuntimeError):
         # A build without the template still gets the page box and the status.
         pass
-    # The title is the page menu: the enum property draws as a dropdown showing
-    # the current page. The icon buttons stay beside it for one-click switching.
+    # The page menu is the switcher. The row of unlabeled page glyphs that used
+    # to sit beside it made a second navigation system in the toolbar and read
+    # as decoration; the enum already names every page.
     layout.prop(settings, "props_page", text="", icon="ARMATURE_DATA")
-    pages = layout.row(align=True)
-    for page in ui_props.PAGES:
-        try:
-            pages.prop_enum(
-                settings,
-                "props_page",
-                page,
-                text="",
-                icon=ui_props.PAGE_ICONS.get(page, "DOT"),
-            )
-        except TypeError:
-            pages.prop_enum(settings, "props_page", page, text="")
     layout.separator(factor=0.6)
     import sys
 
@@ -112,7 +101,9 @@ def _header_draw(self, context) -> None:
     if version:
         layout.label(text=f"v{version}")
     layout.separator_spacer()
-    _status_line(layout, settings)
+    width = getattr(getattr(context, "region", None), "width", 0) or 960
+    if width >= 650:
+        _status_line(layout, settings)
 
 
 def _root_draw(self, context) -> None:

@@ -28,7 +28,9 @@ ROSTER_SERIAL = 0
 # picker's Show filter is built from the folders this carries, so the choices are
 # the pak's own directories instead of a hand-written category list.
 MODEL_ITEMS: list[tuple[str, str, str, str]] = []
-MODEL_ROOT_ITEMS: list[tuple[str, str, str]] = []
+MODEL_ROOT_ITEMS: list[tuple[str, str, str]] = [
+    ("ALL", "All folders", "Every model the pak lists"),
+]
 
 
 def model_root_items(self, context):
@@ -469,8 +471,12 @@ class DMF_ModRow(PropertyGroup):
     kind: StringProperty(name="Kind", default="vpk")
     hero: StringProperty(name="Hero", default="")
     modified: StringProperty(name="Modified", default="")
+    toolchain: StringProperty(name="Toolchain", default="")
     sections: StringProperty(name="Cloth sections", default="")
-    bytes: IntProperty(name="Bytes", default=0)
+    # Package folders can exceed the signed 32-bit range. This is display-only,
+    # so a float holds the byte count without
+    # wrapping; the scanner keeps the exact integer in its own record.
+    bytes: FloatProperty(name="Bytes", default=0)
     note: StringProperty(name="Note", default="")
     models: StringProperty(name="Models", default="")
     blends: StringProperty(name="Blend files", default="")
@@ -546,7 +552,7 @@ def refresh_mod_rows(settings) -> None:
             continue
         copy = settings.mod_rows.add()
         for field in (
-            "path", "addon", "kind", "hero", "modified", "sections",
+            "path", "addon", "kind", "hero", "modified", "toolchain", "sections",
             "bytes", "note", "models", "blends", "files", "counts", "total_files",
         ):
             setattr(copy, field, getattr(row, field))
@@ -1193,12 +1199,148 @@ class DMF_Settings(PropertyGroup):
     job_label: StringProperty(name="Job", default="")
     job_message: StringProperty(name="Job step", default="")
     job_progress: FloatProperty(name="Progress", default=0.0, min=0.0, max=1.0, subtype="FACTOR")
-    list_name_width: FloatProperty(
+    source_name_width: FloatProperty(
         name="Name width",
-        description="Share of a list row given to the name; the rest holds the details",
+        description="Share of a model row given to the name; the rest holds the VPK folder",
+        default=0.62,
+        min=0.3,
+        max=0.9,
+        subtype="FACTOR",
+    )
+    folder_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a folder row given to the folder name; the rest holds the model count",
+        default=0.68,
+        min=0.3,
+        max=0.9,
+        subtype="FACTOR",
+    )
+    scan_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a scan-root row given to the folder; the rest holds the package count",
+        default=0.66,
+        min=0.3,
+        max=0.9,
+        subtype="FACTOR",
+    )
+    mods_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a package row given to the name; the rest holds kind, hero and date",
+        default=0.52,
+        min=0.3,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    mod_contents_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a contents row given to the file; the rest holds its type",
+        default=0.7,
+        min=0.3,
+        max=0.9,
+        subtype="FACTOR",
+    )
+    clients_name_width: FloatProperty(
+        name="Name width",
+        description="Share of an install row given to the name; the rest holds kind and build",
+        default=0.55,
+        min=0.3,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    components_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a component row given to the name; the rest holds kind and size",
+        default=0.55,
+        min=0.3,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    ik_name_width: FloatProperty(
+        name="Name width",
+        description="Share of an IK row given to the target; the rest holds the limb it follows",
         default=0.5,
         min=0.25,
-        max=0.8,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    tail_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a tail row given to the hero bone; the rest holds the tail bone",
+        default=0.5,
+        min=0.25,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    bone_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a bone-map row given to the source bone; the rest holds target and state",
+        default=0.45,
+        min=0.25,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    hierarchy_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a hierarchy row given to the bone; the rest holds parent and children",
+        default=0.5,
+        min=0.25,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    parts_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a part row given to the object; the rest holds vertices and materials",
+        default=0.55,
+        min=0.3,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    source_materials_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a source-slot row given to the material; the rest holds its slot",
+        default=0.72,
+        min=0.3,
+        max=0.9,
+        subtype="FACTOR",
+    )
+    part_materials_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a part-slot row given to the material; the rest holds its slot",
+        default=0.72,
+        min=0.3,
+        max=0.9,
+        subtype="FACTOR",
+    )
+    hero_parts_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a hero-part row given to the object; the rest holds type and vertices",
+        default=0.55,
+        min=0.3,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    cloth_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a chain row given to the chain; the rest holds type and bone count",
+        default=0.55,
+        min=0.3,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    rules_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a rule row given to the pattern; the rest holds its state",
+        default=0.65,
+        min=0.3,
+        max=0.9,
+        subtype="FACTOR",
+    )
+    clips_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a clip row given to the clip; the rest holds graph, file type and marks",
+        default=0.52,
+        min=0.3,
+        max=0.85,
         subtype="FACTOR",
     )
     job_cancellable: BoolProperty(name="Cancellable", default=False)

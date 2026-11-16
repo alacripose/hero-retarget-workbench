@@ -91,6 +91,12 @@ def make_fixture(root: Path) -> Path:
     (folder / "clips").mkdir()
     (folder / "clips" / "haze_idle.vnmclip").write_bytes(b"clip")
     (folder / "source.blend").write_bytes(b"BLENDER")
+    compiled = root / "compiled_mod" / "models" / "heroes_staging" / "kelvin"
+    compiled.mkdir(parents=True)
+    (compiled / "kelvin.vmdl_c").write_bytes(b"compiled")
+    script = root / "script_mod" / "scripts"
+    script.mkdir(parents=True)
+    (script / "citadel.lua").write_text("return {}", encoding="utf-8")
     build_vpk(
         root / "haze_old.vpk",
         [
@@ -144,23 +150,39 @@ def run() -> None:
     settings.scan_root_index = 0
     settings.scan_since = "2024-01-01"
     settings.scan_until = ""
+    client = settings.clients.add()
+    client.build = "6836 Oct 31 2026"
+    client.kind = "tools"
+    client.can_compile = True
+    stale_game = settings.clients.add()
+    stale_game.build = "6861 Nov 09 2026"
+    stale_game.kind = "game"
+    stale_game.can_backport = True
+    stale_game.can_compile = True
 
     result = bpy.ops.dmf.scan_mods()
     check("scan-started", result == {"FINISHED"}, result)
     settle_scan()
-    check("scan-count", settings.mods_scanned == 3, settings.mods_scanned)
+    check("scan-count", settings.mods_scanned == 5, settings.mods_scanned)
     kinds = sorted(row.kind for row in settings.mods)
-    check("typed-records", kinds == ["addon", "blend", "vpk"], kinds)
-    check("visible-all", len(settings.mod_rows) == 3, len(settings.mod_rows))
+    check("typed-records", kinds == ["addon", "addon", "addon", "blend", "vpk"], kinds)
+    toolchains = {row.toolchain for row in settings.mods}
+    check("toolchain-predicted", toolchains == {"CSDK 6836"}, toolchains)
+    check("game-not-toolchain", stale_game.can_compile is False, stale_game.can_compile)
+    check("visible-all", len(settings.mod_rows) == 5, len(settings.mod_rows))
     settings.mod_filter = "FOLDER"
-    check("visible-folders", len(settings.mod_rows) == 1, len(settings.mod_rows))
+    check("visible-folders", len(settings.mod_rows) == 3, len(settings.mod_rows))
     settings.mod_filter = "VPK"
     check("visible-vpks", len(settings.mod_rows) == 1, len(settings.mod_rows))
     settings.mod_filter = "BLEND"
     check("visible-blends", len(settings.mod_rows) == 1, len(settings.mod_rows))
     settings.mod_filter = "ALL"
 
-    folder_index = next(i for i, row in enumerate(settings.mod_rows) if row.kind == "addon")
+    folder_index = next(
+        i
+        for i, row in enumerate(settings.mod_rows)
+        if row.kind == "addon" and row.addon == "old_folder"
+    )
     settings.mod_index = folder_index
     categories = {row.category for row in settings.mod_contents}
     check("contents-typed", categories == {"models", "materials", "clips", "blends"}, categories)
@@ -185,7 +207,8 @@ def run() -> None:
         area = next((item for item in window.screen.areas if item.type == "VIEW_3D"), None)
         if area is not None:
             area.spaces.active.show_region_ui = True
-    bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=2)
+    if not bpy.app.background:
+        bpy.ops.wm.redraw_timer(type="DRAW_WIN_SWAP", iterations=2)
     print(f"MODS project={settings.project_file}", flush=True)
     print(f"MODS note={settings.mod_note}", flush=True)
 
@@ -208,6 +231,10 @@ def scroll_sidebar(steps: int = 18) -> None:
 
 
 def shoot() -> None:
+    if bpy.app.background:
+        print("MODS checks complete in background", flush=True)
+        bpy.ops.wm.quit_blender()
+        return
     OUT.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.screen.screenshot(filepath=str(TOP))
     scroll_sidebar()

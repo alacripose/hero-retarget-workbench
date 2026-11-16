@@ -1,9 +1,10 @@
 """Native Blender sidebar for the hero retarget workbench.
 
 The surface follows the Popit model the owner's references define: a page opens
-with one card naming what it edits, its actions are glyphs, the deeper controls
-fold away, and a page is allowed a single message. Blender's own dark theme
-supplies colour; the panel only decides what is worth showing.
+under its named panel, states its build and next action once, and groups the
+controls with space instead of nested cards. Advanced groups fold away and the
+page is allowed a single message. Blender's own dark theme supplies colour; the
+panel only decides what is worth showing.
 
 The surface is Operate: native widgets, dense information, no wizard. The panel
 does not claim a result. It shows the live stage, the bone map, the proof checks
@@ -12,7 +13,6 @@ and the exact refusal that blocks the handoff.
 from __future__ import annotations
 
 import sys
-import textwrap
 from pathlib import Path
 
 import bpy
@@ -47,20 +47,6 @@ _STATE_LABELS = {
 }
 
 
-def _short(value: str, limit: int = 34) -> str:
-    text = " ".join((value or "").split())
-    if len(text) <= limit:
-        return text
-    return text[: limit - 3].rstrip() + "..."
-
-
-def _tail(value: str, limit: int = 46) -> str:
-    text = " ".join((value or "").split())
-    if len(text) <= limit:
-        return text
-    return "..." + text[-(limit - 3) :]
-
-
 def _hero_label(settings) -> str:
     slug = settings.hero_slug
     if slug in ("", "NONE"):
@@ -87,11 +73,7 @@ def _hero_state(settings) -> str:
 
 def _chips(layout, settings, prop: str, values) -> None:
     """A filter as visible choices, not a dropdown that hides the active one."""
-    for start in range(0, len(values), 3):
-        row = layout.row(align=True)
-        row.scale_y = 1.1
-        for value, label in values[start:start + 3]:
-            row.prop_enum(settings, prop, value, text=label)
+    ui_popit.chips(layout, settings, prop, values)
 
 
 def _hero_picker(layout, settings) -> None:
@@ -99,7 +81,6 @@ def _hero_picker(layout, settings) -> None:
     search = layout.row(align=True)
     search.prop(settings, "hero_query", text="", icon="VIEWZOOM")
     search.operator("dmf.refresh_heroes", text="", icon="FILE_REFRESH")
-    properties.sync_folders(settings)
     current = next(
         (item[1] for item in properties.MODEL_ROOT_ITEMS if item[0] == settings.model_root),
         "All folders",
@@ -109,6 +90,12 @@ def _hero_picker(layout, settings) -> None:
         shown = heropick.ensure(settings)
     except Exception:
         shown = len(settings.hero_rows)
+    ui_popit.column_header(
+        layout,
+        settings.source_name_width,
+        ("Model", "Folder"),
+        (1.0,),
+    )
     layout.template_list(
         "DMF_UL_heroes",
         "source",
@@ -116,23 +103,24 @@ def _hero_picker(layout, settings) -> None:
         "hero_rows",
         settings,
         "hero_index",
-        rows=7,
+        rows=max(1, min(7, shown)),
     )
-    row = layout.row(align=True)
-    row.enabled = bool(shown) and not settings.job_running
-    row.operator("dmf.choose_hero", text="Use model", icon="CHECKMARK")
-    right = row.row(align=True)
-    right.alignment = "RIGHT"
-    right.label(text=f"{shown} shown")
+    ui_popit.name_width(layout, settings, "source_name_width")
+    ui_popit.glyphs(
+        layout,
+        ["dmf.choose_hero"],
+        enabled=bool(shown) and not settings.job_running,
+        labels={"dmf.choose_hero": "Use model"},
+    )
     if settings.hero_model_path:
-        layout.label(text=_tail(settings.hero_model_path, 44), icon="FILE")
+        layout.label(text=settings.hero_model_path, icon="FILE")
 
 
 def _mesh_state(settings) -> str:
     mesh = settings.custom_mesh
     if mesh is None:
         return "not set"
-    return _short(mesh.name, 24)
+    return mesh.name
 
 
 def _bind_state(settings) -> str:
@@ -201,7 +189,7 @@ def _next_line(layout, settings) -> None:
     answered, total = stageflow.progress(state)
     row = layout.row(align=True)
     row.scale_y = 1.1
-    row.label(text=_short(step.label, 32), icon=step.icon)
+    row.label(text=step.label, icon=step.icon)
     right = row.row(align=True)
     right.alignment = "RIGHT"
     right.label(text=f"{answered}/{total}")
@@ -214,16 +202,12 @@ def _next_line(layout, settings) -> None:
 
 def _section(layout, title: str, icon: str, detail: str = ""):
     """One grammar for every group: ui_popit.section, with the detail shortened."""
-    return ui_popit.section(layout, title, icon, _short(detail, 26) if detail else "")
+    return ui_popit.section(layout, title, icon, detail)
 
 
-def _hint(layout, text: str, icon: str = "INFO", alert: bool = False, width: int = 36) -> None:
-    """Reserved for a refusal or a state that blocks work; ordinary help lives in tooltips."""
-    lines = textwrap.wrap(" ".join((text or "").split()), width=width, break_on_hyphens=False) or [""]
-    for index, line in enumerate(lines[:2]):
-        row = layout.row(align=True)
-        row.alert = alert
-        row.label(text=line, icon=icon if index == 0 else "BLANK1")
+def _hint(layout, text: str, icon: str = "INFO", alert: bool = False, width: int | None = None) -> None:
+    """The shared wrapped hint; width is measured, never a per-call guess."""
+    ui_popit.hint(layout, text, icon, alert, width)
 
 
 def _path_row(layout, settings, prop: str, label: str, button: str = "", icon: str = "FILEBROWSER") -> None:
@@ -296,7 +280,7 @@ class DMF_PT_main(Panel):
         page = ui_popit.title(
             layout,
             _hero_label(settings),
-            _short(settings.build, 20) or "no build",
+            settings.build or "no build",
             "OUTLINER_OB_ARMATURE",
             alert=settings.status_kind == "ERROR",
         )
@@ -308,7 +292,6 @@ class DMF_PT_main(Panel):
             settings.status,
             _STATUS_ICONS.get(settings.status_kind, "STATUS_INFO"),
             alert=settings.status_kind == "ERROR",
-            max_lines=4 if settings.status_kind == "ERROR" else 3,
         )
         _job(layout, settings)
         _surface(layout)
@@ -321,6 +304,7 @@ class DMF_PT_setup(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -336,13 +320,13 @@ class DMF_PT_setup(Panel):
             "CHECKMARK" if ready else "QUESTION",
             alert=not ready,
         )
-        live = _section(layout, "Live game", "WORLD", _short(settings.build, 24) or "not detected")
+        live = _section(layout, "Live game", "WORLD", settings.build or "not detected")
         live.prop(settings, "deadlock_root", text="Install")
         live.prop(settings, "s2v_cli", text="S2V CLI")
         gui_note = paths.s2v_gui_note(settings.s2v_cli)
         if gui_note:
-            _hint(live, gui_note, "ERROR", alert=True, width=30)
-        ui_popit.glyphs(live, ["dmf.detect_paths"], labels={"dmf.detect_paths": "Detect"})
+            _hint(live, gui_note, "ERROR", alert=True)
+        ui_popit.glyphs(live, ["dmf.detect_paths"], labels={"dmf.detect_paths": "Detect paths"})
 
         tools = _section(
             layout,
@@ -353,60 +337,31 @@ class DMF_PT_setup(Panel):
         tools.prop(settings, "csdk_root", text="Install")
         folder = core.csdk_addon_folder(settings)
         if folder is not None:
-            tools.label(text=_tail(str(folder), 46), icon="FILE_FOLDER")
+            tools.label(text=str(folder), icon="FILE_FOLDER")
         else:
-            _hint(tools, "Set the CSDK folder that holds resourcecompiler.exe.", "QUESTION", width=30)
+            _hint(tools, "Set the CSDK folder that holds resourcecompiler.exe.", "QUESTION")
         ui_popit.stat(tools, "selected", Path(settings.csdk_root).name if settings.csdk_root else "not set", "TOOL_SETTINGS")
-        _hint(
-            tools,
-            "Versions are listed under Tools & clients; choosing one changes only what compiles.",
-            "INFO",
-            width=32,
-        )
         tools.operator("dmf.refresh_clients", text="Find toolchains", icon="FILE_REFRESH")
 
         project = Path(settings.project_file) if settings.project_file else None
         workspace = _section(
             layout,
-            "Active project",
-            "FILE_BLEND",
-            project.name if project is not None else "none",
+            "Mods & projects",
+            "PACKAGE",
+            f"{len(settings.scan_roots)} roots, {settings.mods_scanned} found",
         )
         if project is not None:
-            workspace.label(text=_tail(str(project), 46), icon="FILE_BLEND")
+            workspace.label(text=str(project), icon="FILE_BLEND")
             workspace.label(
-                text=_tail(str(Path(settings.project_root) if settings.project_root else project.parent), 46),
+                text=str(Path(settings.project_root) if settings.project_root else project.parent),
                 icon="FILE_FOLDER",
             )
             row = workspace.row(align=True)
             row.operator("dmf.open_project_folder", text="Open folder", icon="FILE_FOLDER")
             row.prop_enum(settings, "props_page", "MODS", text="Mods", icon="PACKAGE")
         else:
-            _hint(
-                workspace,
-                "Pick a folder, VPK or blend on Mods and create its Blender project.",
-                "QUESTION",
-                width=32,
-            )
+            _hint(workspace, "No project open.", "QUESTION")
             workspace.prop_enum(settings, "props_page", "MODS", text="Open Mods", icon="PACKAGE")
-
-        # Mods is its own page; Setup names where it is and how much it found so
-        # the old "update old addon" corner is not hunted for here.
-        mods = _section(
-            layout,
-            "Mods & old addons",
-            "PACKAGE",
-            f"{len(settings.scan_roots)} roots, {settings.mods_scanned} found",
-        )
-        row = mods.row(align=True)
-        row.enabled = not settings.job_running
-        row.prop_enum(settings, "props_page", "MODS", text="Open Mods", icon="PACKAGE")
-        _hint(
-            mods,
-            "Scanning, update to latest and backport, and the old addon fields live on the Mods page.",
-            "INFO",
-            width=30,
-        )
 
 
 class DMF_PT_source(Panel):
@@ -416,7 +371,7 @@ class DMF_PT_source(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
-    bl_options = {"DEFAULT_CLOSED"}
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -429,9 +384,11 @@ class DMF_PT_source(Panel):
         _hero_picker(hero, settings)
         ui_popit.glyphs(
             hero,
-            ["dmf.detect", "dmf.extract", "dmf.import_hero"],
+            ["dmf.detect", "dmf.extract"],
             enabled=not settings.job_running,
+            labels={"dmf.detect": "Detect build", "dmf.extract": "Extract hero"},
         )
+        _primary(hero, "dmf.import_hero", "Import hero", "IMPORT", enabled=not settings.job_running)
         hero.prop(settings, "target_armature", text="Skeleton")
         hero.prop(settings, "target_body", text="Body")
 
@@ -440,16 +397,15 @@ class DMF_PT_source(Panel):
             custom,
             ["dmf.import_custom"],
             enabled=not settings.job_running,
-            labels={"dmf.import_custom": "Import"},
+            labels={"dmf.import_custom": "Import model"},
         )
         custom.prop(settings, "custom_mesh", text="Mesh")
         custom.prop(settings, "custom_armature", text="Rig")
         name_row = custom.row(align=True)
         name_row.prop(settings, "custom_name", text="Name")
-        name_row.operator("dmf.apply_model_name", text="", icon="SORTALPHA")
-        fit = custom.row(align=True)
-        fit.prop(settings, "axis_preset", text="")
-        fit.prop(settings, "fit_scale", text="")
+        name_row.operator("dmf.apply_model_name", text="Apply", icon="SORTALPHA")
+        custom.prop(settings, "axis_preset", text="Axis")
+        custom.prop(settings, "fit_scale", text="Scale")
         custom.prop(settings, "fit_to_height", text="Match hero height")
         _primary(custom, "dmf.fit", "Fit to hero", "TRANSFORM_ORIGINS", enabled=not settings.job_running)
 
@@ -474,18 +430,13 @@ class DMF_PT_source_files(Panel):
         _path_row(layout, settings, "materials_dir", "Hero materials")
         _path_row(layout, settings, "custom_model", "Model file")
         _path_row(layout, settings, "custom_materials_dir", "Model materials")
-        _hint(
-            layout,
-            "Materials are content roots; their relative paths are preserved. Blank uses the extraction.",
-            "MATERIAL",
-            width=30,
-        )
+        _hint(layout, "Blank uses the extraction folder.", "MATERIAL")
 
 
 class DMF_PT_update(Panel):
     bl_label = "Update old addon"
     bl_idname = "DMF_PT_update"
-    bl_parent_id = "DMF_PT_main"
+    bl_parent_id = "DMF_PT_mods"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
@@ -496,7 +447,7 @@ class DMF_PT_update(Panel):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
-        box = ui_popit.page(layout, settings, "Mods", "update old addon", "FILE_REFRESH")
+        box = layout.column(align=True)
         _path_row(box, settings, "old_vpk", "VPK / folder")
         box.operator("dmf.pick_old_vpk", text="Choose old addon", icon="FILEBROWSER")
         options = box.column(align=True)
@@ -520,12 +471,13 @@ class DMF_PT_update(Panel):
 
 
 class DMF_PT_parts(Panel):
-    bl_label = "Parts & Materials"
+    bl_label = "Parts"
     bl_idname = "DMF_PT_parts"
     bl_parent_id = "DMF_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -541,15 +493,28 @@ class DMF_PT_parts(Panel):
             f"{len(settings.parts)}" if settings.parts else "not scanned",
             "GROUP",
         )
-        collection_box.prop(settings, "custom_collection", text="")
+        ui_popit.micro(collection_box, "Parts collection", "GROUP")
+        collection_box.prop_search(
+            settings,
+            "custom_collection",
+            bpy.data,
+            "collections",
+            text="",
+        )
         ui_popit.glyphs(
             collection_box,
             ["dmf.use_active_collection", "dmf.scan_parts"],
-            labels={"dmf.use_active_collection": "Active", "dmf.scan_parts": "Scan"},
+            labels={"dmf.use_active_collection": "Use active", "dmf.scan_parts": "Scan parts"},
         )
         if not settings.parts:
-            _hint(collection_box, "Choose a collection and scan it.", "QUESTION", width=28)
+            _hint(collection_box, "Choose a collection and scan it.", "QUESTION")
         else:
+            ui_popit.column_header(
+                collection_box,
+                settings.parts_name_width,
+                ("Part", "Verts", "Materials"),
+                (0.2, 0.2),
+            )
             row = collection_box.row(align=True)
             row.template_list(
                 "DMF_UL_parts",
@@ -560,12 +525,14 @@ class DMF_PT_parts(Panel):
                 "part_index",
                 rows=4,
             )
+            ui_popit.name_width(collection_box, settings, "parts_name_width")
             index = max(0, min(settings.part_index, len(settings.parts) - 1))
             part = settings.parts[index].object
             if part is not None:
-                collection_box.operator("dmf.use_part", text=f"Use part: {_short(part.name, 26)}", icon="OBJECT_DATA")
+                ui_popit.stat(collection_box, "part", part.name, "OBJECT_DATA")
+                collection_box.operator("dmf.use_part", text="Use selected part", icon="OBJECT_DATA")
             else:
-                _hint(collection_box, "Selected object is gone. Scan again.", "ERROR", alert=True, width=28)
+                _hint(collection_box, "Selected object is gone. Scan again.", "ERROR", alert=True)
 
 
 class DMF_PT_parts_materials(Panel):
@@ -589,12 +556,18 @@ class DMF_PT_parts_materials(Panel):
         layout.prop(settings, "material_source", text="Source")
         ui_popit.glyphs(layout, ["dmf.scan_materials"], labels={"dmf.scan_materials": "Scan slots"})
         if settings.material_source is None:
-            _hint(layout, "Set a source object, usually the hero body, then scan its slots.", "QUESTION", width=30)
+            _hint(layout, "Set a source object, then scan its slots.", "QUESTION")
             return
         if settings.custom_mesh is None:
-            _hint(layout, "Choose an active part before assigning slots.", "QUESTION", width=30)
+            _hint(layout, "Choose an active part before assigning slots.", "QUESTION")
             return
         ui_popit.micro(layout, "Source slots", "IMPORT")
+        ui_popit.column_header(
+            layout,
+            settings.source_materials_name_width,
+            ("Material", "Slot"),
+            (1.0,),
+        )
         layout.template_list(
             "DMF_UL_materials",
             "source_materials",
@@ -604,7 +577,14 @@ class DMF_PT_parts_materials(Panel):
             "source_material_index",
             rows=3,
         )
+        ui_popit.name_width(layout, settings, "source_materials_name_width")
         ui_popit.micro(layout, "Part slots", "MATERIAL")
+        ui_popit.column_header(
+            layout,
+            settings.part_materials_name_width,
+            ("Material", "Slot"),
+            (1.0,),
+        )
         layout.template_list(
             "DMF_UL_materials",
             "part_materials",
@@ -614,6 +594,7 @@ class DMF_PT_parts_materials(Panel):
             "part_material_index",
             rows=3,
         )
+        ui_popit.name_width(layout, settings, "part_materials_name_width")
         actions = layout.column(align=True)
         actions.operator("dmf.assign_material", text="Assign selected material", icon="FORWARD")
         actions.operator("dmf.append_material", text="Append as new slot", icon="ADD")
@@ -627,6 +608,7 @@ class DMF_PT_cloth(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -646,13 +628,13 @@ class DMF_PT_cloth(Panel):
         ui_popit.glyphs(
             box,
             ["dmf.import_hero_parts", "dmf.scan_cloth"],
-            labels={"dmf.import_hero_parts": "Hero parts", "dmf.scan_cloth": "Chains"},
+            labels={"dmf.import_hero_parts": "Import parts", "dmf.scan_cloth": "Scan chains"},
         )
         ui_popit.micro(box, "Chains from", "MOD_CLOTH")
         _chips(box, settings, "cloth_source", (("HERO", "Hero"), ("CUSTOM", "Custom rig")))
         if settings.cloth_source == "CUSTOM":
             if settings.custom_armature is None:
-                _hint(box, "Choose your model's rig in Parts first.", "QUESTION", width=32)
+                _hint(box, "Choose your model's rig first.", "QUESTION")
             else:
                 box.label(
                     text=f"{settings.custom_armature.name}: {len(settings.custom_armature.data.bones)} bones",
@@ -661,6 +643,12 @@ class DMF_PT_cloth(Panel):
 
         if settings.hero_parts:
             ui_popit.micro(box, "Hero meshes", "MESH_DATA")
+            ui_popit.column_header(
+                box,
+                settings.hero_parts_name_width,
+                ("Part", "Type", "Verts"),
+                (0.25, 0.2),
+            )
             row = box.row(align=True)
             row.template_list(
                 "DMF_UL_hero_parts",
@@ -672,13 +660,9 @@ class DMF_PT_cloth(Panel):
                 rows=3,
             )
             row.label(text=f"{len(settings.hero_parts)}", icon="OBJECT_DATA")
+            ui_popit.name_width(box, settings, "hero_parts_name_width")
         else:
-            _hint(
-                box,
-                "Import the hero to bring in the hair, jacket and the rest beside the body.",
-                "QUESTION",
-                width=32,
-            )
+            _hint(box, "Import the hero to bring in hair, jacket and the rest.", "QUESTION")
 
         built_rows = [row for row in settings.cloth_chains if row.target_mesh is not None]
         if built_rows:
@@ -692,10 +676,16 @@ class DMF_PT_cloth(Panel):
                 pins = ", ".join(f"{row.pin_group} {row.pin_count}" for row in rows)
                 box.label(text=f"{rows[0].cloth_modifier} | {pins}", icon="GROUP_VERTEX")
         if settings.cloth_build_skipped:
-            _hint(box, settings.cloth_build_skipped, "ERROR", width=34)
+            _hint(box, settings.cloth_build_skipped, "ERROR")
 
         if settings.cloth_chains:
             ui_popit.micro(box, "Bone chains", "MOD_CLOTH")
+            ui_popit.column_header(
+                box,
+                settings.cloth_name_width,
+                ("Chain", "Type", "Bones"),
+                (0.25, 0.2),
+            )
             row = box.row(align=True)
             row.template_list(
                 "DMF_UL_cloth_chains",
@@ -706,6 +696,7 @@ class DMF_PT_cloth(Panel):
                 "cloth_index",
                 rows=4,
             )
+            ui_popit.name_width(box, settings, "cloth_name_width")
             index = max(0, min(settings.cloth_index, len(settings.cloth_chains) - 1))
             chain = settings.cloth_chains[index]
             box.label(
@@ -714,7 +705,7 @@ class DMF_PT_cloth(Panel):
                 icon="BONE_DATA",
             )
             if chain.bones:
-                _hint(box, chain.bones, "ARMATURE_DATA", width=34)
+                _hint(box, chain.bones, "ARMATURE_DATA")
             if chain.source == "CUSTOM":
                 edit = box.column(align=True)
                 edit.prop(chain, "source_mesh", text="Mesh")
@@ -732,21 +723,15 @@ class DMF_PT_cloth(Panel):
                     box.label(text=f"{chain.joined} bones joined to the hero", icon="CHECKMARK")
                 _hint(
                     box,
-                    "Join copies this chain into the hero armature at its viewport size. "
-                    "ModelDoc then replaces the Skeleton node from the exported rig; the "
-                    ".vnmskel stays out of the mod VPK.",
+                    "Join copies this chain into the hero armature; the vnmskel stays out of the pack.",
                     "INFO",
-                    width=34,
                 )
-            action = box.row(align=True)
+            actions = ["dmf.build_chain_cloth", "dmf.build_all_cloth"]
+            labels = {"dmf.build_chain_cloth": "Build cloth", "dmf.build_all_cloth": "Build all"}
             if chain.source == "CUSTOM":
-                action.operator("dmf.join_cloth_chain", text="Join to hero", icon="ARMATURE_DATA")
-            action.operator(
-                "dmf.build_chain_cloth",
-                text="Build cloth",
-                icon="MOD_CLOTH",
-            )
-            action.operator("dmf.build_all_cloth", text="", icon="MOD_PHYSICS")
+                actions.insert(0, "dmf.join_cloth_chain")
+                labels["dmf.join_cloth_chain"] = "Join to hero"
+            ui_popit.glyphs(box, actions, labels=labels)
             proxy = box.row(align=True)
             proxy.operator("dmf.mark_cloth_proxy", text="Mark Source 2 proxy", icon="MOD_PHYSICS")
             if chain.proxy:
@@ -759,28 +744,19 @@ class DMF_PT_cloth(Panel):
             else:
                 _hint(
                     box,
-                    "Build writes one vertex group per chain bone on the hero mesh skinned to "
-                    "this chain, a pin group from the chain root, the ordered bone chain, and a "
-                    "cloth modifier that keeps those vertices pinned.",
+                    "Build writes chain vertex groups, a root pin group, and a cloth modifier on the hero mesh.",
                     "INFO",
-                    width=34,
                 )
-        _hint(
-            box,
-            "Source 2 cloth chains are modeldoc ClothChain nodes. This page joins the chain and "
-            "writes the proxy's cloth maps; the ClothChain node is authored in ModelDoc.",
-            "INFO",
-            width=34,
-        )
 
 
 class DMF_PT_rules(Panel):
-    bl_label = "Mapping rules"
+    bl_label = "Rules"
     bl_idname = "DMF_PT_rules"
     bl_parent_id = "DMF_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -799,10 +775,10 @@ class DMF_PT_rules(Panel):
             box,
             ["dmf.add_rule", "dmf.rule_from_row", "dmf.apply_rules", "dmf.learn_rules"],
             labels={
-                "dmf.add_rule": "Add",
-                "dmf.rule_from_row": "From row",
-                "dmf.apply_rules": "Apply",
-                "dmf.learn_rules": "Learn",
+                "dmf.add_rule": "Add rule",
+                "dmf.rule_from_row": "From selection",
+                "dmf.apply_rules": "Apply rules",
+                "dmf.learn_rules": "Learn rules",
             },
         )
 
@@ -811,7 +787,6 @@ class DMF_PT_rules(Panel):
                 box,
                 "Add a rule by hand, or write one from the selected bone-map row.",
                 "QUESTION",
-                width=30,
             )
             return
 
@@ -834,9 +809,15 @@ class DMF_PT_rules(Panel):
         if caught:
             box.label(text=f"{len(caught)} unanswered rows match", icon="CHECKMARK")
         else:
-            _hint(box, "No unanswered row matches this pattern yet.", "INFO", width=30)
-        _hint(box, bonerules.describe(rules.rule_of(rule)), "INFO", width=32)
+            _hint(box, "No unanswered row matches this pattern yet.", "INFO")
+        _hint(box, bonerules.describe(rules.rule_of(rule)), "INFO")
 
+        ui_popit.column_header(
+            box,
+            settings.rules_name_width,
+            ("Rule", "State"),
+            (1.0,),
+        )
         row = box.row()
         row.template_list(
             "DMF_UL_bone_rules",
@@ -847,9 +828,13 @@ class DMF_PT_rules(Panel):
             "bone_rule_index",
             rows=3,
         )
-        side = row.column(align=True)
-        side.operator("dmf.remove_rule", text="", icon="REMOVE")
-        side.operator("dmf.clear_rules", text="", icon="TRASH")
+        buttons = box.row(align=True)
+        buttons.enabled = bool(settings.bone_rules)
+        remove = buttons.row(align=True)
+        remove.alert = True
+        remove.operator("dmf.remove_rule", text="Remove", icon="REMOVE")
+        buttons.operator("dmf.clear_rules", text="Clear rules", icon="TRASH")
+        ui_popit.name_width(box, settings, "rules_name_width")
 
 
 def _draw_ik(layout, settings) -> None:
@@ -874,11 +859,12 @@ def _draw_ik(layout, settings) -> None:
     if settings.ik_bones:
         index = max(0, min(settings.ik_index, len(settings.ik_bones) - 1))
         ui_popit.micro(box, "Targets")
-        head = box.split(factor=settings.list_name_width, align=True)
-        head.label(text="Target")
-        side = head.row(align=True)
-        side.alignment = "RIGHT"
-        side.label(text="Follows")
+        ui_popit.column_header(
+            box,
+            settings.ik_name_width,
+            ("Target", "Follows"),
+            (1.0,),
+        )
         box.template_list(
             "DMF_UL_ik",
             "",
@@ -888,16 +874,16 @@ def _draw_ik(layout, settings) -> None:
             "ik_index",
             rows=4,
         )
+        ui_popit.name_width(box, settings, "ik_name_width")
         box.prop(
             settings.ik_bones[index],
             "target",
             text="Follows",
         )
     message = settings.ik_note or (
-        "Copy Location + Copy Rotation follow the real limb; Bake writes visual keys "
-        "and removes only these constraints, so extra tail bones are baked too."
+        "Constrain follows the real limb; Bake writes visual keys and removes only these constraints."
     )
-    ui_popit.bubble(box, message, "INFO", width=34)
+    ui_popit.bubble(box, message, "INFO")
 
 
 def _draw_tail(layout, settings) -> None:
@@ -923,15 +909,15 @@ def _draw_tail(layout, settings) -> None:
         selected = options[index]
         chosen = box.box()
         chosen.alert = True
-        chosen.label(text=_short(selected.label, 34), icon="BONE_DATA")
+        chosen.label(text=selected.label, icon="BONE_DATA")
         chosen.label(
-            text=f"{selected.count} bones · {selected.source.lower()} · {_short(selected.chain, 24)}",
+            text=f"{selected.count} bones · {selected.source.lower()} · {selected.chain}",
             icon="BLANK1",
         )
         chosen.operator("dmf.load_tail_option", text="Use this tail rig", icon="ARMATURE_DATA")
 
         ui_popit.micro(box, f"Tail sources · {live} live" if live else "Tail sources")
-        grid = box.grid_flow(row_major=True, columns=3, even_columns=True, even_rows=True, align=True)
+        grid = box.grid_flow(row_major=True, columns=2, even_columns=True, even_rows=True, align=True)
         for tile_index, option in enumerate(options):
             tile = grid.box()
             tile.alert = tile_index == settings.tail_option_index
@@ -942,7 +928,7 @@ def _draw_tail(layout, settings) -> None:
                 tile.label(text="", icon="BONE_DATA")
             choice = tile.operator(
                 "dmf.load_tail_option",
-                text=_short(option.label, 19),
+                text=option.label,
                 icon="BONE_DATA",
             )
             choice.index = tile_index
@@ -970,18 +956,14 @@ def _draw_tail(layout, settings) -> None:
     )
     _hint(
         box,
-        "Adds the selected tail's bones, imports this hero's gameplay clips, copies the "
-        "matching source motion into every clip, writes each source DMX, and compiles the "
-        "paired vnmclips against the hero's original skeleton. The vnmskel is not shipped.",
+        "Adds the selected tail to imported clips, writes each DMX, and compiles against the hero skeleton. The vnmskel stays out of the pack.",
         "INFO",
-        width=34,
     )
     if not imported:
         _hint(
             box,
-            f"The clip importer will add {hero or 'this hero'}'s clips automatically when you press the action.",
+            f"The importer adds {hero or 'this hero'}'s clips when you press the action.",
             "QUESTION",
-            width=34,
         )
 
     box.prop(settings, "tail_manual", text="Manual channel map")
@@ -993,6 +975,12 @@ def _draw_tail(layout, settings) -> None:
         if settings.tail_bones:
             index = max(0, min(settings.tail_index, len(settings.tail_bones) - 1))
             row = settings.tail_bones[index]
+            ui_popit.column_header(
+                box,
+                settings.tail_name_width,
+                ("Hero bone", "Tail bone"),
+                (1.0,),
+            )
             box.template_list(
                 "DMF_UL_tail",
                 "",
@@ -1002,6 +990,7 @@ def _draw_tail(layout, settings) -> None:
                 "tail_index",
                 rows=4,
             )
+            ui_popit.name_width(box, settings, "tail_name_width")
             if settings.tail_armature is not None:
                 box.prop_search(
                     row,
@@ -1023,7 +1012,7 @@ def _draw_tail(layout, settings) -> None:
 
     message = settings.tail_note or settings.tail_option_note
     if message:
-        ui_popit.bubble(box, message, "INFO", width=34)
+        ui_popit.bubble(box, message, "INFO")
 
 
 class DMF_PT_animations(Panel):
@@ -1033,7 +1022,7 @@ class DMF_PT_animations(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
-    bl_options = {"DEFAULT_CLOSED"}
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -1042,10 +1031,7 @@ class DMF_PT_animations(Panel):
         layout.use_property_decorate = False
 
         ui_popit.job(layout, settings)
-        layout.label(
-            text="Animations and animation blending is still largely unfinished",
-            icon="INFO",
-        )
+        layout.label(text="Animation tools are incomplete.", icon="INFO")
         imported = sum(1 for row in settings.clips if row.state == "IMPORTED")
         box = ui_popit.page(
             layout,
@@ -1068,29 +1054,33 @@ class DMF_PT_animations(Panel):
         ui_popit.stat(
             box,
             "from",
-            _tail(settings.clip_auto_note or settings.clips_dir or settings.extraction_dir, 30)
+            settings.clip_auto_note or settings.clips_dir or settings.extraction_dir
             or "scan a hero",
             "FILE_FOLDER",
         )
-        ui_popit.stat(box, "write to", _tail(settings.clip_export_dir, 30) or "not set", "EXPORT")
+        ui_popit.stat(box, "write to", settings.clip_export_dir or "not set", "EXPORT")
         ui_popit.micro(box, "Graph", "FILTER")
         _chips(box, settings, "clip_ag_filter", (
             ("ALL", "All"), ("AG1", "AG1"), ("AG2", "AG2"), ("UNKNOWN", "Unknown"),
         ))
         if settings.clip_auto_note:
-            box.label(text=_short(settings.clip_auto_note, 46), icon="FILE_FOLDER")
+            box.label(text=settings.clip_auto_note, icon="FILE_FOLDER")
         if settings.clip_vnmskel:
-            box.label(text=_short(Path(settings.clip_vnmskel).name, 32), icon="ARMATURE_DATA")
+            box.label(text=Path(settings.clip_vnmskel).name, icon="ARMATURE_DATA")
         if not settings.clips:
             _hint(
                 box,
-                "Extract a hero and press Scan. The page finds the clips folders beside "
-                "the body and the .vnmskel on its own.",
+                "Extract a hero, then scan. Clip folders and the vnmskel are found automatically.",
                 "QUESTION",
-                width=30,
             )
             return
 
+        ui_popit.column_header(
+            box,
+            settings.clips_name_width,
+            ("Clip", "Graph", "File"),
+            (0.2, 0.28),
+        )
         row = box.row()
         row.template_list(
             "DMF_UL_clips",
@@ -1101,12 +1091,13 @@ class DMF_PT_animations(Panel):
             "clip_index",
             rows=6,
         )
+        ui_popit.name_width(box, settings, "clips_name_width")
         index = max(0, min(settings.clip_index, len(settings.clips) - 1))
         entry = settings.clips[index]
         detail = box.column(align=True)
-        detail.label(text=_short(entry.name, 32), icon="FILE")
+        detail.label(text=entry.name, icon="FILE")
         if entry.source_hero:
-            detail.label(text=f"from {_short(entry.source_hero, 30)}", icon="FILE_FOLDER")
+            detail.label(text=f"from {entry.source_hero}", icon="FILE_FOLDER")
         meta = detail.row(align=True)
         meta.label(text=f"{entry.kind}{'_c' if entry.compiled else ''}")
         meta.label(text=entry.ag)
@@ -1114,21 +1105,26 @@ class DMF_PT_animations(Panel):
         right.alignment = "RIGHT"
         right.label(text=f"{entry.size:,} bytes")
         if entry.action:
-            detail.label(text=f"action {_short(entry.action, 28)}", icon="ACTION")
+            detail.label(text=f"action {entry.action}", icon="ACTION")
         if entry.exported:
-            detail.label(text=_short(Path(entry.exported).name, 30), icon="EXPORT")
+            detail.label(text=Path(entry.exported).name, icon="EXPORT")
 
-        actions = box.row(align=True)
-        actions.operator("dmf.import_clip", text="Import", icon="IMPORT")
-        actions.operator("dmf.preview_clip", text="Preview", icon="PLAY")
-        actions.operator("dmf.export_clip", text="Write", icon="EXPORT")
-        actions.operator("dmf.bake_clip", text="Bake", icon="ACTION")
+        ui_popit.glyphs(
+            box,
+            ["dmf.import_clip", "dmf.preview_clip", "dmf.export_clip", "dmf.bake_clip"],
+            labels={
+                "dmf.import_clip": "Import",
+                "dmf.preview_clip": "Preview",
+                "dmf.export_clip": "Write",
+                "dmf.bake_clip": "Bake",
+            },
+        )
         prefix = box.row(align=True)
         prefix.prop(settings, "clip_prefix", text="Prefix")
-        prefix.operator("dmf.prefix_clips", text="", icon="SORTALPHA")
+        prefix.operator("dmf.prefix_clips", text="Apply", icon="SORTALPHA")
         box.operator("dmf.clear_clips", text="Clear imported actions", icon="TRASH")
         if settings.clip_note:
-            _hint(box, settings.clip_note, "LOCKED", width=30)
+            _hint(box, settings.clip_note, "LOCKED")
 
 
 
@@ -1140,6 +1136,7 @@ class DMF_PT_compare(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -1152,7 +1149,7 @@ class DMF_PT_compare(Panel):
             ["dmf.compare_split", "dmf.compare_clear"],
             labels={"dmf.compare_split": "Split", "dmf.compare_clear": "Clear"},
         )
-        box.prop(settings, "compare_action", text="Action")
+        box.prop_search(settings, "compare_action", bpy.data, "actions", text="Action")
         box.operator("dmf.apply_compare_action", text="Apply to both rigs", icon="ACTION")
 
 
@@ -1163,6 +1160,7 @@ class DMF_PT_skeleton(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -1179,45 +1177,41 @@ class DMF_PT_skeleton(Panel):
             f"{mapped}/{len(settings.bone_map)}" if settings.bone_map else "not scanned",
             "BONE_DATA",
         )
-        ui_popit.glyphs(top, ["dmf.scan_bones"], labels={"dmf.scan_bones": "Scan"})
+        ui_popit.glyphs(top, ["dmf.scan_bones"], labels={"dmf.scan_bones": "Scan bones"})
         ui_popit.micro(top, "Show", "FILTER")
         _chips(top, settings, "bone_filter", (
             ("ALL", "All"), ("UNMATCHED", "Unmatched"), ("MAPPED", "Mapped"),
             ("EXTRA", "Extra"), ("IGNORED", "Ignored"),
         ))
         if settings.bone_rules:
-            _hint(
-                layout,
-                "Scan matches names, then applies your rules; rows you set yourself stay as they are.",
-                "INFO",
-                width=34,
-            )
+            _hint(layout, "Scan applies your rules to unmatched names.", "INFO")
         if settings.rule_fill_running:
             filling = layout.row(align=True)
             filling.label(
                 text=f"Rules {settings.rule_fill_done}/{settings.rule_fill_total}",
                 icon="TIME",
             )
-            filling.operator("dmf.stop_rules", text="", icon="CANCEL")
+            filling.operator("dmf.stop_rules", text="Stop", icon="CANCEL")
 
-        pose = _section(layout, "Ref pose", "ARMATURE_DATA", settings.pose_stance or "not read")
-        controls = pose.row(align=True)
-        controls.prop(settings, "pose_preview", text="Show", toggle=True)
-        controls.operator("dmf.pose_preview", text="", icon="PLAY")
-        controls.operator("dmf.pose_clear", text="", icon="LOOP_BACK")
+        pose = _section(layout, "Ref pose", "ARMATURE_DATA", settings.pose_stance or "no stance")
+        ui_popit.glyphs(
+            pose,
+            ["dmf.pose_preview", "dmf.pose_clear"],
+            labels={"dmf.pose_preview": "Preview pose", "dmf.pose_clear": "Clear"},
+        )
         if settings.pose_preview_error:
-            _hint(pose, settings.pose_preview_error, "ERROR", alert=True, width=30)
+            _hint(pose, settings.pose_preview_error, "ERROR", alert=True)
         elif not settings.pose_preview:
-            _hint(pose, "Poses the custom rig in the hero's stance; the rest pose is not edited.", "INFO", width=30)
+            _hint(pose, "Previews the hero stance; the rest pose stays unchanged.", "INFO")
 
         if not settings.bone_map:
-            _hint(layout, "No rows yet. Scan the custom rig or add a row.", "QUESTION", width=30)
+            _hint(layout, "No rows yet. Scan the custom rig or add a row.", "QUESTION")
             return
         index = max(0, min(settings.bone_map_index, len(settings.bone_map) - 1))
         entry = settings.bone_map[index]
         edit = ui_popit.title(
             layout,
-            _short(entry.source, 22) or "row",
+            entry.source or "row",
             _STATE_LABELS.get(entry.state, entry.state),
             "BONE_DATA",
             alert=entry.state == "UNMATCHED",
@@ -1229,12 +1223,23 @@ class DMF_PT_skeleton(Panel):
             edit.prop(entry, "target", text="Target")
         edit.prop(entry, "state", text="State")
         if entry.note:
-            _hint(edit, entry.note, "INFO", width=30)
-        glyph = edit.row(align=True)
-        glyph.operator("dmf.rename_bones", text="", icon="SORTALPHA")
-        glyph.operator("dmf.mark_extra", text="", icon="BONE_DATA")
-        glyph.operator("dmf.ignore_entry", text="", icon="HIDE_ON")
-        glyph.operator("dmf.clear_target", text="", icon="X")
+            _hint(edit, entry.note, "INFO")
+        ui_popit.glyphs(
+            edit,
+            ["dmf.rename_bones", "dmf.mark_extra", "dmf.ignore_entry", "dmf.clear_target"],
+            labels={
+                "dmf.rename_bones": "Rename",
+                "dmf.mark_extra": "Mark extra",
+                "dmf.ignore_entry": "Ignore",
+                "dmf.clear_target": "Clear target",
+            },
+        )
+        ui_popit.column_header(
+            layout,
+            settings.bone_name_width,
+            ("Source", "Target", "State"),
+            (0.35, 0.25),
+        )
         row = layout.row()
         row.template_list(
             "DMF_UL_bone_map",
@@ -1245,9 +1250,12 @@ class DMF_PT_skeleton(Panel):
             "bone_map_index",
             rows=5,
         )
-        side = row.column(align=True)
-        side.operator("dmf.add_bone_entry", text="", icon="ADD")
-        side.operator("dmf.remove_bone_entry", text="", icon="REMOVE")
+        buttons = layout.row(align=True)
+        buttons.operator("dmf.add_bone_entry", text="Add row", icon="ADD")
+        remove = buttons.row(align=True)
+        remove.alert = True
+        remove.operator("dmf.remove_bone_entry", text="Remove row", icon="REMOVE")
+        ui_popit.name_width(layout, settings, "bone_name_width")
 
         mapped = bool(settings.show_bone_map and settings.target_armature is not None)
         visual = _section(
@@ -1258,25 +1266,25 @@ class DMF_PT_skeleton(Panel):
         )
         controls = visual.row(align=True)
         controls.prop(settings, "show_bone_map", text="Show", toggle=True)
-        controls.prop(settings, "bone_map_plane", text="")
-        controls.prop(settings, "bone_map_labels", text="", icon="FONT_DATA")
+        controls.prop(settings, "bone_map_plane", text="Plane")
+        controls.prop(settings, "bone_map_labels", text="Labels", icon="FONT_DATA")
         ui_popit.glyphs(
             visual,
             ["dmf.pick_bone_map", "dmf.refresh_hierarchy"],
             labels={"dmf.pick_bone_map": "Pick", "dmf.refresh_hierarchy": "Read"},
         )
         if settings.bone_map_error:
-            _hint(visual, f"Map draw failed: {settings.bone_map_error}", "ERROR", alert=True, width=30)
+            _hint(visual, f"Map draw failed: {settings.bone_map_error}", "ERROR", alert=True)
         elif settings.hierarchy:
             chosen = settings.hierarchy[max(0, min(settings.hierarchy_index, len(settings.hierarchy) - 1))]
             summary = visual.row(align=True)
-            summary.label(text=_short(chosen.name, 22), icon="BONE_DATA")
+            summary.label(text=chosen.name, icon="BONE_DATA")
             right = summary.row(align=True)
             right.alignment = "RIGHT"
             right.label(text=f"{chosen.children} children" if chosen.children else "leaf")
             chain = workbench.bone_chain(settings, chosen.name)
             if chain:
-                _hint(visual, " <- ".join(reversed(chain)), "FILE_PARENT", width=40)
+                _hint(visual, " <- ".join(reversed(chain)), "FILE_PARENT")
 
 
 
@@ -1296,6 +1304,12 @@ class DMF_PT_skeleton_bones(Panel):
         layout.use_property_decorate = False
         if settings.hierarchy:
             layout.operator("dmf.select_hierarchy_bone", text="Select bone", icon="RESTRICT_SELECT_OFF")
+            ui_popit.column_header(
+                layout,
+                settings.hierarchy_name_width,
+                ("Bone", "Parent", "Children"),
+                (0.3, 0.4),
+            )
             layout.template_list(
                 "DMF_UL_hierarchy",
                 "hierarchy",
@@ -1305,31 +1319,39 @@ class DMF_PT_skeleton_bones(Panel):
                 "hierarchy_index",
                 rows=6,
             )
+            ui_popit.name_width(layout, settings, "hierarchy_name_width")
         else:
             layout.operator("dmf.refresh_hierarchy", text="Read bone list", icon="FILE_REFRESH")
 
-        align = layout.row(align=True)
-        align.operator("dmf.align_bone", text="", icon="SNAP_ON")
-        align.operator("dmf.align_all_bones", text="", icon="ARROW_LEFTRIGHT")
-        align.operator("dmf.copy_pose", text="", icon="COPYDOWN")
-        nudge = layout.row(align=True)
-        nudge.prop(settings, "nudge_axis", text="")
-        nudge.prop(settings, "nudge_amount", text="")
+        ui_popit.glyphs(
+            layout,
+            ["dmf.align_bone", "dmf.align_all_bones", "dmf.copy_pose"],
+            labels={
+                "dmf.align_bone": "Align",
+                "dmf.align_all_bones": "Align all",
+                "dmf.copy_pose": "Copy pose",
+            },
+        )
+        nudge = layout.column(align=True)
+        nudge.prop(settings, "nudge_axis", text="Axis")
+        nudge.prop(settings, "nudge_amount", text="Amount")
         nudge.prop(settings, "nudge_rotate", text="Rotate")
-        minus = nudge.operator("dmf.nudge_bone", text="", icon="REMOVE")
+        step = layout.row(align=True)
+        minus = step.operator("dmf.nudge_bone", text="- Step", icon="REMOVE")
         minus.direction = -1
-        plus = nudge.operator("dmf.nudge_bone", text="", icon="ADD")
+        plus = step.operator("dmf.nudge_bone", text="+ Step", icon="ADD")
         plus.direction = 1
-        _hint(layout, "Rest alignment changes the bind pose; rebind if the mesh is already weighted.", "INFO", width=30)
+        _hint(layout, "Alignment changes the bind pose. Rebind weighted meshes.", "INFO")
 
 
 class DMF_PT_weights(Panel):
-    bl_label = "Weights & Proof"
+    bl_label = "Weights"
     bl_idname = "DMF_PT_weights"
     bl_parent_id = "DMF_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -1353,10 +1375,16 @@ class DMF_PT_weights(Panel):
             enabled=not settings.job_running and settings.custom_mesh is not None and settings.target_armature is not None,
         )
         if settings.unmatched:
-            _hint(layout, "Unmapped: " + _short(settings.unmatched, 44), "STATUS_WARNING", alert=True, width=30)
+            _hint(layout, "Unmapped: " + settings.unmatched, "STATUS_WARNING", alert=True)
 
         gate = _proof_gate(settings)
-        proof = ui_popit.title(layout, "Axis proof", gate, _CHECK_ICONS.get(gate, "QUESTION"), alert=gate == "fail")
+        proof = ui_popit.section(
+            layout,
+            "Axis proof",
+            _CHECK_ICONS.get(gate, "QUESTION"),
+            gate,
+            alert=gate == "fail",
+        )
         if settings.proof_checks:
             for check in settings.proof_checks:
                 row = proof.row(align=True)
@@ -1366,9 +1394,9 @@ class DMF_PT_weights(Panel):
                 right.alignment = "RIGHT"
                 right.label(text=check.token)
         else:
-            _hint(proof, "No proof minted yet.", "QUESTION", width=28)
+            _hint(proof, "No proof minted yet.", "QUESTION")
         if settings.proof_digest:
-            proof.label(text="BLAKE3 " + _short(settings.proof_digest, 20), icon="LOCKED")
+            ui_popit.stat(proof, "BLAKE3", settings.proof_digest, "LOCKED")
         ui_popit.glyphs(
             proof,
             ["dmf.mint_proof", "dmf.verify_proof"],
@@ -1405,33 +1433,45 @@ class DMF_PT_weights_manual(Panel):
         ui_popit.micro(layout, "Weight tools", "BRUSH_DATA")
         manual = layout.column(align=True)
         manual.prop(settings, "manual_weight", text="Assign weight")
-        row = manual.row(align=True)
-        row.operator("dmf.select_unweighted", text="", icon="RESTRICT_SELECT_OFF")
-        row.operator("dmf.assign_active_bone", text="", icon="BRUSH_DATA")
-        row.operator("dmf.smooth_active_group", text="", icon="MOD_SMOOTH")
-        row.operator("dmf.mirror_weights", text="", icon="ARROW_LEFTRIGHT")
-        row = manual.row(align=True)
-        row.operator("dmf.normalize_weights", text="", icon="NORMALIZE_FCURVES")
-        row.operator("dmf.limit_influences", text="", icon="FULLSCREEN_ENTER")
-        row.operator("dmf.remove_zero_weights", text="", icon="TRASH")
+        ui_popit.glyphs(
+            manual,
+            [
+                "dmf.select_unweighted",
+                "dmf.assign_active_bone",
+                "dmf.smooth_active_group",
+                "dmf.mirror_weights",
+                "dmf.normalize_weights",
+                "dmf.limit_influences",
+                "dmf.remove_zero_weights",
+            ],
+            labels={
+                "dmf.select_unweighted": "Unweighted",
+                "dmf.assign_active_bone": "Assign",
+                "dmf.smooth_active_group": "Smooth",
+                "dmf.mirror_weights": "Mirror",
+                "dmf.normalize_weights": "Normalize",
+                "dmf.limit_influences": "Limit",
+                "dmf.remove_zero_weights": "Clear zero",
+            },
+        )
 
         layout.separator()
         layout.prop(settings, "proof_presenter", text="Presenter")
         layout.prop(settings, "proof_ticket", text="Ticket")
         if settings.proof_claim:
-            _hint(layout, settings.proof_claim, "FILE", width=30)
+            _hint(layout, settings.proof_claim, "FILE")
         if settings.proof_tick:
             layout.label(text=f"Tick {settings.proof_tick}", icon="TIME")
 
 
 class DMF_PT_handoff(Panel):
-    bl_label = "Stage & compile"
+    bl_label = "Release"
     bl_idname = "DMF_PT_handoff"
     bl_parent_id = "DMF_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
-    bl_options = {"DEFAULT_CLOSED"}
+    bl_options = set()
 
     def draw(self, context):
         settings = context.scene.dmf
@@ -1457,11 +1497,11 @@ class DMF_PT_handoff(Panel):
         addon = ui_popit.page(layout, settings, "Release", state, icon)
         addon.prop(settings, "addon_name", text="Name")
         if folder is not None:
-            addon.label(text=_tail(str(folder), 44), icon="FILE_FOLDER")
+            addon.label(text=str(folder), icon="FILE_FOLDER")
         else:
-            _hint(addon, "No addon folder: set CSDK13 in Setup and a name.", "QUESTION", width=30)
+            _hint(addon, "No addon folder: set CSDK13 in Setup and a name.", "QUESTION")
         if settings.body_dmx and not settings.vmdl:
-            _hint(addon, "No S2V vmdl set; choose it under Files.", "STATUS_WARNING", alert=True, width=30)
+            _hint(addon, "No S2V vmdl set; choose it under Files.", "STATUS_WARNING", alert=True)
 
         built = [row for row in settings.lod_levels if row.object is not None]
         if built:
@@ -1472,16 +1512,15 @@ class DMF_PT_handoff(Panel):
             right.alignment = "RIGHT"
             right.label(text="rebuild" if stale else "current")
 
-        glyph = addon.row(align=True)
-        glyph.operator("dmf.build_lods", text="", icon="MOD_DECIM")
-        glyph.operator("dmf.export_stage", text="Export & stage", icon="EXPORT")
-        glyph.operator("dmf.compile", text="Compile", icon="PLAY")
         addon.enabled = not settings.job_running
+        actions = addon.row(align=True)
+        actions.operator("dmf.build_lods", text="Build LODs", icon="MOD_DECIM")
+        actions.operator("dmf.export_stage", text="Export & stage", icon="EXPORT")
+        _primary(addon, "dmf.compile", "Compile", "PLAY", enabled=not settings.job_running)
         _hint(
             addon,
             "This is the only compile button. Release packs what it produces.",
             "INFO",
-            width=30,
         )
 
 
@@ -1522,42 +1561,38 @@ class DMF_PT_handoff_paths(Panel):
             right.alignment = "RIGHT"
             right.label(text=f"{row.vertices:,}v")
         if settings.lod_levels and settings.lod_tick != settings.axis_tick:
-            _hint(lod, "Weights or fit changed; rebuild so the LODs match.", "STATUS_WARNING", alert=True, width=30)
+            _hint(lod, "Weights or fit changed; rebuild so the LODs match.", "STATUS_WARNING", alert=True)
 
 
 class DMF_PT_release(Panel):
-    bl_label = "Release"
+    bl_label = "Pack & install"
     bl_idname = "DMF_PT_release"
-    bl_parent_id = "DMF_PT_main"
+    bl_parent_id = "DMF_PT_handoff"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Deadlock"
-    bl_options = {"DEFAULT_CLOSED"}
 
     def draw(self, context):
         settings = context.scene.dmf
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
-        ui_popit.job(layout, settings)
         pak = Path(bpy.path.abspath(settings.release_pak)) if settings.release_pak else None
         packed = pak is not None and pak.is_file()
-        ui_popit.section(
+        chain = _section(
             layout,
-            "Pack & install",
-            "CHECKMARK" if packed else "PACKAGE",
+            "Build chain",
+            "PLAY",
             "pak ready" if packed else "no pak",
         )
-        chain = _section(layout, "Build chain", "PLAY", "one owner")
         buttons = chain.column(align=True)
         buttons.operator("dmf.write_model", icon="ARMATURE_DATA", text="Write model from armature")
         buttons.operator("dmf.pack_vpk", icon="PACKAGE", text="Pack VPK")
         buttons.operator("dmf.install_pak", icon="IMPORT", text="Install into addon slot")
         buttons.operator("dmf.launch_game", icon="PLAY", text="Launch game")
-        ui_popit.stat(chain, "compiled", "Stage & compile above", "CHECKMARK")
 
         if settings.release_note:
-            ui_popit.bubble(layout, settings.release_note, "CHECKMARK", width=34)
+            ui_popit.bubble(layout, settings.release_note, "CHECKMARK")
 
 
 def _draw_write(layout, settings) -> None:
@@ -1572,11 +1607,8 @@ def _draw_write(layout, settings) -> None:
         layout.label(text=f"{written} clips written", icon="CHECKMARK")
     _hint(
         layout,
-        "Bake + write makes Model 22 DMX clips: visual keying, original frame range, "
-        "constraints cleared. AG2 writes <folder>/clips/<clip>.dmx. ModelDoc's "
-        "Make Default Animgraph2 converts those into vnmclip_c; pack the clip, not the .vnmskel.",
+        "Writes Model 22 DMX clips with visual keys and the original frame range. Pack the clip, not the vnmskel.",
         "INFO",
-        width=34,
     )
 
 
@@ -1645,7 +1677,7 @@ class DMF_PT_release_slot(Panel):
 
             env = core.env(settings)
             if env.game_dir is not None:
-                ui_popit.stat(slot_box, "game", _tail(str(env.game_dir), 30), "DISK_DRIVE")
+                ui_popit.stat(slot_box, "game", str(env.game_dir), "DISK_DRIVE")
             slot = release.slot(settings)
             ceiling, mounted = release.slot_ceiling(settings, slot.parent)
             ui_popit.stat(slot_box, "writes", slot.name, "FILEBROWSER")
@@ -1674,7 +1706,6 @@ CLASSES = (
     DMF_PT_weights_manual,
     DMF_PT_handoff,
     DMF_PT_handoff_paths,
-    DMF_PT_update,
     DMF_PT_release,
     DMF_PT_release_slot,
 )

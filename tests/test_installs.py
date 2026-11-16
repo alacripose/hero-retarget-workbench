@@ -116,6 +116,22 @@ class InstallDiscoveryTests(unittest.TestCase):
         self.assertEqual(rows[0].kind, "tools")
         self.assertTrue(rows[0].can_compile)
 
+    def test_a_full_game_with_copied_compiler_files_is_not_a_toolchain(self) -> None:
+        make_tree(
+            self.library / "steamapps" / "common" / "Deadlock",
+            "citadel",
+            deadlock_exe=True,
+            compiler=True,
+            vpk=True,
+            build="ClientVersion=6861\nVersionDate=Nov 09 2026\n",
+        )
+
+        rows = installs.discover(libraries=[self.library], drives=[])
+
+        self.assertEqual(len(rows), 1)
+        self.assertTrue(rows[0].can_backport)
+        self.assertFalse(rows[0].can_compile)
+
     def test_a_client_folder_is_searched_to_a_bounded_depth(self) -> None:
         nested = self.root / "clients" / "old" / "Reduced_CSDK_10"
         make_tree(nested, "citadel", compiler=True)
