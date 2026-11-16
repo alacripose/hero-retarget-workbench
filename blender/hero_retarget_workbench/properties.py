@@ -791,6 +791,14 @@ class DMF_Settings(PropertyGroup):
     tail_note: StringProperty(name="Tail note", default="")
     tail_options: CollectionProperty(type=DMF_TailOption, description="Tail skeletons found in the hero, custom rig, extractions and clips")
     tail_option_index: IntProperty(name="Tail option", default=0)
+    tail_bare_only: BoolProperty(
+        name="Tail only (no clips, no skeleton doc)",
+        description=(
+            "Ship literally the tail: its bones attached to the hero and the tail mesh, with no "
+            "clips, no .vnmskel and no animation blending -- the haze_noskel shape without clips"
+        ),
+        default=False,
+    )
     tail_scan_dir: StringProperty(
         name="Extra tail folder",
         description="Optional folder of older hero models or clips to scan for tails",
