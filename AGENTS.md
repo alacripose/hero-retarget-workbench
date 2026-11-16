@@ -94,6 +94,12 @@ ability to detect other installs"*.
   previous" then restored the broken build. `install` now names its backup after the sha256 prefix of
   the bytes it holds (`pak97_dir.<hash>.vpk`) and never overwrites it. `addons/pak97_dir.vpk` was
   restored from `artifacts/haze-tail/haze_noskel.vpk` and verified `b849c6bfdeff91eb`.
+- **Tail-only is a mode, and it is exactly the no-clip shape.** `settings.tail_bare_only` (Tail page,
+  "Tail only (no clips, no skeleton doc)") makes `publish_tail_anims` export the hero armature with
+  the tail bones attached plus the tail mesh into `<addon>/<hero>/dmx/mesh/<hero>_tailbones.dmx` and
+  stop there: no clips are authored, no `.vnmskel` is written or compiled, and nothing is blended.
+  The owner's correction is the spec: *"it has to literally just be the tail it's bones attached to
+  the hero"*, and haze_noskel-without-clips is the shape -- not a partial animation build.
 - **The release page is generic, and the pak number is not written into the code.** `DMF_PT_release`
   packs any staged CSDK addon: write model, compile, pack (`--vpk_create`), install, launch.
   `release.slot` reads `release_slot_number` (0 = replace the newest `pakNN_dir.vpk` already in

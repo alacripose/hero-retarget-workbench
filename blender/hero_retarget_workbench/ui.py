@@ -881,7 +881,12 @@ def _draw_tail(layout, settings) -> None:
         text=f"Add tail and compile {len(imported)} clips" if imported else "Add tail and compile all clips",
         icon="ACTION",
     )
-    box.operator("dmf.publish_tail_anims", text="Compile already-tailed clips", icon="FILE_REFRESH")
+    box.prop(settings, "tail_bare_only")
+    box.operator(
+        "dmf.publish_tail_anims",
+        text="Export tail only" if settings.tail_bare_only else "Compile already-tailed clips",
+        icon="FILE_REFRESH",
+    )
     _hint(
         box,
         "Adds the selected tail's bones, imports this hero's gameplay clips, copies the "

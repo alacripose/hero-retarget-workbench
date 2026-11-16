@@ -1052,6 +1052,39 @@ def publish_tail_anims(settings) -> dict:
     model's own skeleton already has the appended tail bones.
     """
     extraction, hero = _hero_roots(settings)
+    if getattr(settings, "tail_bare_only", False):
+        # The haze_noskel shape: the tail's bones attached to the hero and its mesh, nothing else.
+        # No clips are authored, no .vnmskel is written or compiled, and nothing is blended -- the
+        # owner's sentence is "it has to literally just be the tail it's bones attached to the hero".
+        body = settings.target_armature
+        if body is None or body.type != "ARMATURE":
+            raise RuntimeError("tail-bare-needs-hero: import the hero first")
+        body_mesh = max(
+            (obj for obj in bpy.context.scene.objects if obj.type == "MESH"),
+            key=lambda obj: len(obj.data.vertices),
+            default=None,
+        )
+        root = _tail_artifact_root(settings, hero)
+        hero_relative = hero.relative_to(extraction)
+        skeleton = root / hero_relative / "dmx" / "mesh" / f"{hero.name}_tailbones.dmx"
+        export_tail_skeleton(settings, skeleton, mesh=body_mesh)
+        content_addon = core.csdk_addon_folder(settings)
+        if content_addon is None:
+            raise RuntimeError("tail-bare-needs-stage: stage the addon in Setup before exporting")
+        target = content_addon / skeleton.relative_to(root)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(skeleton, target)
+        return {
+            "mode": "tail-only",
+            "bundle": str(root),
+            "written": 0,
+            "compiled": 0,
+            "failed": 0,
+            "game_addon": str(content_addon),
+            "skeleton": str(target),
+            "outcomes": [],
+            "gate": {"gate": "SKIPPED tail-only: no clips and no .vnmskel to gate"},
+        }
     docs = animgraph.documents(hero, extraction)
     body = settings.target_armature
     body_mesh = max(
@@ -1936,6 +1969,14 @@ class DMF_OT_publish_tail_anims(Operator):
             core.set_status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
+        if result.get("mode") == "tail-only":
+            core.set_status(
+                settings,
+                f"Tail only: wrote the tail mesh and its bones to {result['skeleton']}; "
+                "no clips and no .vnmskel",
+                "OK",
+            )
+            return {"FINISHED"}
         core.set_status(
             settings,
             f"Wrote {result['written']} source DMXs; compiled {result['compiled']} vnmclips "
