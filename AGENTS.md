@@ -3559,3 +3559,23 @@ dropdown also needs to be modernized ... the default page needs to be the setup 
   Blender window with splash disabled through a temporary user config, screenshots all 12 pages to
   `artifacts/visual/ui-pass/`, and the pass found and fixed the broken chip grid, the missing
   Release page header and the native cloth-source toggle. The 0.15.0 zip is built from this tree.
+
+
+## 2026-11-16 — the markers follow the selected clients, not the detected install
+
+**Owner instruction, verbatim:** *"Make the version markers follow the selected clients, not just the
+detected install: show the active extraction client, compile toolchain and backport target where they
+differ"*.
+
+- `core.marker_rows` builds the rows from `deadlock_root`, `csdk_root` and `mod_target_client`,
+  resolves each selected path to its detected client label and build, and falls back to the install's
+  own `steam.inf` and folder name. Every page card prints `Extract` and `Compile`, plus `Backport`
+  only when it targets another install.
+- `dmf.use_client` now selects the extraction client and records its build. A backport target that
+  was the extraction client follows the new selection; one chosen deliberately stays put.
+- `dmf.use_backport_client` selects a separate game client for backporting. Tools & clients draws
+  both actions beside the selected install and states its build, path and whether it can provide
+  game files, compile, or both.
+- Verified in the headless probe (`Extract Deadlock · 6861…`, `Compile CSDK13 · 13.0…`, `Backport
+  Reduced_CSDK_10 · 4192…`, and no backport row when paths match) and in the GUI capture
+  `artifacts/visual/ui-pass/setup.png`.

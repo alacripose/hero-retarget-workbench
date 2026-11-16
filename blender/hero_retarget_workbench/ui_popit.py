@@ -35,18 +35,14 @@ def page(layout, settings, name: str, detail: str = "", icon: str = "NONE", aler
     says which build its inputs come from and which build its output targets.
     """
     box = title(layout, name, detail, icon, alert)
-    source = tools = ""
+    rows = []
     try:
         from . import core
 
-        source = core.source_build(settings)
-        tools = core.tools_build(settings)
+        rows = core.marker_rows(settings)
     except Exception:
         pass
-    for label, value, marker in (
-        ("Game", source or "no build", "WORLD"),
-        ("Compile", tools or "no build", "TOOL_SETTINGS"),
-    ):
+    for label, value, marker in rows:
         row = box.row(align=True)
         row.scale_y = 0.7
         row.label(text=label, icon=marker)
