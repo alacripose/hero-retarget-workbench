@@ -109,6 +109,8 @@ def main() -> int:
             element = next(element[key] for key in element.keys() if hasattr(element[key], "keys"))
         joint = element["jointList"][0]
         print(f"JOINT-KEYS {joint.name}: {sorted(joint.keys())}", flush=True)
+        transform = joint["transform"]
+        print(f"TRANSFORM type={type(transform).__name__} repr={repr(transform)[:300]}", flush=True)
         return 0
     reference = _joint_list(module.load(args.reference).root)
     if args.candidate_vmdl:

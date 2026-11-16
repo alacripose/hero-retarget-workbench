@@ -56,12 +56,16 @@ def test_packer_cannot_pack_without_the_game_skeleton() -> None:
     assert '["--game-skeleton", args.game_skeleton]' in packer
 
 
-def test_gate_refuses_a_pelvis_under_a_rotated_root() -> None:
-    """The v8 build collapsed in on itself because pelvis inherited root_motion's 90 deg twice."""
+def test_gate_refuses_a_pelvis_that_lands_off_the_game_pose() -> None:
+    """The v8 build collapsed in on itself because pelvis inherited root_motion's 90 deg twice.
+
+    A parent and a rest are one fact: our compensated rest at a root and the game's rest under
+    the game's parent describe the same pose, but mixing them doubles the offset.  So the check
+    is on the world transform, not on which parent is used.
+    """
     gate = read("tools/tail_release_gate.py")
-    assert "pelvis-parented-under-rotated-root" in gate
-    writers = read("tools/model_skeleton_write.py") + read("tools/skeleton_game_prefix.py")
-    assert writers.count('parents["pelvis"] = None') == 2, "both skeleton writers must keep pelvis at the root"
+    assert "pelvis-world-differs-from-game" in gate
+    assert "_joint_world(" in gate
 
 
 def test_reorder_tool_refuses_instead_of_guessing() -> None:
