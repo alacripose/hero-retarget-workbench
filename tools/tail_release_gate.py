@@ -520,6 +520,35 @@ def run(root: Path, clips: str = "", bodies: str = "", game_skeleton: str = "", 
     model_game = [name for name in model_joints if not object_like(name)]
     skeleton_game = [name for name in skeleton_joints if not object_like(name)]
     shared = [name for name in model_game if name in set(skeleton_game)]
+
+    # 3b. The vmdl's own `Skeleton` section must declare every joint the shipped skeleton
+    #     carries, in the same slot order.  This is the check that was missing on 2026-11-15:
+    #     the pack compared the render mesh DMX (131 joints) against the skeleton and admitted,
+    #     while the model the client actually loaded declared 120 bones with no tail at all, so
+    #     70 of 120 shared joints sat at a different slot and the arms, head and tail rotated.
+    #     The mesh DMX and the vmdl are not the same document and one does not vouch for the other.
+    from skeleton_model_order_probe import model_bone_tree  # noqa: WPS433
+
+    declared, _declared_parents = model_bone_tree(Path(report["model"]))
+    declared_set = set(declared)
+    absent = [name for name in skeleton_game if name not in declared_set]
+    if absent:
+        raise Refused(
+            "model-vmdl-missing-skeleton-joint",
+            f"{Path(report['model']).name} declares {len(declared)} bones and the shipped skeleton "
+            f"carries {len(skeleton_game)}; {len(absent)} skeleton joints are absent from the model "
+            f"({absent[:6]}). The client cannot bind a bone the model does not declare.",
+        )
+    declared_shared = [name for name in declared if name in set(skeleton_game)]
+    if _subsequence(declared_shared, skeleton_game):
+        first = _subsequence(declared_shared, skeleton_game)[0]
+        raise Refused(
+            "model-vmdl-order-diverges",
+            f"{Path(report['model']).name} declares its bones in a different slot order than the "
+            f"shipped skeleton; first divergence at {first!r}. Binds are by slot, so this rotates "
+            "every joint downstream of the first difference.",
+        )
+
     out_of_order = _subsequence(shared, skeleton_game)
     if out_of_order:
         raise Refused(
