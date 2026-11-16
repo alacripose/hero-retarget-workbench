@@ -134,15 +134,21 @@ def main() -> int:
     # as well re-parented `pelvis` under `root_motion`, whose rest carries the authored 90 deg,
     # so the body applied it twice and collapsed in on itself (2026-11-16, the v8 build).  Order
     # and hierarchy are separate facts and only the order indexes a mask.
+    # The game's parents are adopted, because the client numbers bones by walking the tree: in
+    # v9 our own parents put `weaponHand_L` at 21 where the game walks it at 6 and the head, arms
+    # and tail rotated again.  The one parent that is NOT copied is `pelvis`: the model's
+    # `root_motion` carries the authored 90 deg, so a pelvis under it applies that rotation twice
+    # and the body collapses in on itself (v8).  Those two failures are why order and hierarchy
+    # are both taken from the game except for that single edge.
     parents = {}
     for name in order:
-        parents[name] = our_parents.get(name) if name in our_parents else game_parents.get(name)
-    # `pelvis` stays a root: the model's `root_motion` carries the authored 90 deg, and a pelvis
-    # under it applies that rotation twice (body collapses in on itself, 2026-11-15 and
-    # 2026-11-16).  The game's own skeleton nests it differently; that is the one parent we do
-    # not copy, and the gate now refuses the alternative by name.
-    if "pelvis" in parents:
-        parents["pelvis"] = None
+        parents[name] = game_parents.get(name) if name in game_parents else our_parents.get(name)
+    # Now that the game's own rests are copied, the game's parent is correct for pelvis as well:
+    # the compensation that made it a root is gone with the old rest, so copying the pair keeps
+    # the same world pose the game ships.  (Forcing a root here was the v9 mistake, solved the
+    # wrong way; the pair, not the parent alone, is what holds the pose.)
+    if "pelvis" in parents and game_parents.get("pelvis"):
+        parents["pelvis"] = game_parents.get("pelvis")
     for name in order:
         parent = parents.get(name)
         if parent and parent not in by_name:
@@ -156,6 +162,24 @@ def main() -> int:
             children[parent].append(name)
         else:
             roots.append(name)
+
+    # Shared joints take the game's own rest.  The pair (parent, rest) is one fact: our pelvis
+    # sat at the root with a rest 54.4 units and 60 deg away from the game's, which is the same
+    # pose only while that rest compensates the parent.  Adopting the game's parents without its
+    # rests composes the two compensations and the body collapses; adopting both makes the
+    # shipped skeleton the game's skeleton plus appended tail joints, which is what the clips
+    # and the mesh bind were authored against.
+    game_joints_by_name = {joint.name: joint for joint in _joints(game_model)}
+    rest_copied = 0
+    for name in game_names:
+        source = game_joints_by_name.get(name)
+        target = by_name.get(name)
+        if source is None or target is None:
+            continue
+        # A joint's rest is one `transform` matrix, not separate position/orientation fields.
+        if "transform" in source.keys() and "transform" in target.keys():
+            target["transform"] = source["transform"]
+            rest_copied += 1
 
     element_type = type(_joints(our_model)[0])
     for name in order:
@@ -182,6 +206,7 @@ def main() -> int:
         "bytes": out.stat().st_size,
         "game_joints": len(game_names),
         "appended": extras,
+        "rest_fields_copied": rest_copied,
         "joints": len(written),
         "prefix_kept": written[: len(game_names)] == game_names,
     }

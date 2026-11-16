@@ -92,6 +92,7 @@ def main() -> int:
         action="store_true",
         help="also compare each shared joint's rest head/orientation and parent between the two",
     )
+    parser.add_argument("--keys", action="store_true", help="print a joint element's field names and exit")
     parser.add_argument("--report", default="")
     parser.add_argument(
         "--candidate-vmdl",
@@ -101,6 +102,14 @@ def main() -> int:
     args = parser.parse_args(argv)
 
     module = datamodel()
+    if args.keys:
+        root = module.load(args.reference).root
+        element = root["model"] if "model" in root.keys() else root
+        while "jointList" not in element.keys():
+            element = next(element[key] for key in element.keys() if hasattr(element[key], "keys"))
+        joint = element["jointList"][0]
+        print(f"JOINT-KEYS {joint.name}: {sorted(joint.keys())}", flush=True)
+        return 0
     reference = _joint_list(module.load(args.reference).root)
     if args.candidate_vmdl:
         from skeleton_model_order_probe import model_bone_tree  # noqa: WPS433

@@ -83,25 +83,67 @@ def main() -> int:
     from math import degrees  # noqa: WPS433
 
     extra: dict[str, list[str]] = {}
-    missing = [name for name in order if name not in present]
-    if missing:
-        try:
-            from mathutils import Quaternion  # noqa: WPS433
-        except Exception as error:  # noqa: BLE001
-            raise SystemExit(f"model-skeleton-write-needs-mathutils: {error}") from error
-        for name in missing:
-            row = table.get(name)
-            if not row:
-                raise SystemExit(f"model-skeleton-write-no-rest: {name}")
-            head = list(row["head"])
-            orientation = list(row["orientation"])
-            quaternion = Quaternion((orientation[3], orientation[0], orientation[1], orientation[2]))
-            angles = [degrees(value) for value in quaternion.to_euler("XYZ")]
-            extra[name] = [
-                "origin = [ " + ", ".join(f"{value:.6f}" for value in head) + " ]",
-                "angles = [ " + ", ".join(f"{value:.6f}" for value in angles) + " ]",
-                "do_not_discard = true",
-            ]
+    try:
+        from mathutils import Quaternion  # noqa: WPS433
+    except Exception as error:  # noqa: BLE001
+        raise SystemExit(f"model-skeleton-write-needs-mathutils: {error}") from error
+    def document_angles(name: str):
+        if name not in present:
+            return None
+        line = next((row for row in present[name] if row.startswith("angles =")), None)
+        if line is None:
+            return None
+        return [float(value) for value in line.split("[")[1].split("]")[0].split(",")]
+
+    # The convention is discovered, not assumed, and it is refused when nothing fits.  The
+    # document writes Z-up Euler degrees and the skeleton carries a quaternion whose component
+    # order is not documented; assuming either wrote every rest 30 deg out and would collapse
+    # the body.  One bone the document already declares picks the pair that matches.
+    sample = next(
+        (name for name in ("clavicle_L", "pelvis", "root_motion", "spine_0") if document_angles(name)),
+        None,
+    )
+    if sample is None:
+        raise SystemExit("model-skeleton-euler-mismatch: no declared bone to check the convention against")
+    numbers = document_angles(sample)
+    row = table[sample]
+    orientation = list(row["orientation"])
+    candidates = []
+    for label, components in (
+        ("xyzw", (orientation[3], orientation[0], orientation[1], orientation[2])),
+        ("wxyz", (orientation[0], orientation[1], orientation[2], orientation[3])),
+    ):
+        quaternion = Quaternion(components)
+        for order in ("XYZ", "XZY", "YXZ", "YZX", "ZXY", "ZYX"):
+            angles = [degrees(value) for value in quaternion.to_euler(order)]
+            error = max(abs(a - b) for a, b in zip(numbers, angles))
+            candidates.append((error, label, order))
+    error, label, order = min(candidates)
+    if error > 2.0:
+        raise SystemExit(
+            "model-skeleton-euler-mismatch: "
+            f"{sample} is {numbers} in the document; the closest rotation reading is "
+            f"{label}/{order} at {error:.3f} deg. Refusing instead of rewriting every rest"
+        )
+    print(f"MODEL-SKELETON-WRITE convention={label}/{order} ({error:.3f} deg on {sample})", flush=True)
+
+    for name in order:
+        row = table.get(name)
+        if not row:
+            raise SystemExit(f"model-skeleton-write-no-rest: {name}")
+        head = list(row["head"])
+        orientation = list(row["orientation"])
+        components = (
+            (orientation[3], orientation[0], orientation[1], orientation[2])
+            if label == "xyzw"
+            else (orientation[0], orientation[1], orientation[2], orientation[3])
+        )
+        angles = [degrees(value) for value in Quaternion(components).to_euler(order)]
+        extra[name] = [
+            "origin = [ " + ", ".join(f"{value:.6f}" for value in head) + " ]",
+            "angles = [ " + ", ".join(f"{value:.6f}" for value in angles) + " ]",
+            "do_not_discard = true",
+        ]
 
     # `pelvis` is written as a root even when the document nests it elsewhere.  The model's
     # `root_motion` carries the authored 90 deg (orientation [0.5, 0.5, 0.5, 0.5]); a pelvis
