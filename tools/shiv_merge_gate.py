@@ -178,6 +178,18 @@ def main() -> int:
     def check(name: str, passed: bool, detail: str = "") -> None:
         checks.append({"name": name, "pass": bool(passed), "detail": detail})
 
+    # The pinned reference is checked first, because it is the one input that exists on every
+    # machine and it is the build the owner named as the thing to strive for.  When the
+    # historical baselines below are absent the gate used to `return 2` before ever reaching
+    # the installed check, so a slot holding some other pak was never reported.
+    installed_sha = sha256(INSTALLED_PAK) if INSTALLED_PAK.is_file() else None
+    if not args.skip_installed:
+        check(
+            f"{INSTALLED_PAK.name} is the pinned Shiv build (01efc18e)",
+            installed_sha == APPEND_VPK_SHA,
+            (installed_sha or "missing")[:16],
+        )
+
     inputs = (
         ("accepted pak97 v1", ACCEPTED_PAK),
         ("accepted item_run_center DMX", ACCEPTED_DMX),
@@ -188,8 +200,17 @@ def main() -> int:
     )
     for label, path in inputs:
         check(label, path.is_file(), str(path))
-    if not all(item["pass"] for item in checks):
-        report = {"summary": "shiv merge gate input missing", "checks": checks}
+    baselines = [label for label, path in inputs if not path.is_file()]
+    if baselines:
+        # Four anonymous FAIL rows read as "the build is wrong".  The truth is that this
+        # gate's evidence was deleted by the recorded disk cleanup, so the build cannot be
+        # audited at all; that is a named refusal about the evidence, not about the pak.
+        report = {
+            "summary": "shiv merge gate baseline missing",
+            "refused": "shiv-gate-baseline-missing",
+            "missing": baselines,
+            "checks": checks,
+        }
         Path(args.report).parent.mkdir(parents=True, exist_ok=True)
         Path(args.report).write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         print(json.dumps(report, indent=2))
@@ -281,16 +302,15 @@ def main() -> int:
         # The owner directed the installed slot back to the 06:47 base
         # (artifacts/shiv-168-full-baked3.vpk) while the merged build is fixed, so
         # the slot accepts either the reviewed merge or that base and says which.
-        accepted = {RELEASE_VPK_SHA, GOLDEN_BASE_SHA, APPEND_VPK_SHA}
-        label = {
-            RELEASE_VPK_SHA: "clips-only release",
-            GOLDEN_BASE_SHA: "06:47 base",
-            APPEND_VPK_SHA: "append build",
-        }
+        # One pinned build, not a set of acceptable ones.  The owner's instruction is that
+        # `pak93_dir.vpk` (01efc18e, the append build) is *the pinned version to strive for*.
+        # An earlier revision of this check accepted three shas because the slot had held
+        # three different builds across a day; that is a check widened until it cannot fail,
+        # and it is not what a gate is for.  A different pak in the slot is a refusal.
         check(
-            f"{INSTALLED_PAK.name} is a reviewed Shiv build",
-            installed in accepted,
-            label.get(installed, installed or "missing"),
+            f"{INSTALLED_PAK.name} is the pinned Shiv build",
+            installed == APPEND_VPK_SHA,
+            (installed or "missing") if installed != APPEND_VPK_SHA else "append build",
         )
     dmx_sha = sha256(ACCEPTED_DMX)
     check(

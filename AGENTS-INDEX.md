@@ -84,3 +84,5 @@ audit read from it, so a rule does not have to be found by reading 2,900 lines i
 | 2962 | — | Removed evidence | refusal, receipt |
 | 3002 | 2026-11-15 | how this file is read now: an audit, an index, and an additive resynthesis | refuted, trap, refusal, receipt |
 | 3044 | 2026-11-15 | addressing `ala`: no gendered pronoun, and why this keeps happening | refusal, rule |
+| 3073 | 2026-11-15 | the pak ships its vnmskeleton, and that is not a choice | refusal, rule |
+| 3098 | 2026-11-15 | `pak93_dir.vpk` is the pinned Shiv build, and a gate is not widened to fit a slot | refusal, receipt, rule |
