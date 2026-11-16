@@ -19,7 +19,7 @@ import bpy
 from bpy.types import Panel
 from forge import bonerules, paths, stageflow
 
-from . import clipops, core, heropick, rules, tailops, tailpreview, ui_popit, workbench
+from . import clipops, core, heropick, properties, rules, tailops, tailpreview, ui_popit, workbench
 
 
 _STATUS_ICONS = {
@@ -64,13 +64,13 @@ def _tail(value: str, limit: int = 46) -> str:
 def _hero_label(settings) -> str:
     slug = settings.hero_slug
     if slug in ("", "NONE"):
-        return "no hero"
-    from . import properties
-
-    for value, title, _model in properties.HERO_ITEMS:
-        if value == slug:
-            return title
-    return slug.replace("_", " ").title()
+        return "no model"
+    title = heropick.title_for(slug)
+    if title:
+        return title
+    if settings.hero_model_path:
+        return Path(settings.hero_model_path).stem.replace("_", " ").title()
+    return Path(slug).stem.replace("_", " ").title()
 
 
 def _hero_state(settings) -> str:
@@ -85,12 +85,26 @@ def _hero_state(settings) -> str:
     return "imported"
 
 
+def _chips(layout, settings, prop: str, values) -> None:
+    """A filter as visible choices, not a dropdown that hides the active one."""
+    for start in range(0, len(values), 3):
+        row = layout.row(align=True)
+        row.scale_y = 1.1
+        for value, label in values[start:start + 3]:
+            row.prop_enum(settings, prop, value, text=label)
+
+
 def _hero_picker(layout, settings) -> None:
-    """Search, kind filter, a short list and one confirm; no roster dropdown."""
+    """Search, a real VPK folder, a short list and one confirm; no roster dropdown."""
     search = layout.row(align=True)
     search.prop(settings, "hero_query", text="", icon="VIEWZOOM")
     search.operator("dmf.refresh_heroes", text="", icon="FILE_REFRESH")
-    layout.prop(settings, "hero_kind", text="")
+    properties.sync_folders(settings)
+    current = next(
+        (item[1] for item in properties.MODEL_ROOT_ITEMS if item[0] == settings.model_root),
+        "All folders",
+    )
+    layout.operator("dmf.browse_folders", text=f"VPK folder: {current}", icon="FILE_FOLDER")
     try:
         shown = heropick.ensure(settings)
     except Exception:
@@ -106,10 +120,12 @@ def _hero_picker(layout, settings) -> None:
     )
     row = layout.row(align=True)
     row.enabled = bool(shown) and not settings.job_running
-    row.operator("dmf.choose_hero", text="Use hero", icon="CHECKMARK")
+    row.operator("dmf.choose_hero", text="Use model", icon="CHECKMARK")
     right = row.row(align=True)
     right.alignment = "RIGHT"
     right.label(text=f"{shown} shown")
+    if settings.hero_model_path:
+        layout.label(text=_tail(settings.hero_model_path, 44), icon="FILE")
 
 
 def _mesh_state(settings) -> str:
@@ -197,15 +213,8 @@ def _next_line(layout, settings) -> None:
 
 
 def _section(layout, title: str, icon: str, detail: str = ""):
-    box = layout.box()
-    header = box.row(align=True)
-    header.scale_y = 0.9
-    header.label(text=title.upper(), icon=icon)
-    if detail:
-        right = header.row(align=True)
-        right.alignment = "RIGHT"
-        right.label(text=_short(detail, 26))
-    return box
+    """One grammar for every group: ui_popit.section, with the detail shortened."""
+    return ui_popit.section(layout, title, icon, _short(detail, 26) if detail else "")
 
 
 def _hint(layout, text: str, icon: str = "INFO", alert: bool = False, width: int = 36) -> None:
@@ -318,6 +327,15 @@ class DMF_PT_setup(Panel):
         layout = self.layout
 
         ui_popit.job(layout, settings)
+        ready = bool(settings.deadlock_root and settings.s2v_cli and settings.csdk_root)
+        ui_popit.page(
+            layout,
+            settings,
+            "Setup",
+            "ready" if ready else "paths missing",
+            "CHECKMARK" if ready else "QUESTION",
+            alert=not ready,
+        )
         live = _section(layout, "Live game", "WORLD", _short(settings.build, 24) or "not detected")
         live.prop(settings, "deadlock_root", text="Install")
         live.prop(settings, "s2v_cli", text="S2V CLI")
@@ -326,13 +344,26 @@ class DMF_PT_setup(Panel):
             _hint(live, gui_note, "ERROR", alert=True, width=30)
         ui_popit.glyphs(live, ["dmf.detect_paths"], labels={"dmf.detect_paths": "Detect"})
 
-        csdk = _section(layout, "CSDK13", "PACKAGE", "compiler")
-        csdk.prop(settings, "csdk_root", text="Install")
+        tools = _section(
+            layout,
+            "Compile toolchain",
+            "TOOL_SETTINGS",
+            core.tools_build(settings) or "no build",
+        )
+        tools.prop(settings, "csdk_root", text="Install")
         folder = core.csdk_addon_folder(settings)
         if folder is not None:
-            csdk.label(text=_tail(str(folder), 46), icon="FILE_FOLDER")
+            tools.label(text=_tail(str(folder), 46), icon="FILE_FOLDER")
         else:
-            _hint(csdk, "Set the CSDK13 folder that holds resourcecompiler.exe.", "QUESTION", width=30)
+            _hint(tools, "Set the CSDK folder that holds resourcecompiler.exe.", "QUESTION", width=30)
+        ui_popit.stat(tools, "selected", Path(settings.csdk_root).name if settings.csdk_root else "not set", "TOOL_SETTINGS")
+        _hint(
+            tools,
+            "Versions are listed under Tools & clients; choosing one changes only what compiles.",
+            "INFO",
+            width=32,
+        )
+        tools.operator("dmf.refresh_clients", text="Find toolchains", icon="FILE_REFRESH")
 
         workspace = _section(layout, "Workspace", "FILE_FOLDER", "optional")
         workspace.prop(settings, "project_root", text="Folder")
@@ -372,7 +403,7 @@ class DMF_PT_source(Panel):
         layout.use_property_decorate = False
 
         ui_popit.job(layout, settings)
-        hero = ui_popit.title(layout, "Hero", _hero_state(settings), "WORLD")
+        hero = ui_popit.page(layout, settings, "Source", _hero_state(settings), "WORLD")
         _hero_picker(hero, settings)
         ui_popit.glyphs(
             hero,
@@ -443,7 +474,7 @@ class DMF_PT_update(Panel):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
-        box = ui_popit.title(layout, "Old addon", settings.update_addon_name or "not set", "FILE_REFRESH")
+        box = ui_popit.page(layout, settings, "Mods", "update old addon", "FILE_REFRESH")
         _path_row(box, settings, "old_vpk", "VPK / folder")
         box.operator("dmf.pick_old_vpk", text="Choose old addon", icon="FILEBROWSER")
         options = box.column(align=True)
@@ -481,8 +512,9 @@ class DMF_PT_parts(Panel):
         layout.use_property_decorate = False
 
         ui_popit.job(layout, settings)
-        collection_box = ui_popit.title(
+        collection_box = ui_popit.page(
             layout,
+            settings,
             "Parts",
             f"{len(settings.parts)}" if settings.parts else "not scanned",
             "GROUP",
@@ -582,8 +614,9 @@ class DMF_PT_cloth(Panel):
 
         ui_popit.job(layout, settings)
         chains = len(settings.cloth_chains)
-        box = ui_popit.title(
+        box = ui_popit.page(
             layout,
+            settings,
             "Cloth",
             f"{chains} chains" if chains else "not scanned",
             "MOD_CLOTH",
@@ -593,9 +626,8 @@ class DMF_PT_cloth(Panel):
             ["dmf.import_hero_parts", "dmf.scan_cloth"],
             labels={"dmf.import_hero_parts": "Hero parts", "dmf.scan_cloth": "Chains"},
         )
-        source = box.row(align=True)
-        source.label(text="Chains from")
-        source.prop(settings, "cloth_source", text="", expand=True)
+        ui_popit.micro(box, "Chains from", "MOD_CLOTH")
+        _chips(box, settings, "cloth_source", (("HERO", "Hero"), ("CUSTOM", "Custom rig")))
         if settings.cloth_source == "CUSTOM":
             if settings.custom_armature is None:
                 _hint(box, "Choose your model's rig in Parts first.", "QUESTION", width=32)
@@ -734,8 +766,9 @@ class DMF_PT_rules(Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        box = ui_popit.title(
+        box = ui_popit.page(
             layout,
+            settings,
             "Rules",
             f"{len(settings.bone_rules)}" if settings.bone_rules else "none",
             "DRIVER",
@@ -802,7 +835,7 @@ def _draw_ik(layout, settings) -> None:
     count = len(settings.ik_bones)
     box = ui_popit.title(
         layout,
-        "Source 2 IK",
+        "Targets",
         (f"{count} target" if count == 1 else f"{count} targets") if count else "not scanned",
         "CONSTRAINT",
     )
@@ -851,7 +884,7 @@ def _draw_tail(layout, settings) -> None:
     live = sum(1 for option in options if option.source == "LIVE")
     box = ui_popit.title(
         layout,
-        "Tails",
+        "Tail sources",
         f"{len(options)} sources" if options else "not scanned",
         "ARMATURE_DATA",
     )
@@ -992,9 +1025,10 @@ class DMF_PT_animations(Panel):
             icon="INFO",
         )
         imported = sum(1 for row in settings.clips if row.state == "IMPORTED")
-        box = ui_popit.title(
+        box = ui_popit.page(
             layout,
-            "Clips",
+            settings,
+            "Animations",
             f"{imported}/{len(settings.clips)}" if settings.clips else "not scanned",
             "ACTION",
         )
@@ -1009,14 +1043,23 @@ class DMF_PT_animations(Panel):
             },
         )
         _path_row(box, settings, "clips_dir", "Folder (optional)")
-        box.prop(settings, "clip_ag_filter", text="Show")
+        ui_popit.stat(
+            box,
+            "from",
+            _tail(settings.clip_auto_note or settings.clips_dir or settings.extraction_dir, 30)
+            or "scan a hero",
+            "FILE_FOLDER",
+        )
+        ui_popit.stat(box, "write to", _tail(settings.clip_export_dir, 30) or "not set", "EXPORT")
+        ui_popit.micro(box, "Graph", "FILTER")
+        _chips(box, settings, "clip_ag_filter", (
+            ("ALL", "All"), ("AG1", "AG1"), ("AG2", "AG2"), ("UNKNOWN", "Unknown"),
+        ))
         if settings.clip_auto_note:
             box.label(text=_short(settings.clip_auto_note, 46), icon="FILE_FOLDER")
         if settings.clip_vnmskel:
             box.label(text=_short(Path(settings.clip_vnmskel).name, 32), icon="ARMATURE_DATA")
         if not settings.clips:
-            _draw_ik(layout, settings)
-            _draw_tail(layout, settings)
             _hint(
                 box,
                 "Extract a hero and press Scan. The page finds the clips folders beside "
@@ -1065,24 +1108,7 @@ class DMF_PT_animations(Panel):
         if settings.clip_note:
             _hint(box, settings.clip_note, "LOCKED", width=30)
 
-        _draw_ik(layout, settings)
-        _draw_tail(layout, settings)
-        ui_popit.micro(box, "Write back", "EXPORT")
-        _path_row(box, settings, "clip_export_dir", "Folder")
-        write = box.row(align=True)
-        write.operator("dmf.export_clips", text="Write all", icon="EXPORT")
-        write.operator("dmf.cancel_clips", text="Stop", icon="CANCEL")
-        written = sum(1 for row in settings.clips if row.state == "WRITTEN")
-        if written:
-            box.label(text=f"{written} clips written", icon="CHECKMARK")
-        _hint(
-            box,
-            "Bake + write makes Model 22 DMX clips: visual keying, original frame range, "
-            "constraints cleared. AG2 writes <folder>/clips/<clip>.dmx. ModelDoc's "
-            "Make Default Animgraph2 converts those into vnmclip_c; pack the clip, not the .vnmskel.",
-            "INFO",
-            width=34,
-        )
+
 
 
 class DMF_PT_compare(Panel):
@@ -1098,7 +1124,7 @@ class DMF_PT_compare(Panel):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
-        box = ui_popit.title(layout, "Split view", "both rigs" if settings.compare_active else "off", "SPLIT_VERTICAL")
+        box = ui_popit.page(layout, settings, "Compare", "both rigs" if settings.compare_active else "off", "SPLIT_VERTICAL")
         ui_popit.glyphs(
             box,
             ["dmf.compare_split", "dmf.compare_clear"],
@@ -1124,14 +1150,19 @@ class DMF_PT_skeleton(Panel):
 
         ui_popit.job(layout, settings)
         mapped = sum(1 for row in settings.bone_map if row.state == "MAPPED")
-        top = ui_popit.title(
+        top = ui_popit.page(
             layout,
-            "Bone map",
+            settings,
+            "Skeleton",
             f"{mapped}/{len(settings.bone_map)}" if settings.bone_map else "not scanned",
             "BONE_DATA",
         )
         ui_popit.glyphs(top, ["dmf.scan_bones"], labels={"dmf.scan_bones": "Scan"})
-        top.prop(settings, "bone_filter", text="Show")
+        ui_popit.micro(top, "Show", "FILTER")
+        _chips(top, settings, "bone_filter", (
+            ("ALL", "All"), ("UNMATCHED", "Unmatched"), ("MAPPED", "Mapped"),
+            ("EXTRA", "Extra"), ("IGNORED", "Ignored"),
+        ))
         if settings.bone_rules:
             _hint(
                 layout,
@@ -1284,7 +1315,7 @@ class DMF_PT_weights(Panel):
         layout.use_property_split = True
         layout.use_property_decorate = False
         ui_popit.job(layout, settings)
-        ui_popit.title(layout, "Weights", settings.weight_mode.title(), "MOD_VERTEX_WEIGHT")
+        ui_popit.page(layout, settings, "Weights", settings.weight_mode.title(), "MOD_VERTEX_WEIGHT")
 
         layout.prop(settings, "weight_mode", text="Method")
         options = layout.column(align=True)
@@ -1401,7 +1432,7 @@ class DMF_PT_handoff(Panel):
 
         state = "compiled" if compiled else "staged" if staged else "not staged"
         icon = "CHECKMARK" if compiled else "PACKAGE" if staged else "QUESTION"
-        addon = ui_popit.title(layout, settings.addon_name or "addon", state, icon)
+        addon = ui_popit.page(layout, settings, "Release", state, icon)
         addon.prop(settings, "addon_name", text="Name")
         if folder is not None:
             addon.label(text=_tail(str(folder), 44), icon="FILE_FOLDER")
@@ -1488,34 +1519,117 @@ class DMF_PT_release(Panel):
         layout.use_property_decorate = False
         ui_popit.job(layout, settings)
         pak = Path(bpy.path.abspath(settings.release_pak)) if settings.release_pak else None
-        state = "packed" if pak is not None and pak.is_file() else "no pak"
-        icon = "CHECKMARK" if pak is not None and pak.is_file() else "PACKAGE"
-        ui_popit.title(layout, "Addon release", state, icon)
-        layout.label(text="Any staged addon: pack, install, launch", icon="INFO")
-        column = layout.column(align=True)
-        column.operator("dmf.write_model", icon="ARMATURE_DATA", text="Write model from armature")
-        column.operator("dmf.pack_vpk", icon="PACKAGE", text="Pack VPK")
-        column.operator("dmf.install_pak", icon="IMPORT", text="Install into addon slot")
-        column.operator("dmf.launch_game", icon="PLAY", text="Launch game")
-        layout.prop(settings, "release_slot_number")
-        layout.prop(settings, "release_pak")
+        packed = pak is not None and pak.is_file()
+        ui_popit.section(
+            layout,
+            "Pack & install",
+            "CHECKMARK" if packed else "PACKAGE",
+            "pak ready" if packed else "no pak",
+        )
+        chain = _section(layout, "Build chain", "PLAY", "one owner")
+        buttons = chain.column(align=True)
+        buttons.operator("dmf.write_model", icon="ARMATURE_DATA", text="Write model from armature")
+        buttons.operator("dmf.pack_vpk", icon="PACKAGE", text="Pack VPK")
+        buttons.operator("dmf.install_pak", icon="IMPORT", text="Install into addon slot")
+        buttons.operator("dmf.launch_game", icon="PLAY", text="Launch game")
+        ui_popit.stat(chain, "compiled", "Stage & compile above", "CHECKMARK")
+
+        if settings.release_note:
+            ui_popit.bubble(layout, settings.release_note, "CHECKMARK", width=34)
+
+
+def _draw_write(layout, settings) -> None:
+    """Write the imported clips back as Model 22 DMX, and say where they go."""
+    ui_popit.stat(layout, "clips", f"{len(settings.clips)} found", "ACTION")
+    _path_row(layout, settings, "clip_export_dir", "Folder")
+    write = layout.row(align=True)
+    write.operator("dmf.export_clips", text="Write all", icon="EXPORT")
+    write.operator("dmf.cancel_clips", text="Stop", icon="CANCEL")
+    written = sum(1 for row in settings.clips if row.state == "WRITTEN")
+    if written:
+        layout.label(text=f"{written} clips written", icon="CHECKMARK")
+    _hint(
+        layout,
+        "Bake + write makes Model 22 DMX clips: visual keying, original frame range, "
+        "constraints cleared. AG2 writes <folder>/clips/<clip>.dmx. ModelDoc's "
+        "Make Default Animgraph2 converts those into vnmclip_c; pack the clip, not the .vnmskel.",
+        "INFO",
+        width=34,
+    )
+
+
+class DMF_PT_animation_ik(Panel):
+    bl_label = "IK"
+    bl_idname = "DMF_PT_animation_ik"
+    bl_parent_id = "DMF_PT_animations"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        _draw_ik(self.layout, context.scene.dmf)
+
+
+class DMF_PT_animation_tail(Panel):
+    bl_label = "Tail"
+    bl_idname = "DMF_PT_animation_tail"
+    bl_parent_id = "DMF_PT_animations"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        _draw_tail(self.layout, context.scene.dmf)
+
+
+class DMF_PT_animation_write(Panel):
+    bl_label = "Write back"
+    bl_idname = "DMF_PT_animation_write"
+    bl_parent_id = "DMF_PT_animations"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        settings = context.scene.dmf
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+        _draw_write(layout, settings)
+
+
+class DMF_PT_release_slot(Panel):
+    bl_label = "Addon slot"
+    bl_idname = "DMF_PT_release_slot"
+    bl_parent_id = "DMF_PT_release"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Deadlock"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    def draw(self, context):
+        settings = context.scene.dmf
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+        slot_box = ui_popit.section(layout, "Addon slot", "FILEBROWSER")
+        slot_box.prop(settings, "release_slot_number")
+        slot_box.prop(settings, "release_pak")
         try:
             from . import release
 
             env = core.env(settings)
             if env.game_dir is not None:
-                layout.label(text=f"game: {env.game_dir}", icon="DISK_DRIVE")
+                ui_popit.stat(slot_box, "game", _tail(str(env.game_dir), 30), "DISK_DRIVE")
             slot = release.slot(settings)
             ceiling, mounted = release.slot_ceiling(settings, slot.parent)
-            layout.label(text=f"slot: {slot}", icon="FILEBROWSER")
-            layout.label(
-                text=f"pak numbers 1..{ceiling}; game/citadel mounts {mounted}",
-                icon="INFO",
-            )
+            ui_popit.stat(slot_box, "writes", slot.name, "FILEBROWSER")
+            ui_popit.stat(slot_box, "pak numbers", f"1..{ceiling}, citadel mounts {mounted}", "INFO")
         except Exception as error:
-            layout.label(text=f"slot: {error}", icon="ERROR")
-        if settings.release_note:
-            layout.label(text=settings.release_note, icon="INFO")
+            slot_box.label(text=str(error), icon="ERROR")
 
 
 CLASSES = (
@@ -1530,6 +1644,9 @@ CLASSES = (
     DMF_PT_skeleton_bones,
     DMF_PT_rules,
     DMF_PT_animations,
+    DMF_PT_animation_ik,
+    DMF_PT_animation_tail,
+    DMF_PT_animation_write,
     DMF_PT_compare,
     DMF_PT_weights,
     DMF_PT_weights_manual,
@@ -1537,6 +1654,7 @@ CLASSES = (
     DMF_PT_handoff_paths,
     DMF_PT_update,
     DMF_PT_release,
+    DMF_PT_release_slot,
 )
 
 

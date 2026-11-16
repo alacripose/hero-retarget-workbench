@@ -51,6 +51,9 @@ PAGE_BY_ID = {
     "DMF_PT_skeleton_bones": "SKELETON",
     "DMF_PT_rules": "RULES",
     "DMF_PT_animations": "ANIMATIONS",
+    "DMF_PT_animation_ik": "ANIMATIONS",
+    "DMF_PT_animation_tail": "ANIMATIONS",
+    "DMF_PT_animation_write": "ANIMATIONS",
     "DMF_PT_compare": "COMPARE",
     "DMF_PT_weights": "WEIGHTS",
     "DMF_PT_weights_manual": "WEIGHTS",
@@ -59,9 +62,11 @@ PAGE_BY_ID = {
     "DMF_PT_handoff": "RELEASE",
     "DMF_PT_handoff_paths": "RELEASE",
     "DMF_PT_setup_tools": "SETUP",
+    "DMF_PT_setup_toolchains": "SETUP",
     "DMF_PT_mods": "MODS",
     "DMF_PT_components": "COMPONENTS",
     "DMF_PT_release": "RELEASE",
+    "DMF_PT_release_slot": "RELEASE",
 }
 
 PAGES = (

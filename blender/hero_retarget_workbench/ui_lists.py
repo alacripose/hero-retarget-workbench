@@ -52,8 +52,6 @@ def _rules_text(entry) -> str:
 class DMF_UL_heroes(UIList):
     bl_idname = "DMF_UL_heroes"
 
-    _ROWS = {"HERO": "hero", "HIDEOUT": "hideout", "OTHER": "model"}
-
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
         # The page's own search and kind filter already narrowed the rows; the
@@ -64,14 +62,34 @@ class DMF_UL_heroes(UIList):
         settings = getattr(context.scene, "dmf", None)
         chosen = settings is not None and settings.hero_slug == item.slug
         row = layout.row(align=True)
-        row.alert = chosen
         row.label(
-            text=_short(item.title, 30) or item.slug,
+            text=_short(item.title, 28) or item.slug,
             icon="RADIOBUT_ON" if chosen else "RADIOBUT_OFF",
         )
         right = row.row(align=True)
         right.alignment = "RIGHT"
-        right.label(text=self._ROWS.get(item.kind, "model"))
+        folder = item.kind.rstrip("/").split("/")[-1] if item.kind else "models"
+        right.label(text=_short(folder, 14))
+
+
+class DMF_UL_model_folders(UIList):
+    bl_idname = "DMF_UL_model_folders"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [f"{row.label} {row.root} {row.description}" for row in rows])
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        settings = getattr(context.scene, "dmf", None)
+        chosen = settings is not None and settings.model_root == item.root
+        row = layout.row(align=True)
+        row.label(
+            text=_short(item.label, 24) or item.root,
+            icon="RADIOBUT_ON" if chosen else "RADIOBUT_OFF",
+        )
+        right = row.row(align=True)
+        right.alignment = "RIGHT"
+        right.label(text=f"{item.count:,} models")
 
 
 class DMF_UL_bone_map(UIList):
@@ -370,19 +388,19 @@ class DMF_UL_clients(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         width = float(getattr(context.scene.dmf, "list_name_width", 0.5))
         split = layout.split(factor=width, align=True)
-        icon = "CHECKMARK" if item.active else ("TOOL_SETTINGS" if item.can_compile else "PACKAGE")
+        if item.active:
+            icon = "CHECKMARK"
+        elif item.tool_active:
+            icon = "TOOL_SETTINGS"
+        elif item.can_compile:
+            icon = "SETTINGS"
+        else:
+            icon = "PACKAGE"
         left = split.row(align=True)
         left.label(text=item.label or "install", icon=icon)
         right = split.row(align=True)
         right.alignment = "RIGHT"
-        bits = [item.kind or "install"]
-        if item.can_compile:
-            bits.append("compiler")
-        if item.can_backport:
-            bits.append("vpk")
-        if item.build:
-            bits.append(item.build)
-        right.label(text=" · ".join(bits))
+        right.label(text=_short(item.build or item.kind or "install", 20))
 
 
 class DMF_UL_components(UIList):
@@ -411,6 +429,7 @@ class DMF_UL_components(UIList):
 
 
 CLASSES = (
+    DMF_UL_model_folders,
     DMF_UL_heroes,
     DMF_UL_bone_map,
     DMF_UL_mods,

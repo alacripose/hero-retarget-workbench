@@ -347,6 +347,48 @@ def list_models(env: Environment) -> list[str]:
     return paths
 
 
+def list_all_models(env: Environment) -> list[str]:
+    """Every compiled model the live pak carries under `models/`, by S2V's own listing.
+
+    `list_models` walks four character roots so a hero roster stays small. The picker
+    needs the other direction: every `.vmdl_c` the pak holds, so a directory filter can
+    name a real VPK folder instead of a hand-written category.
+    """
+    return sorted(set(list_assets(env, "models/", "vmdl_c")))
+
+
+def model_root(path: str) -> str:
+    """The VPK folder a model lives in, two levels under `models/`.
+
+    A model that sits directly in `models/` has no folder of its own, so it belongs
+    to `models` rather than to a pseudo-folder named after the file.
+    """
+    parts = [part for part in str(path).replace("\\", "/").strip("/").split("/") if part]
+    folders = parts[:-1]
+    if len(folders) >= 2:
+        return "/".join(folders[:2])
+    return folders[0] if folders else ""
+
+
+def roster_for_models(paths: list[str], named: list[Hero] | tuple = ()) -> list[Hero]:
+    """One picker row per live model, keeping a hero's own title where the table has it."""
+    titles = {hero.model_path.lower(): hero.title for hero in named}
+    rows: list[Hero] = []
+    seen: set[str] = set()
+    for path in paths:
+        key = path.lower()
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        title = titles.get(key)
+        if not title:
+            stem = Path(path).stem
+            folder = Path(path).parent.name
+            title = f"{stem} · {folder}" if folder and folder.lower() != stem.lower() else stem
+        rows.append(Hero(slug=path, model_path=path, title=title))
+    return sorted(rows, key=lambda hero: (hero.title.lower(), hero.model_path.lower()))
+
+
 def list_heroes(env: Environment) -> list[Hero]:
     """List every playable hero plus its live model variants and NPCs."""
     with tempfile.TemporaryDirectory(prefix="dmf-roster-") as temporary:

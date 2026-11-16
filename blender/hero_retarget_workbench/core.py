@@ -152,6 +152,38 @@ def csdk_addon_folder(settings) -> Path | None:
     return root / "content" / "citadel_addons" / name
 
 
+def _steam_build(root) -> str:
+    """ClientVersion and VersionDate from a tree's own steam.inf, or an empty string."""
+    base = Path(root) if root else None
+    if base is None:
+        return ""
+    candidates = [base] if base.name.lower() == "game" else [base / "game", base]
+    for game in candidates:
+        for info in sorted(game.glob("*/steam.inf")):
+            values: dict[str, str] = {}
+            try:
+                for line in info.read_text(encoding="utf-8", errors="replace").splitlines():
+                    if "=" in line:
+                        key, value = line.split("=", 1)
+                        values[key.strip()] = value.strip()
+            except OSError:
+                continue
+            label = f"{values.get('ClientVersion', '')} {values.get('VersionDate', '')}".strip()
+            if label:
+                return label
+    return ""
+
+
+def source_build(settings) -> str:
+    """The build of the install models are extracted from."""
+    return _steam_build(settings.deadlock_root) or str(getattr(settings, "build", "") or "")
+
+
+def tools_build(settings) -> str:
+    """The build of the install the compiler and packer run from."""
+    return _steam_build(settings.csdk_root)
+
+
 def env(settings):
     detected = detect_environment(settings)
     if detected.game_root:
