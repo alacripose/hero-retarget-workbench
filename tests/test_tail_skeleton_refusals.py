@@ -95,3 +95,29 @@ def test_the_gate_is_the_only_pack_path() -> None:
     assert re.search(r"--skip-gate", packer), "diagnostic escape hatch must stay named"
     # A release is the default; skipping the gate has to be explicit and is never a release.
     assert "diagnostics" in packer.lower()
+
+
+def test_tree_check_compares_walks_not_the_game_list() -> None:
+    """The game's own skeleton walks 4 joints out of its list order (measured 2026-11-16).
+
+    `clavicle_R`, `leg_upper_L`, `leg_upper_R` and `attachWorld` sit in a different order in
+    `haze_skel.dmx`'s tree than in its own `jointList`, so a check that a walk is a subsequence of
+    that list refuses the game's own file — it refused ours for exactly those 4 joints.  The walk
+    must be compared against the game's walk; the list is a separate contract, checked separately.
+    """
+    gate = read("tools/tail_release_gate.py")
+    assert "_joint_tree_order(datamodel, game_skeleton)" in gate
+    assert "game_walk_vs_list_inversions" in gate
+
+
+def test_rest_check_compares_world_poses_not_local_decompositions() -> None:
+    """A parent and a rest are one fact, so two correct spellings read as different locals.
+
+    Our skeleton writes `pelvis` under `root_motion`; the model document writes it at the root.
+    Measured: both land at `[-0.482, 0, 53.909]` with the same rotation, while the local
+    decompositions differ by 54.4 units and 60 deg.  Comparing locals reported a shifted joint on
+    a correct pair.
+    """
+    gate = read("tools/tail_release_gate.py")
+    assert "_joint_world_map(datamodel, skeleton_dmx)" in gate
+    assert "_joint_world_map(datamodel, model_dmx)" in gate

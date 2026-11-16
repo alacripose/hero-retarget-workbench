@@ -154,9 +154,16 @@ def main() -> int:
         if parent and parent not in by_name:
             raise SystemExit(f"skeleton-parent-missing: {name} names {parent}")
 
+    # The tree is written in the order the client *walks* it, which is not the order the game's
+    # `jointList` lists.  Both are contracts on different things: masks index the list, and the
+    # bones are numbered by walking the tree.  Writing the tree from the list order put
+    # `clavicle_R`, `leg_upper_L` and `leg_upper_R` out of step with the game's walk and the gate
+    # refused it.
+    game_walk = [joint.name for joint in _joints(game_model)]
+    walk_order = [name for name in game_walk if name in set(order)] + extras
     children: dict[str, list[str]] = {name: [] for name in order}
     roots: list[str] = []
-    for name in order:
+    for name in walk_order:
         parent = parents.get(name)
         if parent and parent in children:
             children[parent].append(name)
@@ -207,6 +214,7 @@ def main() -> int:
         "game_joints": len(game_names),
         "appended": extras,
         "rest_fields_copied": rest_copied,
+        "walk_order_kept": [name for name in walk_order if name in game_parents or name in parents],
         "joints": len(written),
         "prefix_kept": written[: len(game_names)] == game_names,
     }
