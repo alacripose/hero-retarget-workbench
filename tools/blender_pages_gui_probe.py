@@ -213,11 +213,14 @@ def main() -> int:
         {"surface": surface, "supported": ui_space.custom_space_supported()},
     )
 
-    root = getattr(
-        bpy.types,
-        "DMF_PT_space_main" if surface == "editor" else "DMF_PT_main",
-        None,
-    )
+    if surface == "editor":
+        # The editor pages are top-level WINDOW panels; the old WINDOW root is
+        # not registered. The header and the page mirrors are the live surface.
+        root = getattr(bpy.types, "DMF_HT_workbench", None) or getattr(
+            bpy.types, "DMF_PT_space_setup", None
+        )
+    else:
+        root = getattr(bpy.types, "DMF_PT_main", None)
     _check(
         "surface-open-control",
         hasattr(bpy.ops.dmf, "open_workbench") and root is not None,
@@ -255,7 +258,9 @@ def main() -> int:
     root_name = f"DMF_PT_{prefix}_main"
     if not hasattr(bpy.types, root_name):
         root_name = "DMF_PT_main"
-    pages = [("root", getattr(bpy.types, root_name).draw, "ALL")]
+    pages = []
+    if hasattr(bpy.types, root_name):
+        pages.append(("root", getattr(bpy.types, root_name).draw, "ALL"))
     for panel_idname, page in ui_props.PAGE_BY_ID.items():
         name = f"DMF_PT_{prefix}_{panel_idname[len('DMF_PT_'):]}"
         cls = getattr(bpy.types, name, None)
@@ -304,6 +309,10 @@ def main() -> int:
     if surface == "editor":
         attributes["bl_space_type"] = "CUSTOM"
         attributes["bl_space_idname"] = ui_space.SPACE_IDNAME
+        # The editor pages are WINDOW panels. A UI-region probe would sit in the
+        # hidden sidebar and report zero draws, which is the defect that kept
+        # this probe from covering the surface the owner uses.
+        attributes["bl_region_type"] = "WINDOW"
     else:
         attributes["bl_space_type"] = "VIEW_3D"
         attributes["bl_region_type"] = "UI"

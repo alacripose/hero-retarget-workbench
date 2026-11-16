@@ -12,17 +12,14 @@ from bpy.types import UIList
 from forge import cloth as clothscan
 from forge import uilist
 
+from . import ui_popit
+
 _ICONS = {
     "MAPPED": "CHECKMARK",
     "UNMATCHED": "QUESTION",
     "EXTRA": "BONE_DATA",
     "IGNORED": "HIDE_ON",
 }
-
-
-def _short(value: str, limit: int = 28) -> str:
-    text = " ".join((value or "").split())
-    return text if len(text) <= limit else text[: limit - 3].rstrip() + "..."
 
 
 def _filter(ui_list, texts, restrict=None):
@@ -52,24 +49,18 @@ def _rules_text(entry) -> str:
 class DMF_UL_heroes(UIList):
     bl_idname = "DMF_UL_heroes"
 
-    def filter_items(self, context, data, propname):
-        rows = getattr(data, propname)
-        # The page's own search and kind filter already narrowed the rows; the
-        # native header narrows them once more without a second source of truth.
-        return _filter(self, [f"{row.title} {row.kind} {row.model}" for row in rows])
-
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         settings = getattr(context.scene, "dmf", None)
         chosen = settings is not None and settings.hero_slug == item.slug
-        row = layout.row(align=True)
-        row.label(
-            text=_short(item.title, 28) or item.slug,
+        width = getattr(settings, "source_name_width", 0.62)
+        left, right = ui_popit.columns(layout, width)
+        left.label(
+            text=item.title or item.slug,
             icon="RADIOBUT_ON" if chosen else "RADIOBUT_OFF",
         )
-        right = row.row(align=True)
         right.alignment = "RIGHT"
         folder = item.kind.rstrip("/").split("/")[-1] if item.kind else "models"
-        right.label(text=_short(folder, 14))
+        right.label(text=folder)
 
 
 class DMF_UL_model_folders(UIList):
@@ -82,14 +73,14 @@ class DMF_UL_model_folders(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         settings = getattr(context.scene, "dmf", None)
         chosen = settings is not None and settings.model_root == item.root
-        row = layout.row(align=True)
-        row.label(
-            text=_short(item.label, 24) or item.root,
+        width = getattr(settings, "folder_name_width", 0.68)
+        left, right = ui_popit.columns(layout, width)
+        left.label(
+            text=item.label or item.root,
             icon="RADIOBUT_ON" if chosen else "RADIOBUT_OFF",
         )
-        right = row.row(align=True)
         right.alignment = "RIGHT"
-        right.label(text=f"{item.count:,} models")
+        right.label(text=f"{item.count:,}")
 
 
 class DMF_UL_bone_map(UIList):
@@ -105,11 +96,14 @@ class DMF_UL_bone_map(UIList):
         return _filter(self, [_bone_map_text(row) for row in rows], restrict)
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
-        row.label(text=item.source or "source", icon=_ICONS.get(item.state, "DOT"))
-        row.label(text=item.target or "no target", icon="FORWARD")
+        width = getattr(context.scene.dmf, "bone_name_width", 0.45)
+        source, target, state = ui_popit.columns(layout, width, (0.35, 0.25))
+        source.label(text=item.source or "source", icon=_ICONS.get(item.state, "DOT"))
+        target.label(text=item.target or "no target", icon="FORWARD")
+        state.alignment = "RIGHT"
+        state.label(text=item.state.lower())
         if item.note:
-            row.label(text="", icon="INFO")
+            state.label(text="", icon="INFO")
 
 
 class DMF_UL_hierarchy(UIList):
@@ -120,19 +114,17 @@ class DMF_UL_hierarchy(UIList):
         return _filter(self, [f"{row.name} {row.parent}" for row in rows])
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
+        width = getattr(context.scene.dmf, "hierarchy_name_width", 0.5)
+        left, parent, children = ui_popit.columns(layout, width, (0.3, 0.4))
         for _ in range(min(item.depth, 10)):
-            row.label(text="", icon="BLANK1")
-        row.label(
-            text=_short(item.name, 26) or "bone",
+            left.label(text="", icon="BLANK1")
+        left.label(
+            text=item.name or "bone",
             icon="BONE_DATA" if item.children else "DOT",
         )
-        right = row.row(align=True)
-        right.alignment = "RIGHT"
-        if item.parent:
-            right.label(text=f"< {_short(item.parent, 14)}", icon="BLANK1")
-        else:
-            right.label(text="root", icon="BLANK1")
+        parent.label(text=item.parent or "root", icon="BLANK1")
+        children.alignment = "RIGHT"
+        children.label(text=f"{item.children}" if item.children else "leaf")
 
 
 class DMF_UL_parts(UIList):
@@ -146,15 +138,17 @@ class DMF_UL_parts(UIList):
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
+        width = getattr(context.scene.dmf, "parts_name_width", 0.55)
+        left, verts, materials = ui_popit.columns(layout, width, (0.2, 0.2))
         obj = item.object
         if obj is None:
-            row.label(text="missing part", icon="ERROR")
+            left.label(text="missing part", icon="ERROR")
             return
-        row.label(text=_short(obj.name), icon="MESH_DATA")
-        right = row.row(align=True)
-        right.alignment = "RIGHT"
-        right.label(text=f"{len(obj.data.vertices):,}v / {len(obj.data.materials)}m")
+        left.label(text=obj.name, icon="MESH_DATA")
+        verts.alignment = "RIGHT"
+        verts.label(text=f"{len(obj.data.vertices):,}v")
+        materials.alignment = "RIGHT"
+        materials.label(text=f"{len(obj.data.materials)}m")
 
 
 class DMF_UL_materials(UIList):
@@ -171,12 +165,20 @@ class DMF_UL_materials(UIList):
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
+        prop = (
+            "part_materials_name_width"
+            if active_propname == "part_material_index"
+            else "source_materials_name_width"
+        )
+        width = getattr(context.scene.dmf, prop, 0.72)
+        left, slot = ui_popit.columns(layout, width)
         material = item.material
-        row.label(text=_short(item.label or (material.name if material else "empty slot")), icon="MATERIAL" if material else "BLANK1")
-        right = row.row(align=True)
-        right.alignment = "RIGHT"
-        right.label(text=f"[{item.slot_index}]")
+        left.label(
+            text=item.label or (material.name if material else "empty slot"),
+            icon="MATERIAL" if material else "BLANK1",
+        )
+        slot.alignment = "RIGHT"
+        slot.label(text=f"[{item.slot_index}]")
 
 
 class DMF_UL_hero_parts(UIList):
@@ -194,17 +196,16 @@ class DMF_UL_hero_parts(UIList):
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
+        width = getattr(context.scene.dmf, "hero_parts_name_width", 0.55)
+        left, kind, verts = ui_popit.columns(layout, width, (0.25, 0.2))
         obj = item.object
         if obj is None:
-            row.label(text="missing part", icon="ERROR")
+            left.label(text="missing part", icon="ERROR")
             return
-        row.label(text=_short(obj.name, 24), icon="MESH_DATA")
-        right = row.row(align=True)
-        right.alignment = "RIGHT"
-        if clothscan.is_cloth(obj.name):
-            right.label(text="cloth")
-        right.label(text=f"{len(obj.data.vertices):,}v")
+        left.label(text=obj.name, icon="MESH_DATA")
+        kind.label(text="cloth" if clothscan.is_cloth(obj.name) else "mesh")
+        verts.alignment = "RIGHT"
+        verts.label(text=f"{len(obj.data.vertices):,}v")
 
 
 class DMF_UL_cloth_chains(UIList):
@@ -221,18 +222,17 @@ class DMF_UL_cloth_chains(UIList):
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
+        width = getattr(context.scene.dmf, "cloth_name_width", 0.55)
+        left, kind, bones = ui_popit.columns(layout, width, (0.25, 0.2))
         icon = "MOD_CLOTH" if clothscan.is_cloth(item.name) else "BONE_DATA"
         built = item.target_mesh is not None
-        row.label(
-            text=_short(item.name, 24) or "chain",
+        left.label(
+            text=item.name or "chain",
             icon="CHECKMARK" if built else icon,
         )
-        right = row.row(align=True)
-        right.alignment = "RIGHT"
-        if built:
-            right.label(text="cloth")
-        right.label(text=f"{item.count}")
+        kind.label(text="cloth" if built else item.source.lower())
+        bones.alignment = "RIGHT"
+        bones.label(text=f"{item.count}")
 
 
 class DMF_UL_rules(UIList):
@@ -243,20 +243,20 @@ class DMF_UL_rules(UIList):
         return _filter(self, [_rules_text(row) for row in rows])
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
-        row.prop(item, "enabled", text="", emboss=False, icon="CHECKBOX_HLT" if item.enabled else "CHECKBOX_DEHLT")
+        width = getattr(context.scene.dmf, "rules_name_width", 0.65)
+        left, right = ui_popit.columns(layout, width)
+        left.prop(item, "enabled", text="", emboss=False, icon="CHECKBOX_HLT" if item.enabled else "CHECKBOX_DEHLT")
         pattern = item.source or "pattern"
         target = item.target or "no target"
         if item.regex:
-            row.label(text=_short(f"{pattern} -> {target}", 21), icon="DRIVER")
+            left.label(text=f"{pattern} -> {target}", icon="DRIVER")
         elif "#" in pattern:
-            row.label(text=_short(f"{pattern} -> {target} {item.delta:+d}", 21), icon="SORT_NUMERIC")
+            left.label(text=f"{pattern} -> {target} {item.delta:+d}", icon="SORT_NUMERIC")
         elif pattern.strip().endswith("*"):
-            row.label(text=_short(f"{pattern} -> {target or 'extra'}", 21), icon="FILE_FONT")
+            left.label(text=f"{pattern} -> {target or 'extra'}", icon="FILE_FONT")
         else:
             stem = target.rsplit("_", 1)[0] if target.rsplit("_", 1)[-1] in ("L", "R") else target
-            row.label(text=_short(f"{pattern}* -> {stem or '?'}*", 21), icon="LINKED")
-        right = row.row(align=True)
+            left.label(text=f"{pattern}* -> {stem or '?'}*", icon="LINKED")
         right.alignment = "RIGHT"
         if item.state == "EXTRA":
             right.label(text="extra")
@@ -291,16 +291,17 @@ class DMF_UL_clips(UIList):
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
-        row.label(text=_short(item.label or item.name, 26), icon=self._ICONS.get(item.state, "ACTION"))
-        right = row.row(align=True)
-        right.alignment = "RIGHT"
+        width = getattr(context.scene.dmf, "clips_name_width", 0.52)
+        left, graph, kind = ui_popit.columns(layout, width, (0.2, 0.28))
+        left.label(text=item.label or item.name, icon=self._ICONS.get(item.state, "ACTION"))
+        graph.label(text=item.ag if item.ag != "UNKNOWN" else "unknown")
         tag = item.kind if item.kind != "dmx" else ("dmx_c" if item.compiled else "dmx")
-        right.label(text=f"{item.ag.lower()} {tag}" if item.ag != "UNKNOWN" else tag)
+        kind.alignment = "RIGHT"
+        kind.label(text=tag)
         if item.action and item.action != item.label:
-            right.label(text="", icon="ACTION")
+            kind.label(text="", icon="ACTION")
         if item.export_bytes:
-            right.label(text="", icon="EXPORT")
+            kind.label(text="", icon="EXPORT")
 
 
 class DMF_UL_ik(UIList):
@@ -311,14 +312,12 @@ class DMF_UL_ik(UIList):
         return _filter(self, [f"{row.bone} {row.target} {row.state}" for row in rows])
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        width = float(getattr(context.scene.dmf, "list_name_width", 0.5))
-        split = layout.split(factor=width, align=True)
-        left = split.row(align=True)
+        width = getattr(context.scene.dmf, "ik_name_width", 0.5)
+        left, right = ui_popit.columns(layout, width)
         left.label(
             text=item.bone or "IK target",
             icon="BONE_DATA" if item.state == "READY" else "CONSTRAINT",
         )
-        right = split.row(align=True)
         right.alignment = "RIGHT"
         right.label(text=item.target or "choose a limb")
         if item.constraints:
@@ -333,11 +332,9 @@ class DMF_UL_tail(UIList):
         return _filter(self, [f"{row.source} {row.target} {row.state}" for row in rows])
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        width = float(getattr(context.scene.dmf, "list_name_width", 0.5))
-        split = layout.split(factor=width, align=True)
-        left = split.row(align=True)
+        width = getattr(context.scene.dmf, "tail_name_width", 0.5)
+        left, right = ui_popit.columns(layout, width)
         left.label(text=item.source or "hero tail", icon="BONE_DATA")
-        right = split.row(align=True)
         right.alignment = "RIGHT"
         right.label(text=item.target or "choose a tail bone")
         if item.state == "MATCHED":
@@ -352,11 +349,14 @@ class DMF_UL_scan_roots(UIList):
         return _filter(self, [f"{row.path} {row.note}" for row in rows])
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
-        row.prop(item, "enabled", text="", emboss=False)
-        name = item.path.rstrip("/\\").split("\\")[-1].split("/")[-1] or item.path or "folder"
-        row.label(text=_short(name, 20), icon="FILE_FOLDER")
-        right = row.row(align=True)
+        width = getattr(context.scene.dmf, "scan_name_width", 0.66)
+        left, right = ui_popit.columns(layout, width)
+        left.prop(item, "enabled", text="", emboss=False)
+        parts = [part for part in item.path.replace("\\", "/").rstrip("/").split("/") if part]
+        # Two scan roots can both be called ``mods``. Three components keep the
+        # Keep two Documents/mods folders distinguishable in the row.
+        name = "/".join(parts[-3:]) or item.path or "folder"
+        left.label(text=name, icon="FILE_FOLDER")
         right.alignment = "RIGHT"
         if item.packages:
             right.label(text=f"{item.packages}")
@@ -386,9 +386,9 @@ class DMF_UL_mod_contents(UIList):
         return _filter(self, [f"{row.label} {row.category}" for row in rows])
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
-        row.label(text=_short(item.label, 34), icon=self._ICONS.get(item.category, "FILE"))
-        right = row.row(align=True)
+        width = getattr(context.scene.dmf, "mod_contents_name_width", 0.7)
+        left, right = ui_popit.columns(layout, width)
+        left.label(text=item.label, icon=self._ICONS.get(item.category, "FILE"))
         right.alignment = "RIGHT"
         right.label(text=item.category)
 
@@ -403,20 +403,24 @@ class DMF_UL_mods(UIList):
         return _filter(
             self,
             [
-                f"{row.addon} {row.hero} {row.kind} {row.modified} {row.sections} {row.note} {row.path}"
+                f"{row.addon} {row.hero} {row.kind} {row.modified} {row.toolchain} {row.sections} {row.note} {row.path}"
                 for row in rows
             ],
         )
 
+    _KIND_LABELS = {"vpk": "VPK", "addon": "Folder", "blend": "Blend"}
+
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        row = layout.row(align=True)
-        row.label(
-            text=_short(item.addon or "package", 26),
+        width = getattr(context.scene.dmf, "mods_name_width", 0.52)
+        left, kind, hero, modified = ui_popit.columns(layout, width, (0.32, 0.33, 0.35))
+        left.label(
+            text=item.addon or "package",
             icon=self._ICONS.get(item.kind, "PACKAGE"),
         )
-        right = row.row(align=True)
-        right.alignment = "RIGHT"
-        right.label(text=item.modified or "unknown")
+        kind.label(text=self._KIND_LABELS.get(item.kind, item.kind))
+        hero.label(text=item.hero or "unknown")
+        modified.alignment = "RIGHT"
+        modified.label(text=item.modified or "unknown")
 
 
 class DMF_UL_clients(UIList):
@@ -430,8 +434,8 @@ class DMF_UL_clients(UIList):
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        width = float(getattr(context.scene.dmf, "list_name_width", 0.5))
-        split = layout.split(factor=width, align=True)
+        width = getattr(context.scene.dmf, "clients_name_width", 0.55)
+        left, kind, build = ui_popit.columns(layout, width, (0.2, 0.25))
         if item.active:
             icon = "CHECKMARK"
         elif item.tool_active:
@@ -440,11 +444,10 @@ class DMF_UL_clients(UIList):
             icon = "SETTINGS"
         else:
             icon = "PACKAGE"
-        left = split.row(align=True)
         left.label(text=item.label or "install", icon=icon)
-        right = split.row(align=True)
-        right.alignment = "RIGHT"
-        right.label(text=_short(item.build or item.kind or "install", 20))
+        kind.label(text=item.kind or "install")
+        build.alignment = "RIGHT"
+        build.label(text=item.build or "unknown")
 
 
 class DMF_UL_components(UIList):
@@ -455,9 +458,8 @@ class DMF_UL_components(UIList):
         return _filter(self, [f"{row.name} {row.relative} {row.kind} {row.bytes}" for row in rows])
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        width = float(getattr(context.scene.dmf, "list_name_width", 0.5))
-        split = layout.split(factor=width, align=True)
-        left = split.row(align=True)
+        width = getattr(context.scene.dmf, "components_name_width", 0.55)
+        left, kind, size = ui_popit.columns(layout, width, (0.2, 0.2))
         left.prop(
             item,
             "selected",
@@ -466,10 +468,9 @@ class DMF_UL_components(UIList):
             icon="CHECKBOX_HLT" if item.selected else "CHECKBOX_DEHLT",
         )
         left.label(text=item.name, icon="MESH_DATA" if item.kind == "dmx" else "FILE")
-        right = split.row(align=True)
-        right.alignment = "RIGHT"
-        right.label(text=item.kind)
-        right.label(text=f"{item.bytes // 1024}k")
+        kind.label(text=item.kind)
+        size.alignment = "RIGHT"
+        size.label(text=f"{item.bytes // 1024}k")
 
 
 CLASSES = (

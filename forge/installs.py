@@ -119,12 +119,18 @@ def classify(root: Path) -> Install | None:
         engine.lower() == "citadel"
         and (root / "game" / "citadel" / "pak01_dir.vpk").is_file()
     )
+    # A game client does not ship a compiler. Files copied into a full game's
+    # ``bin`` by a repair or an older session must not turn that game into a
+    # toolchain, or every mod made with the game would claim a compiler build.
+    # A reduced CSDK can look like a game because it keeps deadlock.exe; it has
+    # no shipping pak, so it remains a valid compiler host.
+    can_compile = compiler and (kind == "tools" or not can_backport)
     return Install(
         root=root,
         kind=kind,
         engine=engine,
         build=_build(root, engine),
-        can_compile=compiler,
+        can_compile=can_compile,
         can_backport=can_backport,
     )
 

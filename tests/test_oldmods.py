@@ -12,6 +12,9 @@ from forge.oldmods import (
     OldModsError,
     content_category,
     content_counts,
+    content_shape,
+    build_date,
+    estimate_toolchain,
     hero_slugs,
     inventory,
     parse_tree,
@@ -165,6 +168,97 @@ class OldModsTests(unittest.TestCase):
             content_counts(["a.vmdl", "b.vmdl_c", "c.vmat", "d.blend", "e.txt"]),
             {"models": 2, "clips": 0, "materials": 1, "blends": 1, "other": 1},
         )
+
+    def test_content_shape_reads_the_games_own_folders_and_suffixes(self) -> None:
+        game = build_vpk(
+            self.tmp_path / "pak01_dir.vpk",
+            [
+                ("scripts/", "citadel.lua"),
+                ("sounds/", "impact.vsnd_c"),
+                ("particles/", "spark.vpcf_c"),
+            ],
+        )
+
+        roots, suffixes = content_shape(game)
+
+        self.assertEqual(roots, {"scripts", "sounds", "particles"})
+        self.assertEqual(suffixes, {".lua", ".vsnd_c", ".vpcf_c"})
+
+    def test_toolchain_prediction_uses_tool_release_dates(self) -> None:
+        self.assertEqual(build_date("6836 Oct 31 2026"), date(2026, 10, 31))
+        self.assertEqual(
+            estimate_toolchain(
+                "2026-05-02",
+                [
+                    (date(2024, 5, 25), "4192 May 25 2024"),
+                    (date(2026, 10, 31), "6836 Oct 31 2026"),
+                ],
+            ),
+            "CSDK 4192 or newer",
+        )
+        self.assertEqual(
+            estimate_toolchain("2026-10-31", ["6836 Oct 31 2026"]),
+            "CSDK 6836 (2026-10-31)",
+        )
+        self.assertEqual(
+            estimate_toolchain("2027-01-01", ["6836 Oct 31 2026"]),
+            "CSDK 6836",
+        )
+
+    def test_inventory_finds_top_level_compiled_and_script_mods(self) -> None:
+        root = self.tmp_path / "mods"
+        compiled = root / "compiled_mod" / "models" / "heroes_staging" / "kelvin"
+        compiled.mkdir(parents=True)
+        (compiled / "kelvin.vmdl_c").write_bytes(b"compiled")
+        script = root / "script_mod" / "scripts"
+        script.mkdir(parents=True)
+        (script / "citadel.lua").write_text("return {}", encoding="utf-8")
+
+        result = inventory([root], since=date(2024, 1, 1))
+
+        by_name = {mod.addon: mod for mod in result.mods if mod.kind == "addon"}
+        self.assertEqual(set(by_name), {"compiled_mod", "script_mod"})
+        self.assertEqual(by_name["compiled_mod"].hero, "kelvin")
+        self.assertEqual(by_name["compiled_mod"].models, ("models/heroes_staging/kelvin/kelvin.vmdl_c",))
+        self.assertEqual(by_name["compiled_mod"].counts["models"], 1)
+        self.assertEqual(by_name["script_mod"].hero, "")
+        self.assertIn("no-model", by_name["script_mod"].note)
+        self.assertEqual(by_name["script_mod"].counts["other"], 1)
+
+    def test_inventory_accepts_game_folder_and_suffix_shapes(self) -> None:
+        root = self.tmp_path / "mods"
+        empty = root / "folder_mod" / "abilities"
+        empty.mkdir(parents=True)
+        custom = root / "suffix_mod" / "custom"
+        custom.mkdir(parents=True)
+        (custom / "effect.vjs_c").write_bytes(b"effect")
+
+        result = inventory(
+            [root],
+            since=date(2024, 1, 1),
+            known_roots={"abilities"},
+            known_suffixes={".vjs_c"},
+        )
+
+        by_name = {mod.addon: mod for mod in result.mods}
+        self.assertEqual(set(by_name), {"folder_mod", "suffix_mod"})
+        self.assertIn("empty-folder", by_name["folder_mod"].note)
+        self.assertEqual(by_name["suffix_mod"].counts["other"], 1)
+
+    def test_two_mods_roots_with_the_same_leaf_are_inventoried_separately(self) -> None:
+        first = self.tmp_path / "Documents" / "mods"
+        second = self.tmp_path / "Documents" / "Documents" / "mods"
+        for root, name in ((first, "first_mod"), (second, "second_mod")):
+            model = root / name / "models" / "heroes_staging" / name / f"{name}.vmdl_c"
+            model.parent.mkdir(parents=True)
+            model.write_bytes(b"compiled")
+
+        result = inventory([first, second], since=date(2024, 1, 1))
+
+        found = {(mod.addon, mod.path) for mod in result.mods if mod.kind == "addon"}
+        self.assertEqual({name for name, _path in found}, {"first_mod", "second_mod"})
+        self.assertEqual(len({path for _name, path in found}), 2)
+        self.assertEqual(result.counts()["addons"], 2)
 
     def test_inventory_records_a_vpk_without_a_compiled_model(self) -> None:
         addons = self.tmp_path / "content" / "citadel_addons"

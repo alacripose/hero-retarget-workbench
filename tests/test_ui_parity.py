@@ -6,7 +6,9 @@ panel fails, and a stop-slop hit in a user-facing string fails.
 """
 from __future__ import annotations
 
+import ast
 import importlib.util
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -73,6 +75,40 @@ class PageParityTests(unittest.TestCase):
         self.assertEqual(heropick.kind_of("Haze", "models/heroes_staging/haze/haze.vmdl_c"), "HERO")
         self.assertEqual(heropick.kind_of("Shiv", "models/heroes_staging/shiv/shiv.vmdl_c"), "HERO")
         self.assertEqual(heropick.kind_of("Trooper", "models/npc/trooper.vmdl_c"), "OTHER")
+
+
+class ListColumnTests(unittest.TestCase):
+    def test_every_list_has_a_named_split_and_own_width(self):
+        addon = ROOT / "blender" / "hero_retarget_workbench"
+        lists = (addon / "ui_lists.py").read_text(encoding="utf-8")
+        tree = ast.parse(lists)
+        used: list[str] = []
+        for node in tree.body:
+            if not isinstance(node, ast.ClassDef) or not node.name.startswith("DMF_UL_"):
+                continue
+            names = {
+                item.value
+                for item in ast.walk(node)
+                if isinstance(item, ast.Constant)
+                and isinstance(item.value, str)
+                and item.value.endswith("_name_width")
+            }
+            self.assertTrue(names, f"{node.name} has no independent width property")
+            body = ast.get_source_segment(lists, node) or ""
+            self.assertIn("ui_popit.columns(", body, f"{node.name} has no category split")
+            used.extend(sorted(names))
+        self.assertEqual(len(used), len(set(used)), f"a width property is shared across lists: {used}")
+
+        declared = set(
+            re.findall(
+                r"^\s+(\w+_name_width): FloatProperty\(",
+                (addon / "properties.py").read_text(encoding="utf-8"),
+                re.M,
+            )
+        )
+        self.assertEqual(declared, set(used))
+        self.assertNotIn("list_name_width", lists)
+        self.assertNotIn("list_name_width", (addon / "properties.py").read_text(encoding="utf-8"))
 
 
 class CopyTests(unittest.TestCase):

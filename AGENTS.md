@@ -29,6 +29,43 @@ https://github.com/oaustegard/claude-skills/releases (declauding)
 https://github.com/hardikpandya/stop-slop
 <home>\.agents\skills\ has a ton of skills for agents to use and yet they never use them for some reason. You need to be using these skills and updating/managing them ccording to family project convention.
 
+## 2026-11-16 — every list is a category table with its own width
+
+**Owner instruction, verbatim:** *"here's a big issue, even when the window is allowed to take up more horizontal space the name width sliders aren't per category and there's none for this view either so names get truncated"*, then *"I want it to be eeverywhere don't make it only for one view holy fuck"*, with a Windows Explorer column view as the reference.
+
+- **One shared row grammar, no shared width.** `ui_popit.columns()` splits a row
+  into a name cell and category cells; `column_header()` labels the same split;
+  `name_width()` draws the list's own slider. Every UIList now uses it. The old
+  `scene.dmf.list_name_width` is gone; each list has a saved `*_name_width`
+  property (`source`, `folder`, `scan`, `mods`, `mod_contents`, `clients`,
+  `components`, `parts`, `source_materials`, `part_materials`, `hero_parts`,
+  `cloth`, `rules`, `ik`, `tail`, `bone`, `hierarchy`, `clips`). The two material
+  lists deliberately use separate values, selected by `active_propname`.
+- **Category headers are part of the table.** Source reads `Model / Folder`;
+  Mods reads `Package / Type / Hero / Date`; scan roots, contents, clients,
+  components, parts, materials, cloth, rules, IK, tails, clips, bone map and
+  hierarchy each name their own fields. The Source VPK browser reads
+  `Folder / Models`.
+- **Fixed list truncation is gone.** Name cells use the full string and let the
+  native cell clip; the old `_short()` caps in `ui_lists.py` are removed. The
+  slider is real: increasing a list's width reveals more of its names without
+  changing any other list.
+- **The Source page no longer writes during draw.** `_hero_picker` stopped
+  calling `properties.sync_folders`; `MODEL_ROOT_ITEMS` starts with the synthetic
+  `All folders` row. This removes the `folder_signature` write-in-draw error and
+  the invalid zero enum warning a fresh file showed under the pages probe.
+- **Measured.** `202` tests pass, `python tools/ui_parity.py --check` and
+  `python tools/ui_prose.py --check` are zero. `tests/test_ui_parity.py` now
+  refuses a UIList that shares a width property or has no category split. The
+  zip probe passes for `0.16.1`; `tools/blender_mods_gui_probe.py` and the
+  Source sidebar probe both draw real rows with headers and independent sliders.
+  Screenshots: `artifacts/ui-pass/source-columns.png`,
+  `artifacts/ui-pass/mods-collection.png`,
+  `artifacts/ui-pass/mods-scan-folders.png`.
+- **Not checked:** the full pages probe fails its own `surface-open-control`
+  check (0/26 draws), so it is not evidence here. The in-game client did not
+  run; this is a Blender sidebar/editor surface, not a Deadlock UI.
+
 ## 2026-11-16 — Mods is a typed collection, and a package becomes a Blender project
 
 **Owner instruction, verbatim:** *"all list views need to be modernized so backporting and updating
@@ -58,6 +95,76 @@ blender projects from those instead of the silly folder workspace thing"*.
   `artifacts/ui-pass/mods-scan-folders.png`.
 - **Not checked by me:** the in-game look of anything on this page. The probe checks Blender's data
   and draw path, not a running client.
+
+## 2026-11-16 — a mods root is a collection, and only released tools predict a toolchain
+
+**Owner instructions, verbatim:** *"if I add both d users alacrity documents (and the sub documents)
+mods directories ... despite these directories having 85 and 238 of their own directories it's not
+seeing them all"*, *"the mods are still valid even if they don't use models just because they might
+be using scripts or particles or sounds, if it has a vpk like structure to it that's valid"*, *"same
+things as other pages where it says when it was last updated and predict what version of the game it
+could have been compiled for, because the newer mods folder was used with a different toolset"*,
+*"csdk tools don't update often so it's based on when the individual tools released"*, and *"the game
+does not ship with a compiler that's an error an agent made by adding the compiler files to my game"*.
+
+- **A root is a collection.** `forge.oldmods.inventory` now records immediate child folders as
+  packages, not only `citadel_addons` unpacked addons. A package is kept when it has a game content
+  folder, a game file suffix, a `.vpk`, or a model/script/sound/particle payload. `content_shape()`
+  reads the live `pak01_dir.vpk`'s own top-level folders and suffixes; the bounded built-in list is
+  the fallback when the game is not installed. Empty `New Folder` shapes stay out, which is why the
+  owner's 85/238 top-level directories inventory as 78/229 packages plus the VPK records.
+- **The two `mods` roots stay separate.** Each root is keyed by its resolved full path, never by its
+  leaf name. The scan-root row shows the last three path components, so `Documents\\mods` and
+  `Documents\\Documents\\mods` are distinct in the UI. The real two-root run found 325 packages:
+  78 folders in the first root and 247 packages (229 folders, 18 VPKs) in the second.
+- **Last updated and toolchain are record fields.** `mod.modified` is the newest file or directory
+  timestamp in the package, shown beside the type in the list and in the selected package's detail
+  panel. `mod.toolchain` is predicted from installed **tool** releases, not from daily game builds;
+  it is also shown in the detail panel and searchable in the Mods filter.
+- **A full game is never a toolchain.** `forge.installs.classify` now sets `can_compile` only for a
+  tools tree or a reduced CSDK with no shipping pak. A game that contains copied
+  `resourcecompiler.exe` files no longer advertises a compiler, no longer feeds the toolchain list,
+  and a stale saved row is cleared when Mods scans. CSDK 4192 and CSDK 6836 are the released tools
+  on this machine; the newer game build 6861 is excluded.
+- **Measured.** 208 unit tests pass; `python tools/ui_parity.py --check` has no duplicates, empty
+  pages or unknown actions; `python tools/ui_prose.py --check` is zero; compileall and
+  `git diff --check` are clean. `tools/blender_mods_gui_probe.py` passes scan-count 5, typed records,
+  toolchain `CSDK 6836`, all filters and project creation. A real Blender scan of both roots
+  completed with `325 packages: 307 folders, 18 VPKs, 0 blends, 3 blend files, 1 cloth` and wrote
+  `artifacts/receipts/oldmods-real.json`; the folder package with a 4.4 GB payload no longer trips
+  Blender's 32-bit integer property.
+- **Zip.** `dist/hero_retarget_workbench-0.16.3.zip` has 68 files, 476,952 bytes, sha256
+  `81a89ac9f98bcf2f3fecd6b19d8017e6e83068b7db029741e8ad798561601e53`; the extracted-zip probe
+  reports 26 panels, 85 operators and pass.
+- **Not checked:** the real sidebar screenshot was not a usable page capture (the probe hid the page
+  category), so the real scan evidence is the receipt and log, not a visual claim. The game's copied
+  compiler files were not deleted; the addon simply stops treating the game as a compiler.
+
+## 2026-11-16 — filter chips keep their labels inside at every width
+
+**Owner instruction, verbatim:** *"no just the text outside of its buttons like hero not being in its
+button like custom rig is"*, with 782 px screenshots of Skeleton (`All`, `Extra`), Cloth (`Hero`) and
+Animations (`All`, `Unknown`) showing the first chip of each row moved into a label column while its
+button stayed empty.
+
+- **One chip helper.** `ui_popit.chips` replaces the duplicated `_chips` bodies in `ui.py` and
+  `ui_mods.py`. The old `grid_flow` inherited the panel's property split; the shared helper creates
+  explicit enum rows with `use_property_split = False` on the column and row, so every label is
+  inside its button. Four choices draw 2 by 2, five draw 3 plus 2, two draw one even row.
+- **Every page that had the bug uses it.** Skeleton, Cloth, Animations and the Mods collection chips
+  share the helper; 782 px screenshots confirm Skeleton (`All`, `Unmatched`, `Mapped`, `Extra`,
+  `Ignored`), Cloth (`Hero`, `Custom rig`) and Animations (`All`, `AG1`, `AG2`, `Unknown`) all keep
+  their text inside the buttons.
+- **Measured.** `208` tests pass; `ui_parity --check`, `ui_prose --check`, `compileall` and
+  `git diff --check` are clean. Visual evidence: `artifacts/visual/ui-pass/skeleton.png`,
+  `cloth.png`, `animations.png`; `artifacts/ui-pass/mods-collection.png` exercises the Mods chips
+  (`All 5`, `Folders 3`, `VPKs 1`, `Blends 1`) through the same helper.
+- **Zip.** `dist/hero_retarget_workbench-0.16.4.zip`, 68 files, 476,950 bytes, sha256
+  `5ed33bdf15d304f4404dede4571636239319a94116752e1f62c9f781993ec396`; the extracted-zip probe
+  reports 26 panels, 85 operators and pass.
+- **Not checked:** the owner's exact theme and 782 px custom-editor window were reproduced at 782 px
+  with the factory theme; a non-default Blender theme was not. The real in-game client is not part
+  of this surface.
 
 ## 2026-11-16 — the boundary got harder, the release end lives in the addon, and Seven ships
 

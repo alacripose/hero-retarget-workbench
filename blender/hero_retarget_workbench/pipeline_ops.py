@@ -156,15 +156,71 @@ class DMF_OT_scan_mods(Operator):
             if settings.mod_report
             else _workspace(settings) / "mods" / "old-mods.json"
         )
+        game_vpk = None
+        try:
+            environment = core.detect_environment(settings, module)
+            game_vpk = environment.vpk
+        except Exception:
+            # The scan can still use Blender's built-in asset families when the
+            # game is not installed or its config is unavailable.
+            game_vpk = None
+        # A full game is a backport target, not a toolchain. Older scenes can
+        # still carry a compiler flag from files copied into a game install;
+        # correct that saved row before using it as a release date.
+        for row in settings.clients:
+            if row.kind == "game" and row.can_backport:
+                row.can_compile = False
+        toolchain_labels = [
+            row.build
+            for row in settings.clients
+            if row.can_compile
+            and row.build
+            and (row.kind == "tools" or not row.can_backport)
+        ]
+        if not toolchain_labels:
+            current = core.tools_build(settings)
+            if current:
+                toolchain_labels = [current]
 
         def work(progress):
             progress(0.02, f"scanning {len(roots)} folders")
+
+            found_toolchains = list(toolchain_labels)
+            if not found_toolchains:
+                try:
+                    progress(0.03, "finding installed toolchains")
+                    found_toolchains = [
+                        row.build
+                        for row in module["installs"].discover()
+                        if row.can_compile and row.build
+                    ]
+                except Exception:
+                    found_toolchains = []
+
+            known_roots = None
+            known_suffixes = None
+            try:
+                if game_vpk is not None and game_vpk.is_file():
+                    progress(0.04, f"reading {game_vpk.name} types")
+                    known_roots, known_suffixes = module["oldmods"].content_shape(
+                        game_vpk
+                    )
+            except Exception as error:
+                # A missing or unreadable game pak is a smaller fallback, not a
+                # reason to hide the mod folders that are already on disk.
+                progress(0.04, f"game types unavailable: {error}")
 
             def walked(fraction, message):
                 progress(0.02 + 0.93 * float(fraction), message)
 
             result = module["oldmods"].inventory(
-                roots, since=since, until=until, progress=walked
+                roots,
+                since=since,
+                until=until,
+                progress=walked,
+                known_roots=known_roots,
+                known_suffixes=known_suffixes,
+                toolchains=found_toolchains,
             )
             progress(0.96, f"writing {report.name}")
             result.save(report)
@@ -180,6 +236,7 @@ class DMF_OT_scan_mods(Operator):
                 row.kind = mod.kind
                 row.hero = mod.hero
                 row.modified = mod.modified
+                row.toolchain = mod.toolchain
                 row.sections = ", ".join(mod.cloth_sections)
                 row.bytes = mod.bytes
                 row.note = mod.note
@@ -202,9 +259,11 @@ class DMF_OT_scan_mods(Operator):
             if counts["skipped_game_paks"]:
                 settings.mod_note += f", {counts['skipped_game_paks']} engine paks skipped"
             for root_row in settings.scan_roots:
-                base = bpy.path.abspath(root_row.path).replace("\\", "/").lower()
+                base = Path(bpy.path.abspath(root_row.path)).resolve()
                 matched = [
-                    mod for mod in result.mods if Path(mod.path).as_posix().lower().startswith(base)
+                    mod
+                    for mod in result.mods
+                    if Path(mod.path).resolve().is_relative_to(base)
                 ]
                 root_row.packages = len(matched)
                 root_row.folders = sum(1 for mod in matched if mod.kind == "addon")
