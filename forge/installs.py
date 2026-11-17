@@ -32,13 +32,17 @@ TOOLS_PATTERNS = (
     "Users/*/Documents/Documents/deadlockpreview/Project8Staging/*",
     "Users/*/Documents/deadlockpreview/Project8Staging/*",
     "Users/*/Documents/*/Project8Staging/*",
-    "Users/*/Downloads/Reduced_CSDK_*",
-    "Users/*/Downloads/CSwin64_build_*",
+    # Tools and reduced CSDKs are not named after one machine's download
+    # folder. Read one level below common user directories and let classify()
+    # decide from each tree's own gameinfo and binaries.
+    "Users/*/Downloads/*",
+    "Users/*/Desktop/*",
+    "Users/*/Documents/*",
     "Users/*/*/Project8Staging/*",
     "Projects/*/Project8Staging/*",
     "dev/*/Project8Staging/*",
     "Documents/*/Project8Staging/*",
-    "Downloaded Files/CSwin64_build_*",
+    "Downloaded Files/*",
 )
 
 

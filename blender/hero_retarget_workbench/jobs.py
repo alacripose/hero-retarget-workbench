@@ -17,6 +17,26 @@ _ACTIVE: "BackgroundJob | None" = None
 _UNLOADING = False
 
 
+class JobProgress:
+    """The worker's progress channel: one overall bar plus named stage bars."""
+
+    def __init__(self, job: "BackgroundJob"):
+        self._job = job
+
+    def __call__(self, value: float, message: str = "") -> None:
+        self._job.progress(value, message)
+
+    def stage(
+        self,
+        key: str,
+        label: str,
+        value: float,
+        message: str = "",
+        state: str = "RUNNING",
+    ) -> None:
+        self._job.stage(key, label, value, message, state)
+
+
 class BackgroundJob:
     def __init__(self, settings, label: str, work: Callable, on_done: Callable, on_error: Callable):
         self.settings = settings
@@ -27,6 +47,9 @@ class BackgroundJob:
         self._lock = threading.Lock()
         self._progress = 0.0
         self._message = "starting"
+        self._stages: dict[str, dict] = {}
+        self._stage_order: list[str] = []
+        self._stage_signature: tuple | None = None
         self._result = None
         self._error: BaseException | None = None
         self._finished = threading.Event()
@@ -39,6 +62,7 @@ class BackgroundJob:
         self.settings.job_cancellable = False
         self.settings.job_state = "RUNNING"
         self.settings.job_log = f"{label}: starting"
+        self.settings.job_stages.clear()
         self._logged = "starting"
         self._thread.start()
         self._timer = bpy.app.timers.register(self._tick, first_interval=0.1, persistent=True)
@@ -49,9 +73,57 @@ class BackgroundJob:
             if message:
                 self._message = message
 
+    def stage(
+        self,
+        key: str,
+        label: str,
+        value: float,
+        message: str = "",
+        state: str = "RUNNING",
+    ) -> None:
+        value = max(0.0, min(1.0, float(value)))
+        with self._lock:
+            row = self._stages.get(key)
+            if row is None:
+                row = {"key": key, "progress": 0.0, "message": "", "state": "QUEUED"}
+                self._stages[key] = row
+                self._stage_order.append(key)
+            if label:
+                row["label"] = label
+            if state == "RUNNING":
+                row["progress"] = max(row["progress"], value)
+            else:
+                row["progress"] = value
+            if message:
+                row["message"] = message
+            row["state"] = state
+
+    def _stage_rows(self) -> list[dict]:
+        with self._lock:
+            return [dict(self._stages[key]) for key in self._stage_order]
+
+    def _sync_stages(self) -> None:
+        rows = self._stage_rows()
+        signature = tuple(
+            (row["key"], row.get("label", ""), row["progress"], row["message"], row["state"])
+            for row in rows
+        )
+        if signature == self._stage_signature:
+            return
+        self._stage_signature = signature
+        stages = self.settings.job_stages
+        stages.clear()
+        for row in rows:
+            item = stages.add()
+            item.key = row["key"]
+            item.label = row.get("label", row["key"])
+            item.progress = row["progress"]
+            item.message = row["message"]
+            item.state = row["state"]
+
     def _run(self) -> None:
         try:
-            self._result = self.work(self.progress)
+            self._result = self.work(JobProgress(self))
         except BaseException as error:  # the timer needs the message, not a traceback dialog
             self._error = error
             traceback.print_exc()
@@ -65,6 +137,7 @@ class BackgroundJob:
         with self._lock:
             progress = self._progress
             message = self._message
+        self._sync_stages()
         self.settings.job_progress = max(self.settings.job_progress, progress)
         if message and message != self._logged:
             self.settings.job_message = message
@@ -73,6 +146,14 @@ class BackgroundJob:
             self.settings.job_log = "\n".join([*lines, message])
         if not self._finished.is_set():
             return 0.1
+        with self._lock:
+            for row in self._stages.values():
+                if row["state"] == "RUNNING":
+                    row["state"] = "DONE" if self._error is None else "FAILED"
+                    if self._error is None:
+                        row["progress"] = 1.0
+                        row["message"] = "done"
+        self._sync_stages()
         self.settings.job_running = False
         self.settings.job_progress = 1.0
         _ACTIVE = None
@@ -106,6 +187,7 @@ def clear_feedback(settings) -> None:
     settings.job_message = ""
     settings.job_progress = 0.0
     settings.job_label = ""
+    settings.job_stages.clear()
 
 
 def active() -> BackgroundJob | None:

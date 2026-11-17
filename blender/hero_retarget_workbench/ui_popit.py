@@ -345,6 +345,30 @@ def job(layout, settings):
         text=getattr(settings, "job_message", ""),
         slider=True,
     )
+    stage_rows = (
+        list(getattr(settings, "job_stages", ()) or ())
+        if getattr(settings, "job_kind", "") == "BACKGROUND"
+        else []
+    )
+    for stage in stage_rows:
+        row = box.row(align=True)
+        row.scale_y = 0.9
+        icon = {
+            "DONE": "CHECKMARK",
+            "FAILED": "ERROR",
+            "RUNNING": "TIME",
+        }.get(stage.state, "BLANK1")
+        row.label(text=stage.label or stage.key, icon=icon)
+        if stage.state == "RUNNING":
+            right = row.row(align=True)
+            right.alignment = "RIGHT"
+            right.label(text=f"{int(stage.progress * 100)}%")
+        box.prop(
+            stage,
+            "progress",
+            text=stage.message or stage.state.lower(),
+            slider=True,
+        )
     for line in log[-2:]:
         row = box.row(align=True)
         row.scale_y = 0.85

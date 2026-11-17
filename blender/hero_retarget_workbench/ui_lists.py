@@ -23,18 +23,129 @@ _ICONS = {
 }
 
 
-def _filter(ui_list, texts, restrict=None):
-    """The list header's search, invert and sort, as ``bitflag_filter_item`` flags."""
-    flags, order = uilist.rows(
-        texts,
-        getattr(ui_list, "filter_name", "") or "",
-        sort_alpha=bool(getattr(ui_list, "use_filter_sort_alpha", False)),
-        reverse=bool(getattr(ui_list, "use_filter_sort_reverse", False)),
-        invert=bool(getattr(ui_list, "use_filter_invert", False)),
-        restrict=restrict,
-    )
+
+_WIDTH_PROPS = {
+    "DMF_UL_model_folders": "folder_name_width",
+    "DMF_UL_bone_map": "bone_name_width",
+    "DMF_UL_hierarchy": "hierarchy_name_width",
+    "DMF_UL_parts": "parts_name_width",
+    "DMF_UL_collections": "collection_name_width",
+    "DMF_UL_hero_parts": "hero_parts_name_width",
+    "DMF_UL_cloth_chains": "cloth_name_width",
+    "DMF_UL_rules": "rules_name_width",
+    "DMF_UL_clips": "clips_name_width",
+    "DMF_UL_ik": "ik_name_width",
+    "DMF_UL_tail": "tail_name_width",
+    "DMF_UL_scan_roots": "scan_name_width",
+    "DMF_UL_mod_contents": "mod_contents_name_width",
+    "DMF_UL_mod_matches": "mod_matches_name_width",
+    "DMF_UL_mod_nodes": "mod_nodes_name_width",
+    "DMF_UL_mod_diffs": "mod_diffs_name_width",
+    "DMF_UL_mods": "mods_name_width",
+    "DMF_UL_clients": "clients_name_width",
+    "DMF_UL_components": "components_name_width",
+}
+
+# A width drag redraws the panel on every pointer move. The list header's filter
+# is unchanged by that, but Blender calls filter_items again for each redraw.
+# Keep the last result per list and reuse it only when the width is what changed;
+# an edit at a fixed width always re-filters, so row text cannot go stale.
+_FILTER_CACHE: dict[tuple, tuple[tuple, float, list[int], list[int]]] = {}
+
+
+def _width_prop(ui_list, propname: str) -> str:
+    name = type(ui_list).__name__
+    if name == "DMF_UL_materials":
+        return (
+            "part_materials_name_width"
+            if propname == "part_materials"
+            else "source_materials_name_width"
+        )
+    return _WIDTH_PROPS.get(name, "")
+
+
+def _filter(ui_list, context, rows=None, text_of=None, restrict=None, *, propname: str = ""):
+    """The list header's search, invert and sort, as ``bitflag_filter_item`` flags.
+
+    ``text_of`` is lazy. A list with no search or A-Z sort, and a width-only
+    redraw of any list, never builds a string for a row. That is what makes a
+    six-thousand-row list feel instant while its name width is dragged.
+
+    The two-argument form ``_filter(ui_list, texts)`` is the probe/diagnostic
+    shape from before the lazy path; it still runs the pure filter directly.
+    """
+    query = getattr(ui_list, "filter_name", "") or ""
+    sort_alpha = bool(getattr(ui_list, "use_filter_sort_alpha", False))
+    reverse = bool(getattr(ui_list, "use_filter_sort_reverse", False))
+    invert = bool(getattr(ui_list, "use_filter_invert", False))
     bit = getattr(ui_list, "bitflag_filter_item", 1)
-    return [bit if flag else 0 for flag in flags], order
+    if text_of is None:
+        raw, order = uilist.rows(
+            context,
+            query,
+            sort_alpha=sort_alpha,
+            reverse=reverse,
+            invert=invert,
+            restrict=restrict if rows is None else rows,
+        )
+        return [bit if flag else 0 for flag in raw], order
+    limit = None if restrict is None else list(restrict)
+    width_prop = _width_prop(ui_list, propname)
+    settings = getattr(getattr(context, "scene", None), "dmf", None)
+    width = getattr(settings, width_prop, None) if width_prop else None
+    # A bpy_prop_collection wrapper is recreated on every draw and its as_pointer
+    # changes; the settings group it belongs to does not. Key on the owner, and
+    # keep propname in the key for the two material lists.
+    data_ptr = getattr(settings, "as_pointer", None)
+    data_key = data_ptr() if callable(data_ptr) else id(rows)
+    base_key = (
+        type(ui_list).__name__,
+        propname,
+        data_key,
+    )
+    signature = (
+        len(rows),
+        query,
+        sort_alpha,
+        reverse,
+        invert,
+        tuple(limit) if limit is not None else None,
+    )
+    cached = _FILTER_CACHE.get(base_key)
+    if (
+        cached is not None
+        and cached[0] == signature
+        and width is not None
+        and width != cached[1]
+    ):
+        _FILTER_CACHE[base_key] = (signature, width, cached[2], cached[3])
+        return cached[2], cached[3]
+
+    if not query and not sort_alpha:
+        flags = [bit] * len(rows)
+        if invert:
+            flags = [0] * len(rows)
+        if limit is not None:
+            flags = [
+                bit if index < len(limit) and limit[index] and not invert else 0
+                for index in range(len(flags))
+            ]
+        order: list[int] = []
+    else:
+        texts = [text_of(row) for row in rows]
+        raw, order = uilist.rows(
+            texts,
+            query,
+            sort_alpha=sort_alpha,
+            reverse=reverse,
+            invert=invert,
+            restrict=limit,
+        )
+        flags = [bit if flag else 0 for flag in raw]
+
+    if width is not None:
+        _FILTER_CACHE[base_key] = (signature, width, flags, order)
+    return flags, order
 
 
 def _bone_map_text(entry) -> str:
@@ -69,7 +180,13 @@ class DMF_UL_model_folders(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [f"{row.label} {row.root} {row.description}" for row in rows])
+        return _filter(
+            self,
+            context,
+            rows,
+            lambda row: f"{row.label} {row.root} {row.description}",
+            propname=propname,
+        )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         settings = getattr(context.scene, "dmf", None)
@@ -94,7 +211,7 @@ class DMF_UL_bone_map(UIList):
         # The state selector is a restriction; the header's search narrows it and
         # the A-Z button sorts what survives.
         restrict = None if mode == "ALL" else [row.state == mode for row in rows]
-        return _filter(self, [_bone_map_text(row) for row in rows], restrict)
+        return _filter(self, context, rows, _bone_map_text, restrict, propname=propname)
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         width = getattr(context.scene.dmf, "bone_name_width", 0.45)
@@ -112,7 +229,13 @@ class DMF_UL_hierarchy(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [f"{row.name} {row.parent}" for row in rows])
+        return _filter(
+            self,
+            context,
+            rows,
+            lambda row: f"{row.name} {row.parent}",
+            propname=propname,
+        )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         width = getattr(context.scene.dmf, "hierarchy_name_width", 0.5)
@@ -135,7 +258,10 @@ class DMF_UL_parts(UIList):
         rows = getattr(data, propname)
         return _filter(
             self,
-            [row.object.name if row.object is not None else "missing part" for row in rows],
+            context,
+            rows,
+            lambda row: row.object.name if row.object is not None else "missing part",
+            propname=propname,
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
@@ -157,7 +283,7 @@ class DMF_UL_collections(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [row.name for row in rows])
+        return _filter(self, context, rows, lambda row: row.name, propname=propname)
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         settings = getattr(context.scene, "dmf", None)
@@ -182,10 +308,10 @@ class DMF_UL_materials(UIList):
         rows = getattr(data, propname)
         return _filter(
             self,
-            [
-                f"{row.label} {row.material.name if row.material else ''} {row.slot_index}"
-                for row in rows
-            ],
+            context,
+            rows,
+            lambda row: f"{row.label} {row.material.name if row.material else ''} {row.slot_index}",
+            propname=propname,
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
@@ -212,11 +338,13 @@ class DMF_UL_hero_parts(UIList):
         rows = getattr(data, propname)
         return _filter(
             self,
-            [
+            context,
+            rows,
+            lambda row: (
                 f"{row.object.name if row.object else 'missing part'} "
                 f"{'cloth' if row.object and clothscan.is_cloth(row.object.name) else ''}"
-                for row in rows
-            ],
+            ),
+            propname=propname,
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
@@ -239,10 +367,13 @@ class DMF_UL_cloth_chains(UIList):
         rows = getattr(data, propname)
         return _filter(
             self,
-            [
-                f"{row.name} {row.root} {row.side} {'cloth' if clothscan.is_cloth(row.name) else ''}"
-                for row in rows
-            ],
+            context,
+            rows,
+            lambda row: (
+                f"{row.name} {row.root} {row.side} "
+                f"{'cloth' if clothscan.is_cloth(row.name) else ''}"
+            ),
+            propname=propname,
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
@@ -264,7 +395,7 @@ class DMF_UL_rules(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [_rules_text(row) for row in rows])
+        return _filter(self, context, rows, _rules_text, propname=propname)
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         width = getattr(context.scene.dmf, "rules_name_width", 0.65)
@@ -306,12 +437,14 @@ class DMF_UL_clips(UIList):
         wanted = getattr(getattr(context.scene, "dmf", None), "clip_ag_filter", "ALL")
         return _filter(
             self,
-            [
+            context,
+            rows,
+            lambda row: (
                 f"{row.label} {row.name} {row.kind} {'compiled' if row.compiled else ''} "
                 f"{row.ag} {row.state} {row.action} {row.source_hero}"
-                for row in rows
-            ],
+            ),
             restrict=None if wanted == "ALL" else [row.ag == wanted for row in rows],
+            propname=propname,
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
@@ -333,7 +466,13 @@ class DMF_UL_ik(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [f"{row.bone} {row.target} {row.state}" for row in rows])
+        return _filter(
+            self,
+            context,
+            rows,
+            lambda row: f"{row.bone} {row.target} {row.state}",
+            propname=propname,
+        )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         width = getattr(context.scene.dmf, "ik_name_width", 0.5)
@@ -353,7 +492,13 @@ class DMF_UL_tail(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [f"{row.source} {row.target} {row.state}" for row in rows])
+        return _filter(
+            self,
+            context,
+            rows,
+            lambda row: f"{row.source} {row.target} {row.state}",
+            propname=propname,
+        )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         width = getattr(context.scene.dmf, "tail_name_width", 0.5)
@@ -370,7 +515,13 @@ class DMF_UL_scan_roots(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [f"{row.path} {row.note}" for row in rows])
+        return _filter(
+            self,
+            context,
+            rows,
+            lambda row: f"{row.path} {row.note}",
+            propname=propname,
+        )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         width = getattr(context.scene.dmf, "scan_name_width", 0.66)
@@ -407,7 +558,13 @@ class DMF_UL_mod_contents(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [f"{row.label} {row.category}" for row in rows])
+        return _filter(
+            self,
+            context,
+            rows,
+            lambda row: f"{row.label} {row.category}",
+            propname=propname,
+        )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         width = getattr(context.scene.dmf, "mod_contents_name_width", 0.7)
@@ -424,10 +581,13 @@ class DMF_UL_mod_matches(UIList):
         rows = getattr(data, propname)
         return _filter(
             self,
-            [
-                f"{row.label} {row.build} {row.install} {row.relative} {row.entry} {row.kind}"
-                for row in rows
-            ],
+            context,
+            rows,
+            lambda row: (
+                f"{row.label} {row.build} {row.install} "
+                f"{row.relative} {row.entry} {row.kind}"
+            ),
+            propname=propname,
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
@@ -442,7 +602,13 @@ class DMF_UL_mod_nodes(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [f"{row.name} {'changed' if row.changed else 'same'}" for row in rows])
+        return _filter(
+            self,
+            context,
+            rows,
+            lambda row: f"{row.name} {'changed' if row.changed else 'same'}",
+            propname=propname,
+        )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         width = getattr(context.scene.dmf, "mod_nodes_name_width", 0.62)
@@ -474,7 +640,13 @@ class DMF_UL_mod_diffs(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [f"{row.path} {row.state}" for row in rows])
+        return _filter(
+            self,
+            context,
+            rows,
+            lambda row: f"{row.path} {row.state}",
+            propname=propname,
+        )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         width = getattr(context.scene.dmf, "mod_diffs_name_width", 0.64)
@@ -493,10 +665,13 @@ class DMF_UL_mods(UIList):
         rows = getattr(data, propname)
         return _filter(
             self,
-            [
-                f"{row.addon} {row.hero} {row.kind} {row.modified} {row.toolchain} {row.sections} {row.note} {row.path}"
-                for row in rows
-            ],
+            context,
+            rows,
+            lambda row: (
+                f"{row.addon} {row.hero} {row.kind} {row.modified} "
+                f"{row.toolchain} {row.sections} {row.note} {row.path}"
+            ),
+            propname=propname,
         )
 
     _KIND_LABELS = {"vpk": "VPK", "addon": "Folder", "blend": "Blend"}
@@ -521,7 +696,10 @@ class DMF_UL_clients(UIList):
         rows = getattr(data, propname)
         return _filter(
             self,
-            [f"{row.label} {row.kind} {row.engine} {row.build} {row.path}" for row in rows],
+            context,
+            rows,
+            lambda row: f"{row.label} {row.kind} {row.engine} {row.build} {row.path}",
+            propname=propname,
         )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
@@ -546,7 +724,13 @@ class DMF_UL_components(UIList):
 
     def filter_items(self, context, data, propname):
         rows = getattr(data, propname)
-        return _filter(self, [f"{row.name} {row.relative} {row.kind} {row.bytes}" for row in rows])
+        return _filter(
+            self,
+            context,
+            rows,
+            lambda row: f"{row.name} {row.relative} {row.kind} {row.bytes}",
+            propname=propname,
+        )
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         width = getattr(context.scene.dmf, "components_name_width", 0.55)

@@ -129,6 +129,19 @@ HASH_SUFFIXES = (
 )
 _CHUNK_VPK = re.compile(r"_\d{3}\.vpk$", re.IGNORECASE)
 
+# Loose matching only needs folders that can carry a hashable asset. Walking a
+# whole engine or game tree (bin, maps, cache, logs) is the slow part on a big
+# install and cannot produce a match.
+HASH_ROOT_DIRS = ("models", "materials", "clips", "particles", "anims", "animation")
+VPK_SKIP_DIRS = set(SKIP_DIRS) | {
+    "bin",
+    "bin_tools",
+    "platform",
+    "tools",
+    "cache",
+    "logs",
+}
+
 _MONTHS = {
     name: index
     for index, name in enumerate(
@@ -435,12 +448,21 @@ def _is_compiled_suffix(value: str) -> bool:
 # A rescan of the same CSDK should not re-read every matching source file. The
 # key includes size and mtime, so an edited asset is hashed again.
 _LOOSE_CRC_CACHE: dict[str, tuple[int, int, int]] = {}
+_MOD_HASH_CACHE: dict[str, tuple[int, int, int, str]] = {}
 
 
 def _file_hash(relative: str, path: Path) -> FileHash | None:
+    key = str(path).lower()
     try:
-        crc, digest = _content_digest(path)
-        size = path.stat().st_size
+        stat = path.stat()
+        cached = _MOD_HASH_CACHE.get(key)
+        if cached is not None and cached[0] == stat.st_size and cached[1] == stat.st_mtime_ns:
+            crc, digest = cached[2], cached[3]
+        else:
+            crc, digest = _content_digest(path)
+            stat = path.stat()
+            _MOD_HASH_CACHE[key] = (stat.st_size, stat.st_mtime_ns, crc, digest)
+        size = stat.st_size
     except OSError:
         return None
     return FileHash(relative=relative, size=size, crc32=crc, sha256=digest)
@@ -710,45 +732,104 @@ def _install_root(install) -> Path:
 
 
 def _install_loose_roots(root: Path) -> list[Path]:
-    """Where a CSDK can leave compiled files without an addon.
+    """Where an install can leave compiled files without an addon.
 
-    Older CSDK10 sessions compiled straight into ``game/citadel``; there was no
-    ``content/citadel_addons`` step. Reading ``game`` covers that layout, while
-    the content folder covers a source addon that was never packed.
+    A CSDK can compile straight into its engine folder, and a source addon can
+    live under any ``content/*_addons`` folder. Reading only ``citadel`` and
+    ``core`` missed tools trees such as ``CSwin64`` and any future engine name,
+    so this follows the tree's own ``gameinfo.gi`` files and addon folders.
     """
+    def hash_roots(base: Path) -> list[Path]:
+        found = [base / name for name in HASH_ROOT_DIRS if (base / name).is_dir()]
+        return found or [base]
+
+    def addon_hash_roots(base: Path) -> list[Path]:
+        # A ``citadel_addons`` folder is a collection of addons, not one addon.
+        # Walking its 260k-file root was the CSDK12 stall; reading each addon's
+        # models/materials/clips keeps the same matches and skips the rest.
+        if not any((base / name).is_dir() for name in HASH_ROOT_DIRS):
+            try:
+                children = [child for child in sorted(base.iterdir()) if child.is_dir()]
+            except OSError:
+                children = []
+            if children:
+                return [path for child in children for path in hash_roots(child)]
+        return hash_roots(base)
+
     roots: list[Path] = []
     game = root / "game"
     if game.is_dir():
-        # A compiled noaddon CSDK writes its assets under game/citadel (and
-        # sometimes game/core). Walking the whole game tree also visits bin,
-        # platform and tool folders that cannot hold a match.
-        for name in ("citadel", "core"):
-            candidate = game / name
-            if candidate.is_dir():
-                roots.append(candidate)
-        if not roots:
-            roots.append(game)
-    elif root.name.lower() in ("game", "citadel"):
-        roots.append(root)
-    for candidate in (
-        root / "content" / "citadel_addons",
-        root / "citadel_addons",
-    ):
-        if candidate.is_dir():
-            roots.append(candidate)
-    return roots
+        try:
+            engine_roots = [
+                child
+                for child in sorted(game.iterdir())
+                if child.is_dir() and (child / "gameinfo.gi").is_file()
+            ]
+        except OSError:
+            engine_roots = []
+        if engine_roots:
+            for engine in engine_roots:
+                roots.extend(hash_roots(engine))
+        else:
+            # Old test fixtures and stripped tools trees can omit gameinfo.gi.
+            for name in ("citadel", "core"):
+                candidate = game / name
+                if candidate.is_dir():
+                    roots.extend(hash_roots(candidate))
+            if not roots:
+                roots.extend(hash_roots(game))
+    elif root.name.lower() in ("game", "citadel", "core"):
+        roots.extend(hash_roots(root))
+
+    for content in (root / "content", root / "citadel_addons"):
+        if not content.is_dir():
+            continue
+        try:
+            addon_roots = [
+                child
+                for child in sorted(content.iterdir())
+                if child.is_dir() and child.name.lower().endswith("addons")
+            ]
+        except OSError:
+            addon_roots = []
+        if addon_roots:
+            for addon_root in addon_roots:
+                roots.extend(addon_hash_roots(addon_root))
+        elif content.name.lower() == "citadel_addons":
+            roots.extend(addon_hash_roots(content))
+
+    unique: dict[str, Path] = {}
+    for candidate in roots:
+        try:
+            key = str(candidate.resolve()).lower()
+        except OSError:
+            key = str(candidate).lower()
+        unique.setdefault(key, candidate)
+    return list(unique.values())
 
 
 def _install_vpks(root: Path) -> list[Path]:
     found: dict[str, Path] = {}
+    base_depth = len(root.parts)
     try:
-        paths = sorted(root.rglob("*.vpk"), key=lambda path: str(path).lower())
+        for current, dirs, files in os.walk(root):
+            depth = len(Path(current).parts) - base_depth
+            if depth >= 6:
+                dirs[:] = []
+            else:
+                dirs[:] = [name for name in dirs if name.lower() not in VPK_SKIP_DIRS]
+            for name in files:
+                if not name.lower().endswith(".vpk") or _CHUNK_VPK.search(name):
+                    continue
+                lower = name.lower()
+                if "bakeresourcecache" in lower or lower.startswith(("shaders_", "toolscene_")):
+                    # These paks hold compiled shader/cache data, never a model,
+                    # clip or material entry the matcher can use.
+                    continue
+                path = Path(current) / name
+                found.setdefault(str(path.resolve()).lower(), path)
     except OSError:
         return []
-    for path in paths:
-        if not path.is_file() or _CHUNK_VPK.search(path.name):
-            continue
-        found.setdefault(str(path.resolve()).lower(), path)
     return list(found.values())
 
 
@@ -762,7 +843,7 @@ def _install_gameinfo(root: Path) -> Path | None:
     return None
 
 
-def match_installs(mods, installs, *, progress=None) -> list[ModRecord]:
+def match_installs(mods, installs, *, progress=None, stage=None) -> list[ModRecord]:
     """Attach byte-identical files from every detected install to each mod.
 
     The mod side is hashed once. A VPK entry already carries the CRC32 and byte
@@ -779,6 +860,14 @@ def match_installs(mods, installs, *, progress=None) -> list[ModRecord]:
             wanted.setdefault((item.size, item.crc32), []).append((mod, item))
             sizes.add(item.size)
     if not wanted or not installs:
+        if stage is not None:
+            stage(
+                "match",
+                "Match installed builds",
+                1.0,
+                "no model hashes to match",
+                "DONE",
+            )
         return list(mods)
 
     matches: dict[str, list[HashMatch]] = {}
@@ -817,6 +906,14 @@ def match_installs(mods, installs, *, progress=None) -> list[ModRecord]:
     def report(index: int, fraction: float, message: str) -> None:
         if progress is not None:
             progress(min(1.0, (index + fraction) / total), message)
+        if stage is not None:
+            stage(
+                "match",
+                "Match installed builds",
+                min(1.0, (index + fraction) / total),
+                message,
+                "RUNNING",
+            )
 
     for index, install in enumerate(installs):
         root = _install_root(install)
@@ -919,6 +1016,14 @@ def match_installs(mods, installs, *, progress=None) -> list[ModRecord]:
         )
     if progress is not None:
         progress(1.0, f"matching complete: {match_count} matches, {source_count} source")
+    if stage is not None:
+        stage(
+            "match",
+            "Match installed builds",
+            1.0,
+            f"{match_count} matches, {source_count} source",
+            "DONE",
+        )
     return [
         ModRecord(
             path=mod.path,
@@ -949,11 +1054,16 @@ def _addon_from_dir(
     *,
     allow_empty: bool = False,
     toolchains=(),
+    progress=None,
 ) -> ModRecord | None:
-    files = sorted(
-        (item for item in path.rglob("*") if item.is_file()),
-        key=lambda item: str(item).lower(),
-    )
+    files: list[Path] = []
+    for item in path.rglob("*"):
+        if not item.is_file():
+            continue
+        files.append(item)
+        if progress is not None and len(files) % 256 == 0:
+            progress(f"reading {path.name}: {len(files):,} files")
+    files.sort(key=lambda item: str(item).lower())
     model_files = sorted(
         item for item in files if item.suffix.lower() in (".vmdl", ".vmdl_c")
     )[:MAX_VMDL_PER_ADDON]
@@ -972,12 +1082,15 @@ def _addon_from_dir(
     models = [item.relative_to(path).as_posix() for item in model_files]
     cloth, per_model = cloth_inventory(text_models)
     relative_files = tuple(item.relative_to(path).as_posix() for item in files)
-    hashes = tuple(
-        found
-        for item in files
-        if item.suffix.lower() in HASH_SUFFIXES
-        if (found := _file_hash(item.relative_to(path).as_posix(), item)) is not None
-    )
+    hash_files = [item for item in files if item.suffix.lower() in HASH_SUFFIXES]
+    hashes_list: list[FileHash] = []
+    for index, item in enumerate(hash_files):
+        if progress is not None and (index % 64 == 0 or index == len(hash_files) - 1):
+            progress(f"hashing {path.name}: {index + 1}/{len(hash_files)}")
+        found = _file_hash(item.relative_to(path).as_posix(), item)
+        if found is not None:
+            hashes_list.append(found)
+    hashes = tuple(hashes_list)
     listed = relative_files[:MAX_LISTED_FILES]
     counts = content_counts(relative_files)
     notes = []
@@ -1089,6 +1202,7 @@ def inventory(
     until: date | None = None,
     max_depth: int = 7,
     progress=None,
+    stage=None,
     known_roots: set[str] | None = None,
     known_suffixes: set[str] | None = None,
     toolchains=(),
@@ -1096,9 +1210,10 @@ def inventory(
 ) -> Inventory:
     """Scan roots for VPKs and unpacked citadel addons.
 
-    ``progress`` is an optional ``(fraction, message)`` callback. The scan can
-    walk tens of thousands of directories, and a button with no moving state
-    reads as a button that did nothing.
+    ``progress`` is an optional ``(fraction, message)`` callback. ``stage`` is
+    an optional ``(key, label, fraction, message, state)`` callback for named
+    sub-bars: each scan root and the install matcher report separately, so a
+    slow package read cannot hide which stage is working.
     """
     mods: list[ModRecord] = []
     seen: set[str] = set()
@@ -1107,21 +1222,56 @@ def inventory(
     skipped_unreadable: list[str] = []
     resolved_roots = [Path(root).expanduser().resolve() for root in roots]
     total_roots = max(1, len(resolved_roots))
+    install_list = list(installs)
+    scan_span = 0.80 if install_list else 1.0
+
+    def mark(key, label, value, message, state="RUNNING") -> None:
+        if stage is not None:
+            stage(key, label, value, message, state)
+
+    root_labels = [
+        f"Folder {index + 1}/{total_roots}: {root.name or root}"
+        for index, root in enumerate(resolved_roots)
+    ]
+    for index, label in enumerate(root_labels):
+        mark(f"root:{index}", label, 0.0, "queued", "QUEUED")
 
     for root_index, root in enumerate(resolved_roots):
-        base = root_index / total_roots
-        span = 1.0 / total_roots
+        base = scan_span * root_index / total_roots
+        span = scan_span / total_roots
+        root_key = f"root:{root_index}"
+        root_label = root_labels[root_index]
+        mark(root_key, root_label, 0.0, "finding packages")
         if progress is not None:
             progress(base + span * 0.01, f"scanning {root.name or root}")
         if not root.exists():
             skipped_unreadable.append(f"root-missing: {root}")
+            mark(root_key, root_label, 1.0, "folder is missing", "DONE")
             continue
 
         top_packages, collection = _top_level_packages(root, known_roots, known_suffixes)
         if top_packages:
             if progress is not None:
                 progress(base + span * 0.03, f"{root.name}: {len(top_packages)} folders")
-            for child in top_packages:
+            mark(root_key, root_label, 0.03, f"{len(top_packages)} folders")
+            total_packages = max(1, len(top_packages))
+            for child_index, child in enumerate(top_packages):
+                package_fraction = 0.05 + 0.55 * (child_index / total_packages)
+                package_message = (
+                    f"reading {child.name} ({child_index + 1}/{len(top_packages)})"
+                )
+                mark(root_key, root_label, package_fraction, package_message)
+                if progress is not None:
+                    progress(base + span * package_fraction, package_message)
+
+                def package_step(
+                    text,
+                    key=root_key,
+                    label=root_label,
+                    value=package_fraction,
+                ):
+                    mark(key, label, value, text)
+
                 key = str(child.resolve()).lower()
                 if key in seen:
                     continue
@@ -1132,17 +1282,28 @@ def inventory(
                     until,
                     allow_empty=collection or child != root,
                     toolchains=toolchains,
+                    progress=package_step,
                 )
                 if record is not None:
                     mods.append(record)
                     addon_roots.append(child.resolve())
 
-        walked = list(_walk_dirs(root, max_depth))
-        step = max(1, len(walked) // 100)
-        for index, (current, _depth) in enumerate(walked):
-            if progress is not None and index % step == 0:
-                progress(
-                    base + span * (0.05 + 0.9 * index / max(1, len(walked))),
+        walked = 0
+        for current, _depth in _walk_dirs(root, max_depth):
+            walked += 1
+            # Do not pre-collect the tree: a slow drive can spend minutes in that
+            # first loop with no message. Walk and report in the same pass.
+            walk_fraction = 0.62 + 0.33 * (walked / (walked + 250))
+            if walked % 64 == 0:
+                if progress is not None:
+                    progress(
+                        base + span * walk_fraction,
+                        f"{current.name}: {len(mods)} found",
+                    )
+                mark(
+                    root_key,
+                    root_label,
+                    walk_fraction,
                     f"{current.name}: {len(mods)} found",
                 )
             lower = current.name.lower()
@@ -1154,7 +1315,22 @@ def inventory(
                     if key in seen:
                         continue
                     seen.add(key)
-                    record = _addon_from_dir(child, since, until, toolchains=toolchains)
+
+                    def nested_step(
+                        text,
+                        key=root_key,
+                        label=root_label,
+                        value=walk_fraction,
+                    ):
+                        mark(key, label, value, text)
+
+                    record = _addon_from_dir(
+                        child,
+                        since,
+                        until,
+                        toolchains=toolchains,
+                        progress=nested_step,
+                    )
                     if record is not None:
                         mods.append(record)
                         addon_roots.append(child.resolve())
@@ -1189,20 +1365,33 @@ def inventory(
                 if record is not None:
                     mods.append(record)
 
+        mark(
+            root_key,
+            root_label,
+            1.0,
+            f"{sum(1 for mod in mods if Path(mod.path).resolve().is_relative_to(root))} packages found",
+            "DONE",
+        )
+
     mods.sort(key=lambda mod: (mod.modified, mod.path), reverse=True)
-    install_roots = tuple(str(_install_root(install).resolve()) for install in installs)
+    install_roots = tuple(str(_install_root(install).resolve()) for install in install_list)
     hash_note = ""
-    if installs:
+    if install_list:
         if progress is not None:
-            progress(0.95, f"matching {len(install_roots)} installed builds")
+            progress(scan_span, f"matching {len(install_roots)} installed builds")
         mods = match_installs(
             mods,
-            installs,
+            install_list,
             progress=(
-                (lambda fraction, message: progress(0.95 + 0.05 * fraction, message))
+                (
+                    lambda fraction, message: progress(
+                        scan_span + (1.0 - scan_span) * fraction, message
+                    )
+                )
                 if progress is not None
                 else None
             ),
+            stage=stage,
         )
         matched = sum(len(mod.matches) for mod in mods)
         source_matches = sum(

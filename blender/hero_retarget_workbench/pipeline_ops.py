@@ -183,35 +183,65 @@ class DMF_OT_scan_mods(Operator):
                 toolchain_labels = [current]
 
         def work(progress):
+            stage = getattr(progress, "stage", None)
+
+            def mark(key, label, value, message, state="RUNNING"):
+                if stage is not None:
+                    stage(key, label, value, message, state)
+
             progress(0.02, f"scanning {len(roots)} folders")
 
             found_toolchains = list(toolchain_labels)
             found_installs = []
             try:
+                mark("installs", "Installed builds", 0.0, "searching detected clients")
                 progress(0.03, "finding installed builds")
                 extra_roots = [
                     _abspath(row.path) for row in settings.clients if row.path
                 ]
-                found_installs = module["installs"].discover(*extra_roots)
+                found_installs = [
+                    row
+                    for row in module["installs"].discover(*extra_roots)
+                    if row.can_compile or row.can_backport
+                ]
+                mark(
+                    "installs",
+                    "Installed builds",
+                    1.0,
+                    f"{len(found_installs)} valid builds found",
+                    "DONE",
+                )
                 if not found_toolchains:
                     found_toolchains = [
                         row.build for row in found_installs if row.can_compile and row.build
                     ]
             except Exception:
                 found_toolchains = found_toolchains or []
+                mark("installs", "Installed builds", 1.0, "discovery failed", "FAILED")
 
             known_roots = None
             known_suffixes = None
             try:
+                mark("types", "Read game file types", 0.0, "reading the live pak")
                 if game_vpk is not None and game_vpk.is_file():
                     progress(0.04, f"reading {game_vpk.name} types")
                     known_roots, known_suffixes = module["oldmods"].content_shape(
                         game_vpk
                     )
+                    mark(
+                        "types",
+                        "Read game file types",
+                        1.0,
+                        f"{len(known_roots or ())} folders",
+                        "DONE",
+                    )
+                else:
+                    mark("types", "Read game file types", 1.0, "using built-in types", "DONE")
             except Exception as error:
                 # A missing or unreadable game pak is a smaller fallback, not a
                 # reason to hide the mod folders that are already on disk.
                 progress(0.04, f"game types unavailable: {error}")
+                mark("types", "Read game file types", 1.0, "using built-in types", "DONE")
 
             def walked(fraction, message):
                 progress(0.02 + 0.96 * float(fraction), message)
@@ -225,9 +255,12 @@ class DMF_OT_scan_mods(Operator):
                 known_suffixes=known_suffixes,
                 toolchains=found_toolchains,
                 installs=found_installs,
+                stage=stage,
             )
+            mark("report", "Write report", 0.0, f"writing {report.name}")
             progress(0.98, f"writing {report.name}")
             result.save(report)
+            mark("report", "Write report", 1.0, "report written", "DONE")
             progress(1.0, f"{result.counts()['packages']} packages")
             return result
 
