@@ -1265,7 +1265,8 @@ class DMF_PT_skeleton(Panel):
         _hint(
             nudge,
             "Nudge mode opens the rest/animation split and orthographic gizmo: arrows or wheel step; "
-            "X/Y/Z axis; R rotate; Tab next; Backspace reset; Enter finish.",
+            "X/Y/Z axis; R rotate; Tab next; Backspace reset; Enter finish. "
+            "The overlay heats the selected chain warm against the cool mapped hero target.",
             "INFO",
         )
         if settings.nudge_overlay_error:
