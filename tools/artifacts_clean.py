@@ -32,6 +32,7 @@ KEEP = (
     "receipts",                       # evidence for every claim in AGENTS.md
     "probes",                         # the scripts behind the receipts
     "visual",                         # captures AGENTS.md cites
+    "ui-pass",                        # older AGENTS.md screenshots still cited
     "oldviper/shiv_tail_all.vpk",     # ledger/pins/shiv.json, sha 0a966d90...
     "oldviper/shiv_append.vpk",       # pinned working build, sha 01efc18e..., installed as pak93
     "oldviper/shiv_aimcells.vpk",     # aim-cell build, sha af336b73...
