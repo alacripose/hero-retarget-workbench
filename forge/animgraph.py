@@ -107,6 +107,15 @@ def _list_end(text: str, start: int) -> int:
     raise ValueError("unterminated-list")
 
 
+def point_skeleton(text: str, source_relative: str) -> str:
+    """Point one ``.vnmskel`` at another skeleton DMX without changing its bones."""
+    if not source_relative:
+        raise AnimGraphError("skeleton-source-empty")
+    if SOURCE_FIELD.search(text or "") is None:
+        raise AnimGraphError("vnmskel-source-field-missing")
+    return SOURCE_LINE.sub(f'm_sourceFilename = "{source_relative}"', text, count=1)
+
+
 def prepare_skeleton(text: str, source_relative: str, tail_names: list[str]) -> str:
     """Point one ``.vnmskel`` at a tail-bearing skeleton and widen body masks.
 

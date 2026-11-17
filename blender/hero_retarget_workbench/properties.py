@@ -1252,6 +1252,13 @@ class DMF_Settings(PropertyGroup):
         description="Remove vertex groups the solver does not use before writing the new weights",
         default=True,
     )
+    custom_bake_dir: StringProperty(
+        name="Custom bake folder",
+        description="Where the custom-rig clips, skeleton and vnmskel are written; blank uses artifacts/custom-anim",
+        subtype="DIR_PATH",
+        default="",
+    )
+    custom_bake_note: StringProperty(name="Custom bake note", default="")
     manual_weight: FloatProperty(
         name="Assign weight",
         description="Weight used by Assign selected to the active group",
