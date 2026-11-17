@@ -3,6 +3,7 @@ import unittest
 from forge.weights import (
     BoneSegment,
     WeightError,
+    bone_related,
     envelope_weights,
     fold_source,
     merge_weights,
@@ -47,6 +48,20 @@ class WeightTests(unittest.TestCase):
         weights = envelope_weights((5.4, 0, 0), bones, max_distance=0.1)
         self.assertIn("tail", weights)
         self.assertAlmostEqual(sum(weights.values()), 1.0)
+
+    def test_bone_related_keeps_a_chain_and_rejects_a_finger_on_a_thigh(self):
+        parents = {
+            "pelvis": "",
+            "thigh_L": "pelvis",
+            "shin_L": "thigh_L",
+            "arm_lower_L": "arm_upper_L",
+            "hand_L": "arm_lower_L",
+            "finger_1_L": "hand_L",
+        }
+        self.assertTrue(bone_related("shin_L", "thigh_L", parents))
+        self.assertTrue(bone_related("finger_1_L", "hand_L", parents))
+        self.assertFalse(bone_related("finger_1_L", "thigh_L", parents))
+        self.assertFalse(bone_related("finger_1_L", "shin_L", parents))
 
     def test_merge_adds_shared_bones(self):
         merged = merge_weights({"a": 0.5, "b": 0.5}, {"a": 0.25, "c": 0.25})

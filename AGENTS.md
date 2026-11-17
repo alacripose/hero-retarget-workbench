@@ -29,6 +29,17 @@ https://github.com/oaustegard/claude-skills/releases (declauding)
 https://github.com/hardikpandya/stop-slop
 C:\Users\ala\.agents\skills\ has a ton of skills for agents to use and yet they never use them for some reason. You need to be using these skills and updating/managing them ccording to family project convention.
 
+## 2026-11-17 — a surface sample cannot cross from a hand onto a thigh
+
+**Owner instruction, verbatim:** *"when I bring in my custom model and I have my bones assigned, when I click the solve and bind key, it works great but it seems to be getting weights in some places really wrong, like a finger weight being applied to a thigh despite that not being how I have the bones set up"*.
+
+- **The hybrid solver's surface sample was region-blind.** `_surface` sampled the nearest hero body vertices and copied every one of their bones, filtered only by whether the bone existed in the target rig. A custom A-pose thigh next to a hero hand could therefore receive `finger_*` weights from the body surface, even with the bone map correct. The sample now has to be on the vertex's own target chain.
+- **The vertex's own painted group is the anchor.** `WeightSolver._anchor` uses the deepest mapped group the custom vertex already carries; only an unweighted vertex falls back to the nearest mapped custom bone, then to the target-space nearest bone for an unrigged mesh. `_surface` and the envelope fallback both reject bones that are not ancestors or descendants of that anchor. `forge.weights.bone_related` is the one chain test, so a thigh can blend with pelvis, shin and foot, never with a finger; a hand can still blend with its fingers.
+- **The refusal is measured, not assumed.** A synthetic Blender probe puts a finger-weighted hero body vertex directly on an unweighted custom thigh, with the custom thigh and finger two metres apart. `artifacts/probes/weight_region_probe.py` reports the thigh vertex at `thigh_L = 1.0` and no finger group; `tests/test_weights.py` pins the chain relation.
+- **Checks.** 336 pytest tests pass; `compileall`, `ui_parity --check` and `ui_prose --check` are clean. The Warden and static-model import probes still pass.
+- **Version and zip.** `0.19.3`; `dist/hero_retarget_workbench-0.19.3.zip`, 69 files, 511,793 bytes, sha256 `9a942d65372df0525d0c23498e05c6db524b40aeaf45b94eb6baac029f6fdd48`; `tools/blender_zip_probe.py` passes with 108 operators, 26 panels and version `0.19.3` (`artifacts/receipts/zip-0193.json`).
+- **Not checked.** The owner's exact custom model was not available as a `.blend`; the regression is reproduced with a synthetic mesh and real `WeightSolver` chunks. The viewport display of the corrected groups was not clicked through.
+
 ## 2026-11-17 — Import Model reads the render list, and a missing rig is not an error
 
 **Owner instruction, verbatim:** *"instead of trying to do a matching thing why don't you look at the components system because we could just allow the user to import the models like normal"*.

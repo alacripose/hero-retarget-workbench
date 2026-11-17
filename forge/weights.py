@@ -75,6 +75,33 @@ def segment_distance(
     return math.dist(point, closest)
 
 
+def bone_related(
+    first: str,
+    second: str,
+    parents: Mapping[str, str],
+) -> bool:
+    """Whether two bones are on the same ancestor/descendant chain.
+
+    Surface transfer copies a nearby hero body vertex's weights.  Two bones on
+    one chain can legitimately blend at a joint; a finger and a thigh cannot,
+    even when the custom mesh's rest pose puts them beside each other.
+    """
+    if not first or not second:
+        return False
+    if first == second:
+        return True
+
+    def ancestors(name: str) -> set[str]:
+        found: set[str] = set()
+        current = parents.get(name, "")
+        while current and current not in found:
+            found.add(current)
+            current = parents.get(current, "")
+        return found
+
+    return first in ancestors(second) or second in ancestors(first)
+
+
 def envelope_weights(
     point: Sequence[float],
     segments: Iterable[BoneSegment],
