@@ -31,6 +31,17 @@ https://github.com/hardikpandya/stop-slop
 
 Do not delete patch probes.
 
+## 2026-11-17 — the bone tooltip shows live coordinates and accuracy (0.22.2)
+
+**Owner instruction, verbatim:** *"and as well the tooltip over the selected bone needs to be updated, it has this percentage that doesn't seem to update so instead it should be moved a little elsewhere, show the coordinates of the bone you're posing and the bone you're moving it to, including rotation, and the percentage is the accuracy"*
+
+- **The label is off the bone.** The two-line tag that sat at the selected joint (`hand_L · 34% Δ...` and `→ hand_L`) is gone. A fixed info card sits above the overlay legend, so the numbers no longer cover the joint or the warm/cool rings.
+- **The card shows both sides.** The custom (posed) bone and its mapped hero target each get a head position `x y z` in metres and an XYZ Euler rotation in degrees, read from the same live matrices the heat uses. The header names the pair and the accuracy.
+- **Accuracy is the displayed percentage.** `_accuracy(error)` returns `(1 - error) * 100`, clamped to 0–100. The gradient still uses the raw error (red far, blue aligned), so the card's accuracy rises as the pair aligns. The overlay probe moves the arm and reads `accuracy_before: 84.7`, `accuracy_after: 66.2`, which is the measured proof that the value follows the pose.
+- **An unmapped target says so.** A bone with no hero target shows `no mapped target` and only the custom coordinates instead of a false 100%.
+- **Evidence.** 343 pytest tests pass; compileall, `ui_parity --check` (0 duplicates/undrawn) and `ui_prose --check` are clean. `artifacts/probes/nudge_overlay_probe.py` passes with `overlay_bone: hand_L`, `views: 1`, `mode: POSE`, `accuracy_before: 84.7`, `accuracy_after: 66.2`, `error: ''`; `artifacts/ui-pass/overlay-pose-mode.png` shows the card above the legend with both coordinate and rotation rows. The local zip is `dist/hero_retarget_workbench-0.22.2.zip`, 71 files, 529,135 bytes, sha256 `64c8b7d2a39c0ee858f1f8786a2ab5bc97e7889c588a959d68c0769004b7c387`; `tools/blender_zip_probe.py` passes with 112 operators, 26 panels and version `0.22.2` (`artifacts/receipts/zip-0222.json`).
+- **Not checked.** The owner's real Warden rig and viewport interaction; the probe uses its synthetic custom/hero chain. Coordinates are in the custom rig's world frame, which is the frame the overlay already compares in.
+
 ## 2026-11-17 — the Chain overlay is one show/hide button (0.22.1)
 
 **Owner instruction, verbatim:** *"okay these redundant useless controls need to be removed along with the axis selector leaving just the show hide overlay button and update this part of the overlay"*, with a screenshot of the Chain overlay section and its viewport legend.
