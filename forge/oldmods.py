@@ -15,9 +15,11 @@ walk a whole drive without turning the live game into a mod.
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import re
 import struct
+import zlib
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from pathlib import Path, PurePosixPath
@@ -108,6 +110,24 @@ MOD_FILE_SUFFIXES = (
 )
 MAX_VMDL_PER_ADDON = 24
 MAX_LISTED_FILES = 300
+
+# Hash matching is deliberately limited to source and compiled assets a port
+# can consume. Walking every sound or texture in a 4 GB package would make the
+# scan slower without answering the question the Mods page asks.
+HASH_SUFFIXES = (
+    ".vmdl",
+    ".vmdl_c",
+    ".dmx",
+    ".vmat",
+    ".vmat_c",
+    ".vtex",
+    ".vtex_c",
+    ".vnmclip",
+    ".vnmclip_c",
+    ".vnmskel",
+    ".vnmskel_c",
+)
+_CHUNK_VPK = re.compile(r"_\d{3}\.vpk$", re.IGNORECASE)
 
 _MONTHS = {
     name: index
@@ -378,6 +398,108 @@ def cloth_inventory(vmdl_paths) -> tuple[list[str], dict[str, list[str]]]:
     return sorted(union), per_model
 
 
+def _content_digest(path: Path) -> tuple[int, str]:
+    """CRC32 and SHA-256 of one file, read once.
+
+    A VPK directory stores CRC32 for every entry, so CRC32 is the identity that
+    can be compared without extracting game data. SHA-256 keeps the receipt
+    useful when two different files happen to share a size and a CRC.
+    """
+    crc = 0
+    sha = hashlib.sha256()
+    with Path(path).open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            crc = zlib.crc32(block, crc)
+            sha.update(block)
+    return crc & 0xFFFFFFFF, sha.hexdigest()
+
+
+def _content_crc(path: Path) -> int:
+    """CRC32 of one installed loose file.
+
+    Matching only needs the identity a VPK directory already carries. The
+    installed side is the slow side, so it does not spend time computing the
+    SHA-256 receipt that is useful on the mod side.
+    """
+    crc = 0
+    with Path(path).open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            crc = zlib.crc32(block, crc)
+    return crc & 0xFFFFFFFF
+
+
+def _is_compiled_suffix(value: str) -> bool:
+    return PurePosixPath(str(value).replace("\\", "/")).suffix.lower().endswith("_c")
+
+
+# A rescan of the same CSDK should not re-read every matching source file. The
+# key includes size and mtime, so an edited asset is hashed again.
+_LOOSE_CRC_CACHE: dict[str, tuple[int, int, int]] = {}
+
+
+def _file_hash(relative: str, path: Path) -> FileHash | None:
+    try:
+        crc, digest = _content_digest(path)
+        size = path.stat().st_size
+    except OSError:
+        return None
+    return FileHash(relative=relative, size=size, crc32=crc, sha256=digest)
+
+
+@dataclass(frozen=True)
+class FileHash:
+    """The identity of one mod-side file."""
+
+    relative: str
+    size: int
+    crc32: int
+    sha256: str = ""
+
+    def to_dict(self) -> dict:
+        return {
+            "relative": self.relative,
+            "size": self.size,
+            "crc32": self.crc32,
+            "sha256": self.sha256,
+        }
+
+
+@dataclass(frozen=True)
+class HashMatch:
+    """A mod file that is byte-identical to a file in an installed build.
+
+    ``container`` is a VPK for compiled game files or the loose file itself in
+    noaddon layouts. ``entry`` is the logical path inside that container. That
+    is enough for ``migrate`` to ask Source 2 Viewer to decompile the installed
+    copy without guessing which build or folder owns the model.
+    """
+
+    relative: str
+    install: str
+    label: str
+    build: str
+    kind: str
+    container: str
+    entry: str
+    size: int
+    crc32: int
+    gameinfo: str = ""
+
+    def to_dict(self) -> dict:
+        return {
+            "relative": self.relative,
+            "install": self.install,
+            "label": self.label,
+            "build": self.build,
+            "kind": self.kind,
+            "container": self.container,
+            "entry": self.entry,
+            "size": self.size,
+            "crc32": self.crc32,
+            "gameinfo": self.gameinfo,
+        }
+
+
 @dataclass(frozen=True)
 class ModRecord:
     path: str
@@ -394,6 +516,8 @@ class ModRecord:
     files: tuple[str, ...] = ()
     counts: dict[str, int] = field(default_factory=dict)
     note: str = ""
+    hashes: tuple[FileHash, ...] = ()
+    matches: tuple[HashMatch, ...] = ()
 
     def to_dict(self) -> dict:
         return {
@@ -411,6 +535,8 @@ class ModRecord:
             "files": list(self.files),
             "counts": dict(self.counts),
             "note": self.note,
+            "hashes": [item.to_dict() for item in self.hashes],
+            "matches": [item.to_dict() for item in self.matches],
         }
 
 
@@ -422,6 +548,8 @@ class Inventory:
     mods: list[ModRecord]
     skipped_game_paks: int
     skipped_unreadable: list[str]
+    installs: tuple[str, ...] = ()
+    hash_note: str = ""
 
     def counts(self) -> dict[str, int]:
         return {
@@ -438,6 +566,9 @@ class Inventory:
                 1 for mod in self.mods if any("hero" in model.lower() for model in mod.models)
             ),
             "skipped_game_paks": self.skipped_game_paks,
+            "hash_matches": sum(len(mod.matches) for mod in self.mods),
+            "matched_packages": sum(1 for mod in self.mods if mod.matches),
+            "installs_scanned": len(self.installs),
         }
 
     def cloth_types(self) -> dict[str, int]:
@@ -456,6 +587,8 @@ class Inventory:
             "counts": self.counts(),
             "cloth_types": self.cloth_types(),
             "skipped_unreadable": self.skipped_unreadable,
+            "installs": list(self.installs),
+            "hash_note": self.hash_note,
             "mods": [mod.to_dict() for mod in self.mods],
         }
 
@@ -570,6 +703,245 @@ def _walk_dirs(root: Path, max_depth: int):
         yield current_path, depth
 
 
+def _install_root(install) -> Path:
+    if hasattr(install, "root"):
+        return Path(install.root).expanduser()
+    return Path(install).expanduser()
+
+
+def _install_loose_roots(root: Path) -> list[Path]:
+    """Where a CSDK can leave compiled files without an addon.
+
+    Older CSDK10 sessions compiled straight into ``game/citadel``; there was no
+    ``content/citadel_addons`` step. Reading ``game`` covers that layout, while
+    the content folder covers a source addon that was never packed.
+    """
+    roots: list[Path] = []
+    game = root / "game"
+    if game.is_dir():
+        # A compiled noaddon CSDK writes its assets under game/citadel (and
+        # sometimes game/core). Walking the whole game tree also visits bin,
+        # platform and tool folders that cannot hold a match.
+        for name in ("citadel", "core"):
+            candidate = game / name
+            if candidate.is_dir():
+                roots.append(candidate)
+        if not roots:
+            roots.append(game)
+    elif root.name.lower() in ("game", "citadel"):
+        roots.append(root)
+    for candidate in (
+        root / "content" / "citadel_addons",
+        root / "citadel_addons",
+    ):
+        if candidate.is_dir():
+            roots.append(candidate)
+    return roots
+
+
+def _install_vpks(root: Path) -> list[Path]:
+    found: dict[str, Path] = {}
+    try:
+        paths = sorted(root.rglob("*.vpk"), key=lambda path: str(path).lower())
+    except OSError:
+        return []
+    for path in paths:
+        if not path.is_file() or _CHUNK_VPK.search(path.name):
+            continue
+        found.setdefault(str(path.resolve()).lower(), path)
+    return list(found.values())
+
+
+def _install_gameinfo(root: Path) -> Path | None:
+    for candidate in sorted((root / "game").glob("*/gameinfo.gi")):
+        if candidate.is_file():
+            return candidate
+    for candidate in (root / "gameinfo.gi", root / "citadel" / "gameinfo.gi"):
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def match_installs(mods, installs, *, progress=None) -> list[ModRecord]:
+    """Attach byte-identical files from every detected install to each mod.
+
+    The mod side is hashed once. A VPK entry already carries the CRC32 and byte
+    length, so a game pak can be compared by reading its directory only. Loose
+    files in a noaddon CSDK are hashed only when their size matches a mod file,
+    which keeps a full game install from being read end to end.
+    """
+    wanted: dict[tuple[int, int], list[tuple[ModRecord, FileHash]]] = {}
+    sizes: set[int] = set()
+    for mod in mods:
+        for item in mod.hashes:
+            if item.size <= 0:
+                continue
+            wanted.setdefault((item.size, item.crc32), []).append((mod, item))
+            sizes.add(item.size)
+    if not wanted or not installs:
+        return list(mods)
+
+    matches: dict[str, list[HashMatch]] = {}
+    seen: set[tuple] = set()
+    match_count = 0
+    source_count = 0
+
+    def add(mod, item, install, kind, container, entry, gameinfo="") -> None:
+        nonlocal match_count, source_count
+        root = _install_root(install)
+        key = (mod.path, item.relative, str(root), kind, str(container), entry)
+        if key in seen:
+            return
+        seen.add(key)
+        matches.setdefault(mod.path, []).append(
+            HashMatch(
+                relative=item.relative,
+                install=str(root),
+                label=str(getattr(install, "label", root.name)),
+                build=str(getattr(install, "build", "")),
+                kind=kind,
+                container=str(container),
+                entry=entry,
+                size=item.size,
+                crc32=item.crc32,
+                gameinfo=gameinfo,
+            )
+        )
+        match_count += 1
+        if not _is_compiled_suffix(item.relative):
+            source_count += 1
+
+    installs = list(installs)
+    total = max(1, len(installs))
+
+    def report(index: int, fraction: float, message: str) -> None:
+        if progress is not None:
+            progress(min(1.0, (index + fraction) / total), message)
+
+    for index, install in enumerate(installs):
+        root = _install_root(install)
+        report(index, 0.0, f"matching {root.name or root}")
+        gameinfo = _install_gameinfo(root)
+        gameinfo_text = str(gameinfo) if gameinfo else ""
+        vpks = _install_vpks(root)
+        for vpk_index, vpk in enumerate(vpks):
+            report(
+                index,
+                0.05 + 0.50 * (vpk_index / max(1, len(vpks))),
+                f"matching {root.name or root}: {vpk.name} ({match_count} matches, {source_count} source)",
+            )
+            try:
+                tree = read_vpk(vpk)
+            except (OldModsError, OSError):
+                continue
+            for entry_index, entry in enumerate(tree.entries):
+                if entry_index % 4096 == 0:
+                    report(
+                        index,
+                        0.05 + 0.50 * (vpk_index / max(1, len(vpks))),
+                        f"matching {root.name or root}: {vpk.name} ({match_count} matches, {source_count} source)",
+                    )
+                if PurePosixPath(entry.path).suffix.lower() not in HASH_SUFFIXES:
+                    continue
+                size = entry.length + entry.preload
+                for mod, item in wanted.get((size, entry.crc), ()):
+                    add(mod, item, install, "vpk", vpk, entry.path, gameinfo_text)
+        loose_roots = _install_loose_roots(root)
+        for loose_index, loose_root in enumerate(loose_roots):
+            loose_start = 0.55 + 0.45 * (loose_index / max(1, len(loose_roots)))
+            loose_end = 0.55 + 0.45 * ((loose_index + 1) / max(1, len(loose_roots)))
+            report(
+                index,
+                loose_start,
+                f"matching {root.name or root}: {loose_root.name}",
+            )
+            candidates: list[tuple[Path, int, int]] = []
+            walked = 0
+            for current, dirs, files in os.walk(loose_root):
+                dirs[:] = [
+                    name
+                    for name in dirs
+                    if name.lower() not in SKIP_DIRS
+                    and name.lower() not in ("bin", "bin_tools", "platform", "tools")
+                ]
+                for name in files:
+                    walked += 1
+                    if walked % 1024 == 0:
+                        report(
+                            index,
+                            loose_start,
+                            f"matching {root.name or root}: scanned {walked} files "
+                            f"({match_count} matches, {source_count} source)",
+                        )
+                    if PurePosixPath(name).suffix.lower() not in HASH_SUFFIXES:
+                        continue
+                    path = Path(current) / name
+                    try:
+                        stat = path.stat()
+                    except OSError:
+                        continue
+                    size = stat.st_size
+                    if size not in sizes:
+                        continue
+                    candidates.append((path, size, stat.st_mtime_ns))
+            report(
+                index,
+                loose_start + 0.10 * (loose_end - loose_start),
+                f"matching {root.name or root}: hashing {len(candidates)} loose files "
+                f"({match_count} matches, {source_count} source)",
+            )
+            hashing_start = loose_start + 0.10 * (loose_end - loose_start)
+            for file_index, (path, size, modified) in enumerate(candidates):
+                report(
+                    index,
+                    hashing_start
+                    + (loose_end - hashing_start)
+                    * (file_index / max(1, len(candidates))),
+                    f"matching {root.name or root}: {file_index}/{len(candidates)} loose "
+                    f"({match_count} matches, {source_count} source)",
+                )
+                key = str(path).lower()
+                cached = _LOOSE_CRC_CACHE.get(key)
+                if cached is not None and cached[0] == size and cached[1] == modified:
+                    crc = cached[2]
+                else:
+                    try:
+                        crc = _content_crc(path)
+                    except OSError:
+                        continue
+                    _LOOSE_CRC_CACHE[key] = (size, modified, crc)
+                for mod, item in wanted.get((size, crc), ()):
+                    add(mod, item, install, "loose", path, path.name, gameinfo_text)
+        report(
+            index,
+            1.0,
+            f"matching {root.name or root}: {match_count} matches, {source_count} source",
+        )
+    if progress is not None:
+        progress(1.0, f"matching complete: {match_count} matches, {source_count} source")
+    return [
+        ModRecord(
+            path=mod.path,
+            kind=mod.kind,
+            addon=mod.addon,
+            hero=mod.hero,
+            bytes=mod.bytes,
+            modified=mod.modified,
+            toolchain=mod.toolchain,
+            models=mod.models,
+            cloth_sections=mod.cloth_sections,
+            per_model=mod.per_model,
+            blends=mod.blends,
+            files=mod.files,
+            counts=mod.counts,
+            note=mod.note,
+            hashes=mod.hashes,
+            matches=tuple(matches.get(mod.path, ())),
+        )
+        for mod in mods
+    ]
+
+
 def _addon_from_dir(
     path: Path,
     since: date | None,
@@ -600,6 +972,12 @@ def _addon_from_dir(
     models = [item.relative_to(path).as_posix() for item in model_files]
     cloth, per_model = cloth_inventory(text_models)
     relative_files = tuple(item.relative_to(path).as_posix() for item in files)
+    hashes = tuple(
+        found
+        for item in files
+        if item.suffix.lower() in HASH_SUFFIXES
+        if (found := _file_hash(item.relative_to(path).as_posix(), item)) is not None
+    )
     listed = relative_files[:MAX_LISTED_FILES]
     counts = content_counts(relative_files)
     notes = []
@@ -624,6 +1002,7 @@ def _addon_from_dir(
         files=listed,
         counts=counts,
         note=", ".join(notes),
+        hashes=hashes,
     )
 
 
@@ -670,6 +1049,16 @@ def _vpk_record(
     chosen = models or compiled
     slug = ", ".join(hero_slugs(chosen)) if chosen else clean_slug(path.stem)
     entries = tuple(entry.path for entry in tree.entries)
+    hashes = tuple(
+        FileHash(
+            relative=entry.path,
+            size=entry.length + entry.preload,
+            crc32=entry.crc,
+        )
+        for entry in tree.entries
+        if PurePosixPath(entry.path).suffix.lower() in HASH_SUFFIXES
+        and entry.length + entry.preload > 0
+    )
     note = ""
     if tree.split:
         note = "split-archives"
@@ -689,6 +1078,7 @@ def _vpk_record(
         files=entries[:MAX_LISTED_FILES],
         counts=content_counts(entries),
         note=note,
+        hashes=hashes,
     )
 
 
@@ -702,6 +1092,7 @@ def inventory(
     known_roots: set[str] | None = None,
     known_suffixes: set[str] | None = None,
     toolchains=(),
+    installs=(),
 ) -> Inventory:
     """Scan roots for VPKs and unpacked citadel addons.
 
@@ -799,6 +1190,36 @@ def inventory(
                     mods.append(record)
 
     mods.sort(key=lambda mod: (mod.modified, mod.path), reverse=True)
+    install_roots = tuple(str(_install_root(install).resolve()) for install in installs)
+    hash_note = ""
+    if installs:
+        if progress is not None:
+            progress(0.95, f"matching {len(install_roots)} installed builds")
+        mods = match_installs(
+            mods,
+            installs,
+            progress=(
+                (lambda fraction, message: progress(0.95 + 0.05 * fraction, message))
+                if progress is not None
+                else None
+            ),
+        )
+        matched = sum(len(mod.matches) for mod in mods)
+        source_matches = sum(
+            1
+            for mod in mods
+            for match in mod.matches
+            if not _is_compiled_suffix(match.relative)
+        )
+        compiled_matches = matched - source_matches
+        hash_note = (
+            f"{matched} hash matches ({source_matches} source, {compiled_matches} compiled) "
+            f"in {len(install_roots)} installs"
+        )
+        if matched == 0:
+            hash_note = f"no hash matches in {len(install_roots)} installs"
+        if progress is not None:
+            progress(1.0, hash_note)
     return Inventory(
         roots=[str(root) for root in resolved_roots],
         since=since.isoformat() if since else "",
@@ -806,4 +1227,6 @@ def inventory(
         mods=mods,
         skipped_game_paks=skipped_game_paks,
         skipped_unreadable=skipped_unreadable,
+        installs=install_roots,
+        hash_note=hash_note,
     )

@@ -5,8 +5,10 @@ import struct
 import tempfile
 import time
 import unittest
+import zlib
 from datetime import date
 from pathlib import Path
+from types import SimpleNamespace
 
 from forge.oldmods import (
     OldModsError,
@@ -68,6 +70,45 @@ def build_vpk(path: Path, entries: list[tuple[str, str]], *, version: int = 2) -
     header = struct.pack("<III", 0x55AA1234, version, len(tree))
     if version == 2:
         header += struct.pack("<IIII", 0, 0, 0, 0)
+    path.write_bytes(header + bytes(tree))
+    return path
+
+
+def build_vpk_hashes(path: Path, entries: list[tuple[str, str, bytes]]) -> Path:
+    """Write a VPK directory whose entries carry real CRC and length values."""
+    tree = bytearray()
+
+    def cstring(value: str) -> None:
+        tree.extend(value.encode())
+        tree.append(0)
+
+    groups: dict[str, dict[str, list[tuple[str, bytes]]]] = {}
+    for directory, name, data in entries:
+        stem, extension = name.rsplit(".", 1)
+        groups.setdefault(extension, {}).setdefault(directory, []).append((stem, data))
+    for extension, directories in groups.items():
+        cstring(extension)
+        for directory, stems in directories.items():
+            cstring(directory)
+            for stem, data in stems:
+                cstring(stem)
+                tree.extend(
+                    struct.pack(
+                        "<IHHII",
+                        zlib.crc32(data) & 0xFFFFFFFF,
+                        0,
+                        0x7FFF,
+                        0,
+                        len(data),
+                    )
+                )
+                tree.extend(struct.pack("<H", 0xFFFF))
+            cstring("")
+        cstring("")
+    cstring("")
+
+    header = struct.pack("<III", 0x55AA1234, 2, len(tree))
+    header += struct.pack("<IIII", 0, 0, 0, 0)
     path.write_bytes(header + bytes(tree))
     return path
 
@@ -244,6 +285,83 @@ class OldModsTests(unittest.TestCase):
         self.assertEqual(set(by_name), {"folder_mod", "suffix_mod"})
         self.assertIn("empty-folder", by_name["folder_mod"].note)
         self.assertEqual(by_name["suffix_mod"].counts["other"], 1)
+
+    def test_inventory_matches_vpk_and_noaddon_loose_files_by_hash(self) -> None:
+        root = self.tmp_path / "mods"
+        model = root / "compiled_mod" / "models" / "heroes_staging" / "kelvin" / "kelvin.vmdl_c"
+        model.parent.mkdir(parents=True)
+        model.write_bytes(b"kelvin-compiled")
+        second = root / "compiled_mod" / "models" / "heroes_staging" / "haze" / "haze.vmdl_c"
+        second.parent.mkdir(parents=True)
+        second.write_bytes(b"haze-compiled")
+
+        install = self.tmp_path / "Reduced_CSDK_10"
+        game = install / "game" / "citadel"
+        game.mkdir(parents=True)
+        (game / "gameinfo.gi").write_text("gameinfo", encoding="utf-8")
+        build_vpk_hashes(
+            game / "pak01_dir.vpk",
+            [("models/heroes_staging/kelvin/", "kelvin.vmdl_c", b"kelvin-compiled")],
+        )
+        loose = game / "models" / "heroes_staging" / "haze" / "haze.vmdl_c"
+        loose.parent.mkdir(parents=True)
+        loose.write_bytes(b"haze-compiled")
+
+        result = inventory(
+            [root],
+            installs=[SimpleNamespace(root=install, label="CSDK10", build="4391")],
+        )
+
+        record = next(mod for mod in result.mods if mod.addon == "compiled_mod")
+        matched = {(match.relative, match.kind, match.entry) for match in record.matches}
+        self.assertIn(("models/heroes_staging/kelvin/kelvin.vmdl_c", "vpk", "models/heroes_staging/kelvin/kelvin.vmdl_c"), matched)
+        self.assertIn(("models/heroes_staging/haze/haze.vmdl_c", "loose", "haze.vmdl_c"), matched)
+        self.assertEqual(result.counts()["hash_matches"], 2)
+        self.assertEqual(result.counts()["matched_packages"], 1)
+        self.assertIn("2 hash matches", result.hash_note)
+
+    def test_inventory_matches_uncompiled_source_files(self):
+        root = self.tmp_path / "mods"
+        model = root / "source_mod" / "models" / "heroes_staging" / "kelvin" / "kelvin.vmdl"
+        model.parent.mkdir(parents=True)
+        model.write_bytes(b"source-vmdl")
+        mesh = model.parent / "kelvin_body.dmx"
+        mesh.write_bytes(b"source-dmx")
+        loose = model.parent / "kelvin_loose.vmdl"
+        loose.write_bytes(b"loose-source-vmdl")
+
+        install = self.tmp_path / "Reduced_CSDK_10"
+        game = install / "game" / "citadel"
+        game.mkdir(parents=True)
+        (game / "gameinfo.gi").write_text("gameinfo", encoding="utf-8")
+        build_vpk_hashes(
+            game / "pak01_dir.vpk",
+            [
+                ("models/heroes_staging/kelvin/", "kelvin.vmdl", b"source-vmdl"),
+                ("models/heroes_staging/kelvin/", "kelvin_body.dmx", b"source-dmx"),
+            ],
+        )
+        installed_loose = game / "models" / "heroes_staging" / "kelvin" / "kelvin_loose.vmdl"
+        installed_loose.parent.mkdir(parents=True)
+        installed_loose.write_bytes(b"loose-source-vmdl")
+
+        events: list[tuple[float, str]] = []
+        result = inventory(
+            [root],
+            installs=[SimpleNamespace(root=install, label="CSDK10", build="4391")],
+            progress=lambda fraction, message: events.append((fraction, message)),
+        )
+
+        record = next(mod for mod in result.mods if mod.addon == "source_mod")
+        matched = {(match.relative, match.kind, match.entry) for match in record.matches}
+        self.assertIn(("models/heroes_staging/kelvin/kelvin.vmdl", "vpk", "models/heroes_staging/kelvin/kelvin.vmdl"), matched)
+        self.assertIn(("models/heroes_staging/kelvin/kelvin_body.dmx", "vpk", "models/heroes_staging/kelvin/kelvin_body.dmx"), matched)
+        self.assertIn(("models/heroes_staging/kelvin/kelvin_loose.vmdl", "loose", "kelvin_loose.vmdl"), matched)
+        self.assertIn("3 hash matches (3 source, 0 compiled)", result.hash_note)
+        self.assertTrue(any("loose" in message for _fraction, message in events))
+        fractions = [fraction for fraction, _message in events]
+        self.assertEqual(fractions, sorted(fractions))
+        self.assertTrue(all(0.0 <= fraction <= 1.0 for fraction in fractions))
 
     def test_two_mods_roots_with_the_same_leaf_are_inventoried_separately(self) -> None:
         first = self.tmp_path / "Documents" / "mods"

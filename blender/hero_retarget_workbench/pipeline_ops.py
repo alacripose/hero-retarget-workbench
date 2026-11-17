@@ -186,16 +186,19 @@ class DMF_OT_scan_mods(Operator):
             progress(0.02, f"scanning {len(roots)} folders")
 
             found_toolchains = list(toolchain_labels)
-            if not found_toolchains:
-                try:
-                    progress(0.03, "finding installed toolchains")
+            found_installs = []
+            try:
+                progress(0.03, "finding installed builds")
+                extra_roots = [
+                    _abspath(row.path) for row in settings.clients if row.path
+                ]
+                found_installs = module["installs"].discover(*extra_roots)
+                if not found_toolchains:
                     found_toolchains = [
-                        row.build
-                        for row in module["installs"].discover()
-                        if row.can_compile and row.build
+                        row.build for row in found_installs if row.can_compile and row.build
                     ]
-                except Exception:
-                    found_toolchains = []
+            except Exception:
+                found_toolchains = found_toolchains or []
 
             known_roots = None
             known_suffixes = None
@@ -211,7 +214,7 @@ class DMF_OT_scan_mods(Operator):
                 progress(0.04, f"game types unavailable: {error}")
 
             def walked(fraction, message):
-                progress(0.02 + 0.93 * float(fraction), message)
+                progress(0.02 + 0.96 * float(fraction), message)
 
             result = module["oldmods"].inventory(
                 roots,
@@ -221,14 +224,16 @@ class DMF_OT_scan_mods(Operator):
                 known_roots=known_roots,
                 known_suffixes=known_suffixes,
                 toolchains=found_toolchains,
+                installs=found_installs,
             )
-            progress(0.96, f"writing {report.name}")
+            progress(0.98, f"writing {report.name}")
             result.save(report)
             progress(1.0, f"{result.counts()['packages']} packages")
             return result
 
         def done(result):
             settings.mods.clear()
+            settings.mod_matches.clear()
             for mod in result.mods:
                 row = settings.mods.add()
                 row.path = mod.path
@@ -247,6 +252,19 @@ class DMF_OT_scan_mods(Operator):
                     f"{name} {value}" for name, value in mod.counts.items() if value
                 )
                 row.total_files = sum(mod.counts.values())
+                for match in mod.matches:
+                    found = settings.mod_matches.add()
+                    found.mod_path = mod.path
+                    found.relative = match.relative
+                    found.install = match.install
+                    found.label = match.label
+                    found.build = match.build
+                    found.kind = match.kind
+                    found.container = match.container
+                    found.entry = match.entry
+                    found.size = match.size
+                    found.crc32 = f"{match.crc32:08x}"
+                    found.gameinfo = match.gameinfo
             properties.refresh_mod_rows(settings)
             counts = result.counts()
             settings.mods_scanned = counts["packages"]
@@ -258,6 +276,8 @@ class DMF_OT_scan_mods(Operator):
             )
             if counts["skipped_game_paks"]:
                 settings.mod_note += f", {counts['skipped_game_paks']} engine paks skipped"
+            if result.hash_note:
+                settings.mod_note += f"; {result.hash_note}"
             for root_row in settings.scan_roots:
                 base = Path(bpy.path.abspath(root_row.path)).resolve()
                 matched = [
@@ -287,11 +307,128 @@ def _selected_mod(settings):
 def _mod_vmdl(row) -> str:
     models = [line.strip() for line in (row.models or "").splitlines() if line.strip()]
     hero = (row.hero or "").split(",")[0].strip().lower()
-    preferred = next(
-        (path for path in models if path.lower().endswith(".vmdl") and hero and hero in path.lower()),
-        None,
-    )
-    return preferred or next((path for path in models if path.lower().endswith(".vmdl")), "")
+    for suffix in (".vmdl", ".vmdl_c"):
+        preferred = next(
+            (
+                path
+                for path in models
+                if path.lower().endswith(suffix) and hero and hero in path.lower()
+            ),
+            None,
+        )
+        if preferred:
+            return preferred
+    for suffix in (".vmdl", ".vmdl_c"):
+        found = next((path for path in models if path.lower().endswith(suffix)), "")
+        if found:
+            return found
+    return ""
+
+
+def _mod_matches(settings, row) -> list[dict]:
+    """The selected package's install matches, in the shape migrate expects."""
+    return [
+        {
+            "relative": item.relative,
+            "install": item.install,
+            "label": item.label,
+            "build": item.build,
+            "kind": item.kind,
+            "container": item.container,
+            "entry": item.entry,
+            "gameinfo": item.gameinfo,
+            "crc32": item.crc32,
+        }
+        for item in settings.mod_matches
+        if item.mod_path == row.path
+    ]
+
+
+def _selected_nodes(settings) -> list[str] | None:
+    if not settings.mod_nodes:
+        return None
+    return [item.name for item in settings.mod_nodes if item.selected]
+
+
+class DMF_OT_analyze_mod(Operator):
+    bl_idname = "dmf.analyze_mod"
+    bl_label = "Analyze package"
+    bl_description = "Resolve the old model, list the nodes it carries, and compare its files with the live hero"
+
+    def execute(self, context):
+        settings = _settings(context)
+        row = _selected_mod(settings)
+        if row is None:
+            self.report({"ERROR"}, "Select a package first")
+            return {"CANCELLED"}
+        if row.kind == "blend":
+            self.report({"ERROR"}, "Blend projects are edited directly; there is no model to analyze")
+            return {"CANCELLED"}
+        hero_slug = (row.hero or "").split(",")[0].strip()
+        if not hero_slug:
+            self.report({"ERROR"}, "This package does not name a hero model")
+            return {"CANCELLED"}
+        module = core.core(settings)
+        env = core.detect_environment(settings, module)
+        if env.game_root is None or env.s2v is None:
+            self.report({"ERROR"}, "Set the live game and Source 2 Viewer in Setup first")
+            return {"CANCELLED"}
+        old_path = _abspath(row.path)
+        old_vmdl = _mod_vmdl(row)
+        matches = _mod_matches(settings, row)
+        slug = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in (row.addon or old_path.stem))
+        output = _workspace(settings) / "analysis" / (slug or "package")
+
+        def work(progress):
+            progress(0.03, "reading the live hero roster")
+            heroes = module["live"].list_heroes(env)
+            hero = next((item for item in heroes if item.slug.lower() == hero_slug.lower()), None)
+            if hero is None:
+                raise RuntimeError(f"Hero {hero_slug} is not in the live roster")
+            progress(0.2, "resolving both models")
+            return module["migrate"].analyze_package(
+                env,
+                old_path,
+                output,
+                hero=hero,
+                old_vmdl=Path(old_vmdl) if old_vmdl else None,
+                old_matches=matches,
+            )
+
+        def done(result):
+            settings.mod_nodes.clear()
+            for node in result.get("nodes", []):
+                item = settings.mod_nodes.add()
+                item.name = node["name"]
+                item.selected = bool(node.get("selected"))
+                item.changed = bool(node.get("changed"))
+                item.old_lines = int(node.get("old_lines", 0))
+                item.new_lines = int(node.get("new_lines", 0))
+            settings.mod_diffs.clear()
+            for diff in result.get("files", []):
+                item = settings.mod_diffs.add()
+                item.path = diff["path"]
+                item.state = diff["state"]
+                item.old_size = diff.get("old_size", 0)
+                item.new_size = diff.get("new_size", 0)
+            settings.mod_node_index = 0
+            settings.mod_diff_index = 0
+            source = result.get("old_source") or {}
+            settings.mod_analysis_old_vmdl = result.get("old_vmdl", "")
+            settings.mod_analysis_new_vmdl = result.get("new_vmdl", "")
+            settings.mod_analysis_source = source.get("kind", "source")
+            settings.mod_analysis_note = (
+                f"{len(settings.mod_nodes)} nodes, {len(settings.mod_diffs)} differing files"
+            )
+            if settings.mod_analysis_source == "compiled":
+                settings.mod_analysis_note += (
+                    f"; compiled model matched {source.get('install_build') or 'no installed build'}"
+                )
+            core.set_status(settings, f"Analyzed {row.addon}: {settings.mod_analysis_note}", "OK")
+
+        if not _start(settings, f"Analyzing {row.addon}", work, done, "Analyze failed"):
+            return {"CANCELLED"}
+        return {"FINISHED"}
 
 
 class DMF_OT_port_mod(Operator):
@@ -316,6 +453,8 @@ class DMF_OT_port_mod(Operator):
             return {"CANCELLED"}
         old_path = _abspath(row.path)
         old_vmdl = _mod_vmdl(row)
+        old_matches = _mod_matches(settings, row)
+        sections = _selected_nodes(settings)
         addon = f"{(row.addon or old_path.stem).strip().replace(' ', '_')}_updated"
         output = (
             _abspath(settings.update_output)
@@ -337,8 +476,10 @@ class DMF_OT_port_mod(Operator):
                 addon,
                 hero=hero,
                 old_vmdl=Path(old_vmdl) if old_vmdl else None,
+                old_matches=old_matches,
                 preserve_model=settings.update_model_policy,
                 preserve_materials=settings.update_preserve_materials,
+                sections=sections,
                 force=True,
             )
 
@@ -383,6 +524,8 @@ class DMF_OT_backport_mod(Operator):
         env = core.detect_environment(settings, module)
         old_path = _abspath(row.path)
         client = _abspath(settings.mod_target_client)
+        matches = _mod_matches(settings, row)
+        sections = _selected_nodes(settings)
         addon = f"{(row.addon or old_path.stem).strip().replace(' ', '_')}_backport"
         output = _workspace(settings) / "backports"
 
@@ -399,8 +542,10 @@ class DMF_OT_backport_mod(Operator):
                 addon,
                 relative=relative,
                 hero=row.hero,
+                old_matches=matches,
                 preserve_model=settings.update_model_policy,
                 preserve_materials=settings.update_preserve_materials,
+                sections=sections,
                 force=True,
             )
 
@@ -890,6 +1035,7 @@ CLASSES = (
     DMF_OT_add_scan_root,
     DMF_OT_remove_scan_root,
     DMF_OT_scan_mods,
+    DMF_OT_analyze_mod,
     DMF_OT_port_mod,
     DMF_OT_backport_mod,
     DMF_OT_create_mod_project,

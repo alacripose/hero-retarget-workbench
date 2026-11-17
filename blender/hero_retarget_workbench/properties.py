@@ -492,12 +492,49 @@ class DMF_ModContentRow(PropertyGroup):
     category: StringProperty(name="Type", default="other")
 
 
+class DMF_ModNodeRow(PropertyGroup):
+    """One top-level node in the old model, kept or left behind."""
+
+    name: StringProperty(name="Node", default="")
+    selected: BoolProperty(name="Keep", default=False)
+    changed: BoolProperty(name="Different", default=False)
+    old_lines: IntProperty(name="Old lines", default=0)
+    new_lines: IntProperty(name="Modern lines", default=0)
+
+
+class DMF_ModDiffRow(PropertyGroup):
+    """One file the old and modern models name differently."""
+
+    path: StringProperty(name="File", default="")
+    state: StringProperty(name="State", default="")
+    old_size: FloatProperty(name="Old bytes", default=0.0)
+    new_size: FloatProperty(name="Modern bytes", default=0.0)
+
+
+class DMF_ModMatchRow(PropertyGroup):
+    """One byte-identical file in a detected game or tools install."""
+
+    mod_path: StringProperty(name="Package", default="")
+    relative: StringProperty(name="Mod file", default="")
+    install: StringProperty(name="Install", default="")
+    label: StringProperty(name="Build name", default="")
+    build: StringProperty(name="Build", default="")
+    kind: StringProperty(name="Kind", default="")
+    container: StringProperty(name="Container", subtype="FILE_PATH", default="")
+    entry: StringProperty(name="Entry", default="")
+    size: FloatProperty(name="Bytes", default=0.0)
+    crc32: StringProperty(name="CRC32", default="")
+    gameinfo: StringProperty(name="Gameinfo", subtype="FILE_PATH", default="")
+
+
 def _mod_filter_changed(self, context) -> None:
     refresh_mod_rows(self)
 
 
 def _mod_index_changed(self, context) -> None:
     refresh_mod_contents(self)
+    refresh_mod_matches(self)
+    clear_mod_analysis(self)
 
 
 def _mod_content_filter_changed(self, context) -> None:
@@ -522,6 +559,40 @@ def refresh_mod_contents(settings) -> None:
             row.label = line
             row.category = oldmods.content_category(line)
     refresh_mod_content_rows(settings)
+
+
+def refresh_mod_matches(settings) -> None:
+    """Show install copies of the selected package's files."""
+    settings.mod_match_rows.clear()
+    selected = None
+    if settings.mod_rows:
+        selected = settings.mod_rows[min(max(settings.mod_index, 0), len(settings.mod_rows) - 1)]
+    if selected is None:
+        settings.mod_match_index = 0
+        return
+    for row in settings.mod_matches:
+        if row.mod_path != selected.path:
+            continue
+        copy = settings.mod_match_rows.add()
+        for field in (
+            "mod_path", "relative", "install", "label", "build", "kind",
+            "container", "entry", "size", "crc32", "gameinfo",
+        ):
+            setattr(copy, field, getattr(row, field))
+    settings.mod_match_index = min(
+        max(settings.mod_match_index, 0), max(0, len(settings.mod_match_rows) - 1)
+    )
+
+
+def clear_mod_analysis(settings) -> None:
+    settings.mod_nodes.clear()
+    settings.mod_diffs.clear()
+    settings.mod_node_index = 0
+    settings.mod_diff_index = 0
+    settings.mod_analysis_note = ""
+    settings.mod_analysis_old_vmdl = ""
+    settings.mod_analysis_new_vmdl = ""
+    settings.mod_analysis_source = ""
 
 
 def refresh_mod_content_rows(settings) -> None:
@@ -557,7 +628,9 @@ def refresh_mod_rows(settings) -> None:
         ):
             setattr(copy, field, getattr(row, field))
     settings.mod_index = min(max(settings.mod_index, 0), max(0, len(settings.mod_rows) - 1))
+    clear_mod_analysis(settings)
     refresh_mod_contents(settings)
+    refresh_mod_matches(settings)
 
 
 class DMF_ClientRow(PropertyGroup):
@@ -840,6 +913,17 @@ class DMF_Settings(PropertyGroup):
     mod_report: StringProperty(name="Corpus receipt", subtype="FILE_PATH", default="")
     mod_note: StringProperty(name="Mods note", default="")
     mods_scanned: IntProperty(name="Packages scanned", default=0)
+    mod_matches: CollectionProperty(type=DMF_ModMatchRow, description="Installed copies of scanned mod files")
+    mod_match_rows: CollectionProperty(type=DMF_ModMatchRow, description="Installed copies of the selected package")
+    mod_match_index: IntProperty(name="Match row", default=0)
+    mod_nodes: CollectionProperty(type=DMF_ModNodeRow, description="Top-level nodes in the analyzed old model")
+    mod_node_index: IntProperty(name="Node row", default=0)
+    mod_diffs: CollectionProperty(type=DMF_ModDiffRow, description="Files that differ between the old and modern model")
+    mod_diff_index: IntProperty(name="Diff row", default=0)
+    mod_analysis_note: StringProperty(name="Analysis", default="")
+    mod_analysis_old_vmdl: StringProperty(name="Old model", subtype="FILE_PATH", default="")
+    mod_analysis_new_vmdl: StringProperty(name="Modern model", subtype="FILE_PATH", default="")
+    mod_analysis_source: StringProperty(name="Old model source", default="")
     mod_target_client: StringProperty(
         name="Target client",
         description="Older game build (install, game, or game/citadel folder); every VPK in it is searched for the hero model",
@@ -1239,6 +1323,30 @@ class DMF_Settings(PropertyGroup):
         max=0.9,
         subtype="FACTOR",
     )
+    mod_matches_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a match row given to the installed build; the rest holds the file",
+        default=0.42,
+        min=0.25,
+        max=0.85,
+        subtype="FACTOR",
+    )
+    mod_nodes_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a node row given to its name; the rest holds the state",
+        default=0.62,
+        min=0.3,
+        max=0.9,
+        subtype="FACTOR",
+    )
+    mod_diffs_name_width: FloatProperty(
+        name="Name width",
+        description="Share of a differing-file row given to the file; the rest holds its state",
+        default=0.64,
+        min=0.3,
+        max=0.9,
+        subtype="FACTOR",
+    )
     clients_name_width: FloatProperty(
         name="Name width",
         description="Share of an install row given to the name; the rest holds kind and build",
@@ -1526,6 +1634,9 @@ CLASSES = (
     DMF_ScanRoot,
     DMF_ModRow,
     DMF_ModContentRow,
+    DMF_ModNodeRow,
+    DMF_ModDiffRow,
+    DMF_ModMatchRow,
     DMF_ClientRow,
     DMF_ComponentRow,
     DMF_HeroRow,

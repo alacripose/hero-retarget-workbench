@@ -417,6 +417,73 @@ class DMF_UL_mod_contents(UIList):
         right.label(text=item.category)
 
 
+class DMF_UL_mod_matches(UIList):
+    bl_idname = "DMF_UL_mod_matches"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(
+            self,
+            [
+                f"{row.label} {row.build} {row.install} {row.relative} {row.entry} {row.kind}"
+                for row in rows
+            ],
+        )
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        width = getattr(context.scene.dmf, "mod_matches_name_width", 0.42)
+        left, right = ui_popit.columns(layout, width)
+        left.label(text=item.label or item.install or "install", icon="PACKAGE" if item.kind == "vpk" else "FILE_FOLDER")
+        right.label(text=item.relative or item.entry or "file", icon="FILE")
+
+
+class DMF_UL_mod_nodes(UIList):
+    bl_idname = "DMF_UL_mod_nodes"
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [f"{row.name} {'changed' if row.changed else 'same'}" for row in rows])
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        width = getattr(context.scene.dmf, "mod_nodes_name_width", 0.62)
+        left, right = ui_popit.columns(layout, width)
+        left.prop(
+            item,
+            "selected",
+            text="",
+            emboss=False,
+            icon="CHECKBOX_HLT" if item.selected else "CHECKBOX_DEHLT",
+        )
+        left.label(text=item.name or "node", icon="NODETREE")
+        right.alignment = "RIGHT"
+        right.label(
+            text=f"{item.old_lines} / {item.new_lines}" if item.changed else "same",
+            icon="FILE_REFRESH" if item.changed else "CHECKMARK",
+        )
+
+
+class DMF_UL_mod_diffs(UIList):
+    bl_idname = "DMF_UL_mod_diffs"
+
+    _ICONS = {
+        "changed": "FILE_REFRESH",
+        "old-only": "IMPORT",
+        "new-only": "EXPORT",
+        "missing": "ERROR",
+    }
+
+    def filter_items(self, context, data, propname):
+        rows = getattr(data, propname)
+        return _filter(self, [f"{row.path} {row.state}" for row in rows])
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        width = getattr(context.scene.dmf, "mod_diffs_name_width", 0.64)
+        left, right = ui_popit.columns(layout, width)
+        left.label(text=item.path or "file", icon=self._ICONS.get(item.state, "FILE"))
+        right.alignment = "RIGHT"
+        right.label(text=item.state or "changed")
+
+
 class DMF_UL_mods(UIList):
     bl_idname = "DMF_UL_mods"
 
@@ -501,6 +568,9 @@ CLASSES = (
     DMF_UL_model_folders,
     DMF_UL_scan_roots,
     DMF_UL_mod_contents,
+    DMF_UL_mod_matches,
+    DMF_UL_mod_nodes,
+    DMF_UL_mod_diffs,
     DMF_UL_heroes,
     DMF_UL_bone_map,
     DMF_UL_mods,

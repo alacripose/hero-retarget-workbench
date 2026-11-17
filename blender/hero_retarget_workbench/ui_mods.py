@@ -265,6 +265,7 @@ class DMF_PT_mods(Panel):
             ui_popit.stat(detail, "Hero", selected.hero or "unknown")
             ui_popit.stat(detail, "Updated", selected.modified or "unknown")
             ui_popit.stat(detail, "Toolchain", selected.toolchain or "unknown")
+            ui_popit.stat(detail, "Installed copies", f"{len(settings.mod_match_rows)}")
             ui_popit.stat(detail, "Size", _size(selected.bytes))
             if selected.counts:
                 _hint(detail, selected.counts, "FILE")
@@ -323,9 +324,90 @@ class DMF_PT_mods(Panel):
                 if not settings.mod_content_rows:
                     _hint(contents, "No files of this type in the package.", "INFO")
 
+            if settings.mod_match_rows:
+                matches = _section(
+                    layout,
+                    "Installed copies",
+                    "PACKAGE",
+                    f"{len(settings.mod_match_rows)} matched files",
+                )
+                ui_popit.column_header(
+                    matches,
+                    settings.mod_matches_name_width,
+                    ("Install", "File"),
+                    (1.0,),
+                )
+                matches.template_list(
+                    "DMF_UL_mod_matches",
+                    "",
+                    settings,
+                    "mod_match_rows",
+                    settings,
+                    "mod_match_index",
+                    rows=5,
+                )
+                ui_popit.name_width(matches, settings, "mod_matches_name_width")
+                if settings.mod_match_rows:
+                    picked = settings.mod_match_rows[
+                        min(settings.mod_match_index, len(settings.mod_match_rows) - 1)
+                    ]
+                    ui_popit.stat(matches, "Build", picked.build or picked.label or "unknown")
+                    ui_popit.stat(matches, "File", picked.relative or picked.entry)
+                    ui_popit.stat(matches, "Container", Path(picked.container).name)
+
+            if settings.mod_nodes:
+                nodes = _section(
+                    layout,
+                    "Old model nodes",
+                    "NODETREE",
+                    f"{sum(1 for row in settings.mod_nodes if row.selected)} kept",
+                )
+                ui_popit.column_header(
+                    nodes,
+                    settings.mod_nodes_name_width,
+                    ("Node", "Lines"),
+                    (1.0,),
+                )
+                nodes.template_list(
+                    "DMF_UL_mod_nodes",
+                    "",
+                    settings,
+                    "mod_nodes",
+                    settings,
+                    "mod_node_index",
+                    rows=6,
+                )
+                ui_popit.name_width(nodes, settings, "mod_nodes_name_width")
+                _hint(nodes, "Check the sections to copy from the old model. Mesh policy still controls the old DMX files.")
+
+            if settings.mod_diffs:
+                diffs = _section(
+                    layout,
+                    "Files that differ",
+                    "FILE_REFRESH",
+                    f"{len(settings.mod_diffs)} files",
+                )
+                ui_popit.column_header(
+                    diffs,
+                    settings.mod_diffs_name_width,
+                    ("File", "State"),
+                    (1.0,),
+                )
+                diffs.template_list(
+                    "DMF_UL_mod_diffs",
+                    "",
+                    settings,
+                    "mod_diffs",
+                    settings,
+                    "mod_diff_index",
+                    rows=6,
+                )
+                ui_popit.name_width(diffs, settings, "mod_diffs_name_width")
+
             actions = _section(layout, "Update and backport", "FILE_REFRESH")
             if selected.kind != "blend":
                 row = actions.row(align=True)
+                row.operator("dmf.analyze_mod", text="Analyze", icon="VIEWZOOM")
                 row.operator("dmf.port_mod", text="Update to latest", icon="FILE_REFRESH")
                 row.prop(settings, "backport_experimental", text="Backport")
                 if settings.backport_experimental:
@@ -339,7 +421,8 @@ class DMF_PT_mods(Panel):
                 _hint(actions, "Blend projects are edited directly; update does not apply.", "INFO")
             _hint(
                 actions,
-                "Update moves the mod onto today's hero. Backport resolves the same path in the target build.",
+                settings.mod_analysis_note
+                or "Analyze lists the old nodes and differing files. Update then moves the mod onto today's hero; backport resolves the same path in the target build.",
             )
         if settings.mod_report:
             layout.label(text=settings.mod_report, icon="TEXT")
