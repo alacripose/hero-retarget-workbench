@@ -33,7 +33,6 @@ REST = (0.42, 0.47, 0.56, 0.80)
 WARM = (1.00, 0.52, 0.14, 1.0)
 COOL = (0.20, 0.72, 1.00, 0.95)
 COOL_BRIGHT = (0.48, 0.92, 1.00, 1.0)
-ACTIVE = (1.00, 0.86, 0.30, 1.0)
 PANEL = (0.045, 0.055, 0.070, 0.88)
 BORDER = (0.24, 0.28, 0.34, 1.0)
 
@@ -302,7 +301,7 @@ def _metrics(settings, custom, hero, name: str, mapping: dict[str, str], axes):
     }
 
 
-def _draw_legend(settings, selected_error: float) -> None:
+def _draw_legend(selected_error: float) -> None:
     x = 14.0
     y = 14.0
     width = 350.0
@@ -313,21 +312,13 @@ def _draw_legend(settings, selected_error: float) -> None:
         BORDER,
         1.0,
     )
-    _text("Nudge map  warm custom / cool hero", x + 9.0, y + height - 17.0, 11.0, TEXT)
+    _text("Chain overlay  warm custom / cool hero", x + 9.0, y + height - 17.0, 11.0, TEXT)
     _radial_field((x + 22.0, y + 36.0), 15.0, _warm_color(selected_error, True), strength=0.9)
     _text("custom", x + 42.0, y + 41.0, 9.0, WARM)
     _radial_field((x + 124.0, y + 36.0), 15.0, COOL, target=True, strength=0.9)
     _text("hero target", x + 144.0, y + 41.0, 9.0, COOL_BRIGHT)
     _text("red = far  ·  blue = aligned", x + 9.0, y + 22.0, 9.0, DIM)
-    _text(
-        f"axis {settings.nudge_axis}  |  {'rotate' if settings.nudge_rotate else 'translate'}  |  "
-        f"{'relative' if settings.nudge_relative else 'absolute'}",
-        x + 196.0,
-        y + 22.0,
-        9.0,
-        DIM,
-    )
-    _text("chain: selected bone and its mapped ancestors", x + 9.0, y + 7.0, 9.0, DIM)
+    _text("chain: picked bone and its mapped ancestors", x + 9.0, y + 7.0, 9.0, DIM)
 
 
 def _draw(context) -> None:
@@ -355,7 +346,6 @@ def _draw(context) -> None:
     if not chain:
         return
     selected_item = next((item for item in chain if item["name"] == selected), None)
-    active_axis = {"X": 0, "Y": 1, "Z": 2}.get(settings.nudge_axis, 0)
 
     gpu.state.blend_set("ALPHA")
     # Cool target halos first, then warm custom halos.  Each halo is local to its
@@ -435,14 +425,6 @@ def _draw(context) -> None:
             _ring(custom_point, 8.5, _heat(selected_item["error"]), 2.0)
             _ring(custom_point, 5.0, WARM, 2.0)
             _cross(custom_point, 5.0, WARM, 1.8)
-            axis = (selected_item["pose"].x_axis, selected_item["pose"].y_axis, selected_item["pose"].z_axis)[active_axis]
-            axis_length = max(float(selected_item["bone"].length) * 1.1, 0.02)
-            tip = custom_head + Vector(axis) * axis_length
-            tip_point = _project(region, region_3d, tip)
-            if tip_point is not None:
-                _line([custom_point, tip_point], ACTIVE, 2.4)
-                _cross(tip_point, 3.0, ACTIVE, 1.4)
-                _text(settings.nudge_axis, tip_point[0] + 5.0, tip_point[1] + 4.0, 10.0, ACTIVE)
             if target_point is not None:
                 # The connector is a comparison, not an axis trail: it runs from
                 # the current custom head to the cool target head and fades warm
@@ -477,7 +459,7 @@ def _draw(context) -> None:
                     COOL_BRIGHT,
                 )
 
-    _draw_legend(settings, selected_item["error"] if selected_item is not None else 0.0)
+    _draw_legend(selected_item["error"] if selected_item is not None else 0.0)
 
 
 def draw(_self=None, context=None) -> None:

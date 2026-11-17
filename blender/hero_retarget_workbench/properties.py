@@ -1267,30 +1267,6 @@ class DMF_Settings(PropertyGroup):
         max=1.0,
         precision=3,
     )
-    nudge_axis: EnumProperty(
-        name="Nudge axis",
-        description="Pose-space axis for the manual bone nudge",
-        items=[("X", "X", "X"), ("Y", "Y", "Y"), ("Z", "Z", "Z")],
-        default="X",
-    )
-    nudge_amount: FloatProperty(
-        name="Step",
-        description="Distance or angle per nudge click",
-        default=0.01,
-        min=0.0001,
-        soft_max=0.25,
-        precision=4,
-    )
-    nudge_rotate: BoolProperty(
-        name="Rotate",
-        description="Rotate the active pose bone instead of translating it",
-        default=False,
-    )
-    nudge_relative: BoolProperty(
-        name="Relative step",
-        description="Scale translation steps by the selected bone's length so a short finger and a long arm use the same control",
-        default=True,
-    )
     show_nudge_overlay: BoolProperty(
         name="Chain overlay",
         description=(
