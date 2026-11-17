@@ -15,6 +15,28 @@ import bpy
 
 _ACTIVE: "BackgroundJob | None" = None
 _UNLOADING = False
+# The jobs card is drawn by these surfaces; a timer that only writes RNA leaves
+# the visible frame at "starting" until some unrelated event happens to redraw.
+_REDRAW_AREAS = {"VIEW_3D", "PROPERTIES", "CUSTOM"}
+
+
+def _tag_redraw() -> None:
+    """Ask every surface that can show the job card to draw again."""
+    try:
+        windows = bpy.context.window_manager.windows
+    except (AttributeError, RuntimeError):
+        return
+    for window in windows:
+        screen = getattr(window, "screen", None)
+        if screen is None:
+            continue
+        for area in screen.areas:
+            if area.type not in _REDRAW_AREAS:
+                continue
+            try:
+                area.tag_redraw()
+            except (ReferenceError, RuntimeError):
+                pass
 
 
 class JobProgress:
@@ -145,6 +167,7 @@ class BackgroundJob:
             lines = self.settings.job_log.splitlines()[-11:]
             self.settings.job_log = "\n".join([*lines, message])
         if not self._finished.is_set():
+            _tag_redraw()
             return 0.1
         with self._lock:
             for row in self._stages.values():
@@ -171,6 +194,7 @@ class BackgroundJob:
             lines = self.settings.job_log.splitlines()[-11:]
             self.settings.job_log = "\n".join([*lines, final])
             self.on_done(self._result)
+        _tag_redraw()
         return None
 
 

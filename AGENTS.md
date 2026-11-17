@@ -29,6 +29,16 @@ https://github.com/oaustegard/claude-skills/releases (declauding)
 https://github.com/hardikpandya/stop-slop
 C:\Users\ala\.agents\skills\ has a ton of skills for agents to use and yet they never use them for some reason. You need to be using these skills and updating/managing them ccording to family project convention.
 
+## 2026-11-17 — a running background job tags its surface for redraw
+
+**Owner instruction, verbatim:** *"okay so your probe can do it but when I operate it myself it doesn't show progress? it literally sat for 10 minutes on the starting scan page"*, after *"the changes to the mods page to make it more verbose are just gone? it doesn't show any details now???? version 16.9 added all of that and now it's not here??????"*
+
+- **The probe was calling `_tick()` by hand.** That proved the stage rows and data, not the timer path the owner uses. A real `BackgroundJob` was updating `job_progress`, `job_message` and `job_stages` every 0.1 s, but no area was tagged for redraw; the Workbench stayed on its first frame at 0% `starting` while the scan ran.
+- **The timer now tags the surfaces that draw the card.** `jobs._tag_redraw()` walks every window and tags `VIEW_3D`, `PROPERTIES` and `CUSTOM` areas on each live tick and once at completion. A live probe without manual ticks read `58%`, seven stages, `step 7 of 12` in the state while the old frame still showed 8%; after the tag the visible card showed 58%, seven stage bars and the current step. The same probe's finished card kept all 12 stages and the dismiss control.
+- **A completed scan keeps its named steps.** `ui_popit.job()` still uses the one-line history row for jobs without stages, but a finished scan now keeps its stage card: label, state, per-stage bar, and the X to dismiss it. The old finished branch discarded the stage list even though the docstring promised the last run's steps stayed visible.
+- **Checks.** 217 unit tests pass; `compileall`, `ui_parity --check`, `ui_prose --check` and `git diff --check` are clean. A live custom-editor probe started a real `BackgroundJob` and never called `_tick` manually; its running and finished screenshots are `artifacts/probes/mods-job-live-ui.png` and `mods-job-live-finished-ui.png`. `tools/blender_mods_gui_probe.py` passed all 18 data checks and its finished screenshot `artifacts/ui-pass/mods-scan-folders.png` shows the five stage rows. That probe then failed in its pre-existing `scroll_sidebar()` call because the invocation lacked `--enable-event-simulate`; the scan had already passed and the screenshot was written, so this is a probe-runner issue, not a release failure.
+- **Version and zip.** `0.17.1`; `dist/hero_retarget_workbench-0.17.1.zip`, 68 files, 493,689 bytes, sha256 `06215481a3f54b7dd72f018581ae3effd2f4698f7a38a5962c2525e59742f8c3`. `blender_zip_probe` reports pass, 86 operators and 26 panels, version `0.17.1`.
+
 ## 2026-11-17 — a name-width drag redraws the list, not every row's text
 
 **Owner instruction, verbatim:** *"okay for v17 you're going to have to find why performance hangs badly on large views/lists when the name width slider is adjusted, probably something to do with falsley rendering items in lists that aren't visible?"*
