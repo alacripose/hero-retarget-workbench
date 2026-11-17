@@ -234,7 +234,8 @@ class DMF_OT_choose_hero(Operator):
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
-        _status(settings, f"Hero: {title}", "OK")
+        settings.mod_target = settings.hero_slug
+        _status(settings, f"Hero: {title} (port target)", "OK")
         return {"FINISHED"}
 
 
@@ -274,6 +275,8 @@ class DMF_OT_detect(Operator):
                 properties.set_hero_items(heroes)
                 properties.set_model_items(models)
                 properties.sync_folders(settings, force=True)
+                if settings.mod_target not in {row[0] for row in properties.HERO_ITEMS}:
+                    settings.mod_target = "NONE"
                 roots = {root for _slug, _title, _model, root in properties.MODEL_ITEMS}
                 settings.hero_slug = "NONE"
                 if old and old != "NONE" and any(row[0] == old for row in properties.MODEL_ITEMS):

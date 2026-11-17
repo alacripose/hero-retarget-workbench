@@ -337,6 +337,19 @@ def _selected_mod(settings):
     return settings.mod_rows[index]
 
 
+def _target_slug(settings, row=None) -> str:
+    """The live hero chosen for this port, with the old package only a fallback."""
+    for value in (
+        getattr(settings, "mod_target", ""),
+        getattr(settings, "hero_slug", ""),
+        (getattr(row, "hero", "") if row is not None else ""),
+    ):
+        slug = (value or "").split(",")[0].strip()
+        if slug and slug != "NONE":
+            return slug
+    return ""
+
+
 def _mod_vmdl(row) -> str:
     models = [line.strip() for line in (row.models or "").splitlines() if line.strip()]
     hero = (row.hero or "").split(",")[0].strip().lower()
@@ -571,9 +584,9 @@ class DMF_OT_analyze_mod(Operator):
         if row.kind == "blend":
             self.report({"ERROR"}, "Blend projects are edited directly; there is no model to analyze")
             return {"CANCELLED"}
-        hero_slug = (row.hero or "").split(",")[0].strip()
+        hero_slug = _target_slug(settings, row)
         if not hero_slug:
-            self.report({"ERROR"}, "This package does not name a hero model")
+            self.report({"ERROR"}, "Choose a target hero in Update and backport")
             return {"CANCELLED"}
         module = core.core(settings)
         env = core.detect_environment(settings, module)
@@ -628,10 +641,22 @@ class DMF_OT_analyze_mod(Operator):
                 f"{len(settings.mod_nodes)} nodes, {len(settings.mod_diffs)} differing files"
             )
             if settings.mod_analysis_source == "compiled":
-                settings.mod_analysis_note += (
-                    f"; compiled model matched {source.get('install_build') or 'no installed build'}"
-                )
-            core.set_status(settings, f"Analyzed {row.addon}: {settings.mod_analysis_note}", "OK")
+                if source.get("matched"):
+                    settings.mod_analysis_note += (
+                        f"; compiled model matched {source.get('install_build') or 'no installed build'}"
+                    )
+                elif source.get("context"):
+                    settings.mod_analysis_note += (
+                        f"; unique model, old-build context {source.get('install_build') or 'unknown'}"
+                        f" from {source.get('evidence_files', 0)} matching package files"
+                    )
+                else:
+                    settings.mod_analysis_note += "; no installed build context"
+            core.set_status(
+                settings,
+                f"Analyzed {row.addon} for {hero_slug}: {settings.mod_analysis_note}",
+                "OK",
+            )
 
         if not _start(settings, f"Analyzing {row.addon}", work, done, "Analyze failed"):
             return {"CANCELLED"}
@@ -649,9 +674,9 @@ class DMF_OT_port_mod(Operator):
         if row is None:
             self.report({"ERROR"}, "Scan for mods and select a package first")
             return {"CANCELLED"}
-        hero_slug = (row.hero or "").split(",")[0].strip()
+        hero_slug = _target_slug(settings, row)
         if not hero_slug:
-            self.report({"ERROR"}, "This package does not name a hero model")
+            self.report({"ERROR"}, "Choose a target hero in Update and backport")
             return {"CANCELLED"}
         module = core.core(settings)
         env = core.detect_environment(settings, module)
@@ -766,10 +791,11 @@ class DMF_OT_backport_mod(Operator):
             self.report({"ERROR"}, "Choose a target client in Setup > Clients")
             return {"CANCELLED"}
         relative = _mod_vmdl(row)
-        if not relative and not row.hero:
+        hero_slug = _target_slug(settings, row)
+        if not relative and not hero_slug:
             self.report(
                 {"ERROR"},
-                "The package names no model and no hero, so the target build cannot be searched",
+                "Choose a target hero; the package names no model to search in the target build",
             )
             return {"CANCELLED"}
         module = core.core(settings)
@@ -784,7 +810,7 @@ class DMF_OT_backport_mod(Operator):
         def work(progress):
             progress(
                 0.05,
-                f"searching {client.name} for {relative or row.hero or 'the hero model'}",
+                f"searching {client.name} for {relative or hero_slug or 'the hero model'}",
             )
             return module["backport"].backport_package(
                 env,
@@ -793,7 +819,7 @@ class DMF_OT_backport_mod(Operator):
                 output,
                 addon,
                 relative=relative,
-                hero=row.hero,
+                hero=hero_slug,
                 old_matches=matches,
                 preserve_model=settings.update_model_policy,
                 preserve_materials=settings.update_preserve_materials,

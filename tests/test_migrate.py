@@ -9,6 +9,7 @@ from unittest import mock
 
 from forge.migrate import (
     MigrationError,
+    _install_evidence,
     migrate_trees,
     model_file_diff,
     model_node_diff,
@@ -267,6 +268,7 @@ class MigrationTests(unittest.TestCase):
         self.assertEqual(path.resolve(), (destination / "models/test/hero.vmdl").resolve())
         self.assertEqual(source["kind"], "compiled")
         self.assertTrue(source["matched"])
+        self.assertFalse(source["context"])
         command = run.call_args.args[0]
         self.assertIn(str(container), command)
         self.assertIn("-f", command)
@@ -306,6 +308,102 @@ class MigrationTests(unittest.TestCase):
         self.assertIn("--recursive", command)
         self.assertEqual(seen["staged"], Path(command[command.index("-i") + 1]) / "models/test/hero.vmdl_c")
         self.assertTrue(seen["staged_exists"])
+
+    def test_compiled_only_package_uses_the_old_build_that_supplied_its_materials(self):
+        old = self.root / "compiled-old-context"
+        compiled = old / "models/heroes_staging/tokamak/tokamak.vmdl_c"
+        compiled.parent.mkdir(parents=True)
+        compiled.write_bytes(b"unique tokamak model bytes")
+        install = self.root / "Reduced_CSDK_10"
+        gameinfo = install / "game/citadel/gameinfo.gi"
+        gameinfo.parent.mkdir(parents=True)
+        gameinfo.write_text("gameinfo", encoding="utf-8")
+        destination = self.root / "context-resolved"
+
+        def material(relative: str) -> HashMatch:
+            return HashMatch(
+                relative=relative,
+                install=str(install),
+                label="CSDK10",
+                build="4192 May 25 2024",
+                kind="loose",
+                container=str(install / "game/citadel/models" / Path(relative).name),
+                entry=Path(relative).name,
+                size=1,
+                crc32=1,
+                gameinfo=str(gameinfo),
+            )
+
+        matches = [
+            material("models/heroes_staging/tokamak/materials/tokamak_head.vtex_c"),
+            material("models/heroes_staging/tokamak/materials/tokamak_arm.vtex_c"),
+            # A shared file from another hero is evidence for the same install;
+            # the old package's folder name is not a target rule.
+            material("models/heroes_staging/bebop/materials/bebop_arm.vtex_c"),
+        ]
+
+        def fake_run(command, **_kwargs):
+            output = Path(command[command.index("-o") + 1])
+            vmdl = output / "models/heroes_staging/tokamak/tokamak.vmdl"
+            vmdl.parent.mkdir(parents=True, exist_ok=True)
+            vmdl.write_text("[source]", encoding="utf-8")
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+        with mock.patch("forge.migrate.subprocess.run", side_effect=fake_run) as run:
+            path, source = resolve_old_model(
+                Environment(s2v=Path("s2v.exe")),
+                old,
+                preferred="models/heroes_staging/tokamak/tokamak.vmdl_c",
+                matches=matches,
+                destination=destination,
+            )
+
+        self.assertEqual(path.resolve(), (destination / "models/heroes_staging/tokamak/tokamak.vmdl").resolve())
+        self.assertFalse(source["matched"])
+        self.assertTrue(source["context"])
+        self.assertEqual(source["install_build"], "4192 May 25 2024")
+        self.assertEqual(source["evidence_files"], 3)
+        command = run.call_args.args[0]
+        self.assertIn("--game", command)
+        self.assertIn(str(gameinfo), command)
+        self.assertNotIn("-f", command)
+        self.assertTrue(Path(command[command.index("-i") + 1]).name.startswith(".context-resolved-input-"))
+
+    def test_install_evidence_prefers_the_build_with_the_most_matching_files(self):
+        old_install = self.root / "CSDK10"
+        other_install = self.root / "CSDK13"
+        old_install.mkdir()
+        other_install.mkdir()
+
+        def match(install, relative, gameinfo):
+            return HashMatch(
+                relative=relative,
+                install=str(install),
+                label=install.name,
+                build="4192",
+                kind="loose",
+                container=str(install / "pak01_dir.vpk"),
+                entry=relative,
+                size=1,
+                crc32=1,
+                gameinfo=str(gameinfo),
+            )
+
+        old_gameinfo = old_install / "game/citadel/gameinfo.gi"
+        other_gameinfo = other_install / "game/citadel/gameinfo.gi"
+        matches = [
+            match(old_install, "models/heroes_staging/tokamak/materials/a.vtex_c", old_gameinfo),
+            match(old_install, "models/heroes_staging/tokamak/materials/b.vtex_c", old_gameinfo),
+            match(other_install, "models/heroes_staging/bebop/materials/a.vtex_c", other_gameinfo),
+            match(other_install, "models/heroes_staging/bebop/materials/b.vtex_c", other_gameinfo),
+            match(other_install, "models/heroes_staging/bebop/materials/c.vtex_c", other_gameinfo),
+        ]
+
+        evidence = _install_evidence(matches)
+
+        self.assertEqual(evidence["install"], str(other_install))
+        self.assertEqual(evidence["evidence_files"], 3)
+        self.assertEqual(evidence["gameinfo"], str(other_gameinfo))
 
     def test_extracted_vpk_source_satisfies_an_explicit_compiled_path(self):
         old = self.root / "extracted-vpk"

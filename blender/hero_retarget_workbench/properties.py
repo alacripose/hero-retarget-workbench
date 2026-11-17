@@ -743,6 +743,12 @@ class DMF_Settings(PropertyGroup):
         description="The chosen live model path, written by the picker",
         default="NONE",
     )
+    mod_target: EnumProperty(
+        name="Target hero",
+        description="The live hero an old package is ported onto",
+        items=hero_items,
+        default=0,
+    )
     hero_rows: CollectionProperty(type=DMF_HeroRow, description="Models the picker shows after the search and folder filter")
     hero_index: IntProperty(name="Model row", default=0)
     hero_query: StringProperty(
