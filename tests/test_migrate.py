@@ -263,7 +263,7 @@ class MigrationTests(unittest.TestCase):
                 destination=destination,
             )
 
-        self.assertEqual(path, destination / "models/test/hero.vmdl")
+        self.assertEqual(path.resolve(), (destination / "models/test/hero.vmdl").resolve())
         self.assertEqual(source["kind"], "compiled")
         self.assertTrue(source["matched"])
         command = run.call_args.args[0]
@@ -299,7 +299,7 @@ class MigrationTests(unittest.TestCase):
             )
 
         self.assertFalse(source["matched"])
-        self.assertEqual(path, destination / "models/test/hero.vmdl")
+        self.assertEqual(path.resolve(), (destination / "models/test/hero.vmdl").resolve())
         self.assertEqual(Path(source["assets_root"]), destination)
         command = run.call_args.args[0]
         self.assertIn("--recursive", command)
@@ -318,7 +318,7 @@ class MigrationTests(unittest.TestCase):
             preferred="models/test/hero.vmdl_c",
         )
 
-        self.assertEqual(path, source)
+        self.assertEqual(path.resolve(), source.resolve())
         self.assertEqual(info["kind"], "source")
 
     def test_compiled_only_package_updates_without_a_source_vmdl(self):
