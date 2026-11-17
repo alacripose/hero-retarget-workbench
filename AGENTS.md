@@ -31,6 +31,16 @@ https://github.com/hardikpandya/stop-slop
 
 Do not delete patch probes.
 
+## 2026-11-17 — the Chain overlay is one show/hide button (0.22.1)
+
+**Owner instruction, verbatim:** *"okay these redundant useless controls need to be removed along with the axis selector leaving just the show hide overlay button and update this part of the overlay"*, with a screenshot of the Chain overlay section and its viewport legend.
+
+- **The Chain overlay section is one toggle.** The Relative steps, Axis, Amount and Rotate fields and the - Step / + Step row are gone. The section holds **Show overlay** / **Hide overlay**, the hint that the overlay only draws and follows the panel pick, and a draw error when one occurs. Those controls were leftovers of the removed nudge mode; the bone map's Pick and the bone list still choose the highlighted chain.
+- **The nudge buttons and their preview offsets are retired.** `dmf.nudge_bone` and `dmf.reset_hand_nudges` are unregistered, the `nudge_axis`, `nudge_amount`, `nudge_rotate` and `nudge_relative` properties are removed, and the hand preview no longer carries in-memory nudge offsets. `dmf.preview_hands` still plays the chosen action without keying and restores the pose, actions and frame range on Stop. `ui_parity --check` reports 0 undrawn actions (SKELETON now 18 actions); the zip registers 112 operators.
+- **The legend names the overlay, not the removed controls.** The title is **Chain overlay  warm custom / cool hero**, the axis/mode/relative line is gone, and the chain line reads **chain: picked bone and its mapped ancestors**. The viewport axis handle and its X/Y/Z label are removed with the axis selector; the warm/cool halos, labels and target connector stay.
+- **Evidence.** 343 pytest tests pass; compileall, `ui_parity --check` (0 duplicates/undrawn) and `ui_prose --check` are clean. `artifacts/probes/nudge_overlay_probe.py` passes with `overlay_bone: hand_L`, `views: 1`, `mode: POSE`, `error: ''`; `artifacts/ui-pass/pages/skeleton.png` shows the section with only the toggle and hint at version `0.22.1`, and `artifacts/ui-pass/overlay-pose-mode.png` shows the new legend. The local zip is `dist/hero_retarget_workbench-0.22.1.zip`, 71 files, 528,954 bytes, sha256 `ce3d5edcaeca2ed8f52ef0f71d4ab261e86af40d5606c6642058a466b36cb7b7`; `tools/blender_zip_probe.py` passes with 112 operators, 26 panels and version `0.22.1` (`artifacts/receipts/zip-0221.json`).
+- **Not checked.** The owner's real Warden rig and viewport interaction; the overlay screenshot uses the probe's synthetic chain. The retired nudge offsets cannot be created from the UI anymore.
+
 ## 2026-11-17 — the custom rest rig can be posed on the hero's parent tree (0.22.0)
 
 **Owner instruction, verbatim:** *"so a feature the overlay needs to support is when I am using a remapped armature, so I duplicated the warden armature because the model is mapped to it, but I need to pose the armature to the warden rest mode right? so when I am posing the duplicated hero armature to move the bones I can see how close the proposed hand mesh that doesn't correspond to the positions of the custom hero armature but instead its original armature (which I can't pose because it's got a different hierarchy) so there needs to be a way to duplicate the custom models armature with the hero's armature hierarchy"*

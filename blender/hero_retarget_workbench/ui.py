@@ -1255,15 +1255,6 @@ class DMF_PT_skeleton(Panel):
             text="Hide overlay" if settings.show_nudge_overlay else "Show overlay",
             icon="HIDE_OFF",
         )
-        nudge.prop(settings, "nudge_relative", text="Relative steps")
-        nudge.prop(settings, "nudge_axis", text="Axis")
-        nudge.prop(settings, "nudge_amount", text="Amount")
-        nudge.prop(settings, "nudge_rotate", text="Rotate")
-        step = nudge.row(align=True)
-        minus = step.operator("dmf.nudge_bone", text="- Step", icon="REMOVE")
-        minus.direction = -1
-        plus = step.operator("dmf.nudge_bone", text="+ Step", icon="ADD")
-        plus.direction = 1
         _hint(
             nudge,
             "The overlay only draws. Pose Mode, Edit Mode rest edits and Pose > Apply > "
@@ -1281,19 +1272,17 @@ class DMF_PT_skeleton(Panel):
             "live" if settings.hand_preview_active else "off",
         )
         preview.prop_search(settings, "hand_preview_action", bpy.data, "actions", text="Action")
-        controls = preview.row(align=True)
-        controls.operator(
+        preview.operator(
             "dmf.preview_hands",
             text="Stop preview" if settings.hand_preview_active else "Preview hands",
             icon="PAUSE" if settings.hand_preview_active else "PLAY",
         )
-        controls.operator("dmf.reset_hand_nudges", text="Reset nudges", icon="LOOP_BACK")
         if settings.hand_preview_note:
             _hint(preview, settings.hand_preview_note, "INFO")
         else:
             _hint(
                 preview,
-                "Pick a hand or finger row, then nudge while the action runs. Stop restores the actions and pose.",
+                "Pick a hand or finger row to follow it while the action runs. Stop restores the actions and pose.",
                 "INFO",
             )
 

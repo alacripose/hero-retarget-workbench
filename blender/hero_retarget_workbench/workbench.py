@@ -474,50 +474,6 @@ class DMF_OT_copy_pose(Operator):
         return {"FINISHED"}
 
 
-class DMF_OT_nudge_bone(Operator):
-    bl_idname = "dmf.nudge_bone"
-    bl_label = "Nudge Bone"
-    bl_description = "Translate or rotate the selected custom bone in pose space"
-
-    direction: bpy.props.IntProperty(default=1, min=-1, max=1)
-
-    def execute(self, context):
-        settings = context.scene.dmf
-        entry = _entry(settings)
-        armature = settings.custom_armature
-        if entry is None or not entry.source or armature is None:
-            self.report({"ERROR"}, "Choose a mapped row and a custom rig")
-            return {"CANCELLED"}
-        pose_bone = armature.pose.bones.get(entry.source)
-        if pose_bone is None:
-            self.report({"ERROR"}, f"Pose bone missing: {entry.source}")
-            return {"CANCELLED"}
-        axis = {"X": 0, "Y": 1, "Z": 2}[settings.nudge_axis]
-        amount = float(settings.nudge_amount) * int(self.direction)
-        if settings.nudge_relative and not settings.nudge_rotate:
-            amount *= max(float(pose_bone.bone.length), 1e-4)
-        from . import rigops
-
-        if rigops.nudge_hand_preview(
-            settings, entry.source, axis, amount, settings.nudge_rotate
-        ):
-            _status(
-                settings,
-                f"Preview nudge {entry.source} {settings.nudge_axis} {amount:+.4f}; no keys written",
-                "INFO",
-            )
-            return {"FINISHED"}
-        if settings.nudge_rotate:
-            pose_bone.rotation_mode = "XYZ"
-            pose_bone.rotation_euler[axis] += amount
-        else:
-            pose_bone.location[axis] += amount
-        bpy.context.view_layer.update()
-        proofing.bump_tick(settings)
-        _status(settings, f"Nudged {entry.source} {settings.nudge_axis} by {amount:+.4f}", "INFO")
-        return {"FINISHED"}
-
-
 def _view3d_areas(context):
     if context.screen is None:
         return []
@@ -1050,7 +1006,6 @@ CLASSES = (
     DMF_OT_align_bone,
     DMF_OT_align_all_bones,
     DMF_OT_copy_pose,
-    DMF_OT_nudge_bone,
     DMF_OT_compare_split,
     DMF_OT_compare_clear,
     DMF_OT_apply_compare_action,

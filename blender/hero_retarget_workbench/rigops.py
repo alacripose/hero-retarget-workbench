@@ -20,7 +20,7 @@ from pathlib import Path
 
 import bpy
 from bpy.types import Operator
-from mathutils import Matrix, Vector
+from mathutils import Vector
 
 from forge import rigmap
 
@@ -294,7 +294,7 @@ def _on_load(*_args) -> None:
 
 
 class _HandPreview:
-    """Live action preview with in-memory hand nudges; no action is keyed."""
+    """Live action preview; no action is keyed."""
 
     def __init__(self, settings, action):
         self.settings = settings
@@ -302,7 +302,6 @@ class _HandPreview:
         self.hero = settings.target_armature
         self.custom = settings.custom_armature
         self.action = action
-        self.offsets: dict[str, list[tuple[bool, int, float]]] = {}
         self._applying = False
         self._custom_had_data = self.custom.animation_data is not None
         self._hero_had_data = self.hero.animation_data is not None
@@ -348,30 +347,9 @@ class _HandPreview:
         try:
             bpy.context.view_layer.update()
             tailops.apply_retarget_pose(self.custom, self.hero)
-            for name, records in self.offsets.items():
-                bone = self.custom.pose.bones.get(name)
-                if bone is None:
-                    continue
-                basis = bone.matrix_basis.copy()
-                for rotate, axis, amount in records:
-                    if rotate:
-                        basis = basis @ Matrix.Rotation(amount, 4, "XYZ"[axis])
-                    else:
-                        basis.translation[axis] += amount
-                bone.matrix_basis = basis
             bpy.context.view_layer.update()
         finally:
             self._applying = False
-
-    def nudge(self, bone_name: str, axis: int, amount: float, rotate: bool) -> None:
-        self.offsets.setdefault(bone_name, []).append((bool(rotate), int(axis), float(amount)))
-        self.apply()
-        jobs._tag_redraw()
-
-    def reset(self) -> None:
-        self.offsets.clear()
-        self.apply()
-        jobs._tag_redraw()
 
     def stop(self, *, restore: bool = True) -> None:
         global _PREVIEW
@@ -430,7 +408,7 @@ def start_hand_preview(settings) -> str:
     settings.hand_preview_active = True
     settings.show_nudge_overlay = True
     settings.hand_preview_note = (
-        f"Previewing {action.name}; nudge the selected hand or finger row. No keys are written"
+        f"Previewing {action.name}; the overlay follows the picked bone. No keys are written"
     )
     jobs._tag_redraw()
     return action.name
@@ -443,26 +421,6 @@ def stop_hand_preview(settings) -> bool:
     _PREVIEW.stop()
     return True
 
-
-def nudge_hand_preview(settings, bone_name: str, axis: int, amount: float, rotate: bool) -> bool:
-    if _PREVIEW is None:
-        return False
-    _PREVIEW.nudge(bone_name, axis, amount, rotate)
-    settings.hand_preview_note = (
-        f"Previewing {_PREVIEW.action.name}; nudged {bone_name} {settings.nudge_axis} "
-        f"{amount:+.4f}. No keys written"
-    )
-    jobs._tag_redraw()
-    return True
-
-
-def reset_hand_nudges(settings) -> bool:
-    if _PREVIEW is None:
-        return False
-    _PREVIEW.reset()
-    settings.hand_preview_note = "Hand preview nudges reset; no keys written"
-    jobs._tag_redraw()
-    return True
 
 
 def action_rows(settings) -> list[tuple[object, object]]:
@@ -710,16 +668,6 @@ class DMF_OT_use_mapped_names(Operator):
         return {"FINISHED"}
 
 
-def effective_step(settings, bone_name: str, rotate: bool) -> float:
-    """The current step, scaled by the selected bone's length for translation."""
-    amount = float(settings.nudge_amount)
-    custom = settings.custom_armature
-    pose = custom.pose.bones.get(bone_name) if custom is not None else None
-    if settings.nudge_relative and not rotate and pose is not None:
-        amount *= max(float(pose.bone.length), 1e-4)
-    return amount
-
-
 def _selected_source(settings) -> str:
     custom = settings.custom_armature
     if custom is None or not settings.bone_map:
@@ -777,7 +725,7 @@ class DMF_OT_chain_overlay(Operator):
 class DMF_OT_preview_hands(Operator):
     bl_idname = "dmf.preview_hands"
     bl_label = "Preview Hands"
-    bl_description = "Play the chosen hero action on the custom rig without keying; nudge hands live, then stop to restore the pose"
+    bl_description = "Play the chosen hero action on the custom rig without keying; stop restores the pose"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -787,23 +735,11 @@ class DMF_OT_preview_hands(Operator):
                 _status(settings, "Hand preview stopped; the pose and actions were restored", "OK")
             else:
                 name = start_hand_preview(settings)
-                _status(settings, f"Hand preview running {name}; nudge the selected hand row", "OK")
+                _status(settings, f"Hand preview running {name}; the overlay follows the picked bone", "OK")
         except Exception as error:
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
-        return {"FINISHED"}
-
-
-class DMF_OT_reset_hand_nudges(Operator):
-    bl_idname = "dmf.reset_hand_nudges"
-    bl_label = "Reset Hand Nudges"
-    bl_description = "Clear the in-memory nudge offsets in the hand preview; no action is changed"
-
-    def execute(self, context):
-        settings = context.scene.dmf
-        if not reset_hand_nudges(settings):
-            _status(settings, "Start the hand preview before resetting its nudges", "INFO")
         return {"FINISHED"}
 
 
@@ -988,7 +924,6 @@ CLASSES = (
     DMF_OT_use_mapped_names,
     DMF_OT_chain_overlay,
     DMF_OT_preview_hands,
-    DMF_OT_reset_hand_nudges,
     DMF_OT_hero_hierarchy_rig,
     DMF_OT_bake_custom_rig,
 )
