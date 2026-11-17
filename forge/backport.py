@@ -257,8 +257,10 @@ def backport_package(
     relative: str = "",
     hero: str = "",
     old_vmdl: Path | None = None,
+    old_matches=(),
     preserve_model: str = "auto",
     preserve_materials: bool = True,
+    sections=None,
     force: bool = False,
     timeout: int = 1800,
 ):
@@ -282,30 +284,26 @@ def backport_package(
     new_vmdl = extract_client_model(
         client_env, match.relative, new_root, vpk=match.vpk, timeout=timeout
     )
+    old_source: dict = {"kind": "source"}
     old_path = None
     if old_vmdl is not None:
         old_path = Path(old_vmdl)
         if not old_path.is_absolute():
             old_path = old_root / old_path
-    if old_path is None or not old_path.is_file():
-        # The mod's own source path, then the client path the mod was built
-        # from, then the only model in the package. A compiled-only mod has no
-        # source path until extraction, so this must not assume one spelling.
-        for candidate in (relative, match.relative):
-            if not candidate:
-                continue
-            path = Path(candidate)
-            if not path.is_absolute():
-                path = old_root / path
-            if path.is_file():
-                old_path = path
-                break
-    if old_path is None or not old_path.is_file():
-        models = sorted(old_root.rglob("*.vmdl"))
-        if len(models) == 1:
-            old_path = models[0]
-    if old_path is None or not old_path.is_file():
-        raise BackportError(f"old-vmdl-missing: {old_root}")
+    if old_path is not None and old_path.is_file() and old_path.suffix.lower() != ".vmdl_c":
+        pass
+    else:
+        preferred = relative or match.relative
+        old_path, old_source = migrate.resolve_old_model(
+            env,
+            old_root,
+            preferred=preferred,
+            hero=hero,
+            matches=old_matches,
+            destination=output / "old-decompiled",
+            timeout=timeout,
+        )
+    old_assets = Path(old_source["assets_root"]) if old_source.get("assets_root") else None
     result = migrate.migrate_trees(
         old_root=old_root,
         old_vmdl=old_path,
@@ -316,9 +314,11 @@ def backport_package(
         vmdl_relative=match.relative,
         preserve_model=preserve_model,
         preserve_materials=preserve_materials,
-        sections=None,
+        sections=sections,
         force=force,
         old_package=Path(package),
+        old_source=old_source,
+        old_assets=old_assets,
     )
     manifest = result.manifest
     if manifest.is_file():
@@ -329,6 +329,7 @@ def backport_package(
         data["backport_requested_model"] = relative
         data["backport_exact_model"] = match.exact
         data["backport_gameinfo"] = str(client.gameinfo) if client.gameinfo else ""
+        data["old_source"] = old_source
         data["experimental"] = True
         manifest.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     return result
