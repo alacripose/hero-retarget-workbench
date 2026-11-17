@@ -84,15 +84,23 @@ class InstallDiscoveryTests(unittest.TestCase):
             "core",
             compiler=True,
         )
+        make_tree(
+            self.drive / "Users" / "anyone" / "Downloads" / "FutureTool",
+            "core",
+            compiler=True,
+        )
         rows = installs.discover(libraries=[], drives=[self.drive])
         names = {row.label for row in rows}
 
         self.assertIn("Reduced_CSDK_10", names)
         self.assertIn("CSwin64_build_123", names)
+        self.assertIn("FutureTool", names)
         by_name = {row.label: row for row in rows}
         self.assertEqual(by_name["CSwin64_build_123"].kind, "tools")
         self.assertEqual(by_name["CSwin64_build_123"].engine, "core")
         self.assertTrue(by_name["CSwin64_build_123"].can_compile)
+        self.assertEqual(by_name["FutureTool"].engine, "core")
+        self.assertTrue(by_name["FutureTool"].can_compile)
 
     def test_steam_content_depots_are_read(self) -> None:
         depot = self.library / "steamapps" / "content" / "app_1422450" / "depot_1422456"

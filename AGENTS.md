@@ -29,6 +29,52 @@ https://github.com/oaustegard/claude-skills/releases (declauding)
 https://github.com/hardikpandya/stop-slop
 <home>\.agents\skills\ has a ton of skills for agents to use and yet they never use them for some reason. You need to be using these skills and updating/managing them ccording to family project convention.
 
+## 2026-11-17 — a name-width drag redraws the list, not every row's text
+
+**Owner instruction, verbatim:** *"okay for v17 you're going to have to find why performance hangs badly on large views/lists when the name width slider is adjusted, probably something to do with falsley rendering items in lists that aren't visible?"*
+
+- **The hidden rows were already hidden.** A real 6,000-row Mods draw calls `draw_item` only
+  six times per redraw (120 calls across 20 width values), so Blender is not laying out rows outside
+  the viewport. The expensive work is `filter_items`: Blender calls it on every width redraw and
+  the old `_filter` built a search string for every row before deciding that the unchanged empty
+  query matched all of them.
+- **The filter is lazy now.** Every UIList passes the row collection and a `text_of` callable to
+  `ui_lists._filter`. With no search and no A-Z sort it returns the flags without reading a row
+  field, and with a search it builds text only for the rows it must inspect. The two-argument
+  diagnostic form still works, so the existing bone-rules probe keeps its filter checks.
+- **A width change reuses the last filter result.** The cache is keyed by the list class, its
+  property name and the settings group, and is reused only when the width differs and the query,
+  sort flags, restriction and row count are unchanged. An edit at a fixed width always re-filters,
+  which the probe proves with two row edits at one width.
+- **Measured on 6,000 rows, 20 real GUI redraws.** The old path visited 120,000 rows and spent
+  0.314 s filtering; the lazy path spends 0.001 s and the whole run falls from 0.628 s to 0.280 s.
+  With an active search and A-Z sort, the width drag did 9 full text scans in 0.194 s before; it
+  now does one scan in 0.019 s, keeps the one visible row, and the fixed-width edits change the
+  visible count from 0 to 1 to 2 as expected.
+- **Checks.** 217 unit tests pass; compileall, `ui_parity --check`, `ui_prose --check` and
+  `git diff --check` are clean. `artifacts/probes/name_width_perf.py` passes all asserts. The
+  headless `tools/blender_bone_rules_pose_probe.py` reaches its filter checks, then fails its
+  pre-existing assertion that every registered list has `filter_items`; `DMF_UL_heroes` is filtered
+  by `heropick.ensure` and has no native header filter, unrelated to this change.
+- **Zip.** `dist/hero_retarget_workbench-0.17.0.zip`, 68 files, 493,236 bytes, sha256
+  `28c24cc37bdd502ccbb0f531ec54e1c0ce5adac295fd7dd6693a745cb41404a0`; the zip probe passes with
+  86 operators and 26 panels.
+- **Not checked.** The slider was exercised through real `wm.redraw_timer` draw passes, not by a
+  hand drag in the owner's window. The 6,000-row synthetic list is larger than the live 325-package
+  Mods collection; the live scan presentation remains unviewed.
+
+## 2026-11-17 — slow Mods scans report every stage, and matching reads every valid install
+
+**Owner instruction, verbatim:** *"scanning mods folders needs to be more verbose, additional progress bars (multiple) per stage instead of it being just the one, might be frozen on scanning mods? unknown. My d drive is slow and I know my mods folders are massive"*, then *"also make sure matching isn't hardcoded to my system and not to just the csdk10 when I have multiple valid tools instances including cswin64"*.
+
+- **A scan now has named stage bars.** `jobs.JobProgress.stage()` carries a key, label, fraction, message and state; `BackgroundJob` snapshots and syncs them to `settings.job_stages` (`DMF_JobStage`), and `ui_popit.job()` draws one bar per stage under the overall bar. The stages are installed-build discovery, game-type read, one queued bar per scan root, install matching, and report write. A root reports its package name and live file counts while `_addon_from_dir` enumerates and hashes, so a slow D: tree still moves.
+- **The root walk streams instead of pre-collecting.** `inventory` no longer builds the full directory list before drawing; it walks and marks every 64 folders. All root bars are queued up front, then move from package reads to walking to done. Matching has its own aggregate bar and names the install/VPK being read.
+- **Matching reads every valid install, not one CSDK or one machine path.** `pipeline_ops.scan_mods` passes every discovered row with `can_compile or can_backport` to `match_installs`; `oldmods._install_loose_roots` follows each tree's own `gameinfo.gi` engine folders and every `content/*_addons` collection, not fixed `citadel`/`core` names. A `CSwin64`-style `game/core` tree is covered by `test_inventory_matches_every_valid_tools_tree_and_addon_root`.
+- **Discovery no longer names Reduced_CSDK or CSwin64 folders.** `forge.installs.TOOLS_PATTERNS` now reads one level below any `Users/*/Downloads`, `Users/*/Desktop`, `Users/*/Documents` and `Downloaded Files` placement, and classifies each tree from its own `gameinfo.gi`, binaries and paks. The install test adds an arbitrary `FutureTool` tree beside `CSwin64_build_123`; both are found by shape, not by folder name.
+- **Measured.** 217 unit tests pass; compileall, `ui_parity --check`, `ui_prose --check` and `git diff --check` are clean. A source Blender probe populated two stage rows to `DONE` (root and match). The real matching probe read 10 valid installs, including both `CSwin64` and `CSwin64_build_10924`, and found 58 source matches across them in 60.4 s; the earlier 8-install probe was 70.6 s before the VPK/root narrowing. A synthetic two-root `inventory` probe emitted queued, running and done states for both root bars.
+- **Zip.** `dist/hero_retarget_workbench-0.16.9.zip`, 68 files, 491,961 bytes, sha256 `5a11f4f09921e637cc4ebf1c04db93fa2f4c2bb81d36929155417c90a8730377`; `blender_zip_probe` passes with 86 operators and 26 panels.
+- **Not checked.** The bars were not visually inspected in the Blender GUI, and a full 325-package scan against the live two-root collection was not rerun; the stage collection, final state and drawing code are covered, but the owner's D: presentation remains unviewed.
+
 ## 2026-11-16 — Parts is a collection table, and the tail scan yields
 
 **Owner instruction, verbatim:** *"parts page needs to be updated with the modernized

@@ -363,6 +363,49 @@ class OldModsTests(unittest.TestCase):
         self.assertEqual(fractions, sorted(fractions))
         self.assertTrue(all(0.0 <= fraction <= 1.0 for fraction in fractions))
 
+    def test_inventory_matches_every_valid_tools_tree_and_addon_root(self) -> None:
+        root = self.tmp_path / "mods"
+        source = root / "source_mod" / "models" / "heroes_staging" / "kelvin" / "kelvin.vmdl"
+        source.parent.mkdir(parents=True)
+        source.write_bytes(b"shared-source")
+
+        cs_win = self.tmp_path / "CSwin64_build_10924"
+        core = cs_win / "game" / "core"
+        core.mkdir(parents=True)
+        (core / "gameinfo.gi").write_text("gameinfo", encoding="utf-8")
+        core_copy = core / "models" / "heroes_staging" / "kelvin" / "kelvin.vmdl"
+        core_copy.parent.mkdir(parents=True)
+        core_copy.write_bytes(b"shared-source")
+
+        other = self.tmp_path / "Reduced_CSDK_12"
+        addon = other / "content" / "future_addons"
+        addon_copy = addon / "models" / "heroes_staging" / "kelvin" / "kelvin.vmdl"
+        addon_copy.parent.mkdir(parents=True)
+        addon_copy.write_bytes(b"shared-source")
+
+        stages: list[tuple[str, str, float, str, str]] = []
+        result = inventory(
+            [root],
+            installs=[
+                SimpleNamespace(root=cs_win, label="CSwin64", build="10924"),
+                SimpleNamespace(root=other, label="CSDK12", build=""),
+            ],
+            stage=lambda key, label, value, message, state: stages.append(
+                (key, label, value, message, state)
+            ),
+        )
+
+        record = next(mod for mod in result.mods if mod.addon == "source_mod")
+        self.assertEqual({match.label for match in record.matches}, {"CSwin64", "CSDK12"})
+        self.assertEqual({match.kind for match in record.matches}, {"loose"})
+        self.assertIn("2 hash matches", result.hash_note)
+        self.assertIn("root:0", {key for key, *_ in stages})
+        self.assertIn("match", {key for key, *_ in stages})
+        self.assertTrue(any(state == "DONE" for *_rest, state in stages))
+        for key in {key for key, *_ in stages}:
+            values = [value for item_key, _label, value, _message, _state in stages if item_key == key]
+            self.assertEqual(values, sorted(values), f"stage {key} moved backwards")
+
     def test_two_mods_roots_with_the_same_leaf_are_inventoried_separately(self) -> None:
         first = self.tmp_path / "Documents" / "mods"
         second = self.tmp_path / "Documents" / "Documents" / "mods"

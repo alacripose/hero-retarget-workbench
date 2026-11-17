@@ -197,6 +197,16 @@ class DMF_ProofCheck(PropertyGroup):
     detail: StringProperty(name="Detail", default="")
 
 
+class DMF_JobStage(PropertyGroup):
+    """One visible bar for a stage of a background job."""
+
+    key: StringProperty(name="Key", default="")
+    label: StringProperty(name="Stage", default="")
+    message: StringProperty(name="Step", default="")
+    progress: FloatProperty(name="Progress", default=0.0, min=0.0, max=1.0, subtype="FACTOR")
+    state: StringProperty(name="State", default="QUEUED")
+
+
 class DMF_Part(PropertyGroup):
     object: PointerProperty(
         name="Mesh part",
@@ -1283,6 +1293,10 @@ class DMF_Settings(PropertyGroup):
     job_label: StringProperty(name="Job", default="")
     job_message: StringProperty(name="Job step", default="")
     job_progress: FloatProperty(name="Progress", default=0.0, min=0.0, max=1.0, subtype="FACTOR")
+    job_stages: CollectionProperty(
+        type=DMF_JobStage,
+        description="Named stages of the running job, each with its own progress bar",
+    )
     source_name_width: FloatProperty(
         name="Name width",
         description="Share of a model row given to the name; the rest holds the VPK folder",
@@ -1621,6 +1635,7 @@ class DMF_Settings(PropertyGroup):
 CLASSES = (
     DMF_BoneEntry,
     DMF_ProofCheck,
+    DMF_JobStage,
     DMF_Part,
     DMF_ClothChain,
     DMF_MaterialRow,
