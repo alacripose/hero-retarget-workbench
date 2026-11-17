@@ -8,116 +8,117 @@ audit read from it, so a rule does not have to be found by reading 2,900 lines i
 | line | date | section | flags |
 |---:|---|---|---|
 | 1 | — | Current state | refusal, receipt, rule |
-| 32 | 2026-11-17 | the chain overlay is a drawing, not a mode (0.21.0) | receipt |
-| 46 | 2026-11-17 | nudge mode is Pose Mode with the overlay, and finishing keeps the model (0.20.0) | receipt |
-| 57 | 2026-11-17 | nudge overlay compares the selected chain, warm custom to cool hero (0.19.9) | receipt, rule |
-| 68 | 2026-11-17 | nudges survive a collapsed bone, with a split rest/animation radial map (0.19.8) | receipt, rule |
-| 86 | 2026-11-17 | the hand preview is on the Skeleton page, not behind a closed panel (0.19.7) | receipt |
-| 96 | 2026-11-17 | hand preview without keys, and hand heads that stay put (0.19.6) | receipt |
-| 108 | 2026-11-17 | keep the custom skinning, or bake the hero onto it (0.19.5) | refusal, receipt, rule |
-| 120 | 2026-11-17 | a weight may only reach its own mapped bone family (0.19.4) | receipt, rule |
-| 133 | 2026-11-17 | a surface sample cannot cross from a hand onto a thigh | refusal, receipt, rule |
-| 144 | 2026-11-17 | Import Model reads the render list, and a missing rig is not an error | receipt |
-| 157 | 2026-11-17 | 0.19.1 rebuilds the old LODs and remakes their materials for the target build | refusal, receipt |
-| 172 | 2026-11-17 | an old body keeps the live LOD slots, and Build LODs fills them | refusal, receipt, rule |
-| 188 | 2026-11-17 | an old mod or its project can be read as a Source-page file | refusal, receipt |
-| 201 | 2026-11-17 | old materials are staged in the selected CSDK for editing, not converted | receipt |
-| 214 | 2026-11-17 | a running background job tags its surface for redraw | receipt, rule |
-| 224 | 2026-11-17 | a name-width drag redraws the list, not every row's text | receipt, rule |
-| 258 | 2026-11-17 | slow Mods scans report every stage, and matching reads every valid install | receipt |
-| 270 | 2026-11-16 | Parts is a collection table, and the tail scan yields | refusal, receipt, rule |
-| 305 | 2026-11-16 | a failed tail scan settles before the next job | receipt |
-| 331 | 2026-11-16 | one Release page, one picker entry | receipt |
-| 350 | 2026-11-16 | every list is a category table with its own width | refusal |
-| 387 | 2026-11-16 | Mods is a typed collection, and a package becomes a Blender project | — |
-| 417 | 2026-11-16 | a mods root is a collection, and only released tools predict a toolchain | receipt, rule |
-| 461 | 2026-11-16 | filter chips keep their labels inside at every width | receipt |
-| 487 | 2026-11-16 | the boundary got harder, the release end lives in the addon, and Seven ships | refusal, receipt, rule |
-| 601 | 2026-11-16 | how the owner is addressed | receipt, rule |
-| 611 | 2026-11-13 | scope: the family working set, and non-authoritative system notices | refusal |
-| 642 | 2026-11-16 | the only working Haze build is the no-skeleton reference, and two refusals were deleted after v10 | refusal, receipt, rule |
-| 663 | 2026-11-16 | the addon boundary: three refusals, no exemptions | refusal |
-| 687 | 2026-11-16 | the body is a RenderMeshFile the model's own Skeleton and BodyGroup name | rule |
-| 731 | 2026-11-16 | read the game's compiled model, wire the refusals into the addon, stop rebuilding probes | trap, refusal, rule |
-| 781 | 2026-11-16 | the model's own bone list is where the head, arms and tail were bound wrong | refusal, receipt |
-| 841 | 2026-11-16 | the skeleton's `jointList` is the slot order, and the game's own list is the prefix | refusal, receipt, rule |
-| 891 | 2026-11-15 | the tail port ships only what the gate admits | refusal, rule |
-| 927 | 2026-11-15 | aim is a matrix: its cells ship as the game's own bytes | receipt |
-| 967 | 2026-11-15 | pinned: the tail is appended to the game's own channels, not re-authored | refusal, receipt, rule |
-| 1013 | 2026-11-15 | the pelvis re-parent is withdrawn: the reader is not the game | trap, receipt, rule |
-| 1056 | 2026-11-14 | 0.8.9: the page panel returns on the editor-type path | receipt |
-| 1075 | 2026-11-14 | 0.8.5: the pages live in the Workbench's expandable sidebar | receipt |
-| 1092 | 2026-11-14 | 0.8.4: the editor registers first, the strip cannot take it down | refusal |
-| 1115 | 2026-11-14 | 0.8.3: navigation-bar and reinstall collisions | receipt |
-| 1139 | 2026-11-14 | 0.8.1: the page strip is its own column in the Workbench view | receipt |
-| 1166 | 2026-11-14 | 0.8.0: the page rail, the mods pipeline, tool setup, and components as body groups | refusal, receipt |
-| 1214 | 2026-11-14 | 0.6.0: the hero's other meshes, its chains, and pages | receipt |
-| 1264 | 2026-11-14 | 0.7.0: chain to cloth, and the Workbench as its own editor | receipt, rule |
-| 1325 | — | Authority | — |
-| 1341 | — | Non-negotiable source boundary | rule |
-| 1360 | — | Work rules | rule |
-| 1376 | — | Evidence format | — |
-| 1388 | — | Gate | — |
-| 1400 | — | Known environment | receipt, rule |
-| 1442 | 2026-11-12 | manual workbench, Axis proof and BLAKE3 | refusal, rule |
-| 1480 | 2026-11-12 | all live heroes (owner correction) | rule |
-| 1499 | 2026-11-12 | collection export and the Mayu body/head split | — |
-| 1524 | 2026-11-12 | VPK material convention | rule |
-| 1555 | 2026-11-13 | old addon migration is the deliberate vmdl-write exception | refusal, rule |
-| 1597 | 2026-11-13 | mayu_updated retail launch witness | — |
-| 1605 | 2026-11-13 | stage and compile install into the CSDK addon | rule |
-| 1641 | 2026-11-13 | 0.2.9: background staging, one addon-folder source, panel layout | rule |
-| 1680 | 2026-11-13 | 0.4.0: rule-based mapping, live ref pose, clip import | rule |
-| 1726 | 2026-11-13 | 0.5.0: the clips are written back, not just imported | refusal, receipt, rule |
-| 1768 | 2026-11-13 | 0.5.1: Scan shows what the rules answer | — |
-| 1795 | 2026-11-13 | 0.5.2: the rule fill no longer holds the main thread | — |
-| 1826 | 2026-11-13 | 0.5.3: every list header searches and sorts its own view | rule |
-| 1857 | 2026-11-13 | 0.5.4: rule edits reach the map, and numbered chains learn | rule |
-| 1899 | 2026-11-14 | 0.7.1: importing a hero builds its cloth | receipt, rule |
-| 1931 | 2026-11-14 | 0.7.2: the installed zip opens its editor | — |
-| 1962 | 2026-11-14 | 0.10.0: tail tiles from any hero, and the import blind spots | — |
-| 2004 | 2026-11-14 | 0.11.0: every live hero's tail, and a probe lane that can fail | receipt, rule |
-| 2061 | 2026-11-14 | 0.12.0: clips belong to one hero, and the model list is complete | receipt |
-| 2107 | 2026-11-14 | 0.12.1: Components read the model's render list | refusal, receipt |
-| 2132 | 2026-11-14 | 0.13.0: any tail source, with its clips, on a hero without a tail | receipt, rule |
-| 2171 | 2026-11-14 | 0.13.1: the preview needs the compiled skeleton; root_motion is authored and stays | trap, receipt, rule |
-| 2224 | 2026-11-14 | 0.13.2: gameplay clips are authored on the 147-bone animation skeleton | trap, receipt |
-| 2276 | 2026-11-14 | owner correction: the loaded game is the animation test surface | receipt |
-| 2285 | 2026-11-14 | the 06:47 screenshot build is the working base (owner correction) | receipt |
-| 2328 | 2026-11-14 | the head/arm rotation: quaternion sign flips in the body bake | receipt |
-| 2363 | 2026-11-14 | two bake attempts failed in game; 06:47 is reinstalled | refuted, receipt |
-| 2394 | 2026-11-14 | the Viper old-mod slide port: modify the live clip, do not re-synthesise it | receipt |
-| 2469 | 2026-11-14 | Shiv arms/head: the bake is faithful, its track set is not | receipt, rule |
-| 2607 | 2026-11-14 | the good build is pak97 v1; the lift is in the clips that were never recompiled | receipt, rule |
-| 2723 | 2026-11-14 | the bodies must be decompiled one clip at a time | receipt, rule |
-| 2801 | 2026-11-14 | the whole set is measured, not sampled | trap, receipt, rule |
-| 2830 | 2026-11-15 | the tail is lost by shipping a skeleton, not by a bad rest | trap, receipt, rule |
-| 2872 | 2026-11-15 | the look-up tilt is one rest, and "add the skeleton back" is the pin | refuted, trap, receipt |
-| 2914 | 2026-11-15 | the release is one command, and the compiler embeds the addon name | trap, receipt, rule |
-| 2941 | 2026-11-15 | the aim pitch is not in root_motion | receipt |
-| 2960 | 2026-11-15 | the tail existed and was drawn; it never moved | trap, receipt, rule |
-| 3010 | 2026-11-15 | the 68 tail-less clips were our own skip, not the game's data | trap, receipt, rule |
-| 3058 | 2026-11-15 | the tail needs 168-track clips, and every 168-track authoring path | — |
-| 3059 | — | available today re-introduces the lift | trap, receipt |
-| 3129 | 2026-11-15 | a tail ported onto a tailless hero through the addon, from scratch | trap, rule |
-| 3172 | 2026-11-15 | the tail tooling is no longer pinned to Shiv and Werewolf | trap |
-| 3232 | 2026-11-15 | a port ships a set: every clip rebuilt against the shipped skeleton | trap, receipt, rule |
-| 3282 | 2026-11-15 | a shipped skeleton crashes Haze, measured four ways | receipt |
-| 3306 | 2026-11-15 | the merged clips declared the tail twice, and the gate was crashing instead of refusing | trap, refusal, rule |
-| 3353 | 2026-11-15 | the gate admitted a folded body, and the refusals were the shortage | trap, refusal, receipt, rule |
-| 3425 | 2026-11-15 | refusal: an effort caveat is not a reason work stops | refusal, receipt, rule |
-| 3449 | 2026-11-15 | the authoring pass is measured too, and it fails the rest check | refusal, receipt |
-| 3479 | 2026-11-15 | "why is tengu 28 tracks", and the hand-picked inputs that followed | trap, refusal, receipt, rule |
-| 3527 | 2026-11-15 | the pak that shipped wrong, and the three checks it walked past | trap, refusal, rule |
-| 3585 | 2026-11-15 | the tail pipeline is signed with the family proof, and four gates it did not have | refusal, receipt |
-| 3619 | 2026-11-15 | the skeleton ships; what must match is its slots and frames | refusal, receipt |
-| 3657 | 2026-11-15 | two defects, both measured, and the reference is back in the game | refuted, refusal, rule |
-| 3690 | 2026-11-15 | parity with the Shiv pak is measured, and it is not acceptance | refuted, refusal, receipt, rule |
-| 3790 | — | Removed evidence | refusal, receipt |
-| 3830 | 2026-11-15 | how this file is read now: an audit, an index, and an additive resynthesis | refuted, trap, refusal, receipt |
-| 3872 | 2026-11-15 | addressing `ala`: no gendered pronoun, and why this keeps happening | refusal, rule |
-| 3901 | 2026-11-15 | the pak ships its vnmskeleton, and that is not a choice | refusal, rule |
-| 3926 | 2026-11-15 | `pak93_dir.vpk` is the pinned Shiv build, and a gate is not widened to fit a slot | refusal, receipt, rule |
-| 3947 | — | 2026-11-16 (third pass) — the tree, and two checks that were refusing the game's own file | refusal, receipt |
-| 3991 | 2026-11-16 | every page names its build, the folder picker is real, and sections fold | — |
-| 4019 | 2026-11-16 | the markers follow the selected clients, not the detected install | — |
+| 32 | 2026-11-17 | the chain overlay highlights the panel pick, not the bone being posed (0.21.1) | refusal, receipt |
+| 43 | 2026-11-17 | the chain overlay is a drawing, not a mode (0.21.0) | receipt |
+| 57 | 2026-11-17 | nudge mode is Pose Mode with the overlay, and finishing keeps the model (0.20.0) | receipt |
+| 68 | 2026-11-17 | nudge overlay compares the selected chain, warm custom to cool hero (0.19.9) | receipt, rule |
+| 79 | 2026-11-17 | nudges survive a collapsed bone, with a split rest/animation radial map (0.19.8) | receipt, rule |
+| 97 | 2026-11-17 | the hand preview is on the Skeleton page, not behind a closed panel (0.19.7) | receipt |
+| 107 | 2026-11-17 | hand preview without keys, and hand heads that stay put (0.19.6) | receipt |
+| 119 | 2026-11-17 | keep the custom skinning, or bake the hero onto it (0.19.5) | refusal, receipt, rule |
+| 131 | 2026-11-17 | a weight may only reach its own mapped bone family (0.19.4) | receipt, rule |
+| 144 | 2026-11-17 | a surface sample cannot cross from a hand onto a thigh | refusal, receipt, rule |
+| 155 | 2026-11-17 | Import Model reads the render list, and a missing rig is not an error | receipt |
+| 168 | 2026-11-17 | 0.19.1 rebuilds the old LODs and remakes their materials for the target build | refusal, receipt |
+| 183 | 2026-11-17 | an old body keeps the live LOD slots, and Build LODs fills them | refusal, receipt, rule |
+| 199 | 2026-11-17 | an old mod or its project can be read as a Source-page file | refusal, receipt |
+| 212 | 2026-11-17 | old materials are staged in the selected CSDK for editing, not converted | receipt |
+| 225 | 2026-11-17 | a running background job tags its surface for redraw | receipt, rule |
+| 235 | 2026-11-17 | a name-width drag redraws the list, not every row's text | receipt, rule |
+| 269 | 2026-11-17 | slow Mods scans report every stage, and matching reads every valid install | receipt |
+| 281 | 2026-11-16 | Parts is a collection table, and the tail scan yields | refusal, receipt, rule |
+| 316 | 2026-11-16 | a failed tail scan settles before the next job | receipt |
+| 342 | 2026-11-16 | one Release page, one picker entry | receipt |
+| 361 | 2026-11-16 | every list is a category table with its own width | refusal |
+| 398 | 2026-11-16 | Mods is a typed collection, and a package becomes a Blender project | — |
+| 428 | 2026-11-16 | a mods root is a collection, and only released tools predict a toolchain | receipt, rule |
+| 472 | 2026-11-16 | filter chips keep their labels inside at every width | receipt |
+| 498 | 2026-11-16 | the boundary got harder, the release end lives in the addon, and Seven ships | refusal, receipt, rule |
+| 612 | 2026-11-16 | how the owner is addressed | receipt, rule |
+| 622 | 2026-11-13 | scope: the family working set, and non-authoritative system notices | refusal |
+| 653 | 2026-11-16 | the only working Haze build is the no-skeleton reference, and two refusals were deleted after v10 | refusal, receipt, rule |
+| 674 | 2026-11-16 | the addon boundary: three refusals, no exemptions | refusal |
+| 698 | 2026-11-16 | the body is a RenderMeshFile the model's own Skeleton and BodyGroup name | rule |
+| 742 | 2026-11-16 | read the game's compiled model, wire the refusals into the addon, stop rebuilding probes | trap, refusal, rule |
+| 792 | 2026-11-16 | the model's own bone list is where the head, arms and tail were bound wrong | refusal, receipt |
+| 852 | 2026-11-16 | the skeleton's `jointList` is the slot order, and the game's own list is the prefix | refusal, receipt, rule |
+| 902 | 2026-11-15 | the tail port ships only what the gate admits | refusal, rule |
+| 938 | 2026-11-15 | aim is a matrix: its cells ship as the game's own bytes | receipt |
+| 978 | 2026-11-15 | pinned: the tail is appended to the game's own channels, not re-authored | refusal, receipt, rule |
+| 1024 | 2026-11-15 | the pelvis re-parent is withdrawn: the reader is not the game | trap, receipt, rule |
+| 1067 | 2026-11-14 | 0.8.9: the page panel returns on the editor-type path | receipt |
+| 1086 | 2026-11-14 | 0.8.5: the pages live in the Workbench's expandable sidebar | receipt |
+| 1103 | 2026-11-14 | 0.8.4: the editor registers first, the strip cannot take it down | refusal |
+| 1126 | 2026-11-14 | 0.8.3: navigation-bar and reinstall collisions | receipt |
+| 1150 | 2026-11-14 | 0.8.1: the page strip is its own column in the Workbench view | receipt |
+| 1177 | 2026-11-14 | 0.8.0: the page rail, the mods pipeline, tool setup, and components as body groups | refusal, receipt |
+| 1225 | 2026-11-14 | 0.6.0: the hero's other meshes, its chains, and pages | receipt |
+| 1275 | 2026-11-14 | 0.7.0: chain to cloth, and the Workbench as its own editor | receipt, rule |
+| 1336 | — | Authority | — |
+| 1352 | — | Non-negotiable source boundary | rule |
+| 1371 | — | Work rules | rule |
+| 1387 | — | Evidence format | — |
+| 1399 | — | Gate | — |
+| 1411 | — | Known environment | receipt, rule |
+| 1453 | 2026-11-12 | manual workbench, Axis proof and BLAKE3 | refusal, rule |
+| 1491 | 2026-11-12 | all live heroes (owner correction) | rule |
+| 1510 | 2026-11-12 | collection export and the Mayu body/head split | — |
+| 1535 | 2026-11-12 | VPK material convention | rule |
+| 1566 | 2026-11-13 | old addon migration is the deliberate vmdl-write exception | refusal, rule |
+| 1608 | 2026-11-13 | mayu_updated retail launch witness | — |
+| 1616 | 2026-11-13 | stage and compile install into the CSDK addon | rule |
+| 1652 | 2026-11-13 | 0.2.9: background staging, one addon-folder source, panel layout | rule |
+| 1691 | 2026-11-13 | 0.4.0: rule-based mapping, live ref pose, clip import | rule |
+| 1737 | 2026-11-13 | 0.5.0: the clips are written back, not just imported | refusal, receipt, rule |
+| 1779 | 2026-11-13 | 0.5.1: Scan shows what the rules answer | — |
+| 1806 | 2026-11-13 | 0.5.2: the rule fill no longer holds the main thread | — |
+| 1837 | 2026-11-13 | 0.5.3: every list header searches and sorts its own view | rule |
+| 1868 | 2026-11-13 | 0.5.4: rule edits reach the map, and numbered chains learn | rule |
+| 1910 | 2026-11-14 | 0.7.1: importing a hero builds its cloth | receipt, rule |
+| 1942 | 2026-11-14 | 0.7.2: the installed zip opens its editor | — |
+| 1973 | 2026-11-14 | 0.10.0: tail tiles from any hero, and the import blind spots | — |
+| 2015 | 2026-11-14 | 0.11.0: every live hero's tail, and a probe lane that can fail | receipt, rule |
+| 2072 | 2026-11-14 | 0.12.0: clips belong to one hero, and the model list is complete | receipt |
+| 2118 | 2026-11-14 | 0.12.1: Components read the model's render list | refusal, receipt |
+| 2143 | 2026-11-14 | 0.13.0: any tail source, with its clips, on a hero without a tail | receipt, rule |
+| 2182 | 2026-11-14 | 0.13.1: the preview needs the compiled skeleton; root_motion is authored and stays | trap, receipt, rule |
+| 2235 | 2026-11-14 | 0.13.2: gameplay clips are authored on the 147-bone animation skeleton | trap, receipt |
+| 2287 | 2026-11-14 | owner correction: the loaded game is the animation test surface | receipt |
+| 2296 | 2026-11-14 | the 06:47 screenshot build is the working base (owner correction) | receipt |
+| 2339 | 2026-11-14 | the head/arm rotation: quaternion sign flips in the body bake | receipt |
+| 2374 | 2026-11-14 | two bake attempts failed in game; 06:47 is reinstalled | refuted, receipt |
+| 2405 | 2026-11-14 | the Viper old-mod slide port: modify the live clip, do not re-synthesise it | receipt |
+| 2480 | 2026-11-14 | Shiv arms/head: the bake is faithful, its track set is not | receipt, rule |
+| 2618 | 2026-11-14 | the good build is pak97 v1; the lift is in the clips that were never recompiled | receipt, rule |
+| 2734 | 2026-11-14 | the bodies must be decompiled one clip at a time | receipt, rule |
+| 2812 | 2026-11-14 | the whole set is measured, not sampled | trap, receipt, rule |
+| 2841 | 2026-11-15 | the tail is lost by shipping a skeleton, not by a bad rest | trap, receipt, rule |
+| 2883 | 2026-11-15 | the look-up tilt is one rest, and "add the skeleton back" is the pin | refuted, trap, receipt |
+| 2925 | 2026-11-15 | the release is one command, and the compiler embeds the addon name | trap, receipt, rule |
+| 2952 | 2026-11-15 | the aim pitch is not in root_motion | receipt |
+| 2971 | 2026-11-15 | the tail existed and was drawn; it never moved | trap, receipt, rule |
+| 3021 | 2026-11-15 | the 68 tail-less clips were our own skip, not the game's data | trap, receipt, rule |
+| 3069 | 2026-11-15 | the tail needs 168-track clips, and every 168-track authoring path | — |
+| 3070 | — | available today re-introduces the lift | trap, receipt |
+| 3140 | 2026-11-15 | a tail ported onto a tailless hero through the addon, from scratch | trap, rule |
+| 3183 | 2026-11-15 | the tail tooling is no longer pinned to Shiv and Werewolf | trap |
+| 3243 | 2026-11-15 | a port ships a set: every clip rebuilt against the shipped skeleton | trap, receipt, rule |
+| 3293 | 2026-11-15 | a shipped skeleton crashes Haze, measured four ways | receipt |
+| 3317 | 2026-11-15 | the merged clips declared the tail twice, and the gate was crashing instead of refusing | trap, refusal, rule |
+| 3364 | 2026-11-15 | the gate admitted a folded body, and the refusals were the shortage | trap, refusal, receipt, rule |
+| 3436 | 2026-11-15 | refusal: an effort caveat is not a reason work stops | refusal, receipt, rule |
+| 3460 | 2026-11-15 | the authoring pass is measured too, and it fails the rest check | refusal, receipt |
+| 3490 | 2026-11-15 | "why is tengu 28 tracks", and the hand-picked inputs that followed | trap, refusal, receipt, rule |
+| 3538 | 2026-11-15 | the pak that shipped wrong, and the three checks it walked past | trap, refusal, rule |
+| 3596 | 2026-11-15 | the tail pipeline is signed with the family proof, and four gates it did not have | refusal, receipt |
+| 3630 | 2026-11-15 | the skeleton ships; what must match is its slots and frames | refusal, receipt |
+| 3668 | 2026-11-15 | two defects, both measured, and the reference is back in the game | refuted, refusal, rule |
+| 3701 | 2026-11-15 | parity with the Shiv pak is measured, and it is not acceptance | refuted, refusal, receipt, rule |
+| 3801 | — | Removed evidence | refusal, receipt |
+| 3841 | 2026-11-15 | how this file is read now: an audit, an index, and an additive resynthesis | refuted, trap, refusal, receipt |
+| 3883 | 2026-11-15 | addressing `ala`: no gendered pronoun, and why this keeps happening | refusal, rule |
+| 3912 | 2026-11-15 | the pak ships its vnmskeleton, and that is not a choice | refusal, rule |
+| 3937 | 2026-11-15 | `pak93_dir.vpk` is the pinned Shiv build, and a gate is not widened to fit a slot | refusal, receipt, rule |
+| 3958 | — | 2026-11-16 (third pass) — the tree, and two checks that were refusing the game's own file | refusal, receipt |
+| 4002 | 2026-11-16 | every page names its build, the folder picker is real, and sections fold | — |
+| 4030 | 2026-11-16 | the markers follow the selected clients, not the detected install | — |

@@ -422,11 +422,24 @@ def active_or_first_armature(context) -> bpy.types.Object | None:
 
 
 def select_only(context, objects: list[bpy.types.Object]) -> None:
-    bpy.ops.object.select_all(action="DESELECT")
-    for obj in objects:
-        obj.select_set(True)
-    if objects:
-        context.view_layer.objects.active = objects[0]
+    """Select exactly these objects without Blender's Object-Mode-only operator.
+
+    ``bpy.ops.object.select_all`` poll-fails in Pose and Edit Mode, which is
+    where the bone picker and the chain overlay run (the owner's traceback).
+    Selection flags can be set in either mode; the active object is left alone
+    while an edit session is open, so picking a bone does not end the pose.
+    """
+    view_layer = context.view_layer
+    wanted = set(objects)
+    editing = getattr(context, "mode", "OBJECT") != "OBJECT"
+    for obj in view_layer.objects:
+        if obj in wanted:
+            if not obj.select_get():
+                obj.select_set(True)
+        elif obj.select_get():
+            obj.select_set(False)
+    if objects and (not editing or view_layer.objects.active in wanted):
+        view_layer.objects.active = objects[0]
 
 
 def world_bounds(objects: list[bpy.types.Object]) -> tuple[float, float]:

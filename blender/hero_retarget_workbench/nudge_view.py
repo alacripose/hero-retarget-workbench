@@ -172,27 +172,37 @@ def _project(region, region_3d, point: Vector):
     return (x, y)
 
 
-def _selected_name(settings, armature) -> str:
-    """The bone picked in Pose or Edit Mode, else the mapped row being edited.
+def _resolve(settings, armature, name: str) -> str:
+    """A panel pick on the custom rig, following the bone map when needed."""
+    if not name:
+        return ""
+    if armature.pose.bones.get(name) is not None:
+        return name
+    for row in settings.bone_map:
+        if row.target == name and row.source and armature.pose.bones.get(row.source) is not None:
+            return row.source
+    return ""
 
-    The overlay is only a drawing, so Blender owns the mode.  Pose Mode reports
-    ``active_pose_bone``; Edit Mode reports ``active_bone`` from the armature
-    data.  Both drive the chain, and a rest edit stays visible.
+
+def _selected_name(settings, armature) -> str:
+    """The chain chosen in the panel; the pose selection never takes it over.
+
+    The bone map's Pick and the bone list set ``hierarchy_index``; the mapped
+    row is the fallback when no hero hierarchy has been read.  The overlay is a
+    drawing, so posing or rest-editing a different bone leaves the highlighted
+    chain where the owner put it.
     """
-    for attribute in ("active_pose_bone", "active_bone"):
-        active = getattr(bpy.context, attribute, None)
-        if active is None:
-            continue
-        owner = getattr(active, "id_data", None)
-        if owner is armature or owner is armature.data:
-            return active.name
+    if settings.hierarchy and 0 <= settings.hierarchy_index < len(settings.hierarchy):
+        chosen = _resolve(settings, armature, settings.hierarchy[settings.hierarchy_index].name)
+        if chosen:
+            return chosen
     if settings.bone_map:
         index = max(0, min(int(settings.bone_map_index), len(settings.bone_map) - 1))
         row = settings.bone_map[index]
-        if row.source in armature.pose.bones:
-            return row.source
-        if row.target in armature.pose.bones:
-            return row.target
+        for name in (row.source, row.target):
+            chosen = _resolve(settings, armature, name)
+            if chosen:
+                return chosen
     return ""
 
 
