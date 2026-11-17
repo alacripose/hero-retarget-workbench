@@ -1261,12 +1261,16 @@ class DMF_PT_skeleton(Panel):
         toggles = nudge.row(align=True)
         toggles.prop(settings, "show_nudge_overlay", text="3D overlay", toggle=True)
         toggles.prop(settings, "nudge_relative", text="Relative", toggle=True)
-        nudge.operator("dmf.nudge_mode", text="Nudge mode", icon="MOUSE_MOVE")
+        nudge.operator(
+            "dmf.nudge_mode",
+            text="Finish nudge" if settings.nudge_active else "Nudge mode",
+            icon="MOUSE_MOVE",
+        )
         _hint(
             nudge,
-            "Nudge mode opens the rest/animation split and orthographic gizmo: arrows or wheel step; "
-            "X/Y/Z axis; R rotate; Tab next; Backspace reset; Enter finish. "
-            "The overlay heats the selected chain warm against the cool mapped hero target.",
+            "Nudge mode enters Pose Mode on the custom rig with orthographic panes and the gizmo: "
+            "pose with G/R/S, click a bone for its chain. The overlay heats the selected chain warm "
+            "against the cool mapped hero target. Finish restores the saved pose.",
             "INFO",
         )
         if settings.nudge_overlay_error:

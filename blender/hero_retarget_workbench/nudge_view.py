@@ -173,6 +173,14 @@ def _project(region, region_3d, point: Vector):
 
 
 def _selected_name(settings, armature) -> str:
+    """The bone selected in Pose Mode, else the mapped row being edited.
+
+    Pose Mode is the control surface now: clicking a bone in the viewport moves
+    the warm/cool chain with it, and the bone list still seeds the first one.
+    """
+    active = getattr(bpy.context, "active_pose_bone", None)
+    if active is not None and active.id_data == armature:
+        return active.name
     if settings.bone_map:
         index = max(0, min(int(settings.bone_map_index), len(settings.bone_map) - 1))
         row = settings.bone_map[index]
@@ -180,8 +188,7 @@ def _selected_name(settings, armature) -> str:
             return row.source
         if row.target in armature.pose.bones:
             return row.target
-    active = getattr(bpy.context, "active_pose_bone", None)
-    return active.name if active is not None else ""
+    return ""
 
 
 def _mapping(settings) -> dict[str, str]:
@@ -201,11 +208,6 @@ def _chain(armature, selected: str) -> list[str]:
         names.append(pose.name)
         pose = pose.parent
     return list(reversed(names))
-
-
-def _rest_area_here(settings) -> bool:
-    area = getattr(bpy.context, "area", None)
-    return bool(area is not None and settings.nudge_rest_area == f"{area.x}:{area.y}")
 
 
 def _retarget_axes(hero):
@@ -324,11 +326,7 @@ def _draw(context) -> None:
     custom = settings.custom_armature
     if custom is None or custom.type != "ARMATURE":
         return
-    rest_here = _rest_area_here(settings)
-    armature = settings.nudge_rest_armature if rest_here else custom
-    if armature is None or armature.name not in bpy.data.objects:
-        armature = custom
-        rest_here = False
+    armature = custom
     hero = settings.target_armature
     if hero is not None and (hero == armature or hero.type != "ARMATURE"):
         hero = None
@@ -448,9 +446,8 @@ def _draw(context) -> None:
                         )
                 if (target_point[0] - custom_point[0]) ** 2 + (target_point[1] - custom_point[1]) ** 2 < 25.0:
                     _cross(target_point, 4.0, COOL_BRIGHT, 1.4)
-                suffix = " rest" if rest_here else ""
                 _label(
-                    f"{selected_item['name']}{suffix} · {selected_item['error'] * 100.0:.0f}%  "
+                    f"{selected_item['name']} · {selected_item['error'] * 100.0:.0f}%  "
                     f"Δ{selected_item['pos_error']:.3f}m {math.degrees(selected_item['rot_error']):.1f}°",
                     custom_point[0] + 12.0,
                     custom_point[1] + 13.0,
