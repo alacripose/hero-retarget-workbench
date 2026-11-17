@@ -24,6 +24,8 @@ class CompileResult:
     content_addon: Path | None = None
     output: Path | None = None
     compiled_files: list[Path] = field(default_factory=list)
+    material_files: list[Path] = field(default_factory=list)
+    material_errors: list[str] = field(default_factory=list)
     build_addon: Path | None = None
     game_addon: Path | None = None
 
@@ -139,6 +141,21 @@ def compile_stage(
     if not vmdl_relative:
         raise CompileError("stage-manifest-has-no-vmdl")
 
+    # A migrated old body keeps the live hero's LOD slots until the addon's
+    # Build LODs / Export & stage run.  Refuse to compile that half-ported stage:
+    # the VPK would render the old body at distance as the live hero.
+    if manifest.get("preserved_model") and manifest.get("new_root") and manifest.get("new_vmdl"):
+        if not manifest.get("lods") and manifest.get("target_dmx"):
+            from .stage import target_lod_relatives
+
+            live_root = Path(str(manifest["new_root"]))
+            live_lods = target_lod_relatives(live_root, str(manifest["target_dmx"]))
+            if live_lods:
+                raise CompileError(
+                    "compile-needs-restaged-lods: the old body still points at the live hero's "
+                    f"{len(live_lods)} LOD slots; press Build LODs, then Export & stage before compiling"
+                )
+
     # Merge into the addon the user already has open in CSDK rather than
     # replacing the folder and its unrelated files.
     content_addon = stage_content(env, stage_root, addon)
@@ -156,17 +173,45 @@ def compile_stage(
     result = _run(env, command, log_path, timeout)
 
     game_addon = env.csdk_root / "game" / "citadel_addons" / addon
-    compiled = _compiled_paths(game_addon)
+    material_errors: list[str] = []
+    material_files: list[Path] = []
+    if result.returncode == 0:
+        target_relative = str(manifest.get("material_target_dir") or "").replace("\\", "/").strip("/")
+        material_root = content_addon / target_relative if target_relative else None
+        for source in sorted(material_root.glob("*.vmat")) if material_root is not None else []:
+            material_relative = source.relative_to(content_addon).as_posix()
+            material_input = Path("citadel_addons") / addon / material_relative
+            material_command = [
+                str(env.resourcecompiler),
+                "-nop4",
+                "-f",
+                "-game",
+                str(env.csdk_gameinfo.parent),
+                "-i",
+                str(material_input),
+            ]
+            material_result = _run(env, material_command, log_path, timeout)
+            material_files.extend(
+                path
+                for path in _compiled_paths(game_addon)
+                if path.name.lower().startswith(source.stem.lower())
+            )
+            if material_result.returncode:
+                material_errors.append(material_relative)
+
+    compiled = _compiled_paths(game_addon) if result.returncode == 0 and not material_errors else []
     output = game_addon / Path(vmdl_relative).with_suffix(".vmdl_c")
     return CompileResult(
         command,
-        result.returncode,
+        result.returncode if not material_errors else 1,
         result.stdout,
         result.stderr,
         log_path,
         content_addon=content_addon,
-        output=output if output.is_file() else None,
-        compiled_files=compiled if result.returncode == 0 else [],
+        output=output if output.is_file() and not material_errors else None,
+        compiled_files=compiled,
+        material_files=sorted(set(material_files)),
+        material_errors=material_errors,
         build_addon=None,
         game_addon=game_addon,
     )

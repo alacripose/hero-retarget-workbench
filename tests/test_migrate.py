@@ -10,11 +10,13 @@ from unittest import mock
 from forge.migrate import (
     MigrationError,
     _install_evidence,
+    _restage_target_materials,
     migrate_trees,
     model_file_diff,
     model_node_diff,
     resolve_package_source,
     resolve_old_model,
+    target_material_relative,
     update_from_package,
 )
 from forge.modeldoc import sections
@@ -88,6 +90,48 @@ def document(*extra: str, render: str = RENDER) -> str:
         + "".join(extra)
         + FOOTER
     )
+
+
+class TargetMaterialTests(unittest.TestCase):
+    def test_old_material_paths_are_rewritten_to_the_target_folder(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "content"
+            source = root / "models/old/materials/body.vmat"
+            source.parent.mkdir(parents=True)
+            source.write_text(
+                '"Layer0"\n{\n\t"TextureColor1"\t"models/old/materials/body_color.png"\n}\n',
+                encoding="utf-8",
+            )
+            (source.parent / "body.vtex_c").write_bytes(b"compiled texture")
+
+            def decode(env, command, log_path, timeout):
+                output = Path(command[command.index("-o") + 1])
+                image = output / "models/old/materials/body_color_psd_deadbeef.png"
+                image.parent.mkdir(parents=True, exist_ok=True)
+                image.write_bytes(b"PNG")
+                return mock.Mock(returncode=0)
+
+            env = Environment(s2v=Path("s2v.exe"))
+            with mock.patch("forge.migrate._log", side_effect=decode):
+                result = _restage_target_materials(
+                    env,
+                    root,
+                    root,
+                    "models/new/materials",
+                    ["models/old/materials/body.vmat"],
+                )
+            self.assertEqual(result.target_materials, 1)
+            self.assertEqual(result.target_textures, 1)
+            target = root / "models/new/materials/body.vmat"
+            self.assertTrue(target.is_file())
+            self.assertIn("models/new/materials/body_color.png", target.read_text())
+            self.assertTrue((root / "models/new/materials/body_color.png").is_file())
+
+    def test_target_material_folder_follows_the_vmdl(self):
+        self.assertEqual(
+            target_material_relative("models/heroes_staging/bebop/bebop.vmdl"),
+            "models/heroes_staging/bebop/materials",
+        )
 
 
 class MigrationTests(unittest.TestCase):

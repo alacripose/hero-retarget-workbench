@@ -122,6 +122,42 @@ class CompileStageTests(unittest.TestCase):
         with self.assertRaises(CompileError):
             compile_stage(self.env, self.stage, "../escape", log_path=self.log)
 
+    def test_compile_refuses_a_migrated_body_with_live_lod_slots(self):
+        live_root = self.root / "live"
+        live_body = live_root / "models" / "heroes" / "haze" / "haze_body.dmx"
+        live_body.parent.mkdir(parents=True)
+        live_body.write_bytes(b"live body")
+        (live_body.parent / "haze_body_lod13.dmx").write_bytes(b"live lod")
+        manifest = {
+            "vmdl": "models/heroes/haze/haze.vmdl",
+            "preserved_model": True,
+            "new_root": str(live_root),
+            "new_vmdl": "models/heroes/haze/haze.vmdl",
+            "target_dmx": "models/heroes/haze/haze_body.dmx",
+        }
+        (self.source / "stage.json").write_text(json.dumps(manifest), encoding="utf-8")
+        with patch("forge.compile._run") as run:
+            with self.assertRaises(CompileError) as raised:
+                compile_stage(self.env, self.stage, "haze", log_path=self.log)
+        self.assertIn("compile-needs-restaged-lods", str(raised.exception))
+        run.assert_not_called()
+
+    def test_compile_compiles_target_material_sources(self):
+        material = self.source / "models/heroes/haze/materials/haze.vmat"
+        material.parent.mkdir(parents=True)
+        material.write_text('"shader" "pbr.vfx"\n', encoding="utf-8")
+        manifest = {
+            "vmdl": "models/heroes/haze/haze.vmdl",
+            "material_target_dir": "models/heroes/haze/materials",
+        }
+        (self.source / "stage.json").write_text(json.dumps(manifest), encoding="utf-8")
+        with patch("forge.compile._run", side_effect=self.fake_compile) as run:
+            result = compile_stage(self.env, self.stage, "haze", log_path=self.log)
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.material_errors, [])
+        self.assertTrue(any(path.name == "haze.vmat_c" for path in result.material_files))
+        self.assertEqual(run.call_count, 2)
+
     def test_compile_reads_the_edited_csdk_content_instead_of_copying_the_build_again(self):
         stage_content(self.env, self.stage, "haze")
         edited = self.content_root / "haze" / "models" / "heroes" / "haze" / "haze.vmdl"

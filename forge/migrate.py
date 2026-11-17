@@ -21,7 +21,7 @@ from .fileio import copy_file, walk_files
 from .hashes import blake3_file
 from .live import Hero, LiveError, body_for_hero_folder, extract, hero_vmdl_path
 from .paths import Environment
-from .stage import is_texture_asset, material_files
+from .stage import is_texture_asset, material_files, remap_dmx_material_paths
 
 
 # Section names are discovered from each old model. ``Softbody`` and
@@ -59,6 +59,11 @@ class MaterialSourceResult:
     textures: int = 0
     skipped: list[str] = field(default_factory=list)
     error: str = ""
+    source_paths: list[str] = field(default_factory=list)
+    target_relative: str = ""
+    target_materials: int = 0
+    target_textures: int = 0
+    target_error: str = ""
 
 
 def _digest(path: Path) -> str:
@@ -838,6 +843,7 @@ def decompile_material_sources(
         for source in sorted(temporary.rglob("*.vmat")):
             relative = source.relative_to(temporary)
             target = destination / relative
+            result.source_paths.append(relative.as_posix())
             if not target.exists():
                 _copy(source, target)
                 result.materials += 1
@@ -854,6 +860,189 @@ def decompile_material_sources(
         result.error = str(error)
     finally:
         shutil.rmtree(temporary, ignore_errors=True)
+    return result
+
+
+def target_material_relative(vmdl_relative: str) -> str:
+    """The content folder a model's material sources must live in.
+
+    The addon's DMX export writes material tokens relative to the model's own
+    content parent, so a ported body and its LODs resolve materials from
+    ``models/<hero>/materials``.  Keeping an old package's ``tokamak`` folder in
+    that token is what made the compiled LODs reference materials that were not
+    staged beside the target model.
+    """
+    normalized = (vmdl_relative or "").replace("\\", "/").strip("/")
+    parent = PurePosixPath(normalized).parent
+    return (parent / "materials").as_posix() if parent.as_posix() not in ("", ".") else "materials"
+
+
+def _semantic_material_name(stem: str) -> str:
+    """A texture stem without the decompiler's source-hash suffix."""
+    value = stem.lower()
+    value = re.sub(r"_(?:png|psd)_[0-9a-f]{6,}$", "", value)
+    value = re.sub(r"_[0-9a-f]{6,}(?:_(?:metal|rough))?$", "", value)
+    value = re.sub(r"_(?:metal|rough)$", "", value)
+    return value
+
+
+def _material_texture(textures: dict[str, Path], value: str, key: str) -> Path | None:
+    """Find the decoded texture a decompiled vmat line names.
+
+    S2V can emit a compiled reference such as ``tokamak_head_color_png_<hash>``
+    while the package ships ``tokamak_head_color_psd_<hash>``.  The semantic
+    stem, not the hash, is the stable identity.  Metalness maps often were not
+    shipped in old addons; leave those fields out instead of writing a broken
+    path that the compiler will warn about on every build.
+    """
+    stem = Path(str(value).replace("\\", "/")).stem
+    semantic = _semantic_material_name(stem)
+    exact = [
+        png for name, png in textures.items() if _semantic_material_name(Path(name).stem) == semantic
+    ]
+    if exact:
+        return sorted(exact, key=lambda path: path.name)[0]
+    if "metal" in key.lower():
+        return None
+    prefix = [
+        png
+        for name, png in textures.items()
+        if _semantic_material_name(Path(name).stem).startswith(semantic + "_")
+        or semantic.startswith(_semantic_material_name(Path(name).stem) + "_")
+    ]
+    return sorted(prefix, key=lambda path: (len(path.stem), path.name))[0] if prefix else None
+
+
+def _rewrite_target_material(text: str, target_relative: str, textures: dict[str, Path]) -> tuple[str, dict[str, Path], list[str]]:
+    """Point one decompiled vmat at the target model's material folder.
+
+    The decompiler keeps both source fields and a ``Compiled Textures`` block.
+    The latter is evidence from the old build, not source the target compiler
+    should consume, so it is dropped.  Every remaining texture path is mapped to
+    a decoded PNG and rewritten under the target folder; an absent optional map
+    is omitted rather than left pointing at the old build's path.
+    """
+    lines = text.splitlines()
+    output: list[str] = []
+    used: dict[str, Path] = {}
+    skipped: list[str] = []
+    in_compiled = False
+    depth = 0
+    pattern = re.compile(
+        r'(\s*"(?P<key>[^"]+)"\s*")(?P<value>[^"]+\.(?:png|tga|jpg|jpeg|tif|tiff|dds|exr|hdr|vtex))("\s*)$',
+        re.IGNORECASE,
+    )
+    for line in lines:
+        stripped = line.strip()
+        if stripped == '"Compiled Textures"':
+            in_compiled = True
+            depth = 0
+            continue
+        if in_compiled:
+            depth += line.count("{") - line.count("}")
+            if depth <= 0:
+                in_compiled = False
+            continue
+        match = pattern.match(line)
+        if not match:
+            output.append(line)
+            continue
+        key = match.group("key")
+        value = match.group("value")
+        png = _material_texture(textures, value, key)
+        if png is None:
+            skipped.append(key)
+            continue
+        name = Path(value.replace("\\", "/")).name
+        output.append(f'{match.group(1)}{target_relative}/{name}{match.group(4)}')
+        used.setdefault(name.lower(), png)
+    return "\n".join(output) + "\n", used, skipped
+
+
+def _decode_material_textures(
+    env: Environment,
+    root: Path,
+    destination: Path,
+    *,
+    timeout: int = 900,
+) -> tuple[dict[str, Path], str, Path | None]:
+    """Decode every compiled texture independently of the vmat references.
+
+    A vmat's old compiled paths can contain a duplicated material prefix, which
+    makes S2V's material decompile fail to load the texture it is trying to
+    embed.  Asking S2V for the ``vtex_c`` files directly always writes the PNGs;
+    the material restage then maps them by semantic stem.
+    """
+    compiled = [path for path in root.rglob("*.vtex_c") if path.is_file()]
+    if not compiled or env.s2v is None:
+        return {}, "" if not compiled else "source-2-viewer-missing", None
+    temporary = Path(tempfile.mkdtemp(prefix=".dmf-textures-", dir=destination.parent))
+    try:
+        command = [
+            str(env.s2v),
+            "-i",
+            str(root),
+            "-o",
+            str(temporary),
+            "-d",
+            "--recursive",
+            "-e",
+            "vtex_c",
+        ]
+        if env.gameinfo is not None:
+            command += ["--game", str(env.gameinfo)]
+        run = _log(env, command, destination.parent / "s2v-textures.log", timeout)
+        if run.returncode != 0:
+            return {}, "old-texture-decompile-failed", temporary
+        return {
+            path.name.lower(): path
+            for path in sorted(temporary.rglob("*.png"))
+            if path.is_file()
+        }, "", temporary
+    except (OSError, subprocess.SubprocessError) as error:
+        return {}, str(error), temporary
+
+
+def _restage_target_materials(
+    env: Environment,
+    root: Path,
+    destination: Path,
+    target_relative: str,
+    source_paths: list[str],
+    *,
+    timeout: int = 900,
+) -> MaterialSourceResult:
+    """Write normalized target-folder vmat sources and their decoded PNGs."""
+    result = MaterialSourceResult(target_relative=target_relative)
+    if not target_relative or not source_paths:
+        return result
+    textures, error, temporary = _decode_material_textures(
+        env, root, destination, timeout=timeout
+    )
+    if error:
+        result.target_error = error
+    target_root = destination / target_relative
+    target_root.mkdir(parents=True, exist_ok=True)
+    used_textures: dict[str, Path] = {}
+    try:
+        for relative in source_paths:
+            source = root / relative
+            if not source.is_file() or source.suffix.lower() != ".vmat":
+                continue
+            text = source.read_text(encoding="utf-8", errors="replace")
+            rewritten, used, skipped = _rewrite_target_material(text, target_relative, textures)
+            target = target_root / source.name
+            target.write_text(rewritten, encoding="utf-8", newline="\n")
+            result.target_materials += 1
+            result.skipped.extend(f"{relative}:{key}" for key in skipped)
+            for name, png in used.items():
+                if name not in used_textures:
+                    _copy(png, target_root / name)
+                    used_textures[name] = png
+    finally:
+        if temporary is not None:
+            shutil.rmtree(temporary, ignore_errors=True)
+    result.target_textures = len(used_textures)
     return result
 
 
@@ -964,6 +1153,7 @@ def migrate_trees(
     old_material_count = 0
     old_texture_count = 0
     material_sources = MaterialSourceResult()
+    target_relative = target_material_relative(relative)
     if preserve_materials:
         old_material_count, old_texture_count = _copy_materials(old_root, root)
         if env is not None:
@@ -973,6 +1163,20 @@ def migrate_trees(
                 root,
                 timeout=timeout,
             )
+            if material_sources.source_paths:
+                target_sources = _restage_target_materials(
+                    env,
+                    root,
+                    root,
+                    target_relative,
+                    material_sources.source_paths,
+                    timeout=timeout,
+                )
+                material_sources.target_relative = target_sources.target_relative
+                material_sources.target_materials = target_sources.target_materials
+                material_sources.target_textures = target_sources.target_textures
+                material_sources.target_error = target_sources.target_error
+                material_sources.skipped.extend(target_sources.skipped)
 
     model_files: list[str] = []
     model_remap: dict[str, str] = {}
@@ -1083,6 +1287,10 @@ def migrate_trees(
                 _copy(source, root / relative_path)
                 model_files.append(relative_path)
 
+    if material_sources.target_materials and target_relative:
+        for model_relative in model_files:
+            remap_dmx_material_paths(root / model_relative, target_relative)
+
     vmdl_out = root / relative
     vmdl_out.parent.mkdir(parents=True, exist_ok=True)
     vmdl_out.write_text(merged_text, encoding="utf-8", newline="\n")
@@ -1119,6 +1327,10 @@ def migrate_trees(
             "material_source_textures": material_sources.textures,
             "material_source_error": material_sources.error,
             "material_source_skipped": material_sources.skipped,
+            "material_target_dir": material_sources.target_relative,
+            "target_materials": material_sources.target_materials,
+            "target_material_textures": material_sources.target_textures,
+            "material_target_error": material_sources.target_error,
             "material_policy": "old-assets-overlay-live" if preserve_materials else "live-only",
             "sections": merged.actions,
             "cloth_chains": cloth_chains,
