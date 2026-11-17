@@ -1258,6 +1258,18 @@ class DMF_PT_skeleton(Panel):
         minus.direction = -1
         plus = step.operator("dmf.nudge_bone", text="+ Step", icon="ADD")
         plus.direction = 1
+        toggles = nudge.row(align=True)
+        toggles.prop(settings, "show_nudge_overlay", text="3D overlay", toggle=True)
+        toggles.prop(settings, "nudge_relative", text="Relative", toggle=True)
+        nudge.operator("dmf.nudge_mode", text="Nudge mode", icon="MOUSE_MOVE")
+        _hint(
+            nudge,
+            "Nudge mode opens the rest/animation split and orthographic gizmo: arrows or wheel step; "
+            "X/Y/Z axis; R rotate; Tab next; Backspace reset; Enter finish.",
+            "INFO",
+        )
+        if settings.nudge_overlay_error:
+            _hint(nudge, settings.nudge_overlay_error, "ERROR", alert=True)
 
         preview = _section(
             layout,

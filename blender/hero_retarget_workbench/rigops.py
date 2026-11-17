@@ -426,6 +426,7 @@ def start_hand_preview(settings) -> str:
         raise RigError("hand-preview-needs-action: choose or import a hero action")
     _PREVIEW = _HandPreview(settings, action)
     settings.hand_preview_active = True
+    settings.show_nudge_overlay = True
     settings.hand_preview_note = (
         f"Previewing {action.name}; nudge the selected hand or finger row. No keys are written"
     )
@@ -436,9 +437,20 @@ def start_hand_preview(settings) -> str:
 def stop_hand_preview(settings) -> bool:
     if _PREVIEW is None:
         settings.hand_preview_active = False
+        _clear_nudge_view()
         return False
     _PREVIEW.stop()
+    _clear_nudge_view()
     return True
+
+
+def _clear_nudge_view(context=None) -> None:
+    try:
+        from . import workbench
+
+        workbench.clear_nudge_compare(context or bpy.context)
+    except Exception:
+        pass
 
 
 def nudge_hand_preview(settings, bone_name: str, axis: int, amount: float, rotate: bool) -> bool:
@@ -707,6 +719,149 @@ class DMF_OT_use_mapped_names(Operator):
         return {"FINISHED"}
 
 
+def effective_step(settings, bone_name: str, rotate: bool) -> float:
+    """The current step, scaled by the selected bone's length for translation."""
+    amount = float(settings.nudge_amount)
+    custom = settings.custom_armature
+    pose = custom.pose.bones.get(bone_name) if custom is not None else None
+    if settings.nudge_relative and not rotate and pose is not None:
+        amount *= max(float(pose.bone.length), 1e-4)
+    return amount
+
+
+def _selected_source(settings) -> str:
+    custom = settings.custom_armature
+    if custom is None or not settings.bone_map:
+        return ""
+    index = max(0, min(int(settings.bone_map_index), len(settings.bone_map) - 1))
+    row = settings.bone_map[index]
+    for name in (row.source, row.target):
+        if name and custom.pose.bones.get(name) is not None:
+            return name
+    return ""
+
+
+def _next_mapped_source(settings, reverse: bool = False) -> str:
+    custom = settings.custom_armature
+    if custom is None or not settings.bone_map:
+        return ""
+    count = len(settings.bone_map)
+    start = max(0, min(int(settings.bone_map_index), count - 1))
+    for step in range(1, count + 1):
+        index = (start + (-step if reverse else step)) % count
+        row = settings.bone_map[index]
+        for name in (row.source, row.target):
+            if name and custom.pose.bones.get(name) is not None:
+                settings.bone_map_index = index
+                return name
+    return ""
+
+
+class DMF_OT_nudge_mode(Operator):
+    bl_idname = "dmf.nudge_mode"
+    bl_label = "Nudge Mode"
+    bl_description = "Open the rest/animation split and orthographic view for keyboard nudging; Enter restores and exits"
+
+    def _hint(self, settings) -> str:
+        return (
+            f"Nudge {self.bone or 'a bone'}  |  {settings.nudge_axis} "
+            f"{'rotate' if settings.nudge_rotate else 'translate'} "
+            f"{'relative' if settings.nudge_relative else 'absolute'}  |  "
+            "arrows/+- step  X/Y/Z axis  R rotate  Tab next  Backspace reset  Enter finish"
+        )
+
+    def _status(self, context) -> None:
+        try:
+            context.workspace.status_text_set(self._hint(context.scene.dmf))
+        except (AttributeError, TypeError, RuntimeError):
+            pass
+
+    def _finish(self, context, *, close_view: bool = False) -> None:
+        try:
+            context.workspace.status_text_set(None)
+        except (AttributeError, TypeError, RuntimeError):
+            pass
+        if close_view:
+            _clear_nudge_view(context)
+        jobs._tag_redraw()
+
+    def _apply(self, settings, sign: float) -> None:
+        if not self.bone:
+            return
+        rotate = bool(settings.nudge_rotate)
+        amount = effective_step(settings, self.bone, rotate) * sign
+        if not nudge_hand_preview(settings, self.bone, {"X": 0, "Y": 1, "Z": 2}[settings.nudge_axis], amount, rotate):
+            raise RigError("nudge-mode-preview-stopped: start the hand preview again")
+
+    def invoke(self, context, event):
+        settings = context.scene.dmf
+        selected = _selected_source(settings)
+        if not selected:
+            _status(settings, "Select a mapped hand or finger row before entering nudge mode", "ERROR")
+            self.report({"ERROR"}, "No selected mapped bone")
+            return {"CANCELLED"}
+        if _PREVIEW is None:
+            try:
+                start_hand_preview(settings)
+            except Exception as error:
+                _status(settings, str(error), "ERROR")
+                self.report({"ERROR"}, str(error))
+                return {"CANCELLED"}
+        settings.show_nudge_overlay = True
+        self.bone = selected
+        try:
+            from . import workbench
+
+            workbench.start_nudge_compare(context, settings)
+        except Exception as error:
+            _status(settings, f"Nudge mode: split view unavailable: {error}", "WARN")
+        context.window_manager.modal_handler_add(self)
+        self._status(context)
+        return {"RUNNING_MODAL"}
+
+    def modal(self, context, event):
+        settings = context.scene.dmf
+        if _PREVIEW is None:
+            self._finish(context, close_view=True)
+            return {"CANCELLED"}
+        if event.type == "ESC" and event.value == "PRESS":
+            self._finish(context)
+            return {"FINISHED"}
+        if event.type in {"RET", "NUMPAD_ENTER"} and event.value == "PRESS":
+            stop_hand_preview(settings)
+            self._finish(context, close_view=True)
+            return {"FINISHED"}
+        if event.value == "PRESS":
+            if event.type in {"X", "Y", "Z"}:
+                settings.nudge_axis = event.type
+                self._status(context)
+                return {"RUNNING_MODAL"}
+            if event.type == "R":
+                settings.nudge_rotate = not settings.nudge_rotate
+                self._status(context)
+                return {"RUNNING_MODAL"}
+            if event.type == "TAB":
+                self.bone = _next_mapped_source(settings, reverse=bool(event.shift))
+                self._status(context)
+                return {"RUNNING_MODAL"}
+            if event.type == "BACK_SPACE":
+                reset_hand_nudges(settings)
+                self._status(context)
+                return {"RUNNING_MODAL"}
+        try:
+            factor = 0.2 if event.shift else 1.0
+            if event.type in {"RIGHT_ARROW", "EQUAL", "NUMPAD_PLUS", "WHEELUPMOUSE"}:
+                self._apply(settings, factor)
+            elif event.type in {"LEFT_ARROW", "MINUS", "NUMPAD_MINUS", "WHEELDOWNMOUSE"}:
+                self._apply(settings, -factor)
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self._finish(context, close_view=True)
+            return {"CANCELLED"}
+        self._status(context)
+        return {"RUNNING_MODAL"}
+
+
 class DMF_OT_preview_hands(Operator):
     bl_idname = "dmf.preview_hands"
     bl_label = "Preview Hands"
@@ -759,6 +914,7 @@ class DMF_OT_bake_custom_rig(Operator):
 
 CLASSES = (
     DMF_OT_use_mapped_names,
+    DMF_OT_nudge_mode,
     DMF_OT_preview_hands,
     DMF_OT_reset_hand_nudges,
     DMF_OT_bake_custom_rig,
