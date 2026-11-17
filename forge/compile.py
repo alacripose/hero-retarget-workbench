@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 import json
-import shutil
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .fileio import copy_tree
 from .paths import Environment
 
 
@@ -86,6 +86,25 @@ def _compiled_paths(addon_root: Path) -> list[Path]:
     ]
 
 
+def stage_content(env: Environment, stage_root: Path, addon_name: str) -> Path:
+    """Copy a staged addon into the selected CSDK content tree without compiling.
+
+    The content addon is the editable tree: materials and their source files sit
+    there for the user to open in the selected CSDK.  An existing addon is
+    merged, so files this stage does not own survive a second update.
+    """
+    if env.csdk_root is None:
+        raise CompileError("csdk-missing: choose the CSDK13 root in the addon Setup panel")
+    addon = _addon_folder(addon_name)
+    source = Path(stage_root) / "content" / "citadel_addons" / addon
+    if not source.is_dir():
+        raise CompileError(f"stage-content-missing: {source}")
+    content_addon = env.csdk_root / "content" / "citadel_addons" / addon
+    if content_addon.resolve() != source.resolve():
+        copy_tree(source, content_addon)
+    return content_addon
+
+
 def compile_stage(
     env: Environment,
     stage_root: Path,
@@ -120,14 +139,9 @@ def compile_stage(
     if not vmdl_relative:
         raise CompileError("stage-manifest-has-no-vmdl")
 
-    content_addon = env.csdk_root / "content" / "citadel_addons" / addon
-    if content_addon.resolve() != source.resolve():
-        if content_addon.exists():
-            # Merge into the addon the user already has open in CSDK rather
-            # than replacing the folder and its unrelated files.
-            shutil.copytree(source, content_addon, dirs_exist_ok=True)
-        else:
-            shutil.copytree(source, content_addon)
+    # Merge into the addon the user already has open in CSDK rather than
+    # replacing the folder and its unrelated files.
+    content_addon = stage_content(env, stage_root, addon)
 
     input_relative = Path("citadel_addons") / addon / vmdl_relative
     command = [

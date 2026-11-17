@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from forge.compile import CompileError, compile_stage
+from forge.compile import CompileError, compile_stage, stage_content
 from forge.paths import Environment
 
 
@@ -121,6 +121,41 @@ class CompileStageTests(unittest.TestCase):
     def test_addon_name_cannot_leave_the_addon_root(self):
         with self.assertRaises(CompileError):
             compile_stage(self.env, self.stage, "../escape", log_path=self.log)
+
+    def test_compile_reads_the_edited_csdk_content_instead_of_copying_the_build_again(self):
+        stage_content(self.env, self.stage, "haze")
+        edited = self.content_root / "haze" / "models" / "heroes" / "haze" / "haze.vmdl"
+        edited.write_bytes(b"owner edit")
+
+        with patch("forge.compile._run", side_effect=self.fake_compile):
+            compile_stage(self.env, self.env.csdk_root, "haze", log_path=self.log)
+
+        self.assertEqual(edited.read_bytes(), b"owner edit")
+
+    def test_stage_content_copies_materials_without_compiling(self):
+        material = (
+            self.source
+            / "models"
+            / "heroes"
+            / "haze"
+            / "materials"
+            / "haze_l_arm_vmat_g_tselfillummask_2b2ebb3f.vtex_c"
+        )
+        material.parent.mkdir(parents=True)
+        material.write_bytes(b"old material")
+        keeper = self.content_root / "haze" / "notes.txt"
+        keeper.parent.mkdir(parents=True)
+        keeper.write_bytes(b"owner note")
+
+        installed = stage_content(self.env, self.stage, "haze")
+
+        self.assertEqual(installed, self.content_root / "haze")
+        self.assertEqual(
+            (installed / "models/heroes/haze/materials/haze_l_arm_vmat_g_tselfillummask_2b2ebb3f.vtex_c").read_bytes(),
+            b"old material",
+        )
+        self.assertEqual(keeper.read_bytes(), b"owner note")
+        self.assertFalse((self.game_root / "haze").exists())
 
 
 if __name__ == "__main__":

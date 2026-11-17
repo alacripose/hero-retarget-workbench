@@ -1466,6 +1466,8 @@ class DMF_OT_update_old_addon(Operator):
                 raise RuntimeError("The live Deadlock install was not found; set it in Setup")
             if env.s2v is None:
                 raise RuntimeError("Source 2 Viewer CLI was not found; set it in Setup")
+            if env.csdk_root is None:
+                raise RuntimeError("Choose the CSDK13 toolchain in Setup so the update can stage into it")
             output = (
                 Path(bpy.path.abspath(settings.update_output))
                 if settings.update_output
@@ -1473,6 +1475,10 @@ class DMF_OT_update_old_addon(Operator):
             )
             addon = settings.update_addon_name.strip() or f"{Path(settings.old_vpk).stem}_updated"
             sections = None if settings.update_preserve_cloth else ()
+            # Record the target before the job starts, so a failed update still
+            # names the addon and the Stage button has a folder to inspect.
+            settings.update_addon_name = addon
+            settings.update_output = str(output)
             old_path = Path(bpy.path.abspath(settings.old_vpk))
             old_vmdl = Path(bpy.path.abspath(settings.update_old_vmdl)) if settings.update_old_vmdl else None
             hero_slug = settings.hero_slug
@@ -1499,11 +1505,14 @@ class DMF_OT_update_old_addon(Operator):
                     sections=sections,
                     force=replace_output,
                 )
-                progress(0.95, "migration manifest written")
-                return result
+                progress(0.9, "copying the updated addon into the selected CSDK content folder")
+                installed = module["compile"].stage_content(env, result.output, addon)
+                progress(0.98, "staged for material editing")
+                return result, installed
 
-            def done(result):
-                settings.stage_dir = str(result.output)
+            def done(payload):
+                result, installed = payload
+                settings.stage_dir = str(env.csdk_root)
                 settings.extraction_dir = str(result.new_root)
                 settings.vmdl = str(result.vmdl)
                 settings.vmdl_relative = result.vmdl.relative_to(result.root).as_posix()
@@ -1527,7 +1536,8 @@ class DMF_OT_update_old_addon(Operator):
                 _status(
                     settings,
                     f"Updated {addon} from {old_path.name}; {'old' if result.preserved_model else 'live'} model, "
-                    f"{result.material_count} old material assets{cloth}; compile from the Handoff panel",
+                    f"{result.material_count} old material assets{cloth}; staged in {installed}. "
+                    "Edit the material files there, then press Compile.",
                     "OK",
                 )
 
@@ -1538,6 +1548,69 @@ class DMF_OT_update_old_addon(Operator):
             if message:
                 raise RuntimeError(message)
             _status(settings, "Reading the old addon and live hero off the main thread", "BUSY")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
+class DMF_OT_stage_update(Operator):
+    bl_idname = "dmf.stage_update"
+    bl_label = "Stage update in CSDK"
+    bl_description = "Copy the updated addon content tree, including its old material files, into the selected CSDK for editing; it does not compile"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        addon = settings.update_addon_name.strip()
+        if not addon:
+            self.report({"ERROR"}, "Set Updated addon or run Import & update first")
+            return {"CANCELLED"}
+        output = (
+            Path(bpy.path.abspath(settings.update_output))
+            if settings.update_output
+            else core.project_root(settings) / "updates"
+        )
+        source = output / "content" / "citadel_addons" / addon
+        if not source.is_dir():
+            self.report(
+                {"ERROR"},
+                f"No updated addon at {source}; run Import & update first",
+            )
+            return {"CANCELLED"}
+        if settings.job_running or jobs.is_running():
+            self.report({"ERROR"}, "A background job is already running")
+            return {"CANCELLED"}
+        try:
+            module = core.core(settings)
+            env = core.detect_environment(settings, module)
+            if env.csdk_root is None:
+                raise RuntimeError("Choose the CSDK13 toolchain in Setup before staging materials")
+
+            def work(progress):
+                progress(0.2, f"copying {addon} into the CSDK content folder")
+                installed = module["compile"].stage_content(env, output, addon)
+                progress(0.95, "material files staged")
+                return installed
+
+            def done(installed):
+                settings.stage_dir = str(env.csdk_root)
+                settings.addon_name = addon
+                settings.update_output = str(output)
+                settings.update_addon_name = addon
+                _status(
+                    settings,
+                    f"Staged {addon} in {installed}; edit the material files there, then press Compile.",
+                    "OK",
+                )
+
+            def failed(error):
+                _status(settings, str(error), "ERROR")
+
+            message = jobs.start(settings, "Staging the update in CSDK", work, done, failed)
+            if message:
+                raise RuntimeError(message)
+            _status(settings, "Copying the updated addon into the CSDK content folder", "BUSY")
         except Exception as error:
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))
@@ -1704,6 +1777,7 @@ CLASSES = (
     DMF_OT_pick_old_vpk,
     DMF_OT_pick_old_vmdl,
     DMF_OT_update_old_addon,
+    DMF_OT_stage_update,
     DMF_OT_pick_vmdl,
     DMF_OT_write_model,
     DMF_OT_pack_vpk,

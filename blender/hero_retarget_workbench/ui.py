@@ -453,14 +453,22 @@ class DMF_PT_update(Panel):
         options = box.column(align=True)
         options.prop(settings, "update_model_policy", text="Old model")
         options.prop(settings, "update_preserve_cloth", text="Keep cloth/physics")
-        options.prop(settings, "update_preserve_materials", text="Keep old materials")
+        options.prop(settings, "update_preserve_materials", text="Copy old materials")
         options.prop(settings, "update_addon_name", text="Updated addon")
         _primary(
             box,
             "dmf.update_old_addon",
-            "Import & update",
+            "Import, update & stage",
             "FILE_REFRESH",
             enabled=not settings.job_running and settings.hero_slug not in ("", "NONE"),
+        )
+        stage = box.row(align=True)
+        stage.enabled = bool(settings.update_addon_name.strip()) and not settings.job_running
+        stage.operator("dmf.stage_update", text="Stage update in CSDK", icon="FILE_FOLDER")
+        _hint(
+            box,
+            "The update copies its content tree, including old material files, into the CSDK content addon shown in Setup. Edit those files there; Compile stays a separate step.",
+            "INFO",
         )
 
         advanced = _section(layout, "Advanced", "OPTIONS")

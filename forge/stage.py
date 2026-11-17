@@ -11,10 +11,10 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .fileio import copy_file
 from .hashes import blake3_file
 
 
@@ -113,8 +113,10 @@ def _safe_relative(value: str) -> str:
 def _copy(source: Path, destination: Path) -> None:
     if not source.is_file():
         raise StageError(f"missing-input: {source}")
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(source, destination)
+    try:
+        copy_file(source, destination)
+    except OSError as error:
+        raise StageError(f"copy-failed: {source} -> {destination}: {error}") from error
 
 
 def material_files(root: Path) -> list[MaterialCopy]:
