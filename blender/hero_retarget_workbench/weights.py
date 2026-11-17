@@ -17,10 +17,12 @@ from mathutils import Vector, kdtree
 from forge.weights import (
     BoneSegment,
     WeightError,
+    bone_related,
     envelope_weights,
     fold_source,
     merge_weights,
     normalize_weights,
+    segment_distance,
 )
 
 from . import core
@@ -134,6 +136,11 @@ class WeightSolver:
             self._copy_extra_bones()
 
         self.target_bones = set(self.armature.data.bones.keys())
+        self.target_parents = {
+            bone.name: bone.parent.name if bone.parent else ""
+            for bone in self.armature.data.bones
+        }
+        self.source_segments = self._source_segments()
         self.segments = self._target_segments()
         self.allowed_segments = [
             segment
@@ -198,6 +205,64 @@ class WeightSolver:
                     "bone-map-unresolved: "
                     f"{source} has weights but no target; choose a target, mark it Extra, or Ignore it"
                 )
+
+    def _source_segments(self) -> list[BoneSegment]:
+        """Mapped custom bones in world space, for the local-region anchor."""
+        if self.custom_armature is None:
+            return []
+        found: list[BoneSegment] = []
+        matrix = self.custom_armature.matrix_world
+        for bone in self.custom_armature.data.bones:
+            target = self.mapping.get(bone.name, "")
+            if not target and self.options.extra_policy == "KEEP":
+                target = self.extra.get(bone.name, "")
+            if not target or target not in self.armature.data.bones:
+                continue
+            head = matrix @ bone.head_local
+            tail = matrix @ bone.tail_local
+            found.append(BoneSegment(target, tuple(head), tuple(tail)))
+        return found
+
+    def _anchor(self, point: Vector, base: dict[str, float] | None = None) -> str:
+        """The target bone the custom vertex belongs to in its own rig.
+
+        A painted/mapped group is the strongest answer: the user already said
+        which bone owns the vertex.  Only an unweighted vertex falls back to the
+        nearest mapped custom bone, and then to target space for an unrigged
+        mesh.  This is what keeps a nearby hand from redefining a thigh vertex.
+        """
+        painted = [name for name in (base or {}) if name in self.target_parents]
+        if painted:
+            return max(painted, key=self._target_depth)
+        segments = self.source_segments or self.allowed_segments or self.segments
+        if not segments:
+            return ""
+        nearest = min(
+            segments,
+            key=lambda segment: segment_distance(point, segment.head, segment.tail),
+        )
+        return nearest.name
+
+    def _target_depth(self, name: str) -> int:
+        depth = 0
+        current = name
+        seen: set[str] = set()
+        while current and current not in seen:
+            seen.add(current)
+            current = self.target_parents.get(current, "")
+            if current:
+                depth += 1
+        return depth
+
+    def _compatible_segments(self, anchor: str) -> list[BoneSegment]:
+        if not anchor:
+            return self.allowed_segments
+        found = [
+            segment
+            for segment in self.allowed_segments
+            if bone_related(segment.name, anchor, self.target_parents)
+        ]
+        return found or self.allowed_segments
 
     def _target_segments(self) -> list[BoneSegment]:
         segments = []
@@ -281,18 +346,23 @@ class WeightSolver:
             group = self.mesh.vertex_groups.new(name=name)
         return group
 
-    def _surface(self, point: Vector) -> dict[str, float]:
+    def _surface(self, point: Vector, anchor: str) -> dict[str, float]:
         if self.tree is None or not self.body_weights:
             return {}
         found = self.tree.find_n(point, max(1, self.options.surface_samples))
         merged: dict[str, float] = {}
+        allowed = self.target_bones | set(self.extra.values())
         for _, index, distance in found:
             if distance > self.options.max_distance:
                 continue
             factor = (1.0 / (distance + 1e-6)) ** self.options.falloff
-            allowed = self.target_bones | set(self.extra.values())
             for name, weight in self.body_weights[index].items():
-                if name in allowed:
+                # A nearby hero hand can sit beside the custom thigh in an
+                # A-pose.  A finger is not on the thigh's chain, so the body
+                # sample cannot lend that weight across regions.
+                if name in allowed and (
+                    not anchor or bone_related(name, anchor, self.target_parents)
+                ):
                     merged[name] = merged.get(name, 0.0) + weight * factor
         return normalize_weights(merged, max_influences=self.options.max_influences)
 
@@ -315,12 +385,13 @@ class WeightSolver:
             if target:
                 base[target] = base.get(target, 0.0) + weight
         point = self.mesh.matrix_world @ self.mesh.data.vertices[index].co
+        anchor = self._anchor(point, base)
         if self.options.mode == "CUSTOM":
             result = base
         elif self.options.mode == "ENVELOPE":
             result = envelope_weights(
                 point,
-                self.allowed_segments,
+                self._compatible_segments(anchor),
                 max_distance=self.options.max_distance,
                 falloff=self.options.falloff,
                 max_influences=self.options.max_influences,
@@ -329,13 +400,13 @@ class WeightSolver:
             if base and sum(base.values()) >= 0.35:
                 result = base
             else:
-                surface = self._surface(point)
+                surface = self._surface(point, anchor)
                 if surface:
                     result = merge_weights(base, surface)
                 else:
                     result = base or envelope_weights(
                         point,
-                        self.allowed_segments,
+                        self._compatible_segments(anchor),
                         max_distance=self.options.max_distance,
                         falloff=self.options.falloff,
                         max_influences=self.options.max_influences,
