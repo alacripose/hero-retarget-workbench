@@ -127,6 +127,45 @@ class TargetMaterialTests(unittest.TestCase):
             self.assertIn("models/new/materials/body_color.png", target.read_text())
             self.assertTrue((root / "models/new/materials/body_color.png").is_file())
 
+    def test_compiled_texture_roles_become_source_fields(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "content"
+            source = root / "models/old/materials/body.vmat"
+            source.parent.mkdir(parents=True)
+            source.write_text(
+                '"Layer0"\n{\n\t"TextureColor1"\t"models/old/materials/body_color.png"\n'
+                '\t"Compiled Textures"\n\t{\n'
+                '\t\t"g_tNormalRoughness"\t"models/old/materials/body_normal.vtex"\n'
+                '\t}\n}\n',
+                encoding="utf-8",
+            )
+            (source.parent / "body.vtex_c").write_bytes(b"compiled texture")
+
+            def decode(env, command, log_path, timeout):
+                output = Path(command[command.index("-o") + 1])
+                for name in ("body_color_psd_deadbeef.png", "body_normal_psd_deadbeef.png"):
+                    image = output / "models/old/materials" / name
+                    image.parent.mkdir(parents=True, exist_ok=True)
+                    image.write_bytes(b"PNG")
+                return mock.Mock(returncode=0)
+
+            env = Environment(s2v=Path("s2v.exe"))
+            with mock.patch("forge.migrate._log", side_effect=decode):
+                result = _restage_target_materials(
+                    env,
+                    root,
+                    root,
+                    "models/new/materials",
+                    ["models/old/materials/body.vmat"],
+                )
+            target = root / "models/new/materials/body.vmat"
+            text = target.read_text()
+            self.assertEqual(result.target_textures, 2)
+            self.assertIn(
+                '"TextureNormal1"\t"models/new/materials/body_normal_psd_deadbeef.png"',
+                text,
+            )
+
     def test_target_material_folder_follows_the_vmdl(self):
         self.assertEqual(
             target_material_relative("models/heroes_staging/bebop/bebop.vmdl"),
