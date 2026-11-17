@@ -303,7 +303,53 @@ def _source_frame(frame: int, target_start: int, target_end: int, source_start: 
     return source_start + int(round(fraction * (source_end - source_start)))
 
 
+from forge.solver import is_hand_deform as _is_hand_deform
 from forge.solver import is_solver_input as _is_solver_input
+
+
+def apply_retarget_pose(target, source, *, preserve_hand_locations: bool = True) -> int:
+    """Put ``source``'s evaluated pose on ``target`` by solved matrices.
+
+    The root and the animgraph's solver targets keep their authored transforms.
+    Hand and finger deform bones keep the custom head position and take the
+    source rotation only: a copied world translation at a short finger joint
+    breaks the knuckles even when the rest mismatch is small.
+    """
+    root = source.pose.bones.get("root_motion")
+    axes = (
+        root.matrix.to_quaternion().to_matrix().inverted().to_4x4()
+        if root is not None
+        else Matrix.Identity(4)
+    )
+    desired = {}
+    for bone in target.pose.bones:
+        sample = source.pose.bones.get(bone.name)
+        if sample is None:
+            continue
+        if bone.name == "root_motion" or _is_solver_input(bone.name):
+            desired[bone.name] = sample.matrix.copy()
+        else:
+            desired[bone.name] = axes @ sample.matrix
+    for bone in target.pose.bones:
+        rest = bone.bone.matrix_local
+        if bone.name not in desired:
+            bone.matrix_basis = Matrix.Identity(4)
+            continue
+        if bone.parent is None:
+            basis = rest.inverted() @ desired[bone.name]
+        elif bone.parent.name in desired:
+            parent_pose = desired[bone.parent.name]
+            parent_rest = bone.parent.bone.matrix_local
+            basis = (parent_pose @ parent_rest.inverted() @ rest).inverted() @ desired[bone.name]
+        else:
+            basis = (
+                bone.parent.matrix @ bone.parent.bone.matrix_local.inverted() @ rest
+            ).inverted() @ desired[bone.name]
+        if preserve_hand_locations and _is_hand_deform(bone.name):
+            # Keep the custom knuckle at its own rest offset from the parent.
+            basis = basis.to_quaternion().to_matrix().to_4x4()
+        bone.matrix_basis = basis
+    return len(desired)
 
 
 def _bake_body_action(target, source, source_action, label: str):
@@ -340,30 +386,7 @@ def _bake_body_action(target, source, source_action, label: str):
         for frame in range(start, end + 1):
             scene.frame_set(frame)
             bpy.context.view_layer.update()
-            root = source.pose.bones.get("root_motion")
-            axes = root.matrix.to_quaternion().to_matrix().inverted().to_4x4() if root is not None else Matrix.Identity(4)
-            desired = {}
-            for bone in target.pose.bones:
-                sample = source.pose.bones.get(bone.name)
-                if sample is not None:
-                    if bone.name == "root_motion" or _is_solver_input(bone.name):
-                        desired[bone.name] = sample.matrix.copy()
-                    else:
-                        desired[bone.name] = axes @ sample.matrix
-            for bone in target.pose.bones:
-                rest = bone.bone.matrix_local
-                if bone.name not in desired:
-                    bone.matrix_basis = Matrix.Identity(4)
-                elif bone.parent is None:
-                    bone.matrix_basis = rest.inverted() @ desired[bone.name]
-                elif bone.parent.name in desired:
-                    parent_pose = desired[bone.parent.name]
-                    parent_rest = bone.parent.bone.matrix_local
-                    bone.matrix_basis = (parent_pose @ parent_rest.inverted() @ rest).inverted() @ desired[bone.name]
-                else:
-                    bone.matrix_basis = (
-                        bone.parent.matrix @ bone.parent.bone.matrix_local.inverted() @ rest
-                    ).inverted() @ desired[bone.name]
+            apply_retarget_pose(target, source)
             bpy.context.view_layer.update()
             for bone in target.pose.bones:
                 quaternion = bone.matrix_basis.to_quaternion()

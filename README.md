@@ -272,6 +272,12 @@ it publishes anything.
    **Bake hero to custom** does that rename automatically, then bakes every
    imported hero clip onto the custom armature and writes a custom skeleton and
    `vnmskel` under the bake folder. Import the clips on Animations first.
+   To inspect hands before writing anything, use **Hand animation preview** on
+   Skeleton: choose an action, play or scrub it, and nudge the selected hand or
+   finger row. Hand and finger bake channels keep the custom joint positions and
+   take only the hero rotation, so small rest-position differences do not pull
+   the fingers apart. Stop restores the actions, pose and frame range; no keys
+   are written.
 10. **Mint Axis Proof** — records the weight artifact with BLAKE3, the claim,
     origin, evidence, tick span, world digest, presenter, ticket and named checks
     (coverage, normalization, influence limit, bone map, binding, extra bones,

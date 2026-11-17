@@ -20,10 +20,12 @@ from pathlib import Path
 
 import bpy
 from bpy.types import Operator
+from mathutils import Matrix
 
 from . import clipops, core, jobs, parts, proofing, tailops
 
 _ACTIVE = None
+_PREVIEW = None
 
 
 class RigError(RuntimeError):
@@ -246,6 +248,218 @@ def apply_mapped_names(settings) -> dict:
         "bound": bound,
         "pairs": pairs,
     }
+
+
+def _preview_action(settings):
+    hero = settings.target_armature
+    action = getattr(settings, "hand_preview_action", None) or settings.compare_action
+    if action is None and settings.clips:
+        index = max(0, min(int(settings.clip_index), len(settings.clips) - 1))
+        row = settings.clips[index]
+        action = bpy.data.actions.get(row.action) if row.action else None
+    if action is None and hero is not None and hero.animation_data is not None:
+        action = hero.animation_data.action
+    return action
+
+
+def _set_action(armature, action):
+    data = armature.animation_data or armature.animation_data_create()
+    data.action = action
+    if action is not None and hasattr(data, "action_slot") and getattr(action, "slots", None):
+        data.action_slot = action.slots[0]
+    return data
+
+
+def _frame(scene, _depsgraph=None):
+    session = _PREVIEW
+    if session is None:
+        return
+    try:
+        session.apply()
+    except Exception as error:
+        session.settings.hand_preview_note = f"Hand preview stopped at frame {scene.frame_current}: {error}"
+
+
+def _on_load(*_args) -> None:
+    """A loaded file owns new objects; do not keep a handler from the old one."""
+    global _PREVIEW
+    if _PREVIEW is not None:
+        try:
+            _PREVIEW.stop(restore=False)
+        except Exception:
+            pass
+        _PREVIEW = None
+
+
+class _HandPreview:
+    """Live action preview with in-memory hand nudges; no action is keyed."""
+
+    def __init__(self, settings, action):
+        self.settings = settings
+        self.scene = bpy.context.scene
+        self.hero = settings.target_armature
+        self.custom = settings.custom_armature
+        self.action = action
+        self.offsets: dict[str, list[tuple[bool, int, float]]] = {}
+        self._applying = False
+        self._custom_had_data = self.custom.animation_data is not None
+        self._hero_had_data = self.hero.animation_data is not None
+        self._custom_action = self.custom.animation_data.action if self._custom_had_data else None
+        self._custom_slot = (
+            getattr(self.custom.animation_data, "action_slot", None) if self._custom_had_data else None
+        )
+        self._hero_action = self.hero.animation_data.action if self._hero_had_data else None
+        self._hero_slot = getattr(self.hero.animation_data, "action_slot", None) if self._hero_had_data else None
+        self._hero_nla = self.hero.animation_data.use_nla if self._hero_had_data else False
+        self._custom_nla = self.custom.animation_data.use_nla if self._custom_had_data else False
+        self._pose = {
+            bone.name: (bone.rotation_mode, bone.matrix_basis.copy()) for bone in self.custom.pose.bones
+        }
+        self._pose_position = self.custom.data.pose_position
+        self._hero_pose_position = self.hero.data.pose_position
+        self._frame = self.scene.frame_current
+        self._range = (self.scene.frame_start, self.scene.frame_end)
+        start, end = (int(round(value)) for value in action.frame_range)
+        if end <= start:
+            raise RigError("hand-preview-empty-range: the action has no frame range")
+        try:
+            _set_action(self.hero, action)
+            self.hero.animation_data.use_nla = False
+            self.hero.data.pose_position = "POSE"
+            custom_data = self.custom.animation_data_create()
+            custom_data.action = None
+            custom_data.use_nla = False
+            self.custom.data.pose_position = "POSE"
+            self.scene.frame_start = start
+            self.scene.frame_end = end
+            if self.scene.frame_current < start or self.scene.frame_current > end:
+                self.scene.frame_set(start)
+            bpy.app.handlers.frame_change_post.append(_frame)
+        except Exception:
+            self.stop(restore=True)
+            raise
+
+    def apply(self):
+        if self._applying:
+            return
+        self._applying = True
+        try:
+            bpy.context.view_layer.update()
+            tailops.apply_retarget_pose(self.custom, self.hero)
+            for name, records in self.offsets.items():
+                bone = self.custom.pose.bones.get(name)
+                if bone is None:
+                    continue
+                basis = bone.matrix_basis.copy()
+                for rotate, axis, amount in records:
+                    if rotate:
+                        basis = basis @ Matrix.Rotation(amount, 4, "XYZ"[axis])
+                    else:
+                        basis.translation[axis] += amount
+                bone.matrix_basis = basis
+            bpy.context.view_layer.update()
+        finally:
+            self._applying = False
+
+    def nudge(self, bone_name: str, axis: int, amount: float, rotate: bool) -> None:
+        self.offsets.setdefault(bone_name, []).append((bool(rotate), int(axis), float(amount)))
+        self.apply()
+        jobs._tag_redraw()
+
+    def reset(self) -> None:
+        self.offsets.clear()
+        self.apply()
+        jobs._tag_redraw()
+
+    def stop(self, *, restore: bool = True) -> None:
+        global _PREVIEW
+        if _PREVIEW is self:
+            _PREVIEW = None
+        while _frame in bpy.app.handlers.frame_change_post:
+            bpy.app.handlers.frame_change_post.remove(_frame)
+        if restore:
+            self.scene.frame_start, self.scene.frame_end = self._range
+            if self._hero_had_data:
+                _set_action(self.hero, self._hero_action)
+                if self._hero_action is not None and hasattr(self.hero.animation_data, "action_slot"):
+                    self.hero.animation_data.action_slot = self._hero_slot
+                self.hero.animation_data.use_nla = self._hero_nla
+            else:
+                self.hero.animation_data_clear()
+            if self._custom_had_data:
+                _set_action(self.custom, self._custom_action)
+                if self._custom_action is not None and hasattr(self.custom.animation_data, "action_slot"):
+                    self.custom.animation_data.action_slot = self._custom_slot
+                self.custom.animation_data.use_nla = self._custom_nla
+            else:
+                self.custom.animation_data_clear()
+            self.custom.data.pose_position = self._pose_position
+            self.hero.data.pose_position = self._hero_pose_position
+            self.scene.frame_set(self._frame)
+            for name, (mode, basis) in self._pose.items():
+                bone = self.custom.pose.bones.get(name)
+                if bone is not None:
+                    bone.rotation_mode = mode
+                    bone.matrix_basis = basis
+            bpy.context.view_layer.update()
+        self.settings.hand_preview_active = False
+        self.settings.hand_preview_note = (
+            "Hand preview stopped; the action, pose and frame range were restored"
+            if restore
+            else "Hand preview stopped"
+        )
+        jobs._tag_redraw()
+
+
+def start_hand_preview(settings) -> str:
+    global _PREVIEW
+    if settings.job_running or _ACTIVE is not None:
+        raise RigError("hand-preview-job-running: wait for the current job before previewing")
+    if _PREVIEW is not None:
+        _PREVIEW.stop()
+    if settings.target_armature is None or settings.custom_armature is None:
+        raise RigError("hand-preview-needs-rigs: choose the hero and custom armatures")
+    if settings.target_armature == settings.custom_armature:
+        raise RigError("hand-preview-same-rig: the custom armature is already the target")
+    action = _preview_action(settings)
+    if action is None:
+        raise RigError("hand-preview-needs-action: choose or import a hero action")
+    _PREVIEW = _HandPreview(settings, action)
+    settings.hand_preview_active = True
+    settings.hand_preview_note = (
+        f"Previewing {action.name}; nudge the selected hand or finger row. No keys are written"
+    )
+    jobs._tag_redraw()
+    return action.name
+
+
+def stop_hand_preview(settings) -> bool:
+    if _PREVIEW is None:
+        settings.hand_preview_active = False
+        return False
+    _PREVIEW.stop()
+    return True
+
+
+def nudge_hand_preview(settings, bone_name: str, axis: int, amount: float, rotate: bool) -> bool:
+    if _PREVIEW is None:
+        return False
+    _PREVIEW.nudge(bone_name, axis, amount, rotate)
+    settings.hand_preview_note = (
+        f"Previewing {_PREVIEW.action.name}; nudged {bone_name} {settings.nudge_axis} "
+        f"{amount:+.4f}. No keys written"
+    )
+    jobs._tag_redraw()
+    return True
+
+
+def reset_hand_nudges(settings) -> bool:
+    if _PREVIEW is None:
+        return False
+    _PREVIEW.reset()
+    settings.hand_preview_note = "Hand preview nudges reset; no keys written"
+    jobs._tag_redraw()
+    return True
 
 
 def action_rows(settings) -> list[tuple[object, object]]:
@@ -493,6 +707,39 @@ class DMF_OT_use_mapped_names(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_preview_hands(Operator):
+    bl_idname = "dmf.preview_hands"
+    bl_label = "Preview Hands"
+    bl_description = "Play the chosen hero action on the custom rig without keying; nudge hands live, then stop to restore the pose"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            if _PREVIEW is not None:
+                stop_hand_preview(settings)
+                _status(settings, "Hand preview stopped; the pose and actions were restored", "OK")
+            else:
+                name = start_hand_preview(settings)
+                _status(settings, f"Hand preview running {name}; nudge the selected hand row", "OK")
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
+class DMF_OT_reset_hand_nudges(Operator):
+    bl_idname = "dmf.reset_hand_nudges"
+    bl_label = "Reset Hand Nudges"
+    bl_description = "Clear the in-memory nudge offsets in the hand preview; no action is changed"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        if not reset_hand_nudges(settings):
+            _status(settings, "Start the hand preview before resetting its nudges", "INFO")
+        return {"FINISHED"}
+
+
 class DMF_OT_bake_custom_rig(Operator):
     bl_idname = "dmf.bake_custom_rig"
     bl_label = "Bake Hero to Custom"
@@ -512,6 +759,8 @@ class DMF_OT_bake_custom_rig(Operator):
 
 CLASSES = (
     DMF_OT_use_mapped_names,
+    DMF_OT_preview_hands,
+    DMF_OT_reset_hand_nudges,
     DMF_OT_bake_custom_rig,
 )
 
@@ -519,10 +768,20 @@ CLASSES = (
 def register() -> None:
     for cls in CLASSES:
         bpy.utils.register_class(cls)
+    if _on_load not in bpy.app.handlers.load_post:
+        bpy.app.handlers.load_post.append(_on_load)
 
 
 def unregister() -> None:
-    global _ACTIVE
+    global _ACTIVE, _PREVIEW
+    if _on_load in bpy.app.handlers.load_post:
+        bpy.app.handlers.load_post.remove(_on_load)
+    if _PREVIEW is not None:
+        try:
+            _PREVIEW.stop()
+        except Exception:
+            pass
+        _PREVIEW = None
     if _ACTIVE is not None:
         try:
             bpy.app.timers.unregister(_ACTIVE._timer)
