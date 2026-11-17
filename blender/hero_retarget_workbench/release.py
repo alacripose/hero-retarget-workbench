@@ -45,7 +45,15 @@ def _hero_roots(settings) -> tuple[Path, Path]:
 
 
 def _vmdl(settings) -> Path:
-    _, hero = _hero_roots(settings)
+    extraction, hero = _hero_roots(settings)
+    chosen = Path(bpy.path.abspath(settings.vmdl)) if settings.vmdl else None
+    if chosen is not None and chosen.is_file():
+        try:
+            chosen.relative_to(extraction)
+        except ValueError:
+            pass
+        else:
+            return chosen
     found = sorted(hero.glob("*.vmdl"))
     if not found:
         raise ReleaseError("release-needs-vmdl: the hero folder carries no .vmdl")

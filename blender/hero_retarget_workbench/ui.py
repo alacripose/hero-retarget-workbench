@@ -60,6 +60,12 @@ def _hero_label(settings) -> str:
 
 
 def _hero_state(settings) -> str:
+    if settings.source_origin:
+        if not settings.body_dmx:
+            return "choose body"
+        if settings.target_body is None or settings.target_armature is None:
+            return "import needed"
+        return "imported"
     if not settings.build:
         return "not detected"
     if settings.hero_slug in ("", "NONE"):
@@ -359,6 +365,11 @@ class DMF_PT_setup(Panel):
             row = workspace.row(align=True)
             row.operator("dmf.open_project_folder", text="Open folder", icon="FILE_FOLDER")
             row.prop_enum(settings, "props_page", "MODS", text="Mods", icon="PACKAGE")
+            workspace.operator(
+                "dmf.use_project_source",
+                text="Use project as source",
+                icon="IMPORT",
+            ).enabled = not settings.job_running
         else:
             _hint(workspace, "No project open.", "QUESTION")
             workspace.prop_enum(settings, "props_page", "MODS", text="Open Mods", icon="PACKAGE")
@@ -382,6 +393,8 @@ class DMF_PT_source(Panel):
         ui_popit.job(layout, settings)
         hero = ui_popit.page(layout, settings, "Source", _hero_state(settings), "WORLD")
         _hero_picker(hero, settings)
+        if settings.source_origin:
+            ui_popit.stat(hero, "Source", settings.source_origin, "PACKAGE")
         ui_popit.glyphs(
             hero,
             ["dmf.detect", "dmf.extract"],
@@ -424,6 +437,8 @@ class DMF_PT_source_files(Panel):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
+        if settings.source_origin:
+            layout.label(text=f"Source: {settings.source_origin}", icon="PACKAGE")
         _path_row(layout, settings, "body_dmx", "Body DMX")
         _path_row(layout, settings, "vmdl", "Hero vmdl")
         layout.operator("dmf.pick_vmdl", text="Choose S2V vmdl", icon="FILEBROWSER")

@@ -19,7 +19,7 @@ from pathlib import Path
 from . import modeldoc
 from .fileio import copy_file, walk_files
 from .hashes import blake3_file
-from .live import Hero, LiveError, extract, hero_vmdl_path
+from .live import Hero, LiveError, body_for_hero_folder, extract, hero_vmdl_path
 from .paths import Environment
 from .stage import is_texture_asset, material_files
 
@@ -872,6 +872,89 @@ def add_component_mesh(
         "choice": merged.choice,
         "render_meshes": [item.name for item in modeldoc.render_mesh_files(merged.text)],
         "bodygroups": {group.name: list(group.meshes) for group in modeldoc.body_groups(merged.text)},
+    }
+
+
+def resolve_package_source(
+    env: Environment,
+    package: Path,
+    destination: Path,
+    *,
+    old_vmdl: str | Path | None = None,
+    hero: str = "",
+    matches=(),
+    timeout: int = 1800,
+) -> dict[str, object]:
+    """Resolve an old package as an editable Source-page file set.
+
+    This is the read-only counterpart to ``update_from_package``: it extracts a
+    VPK (a folder is used in place), resolves the package's own vmdl (decompiling
+    a compiled-only model when needed), and picks its body from the model's own
+    RenderMeshList.  Nothing is migrated, recompiled, or staged into a CSDK.
+    The caller receives the vmdl, body DMX and material root it can assign to the
+    same Source fields an S2V extraction fills.
+
+    A ``.blend`` is not a Source 2 package. A project that contains one is a
+    Blender scene, so the addon binds that scene directly instead of asking S2V
+    to treat the blend as a VPK.
+    """
+    package = Path(package).expanduser().resolve()
+    if package.suffix.lower() in (".blend", ".blend1"):
+        raise MigrationError(
+            f"old-source-is-blend: {package}; open the project and use its scene as the source"
+        )
+    if not package.exists():
+        raise MigrationError(f"old-package-missing: {package}")
+    destination = Path(destination).expanduser().resolve()
+    destination.mkdir(parents=True, exist_ok=True)
+    old_root = extract_package(env, package, destination / "package", timeout=timeout)
+    preferred = str(old_vmdl) if old_vmdl else None
+    source_path, source_info = resolve_old_model(
+        env,
+        old_root,
+        preferred=preferred,
+        hero=hero,
+        matches=matches,
+        destination=destination / "decompiled",
+        timeout=timeout,
+    )
+    assets_root = Path(source_info.get("assets_root") or old_root).resolve()
+    if not assets_root.is_dir():
+        assets_root = old_root.resolve()
+    dmx_files = sorted(path for path in assets_root.rglob("*.dmx") if path.is_file())
+    body = body_for_hero_folder(source_path, dmx_files) if dmx_files else None
+    materials = material_files(assets_root)
+    materials_root = assets_root
+    if source_info.get("kind") == "compiled":
+        old_materials = material_files(old_root)
+        if old_materials:
+            # A compiled-only package's materials stay in the package. S2V's
+            # decompile writes the vmdl and its DMX references, not the old
+            # vmat/vtex assets, so pointing the Source page at the decompile
+            # root alone would silently drop the materials the mod shipped.
+            materials = old_materials
+            materials_root = old_root
+    try:
+        vmdl_relative = source_path.relative_to(assets_root).as_posix()
+    except ValueError:
+        vmdl_relative = source_path.name
+    body_relative = ""
+    if body is not None:
+        try:
+            body_relative = body.relative_to(assets_root).as_posix()
+        except ValueError:
+            body_relative = body.name
+    return {
+        "package": str(package),
+        "root": str(assets_root),
+        "vmdl": str(source_path),
+        "vmdl_relative": vmdl_relative,
+        "body_dmx": str(body) if body is not None else "",
+        "body_relative": body_relative,
+        "materials_dir": str(materials_root) if materials else "",
+        "material_count": len(materials),
+        "dmx_count": len(dmx_files),
+        "source": source_info,
     }
 
 

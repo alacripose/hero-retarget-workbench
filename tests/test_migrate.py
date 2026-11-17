@@ -12,6 +12,7 @@ from forge.migrate import (
     migrate_trees,
     model_file_diff,
     model_node_diff,
+    resolve_package_source,
     resolve_old_model,
     update_from_package,
 )
@@ -388,6 +389,64 @@ class MigrationTests(unittest.TestCase):
         )
         manifest = json.loads(result.manifest.read_text(encoding="utf-8"))
         self.assertTrue(manifest["old_assets"])
+
+    def test_package_source_fills_the_source_page_without_migrating(self):
+        result = resolve_package_source(
+            Environment(s2v=Path("s2v.exe")),
+            self.old,
+            self.root / "source-read",
+        )
+
+        self.assertEqual(Path(result["vmdl"]).resolve(), (self.old / "models/test/hero.vmdl").resolve())
+        self.assertEqual(Path(result["body_dmx"]).resolve(), (self.old / RENDER).resolve())
+        self.assertEqual(result["vmdl_relative"], "models/test/hero.vmdl")
+        self.assertEqual(result["body_relative"], RENDER)
+        self.assertEqual(result["material_count"], 1)
+        self.assertEqual(Path(result["materials_dir"]).resolve(), self.old.resolve())
+        self.assertFalse((self.root / "source-read/content").exists())
+
+    def test_package_source_decompiles_a_compiled_only_package(self):
+        old = self.root / "source-compiled"
+        compiled = old / "models/test/hero.vmdl_c"
+        compiled.parent.mkdir(parents=True)
+        compiled.write_bytes(b"compiled model bytes")
+        material = old / "models/test/materials/body.vmat_c"
+        material.parent.mkdir(parents=True)
+        material.write_bytes(b"old compiled material")
+        destination = self.root / "source-compiled-read"
+
+        def fake_run(command, **_kwargs):
+            output = Path(command[command.index("-o") + 1])
+            vmdl = output / "models/test/hero.vmdl"
+            vmdl.parent.mkdir(parents=True, exist_ok=True)
+            vmdl.write_text(document(), encoding="utf-8")
+            (output / RENDER).write_bytes(b"old custom dmx")
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+        with mock.patch("forge.migrate.subprocess.run", side_effect=fake_run):
+            result = resolve_package_source(
+                Environment(s2v=Path("s2v.exe")),
+                old,
+                destination,
+                old_vmdl="models/test/hero.vmdl_c",
+            )
+
+        decompiled = destination / "decompiled"
+        self.assertEqual(Path(result["root"]).resolve(), decompiled.resolve())
+        self.assertEqual(Path(result["vmdl"]).resolve(), (decompiled / "models/test/hero.vmdl").resolve())
+        self.assertEqual(Path(result["body_dmx"]).resolve(), (decompiled / RENDER).resolve())
+        self.assertEqual(Path(result["materials_dir"]).resolve(), old.resolve())
+        self.assertEqual(result["material_count"], 1)
+        self.assertEqual(result["source"]["kind"], "compiled")
+
+    def test_package_source_refuses_a_blend_as_a_source_2_package(self):
+        blend = self.root / "project.blend"
+        blend.write_bytes(b"blend")
+
+        with self.assertRaises(MigrationError) as raised:
+            resolve_package_source(Environment(), blend, self.root / "blend-source")
+
+        self.assertIn("old-source-is-blend", str(raised.exception))
 
 
 if __name__ == "__main__":

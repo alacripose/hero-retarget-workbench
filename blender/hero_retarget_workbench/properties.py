@@ -700,6 +700,23 @@ class DMF_Settings(PropertyGroup):
         subtype="FILE_PATH",
         default="",
     )
+    source_origin: StringProperty(
+        name="Source origin",
+        description="The old package or scene the current Source files came from",
+        default="",
+    )
+    mod_source_package: StringProperty(
+        name="Source package",
+        description="Folder, VPK or blend the active project was created from",
+        default="",
+    )
+    mod_source_addon: StringProperty(name="Source addon", default="")
+    mod_source_kind: StringProperty(name="Source kind", default="")
+    mod_source_vmdl: StringProperty(
+        name="Source model",
+        description="The vmdl path the project uses when it is read as a Source-page package",
+        default="",
+    )
     deadlock_root: StringProperty(
         name="Deadlock install",
         description="The Steam Deadlock folder that contains game/citadel/gameinfo.gi; saved with this .blend",

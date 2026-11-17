@@ -379,6 +379,7 @@ class DMF_OT_extract(Operator):
                 elif previous_model and previous_model != hero.model_path:
                     settings.materials_dir = ""
                 settings.material_count = len(result.material_files)
+                settings.source_origin = f"live {hero.title}"
                 if result.vmdl:
                     _status(settings, f"Extracted {hero.title}; the vmdl is unchanged", "OK")
                 else:
@@ -481,10 +482,18 @@ class DMF_OT_import_hero(Operator):
             f"{path.parent.name} imported; pair its tail bones to the chosen tail rig"
         )
         if settings.extraction_dir:
+            # A source read from an old package already carries the logical path
+            # its own vmdl uses. Do not replace it with the live hero's folder
+            # just because a live hero is still selected.
+            fallback = settings.target_dmx_relative or (
+                f"{Path(settings.hero_model_path).parent.as_posix()}/{path.name}"
+                if settings.hero_model_path
+                else f"models/heroes_staging/{settings.hero_slug or 'hero'}/{path.name}"
+            )
             settings.target_dmx_relative = _logical_relative(
                 path,
                 Path(bpy.path.abspath(settings.extraction_dir)),
-                f"{Path(settings.hero_model_path).parent.as_posix()}/{path.name}" if settings.hero_model_path else f"models/heroes_staging/{settings.hero_slug or 'hero'}/{path.name}",
+                fallback,
             )
         context.view_layer.objects.active = arm
         proofing.bump_tick(settings)
@@ -1654,6 +1663,7 @@ class DMF_OT_pick_vmdl(Operator):
         settings = context.scene.dmf
         path = Path(bpy.path.abspath(self.filepath))
         settings.vmdl = str(path)
+        settings.source_origin = f"vmdl {path.name}"
         if settings.extraction_dir:
             settings.vmdl_relative = _logical_relative(
                 path,

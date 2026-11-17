@@ -383,6 +383,180 @@ def _selected_nodes(settings) -> list[str] | None:
     return [item.name for item in settings.mod_nodes if item.selected]
 
 
+def _source_slug(value: str) -> str:
+    slug = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in (value or "mod").strip())
+    return "_".join(part for part in slug.split("_") if part) or "mod"
+
+
+def _scene_source(settings, context) -> dict[str, str]:
+    """Bind the current Blender scene as the custom model source.
+
+    A project opened from a mod's own .blend is already a Blender scene; asking
+    S2V to extract that .blend would be a category error. The largest mesh is
+    the same choice the DMX importer makes, and its armature is the rig the
+    Source page's custom-model fields expect.
+    """
+    meshes = [obj for obj in context.scene.objects if obj.type == "MESH"]
+    if not meshes:
+        raise RuntimeError("mod-source-scene-empty: the open project carries no mesh")
+    mesh = max(meshes, key=lambda obj: len(obj.data.vertices))
+    armature = mesh.find_armature()
+    if armature is None and mesh.parent is not None and mesh.parent.type == "ARMATURE":
+        armature = mesh.parent
+    settings.custom_mesh = mesh
+    settings.custom_armature = armature
+    settings.custom_name = mesh.name
+    project = Path(settings.project_file).name if settings.project_file else "open scene"
+    settings.source_origin = f"project {project}"
+    settings.mod_source_kind = "blend"
+    return {
+        "origin": settings.source_origin,
+        "mesh": mesh.name,
+        "armature": armature.name if armature is not None else "no rig",
+    }
+
+
+def _start_package_source(settings, context, package: Path, row=None) -> bool:
+    """Fill the Source page from a package without updating it to the live hero."""
+    package = _abspath(str(package))
+    if not package.exists():
+        raise RuntimeError(f"old-package-missing: {package}")
+    if package.suffix.lower() in (".blend", ".blend1"):
+        current = _abspath(settings.project_file).resolve() if settings.project_file else None
+        if current is not None and current == package.resolve():
+            result = _scene_source(settings, context)
+            core.set_status(
+                settings,
+                f"Using {result['origin']} as source: {result['mesh']} with {result['armature']}",
+                "OK",
+            )
+            return True
+        raise RuntimeError(
+            f"old-source-is-blend: {package}; open the project, then use Use project as source"
+        )
+    module = core.core(settings)
+    env = core.detect_environment(settings, module)
+    name = (getattr(row, "addon", "") if row is not None else "") or package.stem
+    hero = (getattr(row, "hero", "") if row is not None else "").split(",")[0].strip()
+    preferred = (
+        _mod_vmdl(row) if row is not None else settings.mod_source_vmdl or settings.update_old_vmdl
+    )
+    matches = _mod_matches(settings, row) if row is not None else []
+    kind = getattr(row, "kind", "") if row is not None else package.suffix.lower().lstrip(".")
+    destination = _workspace(settings) / "sources" / _source_slug(name)
+
+    def work(progress):
+        progress.stage("package", "Read package", 0.08, f"reading {package.name}")
+        progress(0.2, "extracting the old package")
+        result = module["migrate"].resolve_package_source(
+            env,
+            package,
+            destination,
+            old_vmdl=preferred or None,
+            hero=hero,
+            matches=matches,
+        )
+        progress.stage("package", "Read package", 1.0, "package read", "DONE")
+        progress.stage(
+            "model",
+            "Resolve model",
+            1.0,
+            f"{Path(result['vmdl']).name}, {result['material_count']} material assets",
+            "DONE",
+        )
+        return result
+
+    def done(result):
+        root = result["root"]
+        material_root = result["materials_dir"] or root
+        settings.extraction_dir = root
+        settings.vmdl = result["vmdl"]
+        settings.vmdl_relative = result["vmdl_relative"]
+        settings.body_dmx = result["body_dmx"]
+        settings.target_dmx_relative = result["body_relative"]
+        settings.materials_dir = material_root
+        settings.custom_materials_dir = material_root
+        settings.old_vpk = str(package)
+        settings.update_old_vmdl = result["vmdl"]
+        settings.mod_source_package = str(package)
+        settings.mod_source_addon = name
+        settings.mod_source_kind = kind
+        settings.mod_source_vmdl = preferred or result["vmdl_relative"]
+        settings.source_origin = f"old mod {name}"
+        if result["body_dmx"]:
+            core.set_status(
+                settings,
+                f"Using {name} as source: {Path(result['vmdl']).name}, body {Path(result['body_dmx']).name}, "
+                f"{result['material_count']} material assets. Source page points at this package.",
+                "OK",
+            )
+        else:
+            core.set_status(
+                settings,
+                f"Using {name} as source: {Path(result['vmdl']).name} and {result['material_count']} material assets; "
+                "the model named no body DMX, so choose one in Source > Files.",
+                "WARN",
+            )
+
+    if not _start(settings, f"Reading {name} as source", work, done, "Source read failed"):
+        return False
+    core.set_status(settings, f"Reading {name} as a Source-page file set", "BUSY")
+    return True
+
+
+class DMF_OT_use_mod_source(Operator):
+    bl_idname = "dmf.use_mod_source"
+    bl_label = "Use mod as source"
+    bl_description = "Read the selected old package as a Source-page model, body and material set without updating it to the live hero"
+
+    def execute(self, context):
+        settings = _settings(context)
+        row = _selected_mod(settings)
+        package = None
+        if row is not None:
+            package = Path(row.path)
+        elif settings.mod_source_package:
+            package = Path(settings.mod_source_package)
+        if package is None:
+            self.report({"ERROR"}, "Select a package or create a project from one first")
+            return {"CANCELLED"}
+        try:
+            started = _start_package_source(settings, context, package, row)
+        except Exception as error:
+            core.set_status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"} if started else {"CANCELLED"}
+
+
+class DMF_OT_use_project_source(Operator):
+    bl_idname = "dmf.use_project_source"
+    bl_label = "Use project as source"
+    bl_description = "Use the package the active project was created from, or the open Blender scene, as the Source-page model"
+
+    def execute(self, context):
+        settings = _settings(context)
+        package = Path(settings.mod_source_package) if settings.mod_source_package else None
+        try:
+            if package is not None and not package.exists():
+                raise RuntimeError(f"mod-source-package-missing: {package}")
+            if package is not None and package.suffix.lower() not in (".blend", ".blend1"):
+                started = _start_package_source(settings, context, package)
+            else:
+                result = _scene_source(settings, context)
+                core.set_status(
+                    settings,
+                    f"Using {result['origin']} as source: {result['mesh']} with {result['armature']}",
+                    "OK",
+                )
+                started = True
+        except Exception as error:
+            core.set_status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"} if started else {"CANCELLED"}
+
+
 class DMF_OT_analyze_mod(Operator):
     bl_idname = "dmf.analyze_mod"
     bl_label = "Analyze package"
@@ -681,6 +855,10 @@ class DMF_OT_create_mod_project(Operator):
             opened = _settings(context)
             opened.project_root = str(blend.parent)
             opened.project_file = str(blend)
+            opened.mod_source_package = str(blend)
+            opened.mod_source_addon = blend.stem
+            opened.mod_source_kind = "blend"
+            opened.mod_source_vmdl = ""
             core.set_status(opened, f"Opened project {blend.name}", "OK")
             return {"FINISHED"}
 
@@ -693,13 +871,33 @@ class DMF_OT_create_mod_project(Operator):
             suffix += 1
         # Set the fields before saving the copy, so reopening the project keeps
         # its own active-project card instead of reverting to no project.
-        previous = (settings.project_root, settings.project_file)
+        previous = (
+            settings.project_root,
+            settings.project_file,
+            settings.mod_source_package,
+            settings.mod_source_addon,
+            settings.mod_source_kind,
+            settings.mod_source_vmdl,
+        )
         settings.project_root = str(base)
         settings.project_file = str(target)
+        # Remember the package the project came from. Reopening this .blend and
+        # pressing Use project as source then reads the same package again.
+        settings.mod_source_package = str(_abspath(row.path))
+        settings.mod_source_addon = row.addon or Path(row.path).stem
+        settings.mod_source_kind = row.kind
+        settings.mod_source_vmdl = _mod_vmdl(row)
         try:
             bpy.ops.wm.save_as_mainfile(filepath=str(target), copy=True)
         except RuntimeError as error:
-            settings.project_root, settings.project_file = previous
+            (
+                settings.project_root,
+                settings.project_file,
+                settings.mod_source_package,
+                settings.mod_source_addon,
+                settings.mod_source_kind,
+                settings.mod_source_vmdl,
+            ) = previous
             core.set_status(settings, f"Could not create {target.name}: {error}", "ERROR")
             return {"CANCELLED"}
         core.set_status(settings, f"Created project {target.name} in {base}", "OK")
@@ -1090,6 +1288,8 @@ CLASSES = (
     DMF_OT_remove_scan_root,
     DMF_OT_scan_mods,
     DMF_OT_analyze_mod,
+    DMF_OT_use_mod_source,
+    DMF_OT_use_project_source,
     DMF_OT_port_mod,
     DMF_OT_backport_mod,
     DMF_OT_create_mod_project,
