@@ -179,7 +179,7 @@ class BackportBuildTests(unittest.TestCase):
         self.assertEqual(
             captured["vmdl_relative"], "models/heroes_wip/doorman_v2/doorman.vmdl"
         )
-        self.assertEqual(captured["old_vmdl"], old_model)
+        self.assertEqual(captured["old_vmdl"].resolve(), old_model.resolve())
         data = json.loads(Path(result.manifest).read_text(encoding="utf-8"))
         self.assertFalse(data["backport_exact_model"])
         self.assertEqual(Path(data["backport_client_vpk"]).resolve(), vpk.resolve())
