@@ -20,7 +20,9 @@ from pathlib import Path
 
 import bpy
 from bpy.types import Operator
-from mathutils import Matrix
+from mathutils import Matrix, Vector
+
+from forge import rigmap
 
 from . import clipops, core, jobs, parts, proofing, tailops
 
@@ -805,6 +807,166 @@ class DMF_OT_reset_hand_nudges(Operator):
         return {"FINISHED"}
 
 
+def _hierarchy_pairs(settings, custom, hero) -> dict[str, str]:
+    """Mapped source -> hero target, plus exact-name matches the map missed."""
+    pairs: dict[str, str] = {}
+    owners: dict[str, str] = {}
+    for row in settings.bone_map:
+        if row.state != "MAPPED":
+            continue
+        source = (row.source or "").strip()
+        target = (row.target or "").strip()
+        if not source or not target:
+            continue
+        if source not in custom.data.bones or target not in hero.data.bones:
+            continue
+        prior = owners.get(target)
+        if prior is not None and prior != source:
+            raise RigError(
+                f"hierarchy-copy-collision: {target} is mapped from {prior} and {source}"
+            )
+        pairs[source] = target
+        owners[target] = source
+    used_targets = set(pairs.values())
+    for bone in custom.data.bones:
+        if (
+            bone.name in hero.data.bones
+            and bone.name not in pairs
+            and bone.name not in used_targets
+        ):
+            pairs[bone.name] = bone.name
+            used_targets.add(bone.name)
+    return pairs
+
+
+def _unique_object_name(base: str) -> str:
+    name = base
+    index = 1
+    while bpy.data.objects.get(name) is not None:
+        name = f"{base}.{index:03d}"
+        index += 1
+    return name
+
+
+def duplicate_hero_hierarchy(settings) -> dict:
+    """Copy the custom rest rig onto the hero parent tree and rebind the mesh.
+
+    Bone names, rest heads/tails/rolls, the pose and the mesh's vertex groups
+    stay exactly as they are, so the existing weights drive the copy without a
+    rename.  Only the parent edges change: a mapped bone sits under the custom
+    bone that maps to its hero parent's nearest mapped ancestor.  The original
+    armature is left untouched.
+    """
+    custom = settings.custom_armature
+    hero = settings.target_armature
+    if custom is None or custom.type != "ARMATURE":
+        raise RigError("hierarchy-copy-needs-custom: choose the custom model's armature")
+    if hero is None or hero.type != "ARMATURE":
+        raise RigError("hierarchy-copy-needs-hero: import the hero skeleton first")
+    if custom == hero:
+        raise RigError("hierarchy-copy-same-rig: choose the custom model's armature, not the hero rig")
+    pairs = _hierarchy_pairs(settings, custom, hero)
+    if not pairs:
+        raise RigError("hierarchy-copy-needs-map: map at least one custom bone to a hero bone")
+    source_parents = {
+        bone.name: (bone.parent.name if bone.parent else None) for bone in custom.data.bones
+    }
+    hero_parents = {
+        bone.name: (bone.parent.name if bone.parent else None) for bone in hero.data.bones
+    }
+    planned = rigmap.hero_tree(source_parents, hero_parents, pairs)
+
+    if custom.mode != "OBJECT":
+        bpy.context.view_layer.objects.active = custom
+        bpy.ops.object.mode_set(mode="OBJECT")
+
+    name = _unique_object_name(f"{custom.name} hero hierarchy")
+    data = bpy.data.armatures.new(name)
+    copy = bpy.data.objects.new(name, data)
+    copy.matrix_world = custom.matrix_world.copy()
+    collection = custom.users_collection[0] if custom.users_collection else bpy.context.scene.collection
+    collection.objects.link(copy)
+    copy["dmf_source_rig"] = custom.name
+    copy["dmf_hero_rig"] = hero.name
+
+    core.select_only(bpy.context, [copy])
+    bpy.context.view_layer.objects.active = copy
+    bpy.ops.object.mode_set(mode="EDIT")
+    try:
+        for bone in custom.data.bones:
+            edit = data.edit_bones.new(bone.name)
+            edit.head = bone.head_local
+            edit.tail = bone.tail_local
+            edit.align_roll(bone.matrix_local.to_3x3() @ Vector((0.0, 0.0, 1.0)))
+            edit.use_deform = bone.use_deform
+            for attribute in ("inherit_scale", "use_inherit_rotation"):
+                if hasattr(bone, attribute) and hasattr(edit, attribute):
+                    setattr(edit, attribute, getattr(bone, attribute))
+        for source, parent in planned.items():
+            edit = data.edit_bones.get(source)
+            if edit is None:
+                continue
+            edit.parent = data.edit_bones.get(parent) if parent else None
+            edit.use_connect = False
+    finally:
+        bpy.ops.object.mode_set(mode="OBJECT")
+
+    data.pose_position = custom.data.pose_position
+    copy.show_in_front = custom.show_in_front
+    copy.display_type = custom.display_type
+    for pose in copy.pose.bones:
+        source = custom.pose.bones.get(pose.name)
+        if source is None:
+            continue
+        pose.rotation_mode = source.rotation_mode
+        pose.matrix_basis = source.matrix_basis.copy()
+    bpy.context.view_layer.update()
+
+    settings.custom_armature = copy
+    meshes = _custom_meshes(settings)
+    for mesh in meshes:
+        if mesh.parent == custom:
+            world = mesh.matrix_world.copy()
+            mesh.parent = copy
+            mesh.matrix_parent_inverse = copy.matrix_world.inverted()
+            mesh.matrix_world = world
+    bound = _bind_custom(settings, meshes)
+    proofing.bump_tick(settings)
+    return {
+        "rig": copy.name,
+        "bones": len(copy.data.bones),
+        "mapped": len(pairs),
+        "meshes": len(meshes),
+        "bound": bound,
+        "parents": sum(1 for value in planned.values() if value),
+    }
+
+
+class DMF_OT_hero_hierarchy_rig(Operator):
+    bl_idname = "dmf.hero_hierarchy_rig"
+    bl_label = "Hero Hierarchy Rig"
+    bl_description = (
+        "Duplicate the custom armature with the hero's parent tree, keep its rest "
+        "bones and pose, and bind the custom mesh to the copy"
+    )
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        try:
+            result = duplicate_hero_hierarchy(settings)
+            _status(
+                settings,
+                f"{result['rig']}: {result['bones']} bones on the hero tree, "
+                f"{result['mapped']} mapped, {result['bound']} meshes rebound",
+                "OK",
+            )
+        except Exception as error:
+            _status(settings, str(error), "ERROR")
+            self.report({"ERROR"}, str(error))
+            return {"CANCELLED"}
+        return {"FINISHED"}
+
+
 class DMF_OT_bake_custom_rig(Operator):
     bl_idname = "dmf.bake_custom_rig"
     bl_label = "Bake Hero to Custom"
@@ -827,6 +989,7 @@ CLASSES = (
     DMF_OT_chain_overlay,
     DMF_OT_preview_hands,
     DMF_OT_reset_hand_nudges,
+    DMF_OT_hero_hierarchy_rig,
     DMF_OT_bake_custom_rig,
 )
 

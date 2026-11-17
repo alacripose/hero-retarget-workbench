@@ -139,3 +139,54 @@ def chain(placed: dict[str, Placed], name: str) -> list[str]:
 def children(placed: dict[str, Placed], name: str) -> list[str]:
     """Direct children of a bone, in layout order."""
     return [item.name for item in placed.values() if item.parent == name]
+
+
+def hero_tree(
+    source_parents: dict[str, str | None],
+    hero_parents: dict[str, str | None],
+    pairs: dict[str, str],
+) -> dict[str, str | None]:
+    """Parent custom bones the way the hero parents their mapped targets.
+
+    ``pairs`` maps custom source -> hero target.  A mapped source's parent is
+    the custom source of the nearest mapped ancestor of its hero target.  An
+    unmapped source keeps its own parent, so extra bones still follow the part
+    of the custom rig they belong to.  A parent that would close a cycle is
+    dropped to ``None``: Blender must never be handed an invalid bone tree.
+    """
+    reverse: dict[str, str] = {}
+    for source, target in pairs.items():
+        if source in source_parents and target and target not in reverse:
+            reverse[target] = source
+
+    planned: dict[str, str | None] = {}
+    for source, original in source_parents.items():
+        target = pairs.get(source)
+        parent = original if original in source_parents else None
+        if target is not None:
+            ancestor = hero_parents.get(target)
+            seen: set[str] = set()
+            parent = None
+            while ancestor and ancestor not in seen:
+                seen.add(ancestor)
+                candidate = reverse.get(ancestor)
+                if candidate is not None and candidate != source:
+                    parent = candidate
+                    break
+                ancestor = hero_parents.get(ancestor)
+        planned[source] = parent
+
+    # The two rigs can disagree about the tree, which can place a mapped bone
+    # under its own descendant.  Cut the edge that revisits the current walk.
+    checked: set[str] = set()
+    for start in planned:
+        path: list[str] = []
+        current: str | None = start
+        while current is not None and current not in checked:
+            if current in path:
+                planned[current] = None
+                break
+            path.append(current)
+            current = planned.get(current)
+        checked.update(path)
+    return planned

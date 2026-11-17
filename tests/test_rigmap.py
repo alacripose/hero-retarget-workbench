@@ -85,6 +85,59 @@ class LayoutTest(unittest.TestCase):
         self.assertAlmostEqual(side, 0.0, places=6)
 
 
+class HeroTreeTest(unittest.TestCase):
+    def test_mapped_bone_follows_the_hero_parent(self):
+        sources = {
+            "root": None,
+            "custom_arm": "root",
+            "custom_hand": "root",
+            "custom_finger": "custom_hand",
+        }
+        heroes = {
+            "root_motion": None,
+            "pelvis": "root_motion",
+            "arm_lower_L": "pelvis",
+            "hand_L": "arm_lower_L",
+            "finger_index_0_L": "hand_L",
+        }
+        pairs = {
+            "root": "pelvis",
+            "custom_arm": "arm_lower_L",
+            "custom_hand": "hand_L",
+            "custom_finger": "finger_index_0_L",
+        }
+        planned = rigmap.hero_tree(sources, heroes, pairs)
+        self.assertEqual(planned["custom_arm"], "root")
+        self.assertEqual(planned["custom_hand"], "custom_arm")
+        self.assertEqual(planned["custom_finger"], "custom_hand")
+        self.assertNotEqual(planned["custom_hand"], "root")
+
+    def test_unmapped_bone_keeps_its_own_parent(self):
+        planned = rigmap.hero_tree(
+            {"root": None, "extra": "root", "hand": "root"},
+            {"root": None, "hand": "root"},
+            {"hand": "hand"},
+        )
+        self.assertEqual(planned["extra"], "root")
+
+    def test_a_disagreeing_tree_is_broken_rather_than_cycled(self):
+        planned = rigmap.hero_tree(
+            {"a": "b", "b": "a"},
+            {"h1": "h2", "h2": "h1"},
+            {"a": "h1", "b": "h2"},
+        )
+        self.assertIsNone(planned["a"])
+        self.assertEqual(planned["b"], "a")
+
+    def test_root_stays_root_when_the_hero_ancestors_are_unmapped(self):
+        planned = rigmap.hero_tree(
+            {"hand": None},
+            {"pelvis": None, "spine": "pelvis", "hand": "spine"},
+            {"hand": "hand"},
+        )
+        self.assertIsNone(planned["hand"])
+
+
 class NearestTest(unittest.TestCase):
     def test_picks_the_closest_head_inside_the_limit(self):
         placed = rigmap.layout(SPINE, "FRONT", (0.0, 0.0, 400.0, 400.0))
