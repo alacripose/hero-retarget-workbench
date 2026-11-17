@@ -1,6 +1,7 @@
 """Bridge between Blender settings and the forge core."""
 from __future__ import annotations
 
+import json
 import os
 import sys
 from pathlib import Path
@@ -151,6 +152,121 @@ def csdk_addon_folder(settings) -> Path | None:
     if root is None or not name or "/" in name or "\\" in name:
         return None
     return root / "content" / "citadel_addons" / name
+
+
+def bind_staged_source(
+    settings,
+    installed: str | Path,
+    *,
+    addon: str = "",
+    package: str | Path | None = None,
+    kind: str = "addon",
+    label: str = "",
+    stage_root: str | Path | None = None,
+) -> dict[str, str]:
+    """Point the Source page at a staged addon instead of the live extraction.
+
+    A staged old mod is a normal content tree: its vmdl, body DMX, compiled
+    materials, and recovered source materials all live below one CSDK content
+    folder.  Binding those fields is what lets Import, Build LODs, Export &
+    stage, and Compile run on it without a separate old-mod path.
+    """
+    installed = Path(installed).resolve()
+    manifest_path = installed / "stage.json"
+    manifest: dict = {}
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        manifest = {}
+
+    relative = str(manifest.get("vmdl") or "").replace("\\", "/").strip("/")
+    vmdl = installed / relative if relative else None
+    if vmdl is None or not vmdl.is_file():
+        candidates = sorted(
+            path for path in installed.rglob("*.vmdl") if path.is_file()
+        )
+        if not candidates:
+            raise RuntimeError(f"staged-source-has-no-vmdl: {installed}")
+        vmdl = candidates[0]
+    try:
+        relative = vmdl.relative_to(installed).as_posix()
+    except ValueError:
+        raise RuntimeError(f"staged-source-vmdl-outside-addon: {vmdl}") from None
+
+    module = core(settings)
+    dmx = sorted(path for path in installed.rglob("*.dmx") if path.is_file())
+    body = None
+    try:
+        body = module["live"].body_for_hero_folder(vmdl, dmx) if dmx else None
+    except Exception:
+        body = None
+    if body is None:
+        candidates = []
+        for entry in manifest.get("model_files") or ():
+            candidate = installed / str(entry).replace("\\", "/")
+            if candidate.is_file():
+                candidates.append(candidate)
+        if candidates:
+            body = max(candidates, key=lambda path: path.stat().st_size)
+
+    # The staged body is the old model to edit; the live body is the skeleton
+    # and body-group target.  Import Hero must load the live body, or the old
+    # decompiled skeleton becomes the target and the live matchmaking groups
+    # are lost.  The old body goes into the custom-model field instead.
+    live_body = None
+    live_root = Path(str(manifest.get("new_root") or "")) if manifest.get("new_root") else None
+    live_vmdl_relative = str(manifest.get("new_vmdl") or "").replace("\\", "/")
+    if live_root is not None and live_vmdl_relative:
+        live_vmdl = live_root / live_vmdl_relative
+        if live_vmdl.is_file():
+            live_dmx = sorted(live_vmdl.parent.glob("*.dmx"))
+            try:
+                live_body = module["live"].body_for_hero_folder(live_vmdl, live_dmx) if live_dmx else None
+            except Exception:
+                live_body = None
+
+    settings.extraction_dir = str(installed)
+    settings.vmdl = str(vmdl)
+    settings.vmdl_relative = relative
+    settings.materials_dir = str(installed)
+    settings.custom_materials_dir = str(installed)
+    if stage_root is not None:
+        settings.stage_dir = str(stage_root)
+    if addon or manifest.get("addon"):
+        settings.addon_name = addon or str(manifest.get("addon"))
+    if body is not None:
+        settings.custom_model = str(body)
+        try:
+            settings.target_dmx_relative = body.relative_to(installed).as_posix()
+        except ValueError:
+            settings.target_dmx_relative = body.name
+        settings.body_dmx = str(live_body if live_body is not None else body)
+    else:
+        settings.body_dmx = ""
+        settings.custom_model = ""
+        settings.target_dmx_relative = ""
+    # A staged old model is a new source.  The LOD slots are replaced from the
+    # current custom collection, not from the previous source's built LODs.
+    settings.generate_lods = True
+    settings.lod_count = 0
+    settings.live_lods = False
+    if package is not None:
+        settings.old_vpk = str(package)
+        settings.mod_source_package = str(package)
+    if addon:
+        settings.mod_source_addon = addon
+    settings.mod_source_kind = kind or "addon"
+    settings.source_origin = label or f"staged {settings.addon_name or installed.name}"
+    settings.material_count = int(manifest.get("materials") or 0) + int(
+        manifest.get("material_sources") or 0
+    )
+    return {
+        "vmdl": str(vmdl),
+        "vmdl_relative": relative,
+        "body_dmx": str(body) if body is not None else "",
+        "model_file": str(body) if body is not None else "",
+        "live_body_dmx": str(live_body) if live_body is not None else "",
+    }
 
 
 def _steam_build(root) -> str:

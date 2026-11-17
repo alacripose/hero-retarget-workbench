@@ -864,10 +864,16 @@ def _join_export_parts(context, settings, collection, source_parts, armature):
     for _, duplicate in duplicates:
         duplicate.select_set(True)
     context.view_layer.objects.active = active
-    result = bpy.ops.object.join()
-    if "FINISHED" not in result:
-        raise RuntimeError("Blender could not join the custom parts for export")
-    joined = context.view_layer.objects.active
+    if len(duplicates) == 1:
+        # A single-part model (a decompiled old body is often one mesh) has
+        # nothing to join.  Blender 5.4 refuses a one-object join, so use the
+        # duplicate directly instead of failing the whole export.
+        joined = active
+    else:
+        result = bpy.ops.object.join()
+        if "FINISHED" not in result:
+            raise RuntimeError("Blender could not join the custom parts for export")
+        joined = context.view_layer.objects.active
     joined.name = "DMF joined export"
     if not any(
         modifier.type == "ARMATURE" and modifier.object is armature
@@ -952,6 +958,24 @@ def clear_lods(settings) -> int:
     return removed
 
 
+def target_lod_count(settings) -> int:
+    """How many LOD slots the staged model's own vmdl already has.
+
+    Export replaces those slots by relative path.  Building three LODs for a
+    two-slot hero makes stage refuse the count mismatch, so the build uses the
+    same slot count the export uses instead of a fixed three.
+    """
+    extraction = Path(bpy.path.abspath(settings.extraction_dir)) if settings.extraction_dir else None
+    relative = (settings.target_dmx_relative or "").strip()
+    if extraction is None or not extraction.is_dir() or not relative:
+        return 0
+    try:
+        module = core.core(settings)
+        return len(module["stage"].target_lod_relatives(extraction, relative))
+    except Exception:
+        return 0
+
+
 def build_lods(context, settings) -> list[tuple[int, int]]:
     """Build the LOD meshes once and keep them in the file.
 
@@ -965,7 +989,7 @@ def build_lods(context, settings) -> list[tuple[int, int]]:
     armature = settings.target_armature
     if armature is None:
         raise RuntimeError("Choose the hero skeleton before building LODs")
-    count = settings.lod_count or 3
+    count = settings.lod_count or target_lod_count(settings) or 3
     collection = _lod_collection(settings)
     clear_lods(settings)
     temp = bpy.data.collections.new("DMF LOD build")
@@ -1125,24 +1149,28 @@ class DMF_OT_export_stage(Operator):
             # Built LODs are reused as they are. Each level is copied into the
             # export scope under the DMX stem PulseSrcOps writes from, sharing
             # the built mesh data, so no armature copy and no decimation runs
-            # here.
+            # here.  A collection exports one DMX, so each level gets its own
+            # collection and its own export call; putting the levels in the
+            # base collection merges them into the base DMX.
+            lod_collections = []
             for order, source_lod in enumerate(live_lods, 1):
                 duplicate = source_lod.copy()
                 duplicate.name = f"{target_stem}_lod{order}"
                 duplicate.parent = None
                 duplicate.matrix_world = source_lod.matrix_world.copy()
-                collection.objects.link(duplicate)
+                lod_collection = bpy.data.collections.new(f"{collection.name}_lod{order}")
+                scene.collection.children.link(lod_collection)
+                lod_collection.objects.link(duplicate)
+                if armature is not None:
+                    lod_collection.objects.link(armature)
+                lod_collection.vs.export = True
+                lod_collections.append(lod_collection)
                 if hasattr(duplicate, "vs"):
                     duplicate.vs.export = True
                     duplicate.vs.generate_lods = False
             # A dedicated collection makes PulseSrcOps export exactly this mesh
             # and its armature, instead of every selected object's collection.
-            scene.vs.export_list.clear()
-            row = scene.vs.export_list.add()
-            row.name = collection.name
-            row.ob_type = "COLLECTION"
-            row.icon = "GROUP"
-            row.collection = collection
+            export_collections = [collection, *lod_collections]
             # PulseSrcOps pushes an undo step and calls bpy.ops.ed.undo() in
             # its finally block. Running that nested undo while this operator is
             # still on the stack crashes Blender 5.4 with joined/LOD meshes.
@@ -1151,11 +1179,18 @@ class DMF_OT_export_stage(Operator):
             old_debug_value = bpy.app.debug_value
             bpy.app.debug_value = max(2, old_debug_value)
             try:
-                result = bpy.ops.export_scene.smd(collection=collection.name)
+                for export_collection in export_collections:
+                    scene.vs.export_list.clear()
+                    row = scene.vs.export_list.add()
+                    row.name = export_collection.name
+                    row.ob_type = "COLLECTION"
+                    row.icon = "GROUP"
+                    row.collection = export_collection
+                    result = bpy.ops.export_scene.smd(collection=export_collection.name)
+                    if "FINISHED" not in result:
+                        raise RuntimeError("PulseSrcOps did not finish the DMX export")
             finally:
                 bpy.app.debug_value = old_debug_value
-            if "FINISHED" not in result:
-                raise RuntimeError("PulseSrcOps did not finish the DMX export")
             dmx_files = sorted(destination.rglob("*.dmx"))
             if not dmx_files:
                 raise RuntimeError("PulseSrcOps produced no DMX file")
@@ -1180,8 +1215,10 @@ class DMF_OT_export_stage(Operator):
             if not lod_count and lod_files:
                 raise RuntimeError("PulseSrcOps produced LOD DMXs while LOD generation was off")
             if lod_count and len(lod_files) != lod_count:
+                produced = ", ".join(path.name for path in dmx_files) or "none"
                 raise RuntimeError(
-                    f"PulseSrcOps produced {len(lod_files)} of {lod_count} LOD DMXs. "
+                    f"PulseSrcOps produced {len(lod_files)} of {lod_count} LOD DMXs "
+                    f"({produced}). "
                     "Lower Decimate per LOD and export again."
                 )
             lods = []
@@ -1542,12 +1579,28 @@ class DMF_OT_update_old_addon(Operator):
                         settings.custom_model = str(max(candidates, key=lambda path: path.stat().st_size))
                 metadata = json.loads(result.manifest.read_text(encoding="utf-8"))
                 cloth = f"; {metadata.get('cloth_chains', 0)} cloth chains, {metadata.get('cloth_hinges', 0)} hinges"
+                source_note = ""
+                try:
+                    bound = core.bind_staged_source(
+                        settings,
+                        installed,
+                        addon=addon,
+                        package=old_path,
+                        kind="addon",
+                        label=f"old mod {addon}",
+                        stage_root=env.csdk_root,
+                    )
+                    source_note = f" Source page now points at {Path(bound['vmdl']).name}."
+                except Exception as error:
+                    source_note = f" Source page binding failed: {error}"
                 _status(
                     settings,
                     f"Updated {addon} from {old_path.name}; {'old' if result.preserved_model else 'live'} model, "
-                    f"{result.material_count} old material assets{cloth}; staged in {installed}. "
-                    "Edit the material files there, then press Compile.",
-                    "OK",
+                    f"{result.material_count} old material assets, "
+                    f"{metadata.get('material_sources', 0)} editable sources{cloth}; staged in {installed}. "
+                    "Edit the material files there, then press Compile."
+                    + source_note,
+                    "WARN" if "binding failed" in source_note else "OK",
                 )
 
             def failed(error):
@@ -1607,10 +1660,26 @@ class DMF_OT_stage_update(Operator):
                 settings.addon_name = addon
                 settings.update_output = str(output)
                 settings.update_addon_name = addon
+                source_note = ""
+                try:
+                    package = Path(bpy.path.abspath(settings.old_vpk)) if settings.old_vpk else None
+                    bound = core.bind_staged_source(
+                        settings,
+                        installed,
+                        addon=addon,
+                        package=package,
+                        kind="addon",
+                        label=f"old mod {addon}",
+                        stage_root=env.csdk_root,
+                    )
+                    source_note = f" Source page points at {Path(bound['vmdl']).name}."
+                except Exception as error:
+                    source_note = f" Source page binding failed: {error}"
                 _status(
                     settings,
-                    f"Staged {addon} in {installed}; edit the material files there, then press Compile.",
-                    "OK",
+                    f"Staged {addon} in {installed}; edit the material files there, then press Compile."
+                    + source_note,
+                    "WARN" if "binding failed" in source_note else "OK",
                 )
 
             def failed(error):

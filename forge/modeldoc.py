@@ -611,6 +611,37 @@ def _root_close(lines: list[str]) -> int:
     raise ModeldocError("modeldoc-has-no-root-children-close")
 
 
+def add_mesh_to_lod_groups(text: str, mesh_name: str) -> str:
+    """Reference one RenderMeshFile from every existing LODGroup.
+
+    A mesh in RenderMeshList but outside every LODGroup compiles and is not
+    drawn, so an unmatched old model part (a head split from the body, a
+    component) must be added to the live LOD levels that already exist.  This
+    adds the name only; the LOD geometry stays whatever the LOD build produces.
+    """
+    mesh_name = (mesh_name or "").strip()
+    if not mesh_name or any(char in mesh_name for char in '"\n\r'):
+        raise MeshListError(f"mesh-name-invalid: {mesh_name!r}")
+    section = sections(text).get("LODGroupList")
+    if section is None:
+        return text
+    lines = text.splitlines()
+    for start, end in _blocks(lines, section, "LODGroup"):
+        open_index = _list_open(lines, start, end, "mesh_references")
+        if open_index is None:
+            continue
+        close_index = _list_close(lines, open_index)
+        if any(f'mesh_name = "{mesh_name}"' in line for line in lines[open_index + 1 : close_index]):
+            continue
+        indent = _indent(lines[open_index]) + "\t"
+        _insert_in_list(
+            lines,
+            open_index,
+            [f"{indent}{{", f'{indent}\tmesh_name = "{mesh_name}"', f"{indent}}},"],
+        )
+    return "\n".join(lines)
+
+
 def merge(
     new_text: str,
     old_text: str,

@@ -51,6 +51,16 @@ class MigrationResult:
     material_texture_count: int = 0
 
 
+@dataclass
+class MaterialSourceResult:
+    """Editable files recovered from a package's compiled material assets."""
+
+    materials: int = 0
+    textures: int = 0
+    skipped: list[str] = field(default_factory=list)
+    error: str = ""
+
+
 def _digest(path: Path) -> str:
     import hashlib
 
@@ -640,6 +650,144 @@ def _copy_materials(root: Path, destination: Path) -> tuple[int, int]:
     return count, textures
 
 
+# A decompiled vmat keeps its compiled texture references and the source
+# texture fields that a material editor shows.  The compiled key names are
+# stable even when a material has no source texture checked in beside it.
+_TEXTURE_FIELDS = {
+    "g_tAmbientOcclusion": ("TextureAmbientOcclusion1",),
+    "g_tColor": ("TextureColor1",),
+    "g_tNormalRoughness": ("TextureNormal1", "TextureRoughness1"),
+    "g_tNprOutlineMask": ("TextureNprOutlineMask1",),
+    "g_tNprTransmissiveColor": ("TextureNprTramsissiveColor1",),
+    "g_tSelfIllumMask": ("TextureSelfIllumMask1",),
+    "g_tTintMask": ("TextureTintMask1",),
+    "g_tTintMaskRimLightMask": ("TextureRimLightMask1",),
+}
+
+
+def _material_texture_pairs(text: str, decompiled: Path) -> list[tuple[str, Path]]:
+    """Map a decompiled vmat's source texture fields to its decoded PNGs.
+
+    S2V writes one PNG per compiled ``.vtex_c`` under the compiled basename.
+    The source texture field can name a different basename, so the compiled
+    block is the bridge: it names the texture, and the field names the slot a
+    person edits.  A missing/default texture is left alone rather than copied
+    over the SDK's own default inventory.
+    """
+    lines = text.splitlines()
+    compiled: dict[str, str] = {}
+    source: dict[str, str] = {}
+    in_compiled = False
+    for line in lines:
+        stripped = line.strip()
+        if stripped == '"Compiled Textures"':
+            in_compiled = True
+            continue
+        if in_compiled:
+            if stripped == "}":
+                break
+            match = re.match(r'\s*"([^"]+)"\s+"([^"]+)"', line)
+            if match:
+                compiled[match.group(1)] = match.group(2)
+            continue
+        match = re.match(r'\s*"(Texture[^"]+)"\s+"([^"]+)"', line)
+        if match:
+            source[match.group(1)] = match.group(2)
+    result: list[tuple[str, Path]] = []
+    for key, fields in _TEXTURE_FIELDS.items():
+        compiled_relative = compiled.get(key, "")
+        if not compiled_relative:
+            continue
+        png = decompiled / Path(_safe_relative(compiled_relative)).with_suffix(".png")
+        if not png.is_file():
+            continue
+        for field in fields:
+            target = source.get(field, "").replace("\\", "/").strip("/")
+            if (
+                not target
+                or target.startswith(("materials/default/", "materials/core/"))
+                or not target.lower().endswith(
+                    (".png", ".tga", ".jpg", ".jpeg", ".tif", ".tiff", ".dds", ".exr", ".hdr")
+                )
+            ):
+                continue
+            result.append((target, png))
+    return result
+
+
+def decompile_material_sources(
+    env: Environment,
+    root: Path,
+    destination: Path,
+    *,
+    timeout: int = 900,
+) -> MaterialSourceResult:
+    """Recover editable vmat and texture sources from compiled material assets.
+
+    Old addons often ship only resourcecompiler output.  Copying those files
+    keeps the model renderable but leaves nothing a person can open in the
+    CSDK material editor.  S2V can decompile the same folder it already used
+    for the model; this helper preserves the package-relative paths, leaves
+    existing source files alone, and never invents a shader for a failed
+    decompile.
+    """
+    root = Path(root).resolve()
+    destination = Path(destination).resolve()
+    compiled = [
+        path
+        for path in sorted(root.rglob("*"))
+        if path.is_file() and path.suffix.lower() in (".vmat_c", ".vtex_c")
+    ]
+    result = MaterialSourceResult()
+    if not compiled:
+        return result
+    if env.s2v is None:
+        result.error = "source-2-viewer-missing: choose the Source 2 Viewer CLI in Setup"
+        return result
+    destination.mkdir(parents=True, exist_ok=True)
+    temporary = Path(tempfile.mkdtemp(prefix=".dmf-material-source-", dir=destination.parent))
+    try:
+        command = [
+            str(env.s2v),
+            "-i",
+            str(root),
+            "-o",
+            str(temporary),
+            "-d",
+            "--recursive",
+            "-e",
+            "vmat_c,vtex_c",
+        ]
+        if env.gameinfo is not None:
+            command += ["--game", str(env.gameinfo)]
+        run = _log(env, command, destination.parent / "s2v-materials.log", timeout)
+        if run.returncode != 0:
+            result.error = (
+                f"old-material-decompile-failed: {root}; see {destination.parent / 's2v-materials.log'}"
+            )
+            return result
+        for source in sorted(temporary.rglob("*.vmat")):
+            relative = source.relative_to(temporary)
+            target = destination / relative
+            if not target.exists():
+                _copy(source, target)
+                result.materials += 1
+            else:
+                result.skipped.append(relative.as_posix())
+            text = source.read_text(encoding="utf-8", errors="replace")
+            for texture_relative, png in _material_texture_pairs(text, temporary):
+                texture_target = destination / _safe_relative(texture_relative)
+                if texture_target.exists():
+                    continue
+                _copy(png, texture_target)
+                result.textures += 1
+    except (OSError, subprocess.SubprocessError, MigrationError) as error:
+        result.error = str(error)
+    finally:
+        shutil.rmtree(temporary, ignore_errors=True)
+    return result
+
+
 def _manifest_vmdl(root: Path, relative: str) -> dict:
     path = root / relative
     return {
@@ -667,6 +815,8 @@ def migrate_trees(
     old_package: Path | None = None,
     old_source: dict | None = None,
     old_assets: Path | None = None,
+    env: Environment | None = None,
+    timeout: int = 1800,
 ) -> MigrationResult:
     """Merge an old addon tree onto a live extraction tree.
 
@@ -702,6 +852,8 @@ def migrate_trees(
     new_text = new_vmdl.read_text(encoding="utf-8", errors="replace")
     old_render = _render_paths(old_text)
     new_render = _render_paths(new_text)
+    old_meshes = modeldoc.render_mesh_files(old_text)
+    new_meshes = modeldoc.render_mesh_files(new_text)
     custom = (
         False
         if preserve_model == "live"
@@ -724,39 +876,134 @@ def migrate_trees(
             modeldoc.cloth_physics_sections(old_text) if sections is None else sections
         )
     )
-    if keep_model and sections is None:
-        if old_render != new_render:
-            requested.append("RenderMeshList")
-        old_material_group = modeldoc.sections(old_text).get("MaterialGroupList")
-        new_material_group = modeldoc.sections(new_text).get("MaterialGroupList")
-        if (
-            old_material_group is not None
-            and new_material_group is not None
-            and old_material_group.text != new_material_group.text
-        ):
-            requested.append("MaterialGroupList")
-    if not keep_model and "RenderMeshList" in requested:
+    # The live RenderMeshList, BodyGroupList and LODGroupList stay in place.
+    # They are what make the model visible in matchmaking and what give
+    # PulseSrcOps's LOD build a slot to replace.  Old meshes are mapped onto
+    # the live mesh names where possible, and only a genuinely new mesh is
+    # appended.  Replacing these sections with an old list made the compiler
+    # reject every live LOD and body-group reference.
+    if "RenderMeshList" in requested:
         requested.remove("RenderMeshList")
     requested = list(dict.fromkeys(requested))
 
     merged = modeldoc.merge(new_text, old_text, requested)
+    merged_text = merged.text
 
     # The live tree supplies the current animation set, skeleton and default
     # materials. The old addon overlays only the assets it owns.
     _copy_tree(new_root, root)
     old_material_count = 0
     old_texture_count = 0
+    material_sources = MaterialSourceResult()
     if preserve_materials:
         old_material_count, old_texture_count = _copy_materials(old_root, root)
+        if env is not None:
+            material_sources = decompile_material_sources(
+                env,
+                old_root,
+                root,
+                timeout=timeout,
+            )
 
     model_files: list[str] = []
+    model_remap: dict[str, str] = {}
+    mesh_actions: dict[str, dict[str, str]] = {}
     if keep_model:
-        for relative_path in old_render:
+        live_by_name = {item.name.casefold(): item for item in new_meshes}
+        live_filenames = {item.filename.casefold() for item in new_meshes}
+        old_body = None
+        live_body = None
+        try:
+            old_dmx = [
+                path
+                for relative in old_render
+                for path in [_old_asset(old_root, old_assets, relative)]
+                if path is not None
+            ]
+            old_body = body_for_hero_folder(old_vmdl, old_dmx) if old_dmx else None
+            live_dmx = [new_root / relative for relative in new_render]
+            live_body = body_for_hero_folder(new_vmdl, live_dmx) if live_dmx else None
+        except Exception:
+            old_body = None
+            live_body = None
+        old_body_relative = ""
+        if old_body is not None:
+            try:
+                old_body_relative = old_body.relative_to(old_root).as_posix()
+            except ValueError:
+                old_body_relative = old_body.name
+        live_body_filename = ""
+        if live_body is not None:
+            try:
+                live_body_filename = live_body.relative_to(new_root).as_posix()
+            except ValueError:
+                live_body_filename = live_body.name
+        live_body_mesh = next(
+            (item for item in new_meshes if item.filename == live_body_filename),
+            None,
+        )
+        groups = modeldoc.body_groups(merged_text)
+        default_group = next(
+            (group for group in groups if group.name.casefold() == "default"),
+            groups[0] if groups else None,
+        )
+        bodygroup = default_group.name if default_group is not None else ""
+        choice = default_group.choices[0] if default_group and default_group.choices else ""
+        for old_mesh in old_meshes:
+            source = _old_asset(old_root, old_assets, old_mesh.filename)
+            if source is None:
+                raise MigrationError(f"old-model-missing: {old_mesh.filename}")
+            # The old body is the mesh the old model's own Skeleton and
+            # BodyGroupList choose.  Its decompiled name can be ``unnamed_1``
+            # (Tokamak), so name matching alone leaves the live body in place
+            # and adds the old body as an extra mesh.  Map the chosen old body
+            # onto the live body slot first.
+            is_old_body = bool(old_body_relative) and (
+                old_mesh.filename == old_body_relative
+                or source.resolve() == old_body.resolve()
+            )
+            live_mesh = live_body_mesh if is_old_body else live_by_name.get(old_mesh.name.casefold())
+            if live_mesh is not None:
+                # The old geometry takes the live mesh slot: same name, same
+                # filename and the same body-group/LOD references.  The live
+                # declarations stay intact, so matchmaking keeps its slots.
+                relative_path = live_mesh.filename
+                _copy(source, root / relative_path)
+                model_files.append(relative_path)
+                model_remap[old_mesh.filename] = relative_path
+                continue
+
+            relative_path = old_mesh.filename
+            if relative_path.casefold() in live_filenames:
+                relative_path = f"{Path(relative_path).stem}_old{Path(relative_path).suffix}"
+            _copy(source, root / relative_path)
+            added = modeldoc.add_render_mesh_file(
+                merged_text,
+                name=old_mesh.name,
+                filename=relative_path,
+                bodygroup=bodygroup,
+                choice=choice,
+            )
+            merged_text = added.text
+            merged_text = modeldoc.add_mesh_to_lod_groups(merged_text, old_mesh.name)
+            model_files.append(relative_path)
+            model_remap[old_mesh.filename] = relative_path
+            mesh_actions[old_mesh.name] = dict(added.actions)
+        # A modeldoc without mesh names cannot be mapped by RenderMeshFile
+        # name.  Keep its live paths and copy the old bytes into those same
+        # slots instead of dropping the old model.
+        unmapped = [
+            relative
+            for relative in old_render
+            if relative not in model_remap
+        ]
+        for relative_path in unmapped:
             source = _old_asset(old_root, old_assets, relative_path)
             if source is None:
                 raise MigrationError(f"old-model-missing: {relative_path}")
             _copy(source, root / relative_path)
             model_files.append(relative_path)
+            model_remap[relative_path] = relative_path
         # Physics hull and skeleton files are referenced by the old vmdl; keep
         # them beside the preserved meshes even when the live equivalents exist.
         for relative_path in dict.fromkeys(
@@ -769,7 +1016,7 @@ def migrate_trees(
 
     vmdl_out = root / relative
     vmdl_out.parent.mkdir(parents=True, exist_ok=True)
-    vmdl_out.write_text(merged.text, encoding="utf-8", newline="\n")
+    vmdl_out.write_text(merged_text, encoding="utf-8", newline="\n")
 
     output_sections = modeldoc.sections(vmdl_out.read_text(encoding="utf-8"))
     cloth_chains = vmdl_out.read_text(encoding="utf-8").count('_class = "ClothChain"')
@@ -788,14 +1035,21 @@ def migrate_trees(
             "old_source": old_source or {"kind": "source"},
             "old_assets": str(old_assets) if old_assets is not None else "",
             "new_vmdl": new_vmdl.relative_to(new_root).as_posix(),
+            "new_root": str(new_root.resolve()),
             "new_vmdl_sha256": _digest(new_vmdl),
             "model_policy": preserve_model,
             "custom_model": custom,
             "preserved_model": keep_model,
             "model_files": model_files,
             "new_model_files": new_render,
+            "model_remap": model_remap,
+            "mesh_actions": mesh_actions,
             "materials": old_material_count,
             "material_textures": old_texture_count,
+            "material_sources": material_sources.materials,
+            "material_source_textures": material_sources.textures,
+            "material_source_error": material_sources.error,
+            "material_source_skipped": material_sources.skipped,
             "material_policy": "old-assets-overlay-live" if preserve_materials else "live-only",
             "sections": merged.actions,
             "cloth_chains": cloth_chains,
@@ -925,15 +1179,24 @@ def resolve_package_source(
     body = body_for_hero_folder(source_path, dmx_files) if dmx_files else None
     materials = material_files(assets_root)
     materials_root = assets_root
+    material_sources = MaterialSourceResult()
     if source_info.get("kind") == "compiled":
         old_materials = material_files(old_root)
         if old_materials:
-            # A compiled-only package's materials stay in the package. S2V's
-            # decompile writes the vmdl and its DMX references, not the old
-            # vmat/vtex assets, so pointing the Source page at the decompile
-            # root alone would silently drop the materials the mod shipped.
+            # A compiled-only package's materials stay in the package, and the
+            # Source page gets a content root that carries both the shipped
+            # compiled assets and the editable sources recovered from them.
+            # S2V's model decompile writes only the vmdl and its DMX references.
             materials = old_materials
-            materials_root = old_root
+            materials_root = destination / "materials"
+            for item in old_materials:
+                _copy(item.source, materials_root / item.relative)
+            material_sources = decompile_material_sources(
+                env,
+                old_root,
+                materials_root,
+                timeout=timeout,
+            )
     try:
         vmdl_relative = source_path.relative_to(assets_root).as_posix()
     except ValueError:
@@ -953,6 +1216,9 @@ def resolve_package_source(
         "body_relative": body_relative,
         "materials_dir": str(materials_root) if materials else "",
         "material_count": len(materials),
+        "material_sources": material_sources.materials,
+        "material_source_textures": material_sources.textures,
+        "material_source_error": material_sources.error,
         "dmx_count": len(dmx_files),
         "source": source_info,
     }
@@ -1066,6 +1332,8 @@ def update_from_package(
         old_package=package,
         old_source=old_source,
         old_assets=old_assets,
+        env=env,
+        timeout=timeout,
     )
 
 
