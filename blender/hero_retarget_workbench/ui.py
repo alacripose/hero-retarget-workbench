@@ -1267,8 +1267,8 @@ class DMF_PT_skeleton(Panel):
         _hint(
             nudge,
             "The overlay only draws. Pose Mode, Edit Mode rest edits and Pose > Apply > "
-            "Apply Pose as Rest Pose all work while it is on. It follows the bone picked in "
-            "Pose or Edit Mode, and the mapped row otherwise.",
+            "Apply Pose as Rest Pose all work while it is on. It highlights the bone picked "
+            "in the bone map or the bone list; the bone being posed does not take it over.",
             "INFO",
         )
         if settings.nudge_overlay_error:

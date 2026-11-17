@@ -966,7 +966,8 @@ class DMF_OT_select_hierarchy_bone(Operator):
             return {"CANCELLED"}
         # Blender 5.4 dropped Bone.select; edit bones still carry it, so a rig
         # that is already in edit mode gets its selection narrowed to this bone.
-        # object.select_all polls false in edit mode, so that path is separate.
+        # Object selection is changed only in Object Mode: doing it from Pose
+        # Mode ends the pose session, and the old operator poll-failed there.
         if armature.mode == "EDIT":
             for candidate in armature.data.edit_bones:
                 candidate.select = candidate.name == row.name
@@ -974,7 +975,8 @@ class DMF_OT_select_hierarchy_bone(Operator):
             if edit_active is not None:
                 armature.data.edit_bones.active = armature.data.edit_bones.get(row.name)
         else:
-            core.select_only(context, [armature])
+            if context.mode == "OBJECT":
+                core.select_only(context, [armature])
             armature.data.bones.active = bone
         chain = bone_chain(settings, row.name)
         _status(settings, f"Active bone {row.name}; chain {' <- '.join(chain)}", "OK")

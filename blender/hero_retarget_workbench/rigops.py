@@ -764,8 +764,8 @@ class DMF_OT_chain_overlay(Operator):
         else:
             _status(
                 settings,
-                "Chain overlay on; it follows the bone picked in Pose or Edit Mode, "
-                "or the mapped row",
+                "Chain overlay on; it follows the bone picked in the bone map or the "
+                "bone list, not the pose selection",
                 "OK",
             )
         jobs._tag_redraw()

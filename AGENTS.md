@@ -29,6 +29,17 @@ https://github.com/oaustegard/claude-skills/releases (declauding)
 https://github.com/hardikpandya/stop-slop
 <home>\.agents\skills\ has a ton of skills for agents to use and yet they never use them for some reason. You need to be using these skills and updating/managing them ccording to family project convention.
 
+## 2026-11-17 — the chain overlay highlights the panel pick, not the bone being posed (0.21.1)
+
+**Owner instruction, verbatim:** *"and I still need the highlighted bones in the overlay to be the bones I've chosen in the ui not the pose mode bones I'm posing"*, then *"Don't re-make the overlay into the thing that we use to edit it needs to just be the overlay wtf"*
+
+- **The overlay is still only a drawing.** No chain picker, no new overlay field and no new editing control were added. The bone choice stays where it already is: the bone map's Pick and the bone list. The Chain overlay section keeps its existing show/hide and step controls.
+- **The panel pick wins.** `nudge_view._selected_name` takes the `hierarchy_index` bone (the bone map's Pick and the bone list) and resolves it through the bone map to the custom rig, then falls back to the selected mapped row. It no longer reads `active_pose_bone` or `active_bone`, so posing or rest-editing a different bone leaves the highlighted chain where it was chosen.
+- **The Pick no longer crashes in Pose Mode.** The owner's traceback was `workbench.py` line 977 → `core.select_only` → `bpy.ops.object.select_all.poll() failed, context is incorrect`; that operator refuses to poll outside Object Mode. `core.select_only` now sets selection flags directly (measured to work in Pose Mode), and `dmf.select_hierarchy_bone` changes object selection only in Object Mode, so a pick cannot end the pose session.
+- **Evidence.** `artifacts/probes/nudge_overlay_probe.py` publishes the leaf pick `hand_L` in `hierarchy`, activates `arm_lower_L` in Pose Mode and reports `overlay_bone: hand_L` with `mode: POSE`; it calls `dmf.select_hierarchy_bone` in Pose Mode and stays in `POSE` (the old traceback); the Edit Mode check activates `arm_lower_L` and still reports `hand_L`; the rest-pose apply moves the tail 0.214 m and the edit tail is `[0.889, 0.5303, 0.8638]`. `artifacts/ui-pass/overlay-pose-mode.png` shows the header posing `arm_lower_L` while the label is `hand_L · 34% Δ0.214m 11.5°`. 339 pytest tests pass; compileall, `ui_parity --check` (20 SKELETON actions, 0 duplicates/undrawn) and `ui_prose --check` are clean.
+- **Version and zip.** `0.21.1`; local `dist/hero_retarget_workbench-0.21.1.zip`, 71 files, 528,438 bytes, sha256 `57c26668bb1d910ff19f86e3c713e63f6b759f4e793fae721d27d300a8ec817d`; `tools/blender_zip_probe.py` passes with 113 operators, 26 panels, 50 icons and version `0.21.1` (`artifacts/receipts/zip-0211.json`).
+- **Not checked.** The owner's real model and viewport click-selection were not exercised; the probe sets `hierarchy_index` and invokes the Pick operator directly.
+
 ## 2026-11-17 — the chain overlay is a drawing, not a mode (0.21.0)
 
 **Owner instruction, verbatim:** *"hmm its kind of unintuitive and the way it interacts with pose mode is kinda shit when I need to be able to adjust the rest pose and I don't like that I can't have the overlay on without nudge mode enabled in pose mode for native blender feel"*
