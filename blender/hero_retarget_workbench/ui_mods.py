@@ -14,7 +14,7 @@ from pathlib import Path
 import bpy
 from bpy.types import Panel
 
-from . import ui, ui_popit
+from . import properties, ui, ui_popit
 
 
 def _section(layout, title: str, icon: str, detail: str = ""):
@@ -413,6 +413,10 @@ class DMF_PT_mods(Panel):
 
             actions = _section(layout, "Update and backport", "FILE_REFRESH")
             if selected.kind != "blend":
+                if len(properties.HERO_ITEMS) > 1:
+                    actions.prop(settings, "mod_target", text="Target hero")
+                else:
+                    _hint(actions, "Detect the live build on Setup to choose a target hero.")
                 row = actions.row(align=True)
                 row.operator("dmf.analyze_mod", text="Analyze", icon="VIEWZOOM")
                 row.operator("dmf.port_mod", text="Update to latest", icon="FILE_REFRESH")

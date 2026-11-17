@@ -14,7 +14,7 @@ import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from . import modeldoc
 from .fileio import copy_file, walk_files
@@ -202,6 +202,18 @@ def _match_value(match, key: str, default=""):
     return getattr(match, key, default)
 
 
+def _model_parts(value: str) -> tuple[str, ...]:
+    """A content-relative path without the optional ``models/`` prefix."""
+    parts = tuple(
+        part.lower()
+        for part in PurePosixPath(str(value or "").replace("\\", "/")).parts
+        if part not in ("", ".")
+    )
+    if parts and parts[0] == "models":
+        parts = parts[1:]
+    return parts
+
+
 def _matching_install(matches, root: Path, compiled: Path) -> dict:
     """The install-side copy of a compiled model, when hashes identified one."""
     relative = compiled.relative_to(root).as_posix()
@@ -220,6 +232,53 @@ def _matching_install(matches, root: Path, compiled: Path) -> dict:
             "crc32": _match_value(match, "crc32", None),
         }
     return {}
+
+
+def _install_evidence(matches) -> dict:
+    """Pick the installed build that supplied the rest of a compiled-only package.
+
+    A shipped ``vmdl_c`` is frequently unique to the mod even when the materials
+    and shared parts it references came from an older SDK. The exact-model match
+    stays authoritative. Otherwise, every byte-identical package file is evidence;
+    the install with the most distinct matching files supplies the game context.
+    """
+    groups: dict[str, dict] = {}
+    for match in matches or ():
+        relative = _model_parts(str(_match_value(match, "relative", "")))
+        if not relative:
+            continue
+        install = str(_match_value(match, "install", ""))
+        item = groups.setdefault(
+            install,
+            {
+                "install": install,
+                "label": str(_match_value(match, "label", "")),
+                "build": str(_match_value(match, "build", "")),
+                "gameinfo": "",
+                "files": set(),
+            },
+        )
+        item["files"].add(relative)
+        if not item["gameinfo"]:
+            item["gameinfo"] = str(_match_value(match, "gameinfo", ""))
+    candidates = [item for item in groups.values() if item["gameinfo"] and item["files"]]
+    if not candidates:
+        return {}
+    candidates.sort(
+        key=lambda item: (
+            -len(item["files"]),
+            item["build"],
+            item["install"],
+        )
+    )
+    best = candidates[0]
+    return {
+        "install": best["install"],
+        "label": best["label"],
+        "build": best["build"],
+        "gameinfo": best["gameinfo"],
+        "evidence_files": len(best["files"]),
+    }
 
 
 def extract_compiled_model(
@@ -301,8 +360,10 @@ def resolve_old_model(
 
     A source model wins when one exists. Otherwise the compiled model is matched
     to an installed build by its content hash; that build's VPK supplies the
-    extraction context. If no installed copy matches, the mod's own compiled
-    file is the input, so a package made without sources still ports.
+    extraction context. When only the package's other files match an old build,
+    that build still supplies the game context while ``matched`` stays false. If
+    no installed copy matches, the mod's own compiled file is the input, so a
+    package made without sources still ports.
     """
     old_root = Path(old_root).resolve()
     preferred_text = (preferred or "").replace("\\", "/").strip("/")
@@ -330,10 +391,16 @@ def resolve_old_model(
             if "ambiguous" in str(source_error):
                 raise
     compiled = find_compiled_model(old_root, preferred, hero)
-    match = _matching_install(matches, old_root, compiled)
-    container = Path(match["container"]) if match.get("container") and match.get("kind") == "vpk" else None
-    entry = match.get("entry", "") if container is not None else ""
-    gameinfo = Path(match["gameinfo"]) if match.get("gameinfo") else None
+    exact_match = _matching_install(matches, old_root, compiled)
+    evidence = _install_evidence(matches) if not exact_match else {}
+    context = exact_match or evidence
+    container = (
+        Path(exact_match["container"])
+        if exact_match.get("container") and exact_match.get("kind") == "vpk"
+        else None
+    )
+    entry = exact_match.get("entry", "") if container is not None else ""
+    gameinfo = Path(context["gameinfo"]) if context.get("gameinfo") else None
     target = Path(destination) if destination is not None else old_root / ".decompiled-old"
     path = extract_compiled_model(
         env,
@@ -352,9 +419,11 @@ def resolve_old_model(
         "assets_root": str(target),
         "container": str(container or compiled),
         "entry": entry,
-        "install": match.get("install", ""),
-        "install_build": match.get("build", ""),
-        "matched": bool(match),
+        "install": context.get("install", ""),
+        "install_build": context.get("build", ""),
+        "matched": bool(exact_match),
+        "context": bool(evidence),
+        "evidence_files": evidence.get("evidence_files", 0),
     }
     return path, source_info
 
