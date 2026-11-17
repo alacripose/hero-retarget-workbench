@@ -31,6 +31,16 @@ C:\Users\ala\.agents\skills\ has a ton of skills for agents to use and yet they 
 
 Do not delete patch probes.
 
+## 2026-11-17 — a lost custom-rig pointer resolves from the hierarchy copy (0.22.5)
+
+**Owner report, verbatim:** *"then why is it suddenly saying this error when it didn't before and I changed nothing that I did"*, with `Report: Error — hierarchy-copy-needs-custom: choose the custom model's armature`.
+
+- **The operator required the scene pointer to be non-empty.** `duplicate_hero_hierarchy` read `settings.custom_armature` directly and raised when Blender had cleared it. The hierarchy copy still carries `dmf_source_rig`, and the custom mesh still points at the copy, so the source rig is recoverable.
+- **Resolution order.** A configured rig is used as-is. Otherwise the active object, the selected objects, the custom mesh's parent and its armature modifiers are tried; a hierarchy copy resolves through `dmf_source_rig` to the original, and the hero rig is skipped. The recovered rig is written back to `settings.custom_armature` before the copy is made.
+- **Measured.** `hero_hierarchy_probe.py` clears the pointer, selects the first hierarchy copy and runs the operator again after the original pass: `HIERARCHY-POINTER-PASS {'active': 'Custom hero hierarchy', 'rig': 'Custom hero hierarchy.001', 'source': 'Custom'}`. The original `HIERARCHY-PASS` still reports `parent_after: custom_arm`, `chain_after: [root, custom_arm, custom_hand]`, `hand_moved: 0.1777`, `mesh_moved: 0.2493`.
+- **Evidence.** 343 pytest tests pass; compileall, `ui_parity --check` (0 duplicates/undrawn) and `ui_prose --check` are clean. The local zip is `dist/hero_retarget_workbench-0.22.5.zip`, 71 files, 529,868 bytes, sha256 `a3b560541589b9b4a430cf29d41abeac4b42f432a67d2f3fd5bef2f95d3451d7`; `tools/blender_zip_probe.py` passes with 112 operators, 26 panels and version `0.22.5` (`artifacts/receipts/zip-0225.json`).
+- **Not checked.** The owner's .blend and real Warden rig; the probe uses the synthetic custom/hero chain. A pointer to a deleted rig with no hierarchy copy, selected armature or bound mesh still reports the same error.
+
 ## 2026-11-17 — accuracy is continuous and follows the selected halo (0.22.4)
 
 **Owner instruction, verbatim:** *"look at the fucking screenshot I pose the heirarchy copy closer to where it needs to be (the fucking red halo to the heroes blue halo) and accuracy doesn't fucking update this is the fucking problem I'm trying to get you to diagnose you piece of shit"*, then *"it's \like if the fucking accuracy measurment is using the pose mode bone instead of the selected bone it's not that fucking hard if you stop jerking me around"*

@@ -784,6 +784,46 @@ def _unique_object_name(base: str) -> str:
     return name
 
 
+def _source_armature(obj):
+    """Follow a hierarchy copy back to the rig it was made from."""
+    name = obj.get("dmf_source_rig", "")
+    source = bpy.data.objects.get(name) if name else None
+    return source if source is not None and source.type == "ARMATURE" else obj
+
+
+def _resolve_custom_armature(settings, hero):
+    """The configured custom rig, or the one the active selection identifies.
+
+    Installing a new add-on build can leave the scene's rig pointer empty.  The
+    hierarchy copy records its source on the copy, so an active hierarchy copy
+    resolves back to the rig it was made from instead of copying the copy.
+    """
+    custom = settings.custom_armature
+    if custom is not None and custom.type == "ARMATURE":
+        return custom
+    candidates = []
+    active = bpy.context.view_layer.objects.active
+    if active is not None:
+        candidates.append(active)
+    candidates.extend(bpy.context.selected_objects)
+    mesh = settings.custom_mesh
+    if mesh is not None:
+        if mesh.parent is not None and mesh.parent.type == "ARMATURE":
+            candidates.append(mesh.parent)
+        for modifier in mesh.modifiers:
+            if modifier.type == "ARMATURE" and modifier.object is not None:
+                candidates.append(modifier.object)
+    for candidate in candidates:
+        if candidate is None or candidate.type != "ARMATURE":
+            continue
+        base = _source_armature(candidate)
+        if base == hero:
+            continue
+        settings.custom_armature = base
+        return base
+    return None
+
+
 def duplicate_hero_hierarchy(settings) -> dict:
     """Copy the custom rest rig onto the hero parent tree and rebind the mesh.
 
@@ -793,8 +833,8 @@ def duplicate_hero_hierarchy(settings) -> dict:
     bone that maps to its hero parent's nearest mapped ancestor.  The original
     armature is left untouched.
     """
-    custom = settings.custom_armature
     hero = settings.target_armature
+    custom = _resolve_custom_armature(settings, hero)
     if custom is None or custom.type != "ARMATURE":
         raise RigError("hierarchy-copy-needs-custom: choose the custom model's armature")
     if hero is None or hero.type != "ARMATURE":
