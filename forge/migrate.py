@@ -918,14 +918,21 @@ def _rewrite_target_material(text: str, target_relative: str, textures: dict[str
 
     The decompiler keeps both source fields and a ``Compiled Textures`` block.
     The latter is evidence from the old build, not source the target compiler
-    should consume, so it is dropped.  Every remaining texture path is mapped to
-    a decoded PNG and rewritten under the target folder; an absent optional map
-    is omitted rather than left pointing at the old build's path.
+    should consume, so its block is dropped.  Its individual roles are still
+    useful: old vmat source fields often lost normal, occlusion and self-illum
+    paths that survive only in the compiled block.  Those roles are restored as
+    source fields pointing at decoded target PNGs.  Every remaining texture path
+    is mapped to a decoded PNG and rewritten under the target folder; an absent
+    optional map is omitted rather than left pointing at the old build's path.
     """
     lines = text.splitlines()
     output: list[str] = []
     used: dict[str, Path] = {}
     skipped: list[str] = []
+    compiled_values: dict[str, str] = {}
+    key_index: dict[str, int] = {}
+    path_keys: set[str] = set()
+    additions: list[str] = []
     in_compiled = False
     depth = 0
     pattern = re.compile(
@@ -939,6 +946,9 @@ def _rewrite_target_material(text: str, target_relative: str, textures: dict[str
             depth = 0
             continue
         if in_compiled:
+            compiled_match = re.match(r'\s*"([^"]+)"\s*"([^"]+)"', line)
+            if compiled_match:
+                compiled_values[compiled_match.group(1)] = compiled_match.group(2)
             depth += line.count("{") - line.count("}")
             if depth <= 0:
                 in_compiled = False
@@ -949,13 +959,42 @@ def _rewrite_target_material(text: str, target_relative: str, textures: dict[str
             continue
         key = match.group("key")
         value = match.group("value")
+        key_index[key] = len(output)
         png = _material_texture(textures, value, key)
         if png is None:
             skipped.append(key)
             continue
         name = Path(value.replace("\\", "/")).name
         output.append(f'{match.group(1)}{target_relative}/{name}{match.group(4)}')
+        path_keys.add(key)
         used.setdefault(name.lower(), png)
+
+    role_fields = {
+        "g_tColor": "TextureColor1",
+        "g_tNormalRoughness": "TextureNormal1",
+        "g_tAmbientOcclusion": "TextureAmbientOcclusion1",
+        "g_tSelfIllumMask": "TextureSelfIllumMask1",
+        "g_tTintMaskRimLightMask": "TextureTintMask1",
+        "g_tMetalness": "TextureMetalness1",
+        "g_tRoughness": "TextureRoughness1",
+    }
+    for role, field in role_fields.items():
+        if field in path_keys:
+            continue
+        png = _material_texture(textures, compiled_values.get(role, ""), field)
+        if png is None:
+            continue
+        line = f'\t"{field}"\t"{target_relative}/{png.name}"'
+        if field in key_index:
+            output[key_index[field]] = line
+        else:
+            additions.append(line)
+        used.setdefault(png.name.lower(), png)
+    if additions:
+        closing = len(output) - 1
+        while closing >= 0 and output[closing].strip() != "}":
+            closing -= 1
+        output[closing:closing] = additions
     return "\n".join(output) + "\n", used, skipped
 
 
