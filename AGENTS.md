@@ -29,6 +29,20 @@ https://github.com/oaustegard/claude-skills/releases (declauding)
 https://github.com/hardikpandya/stop-slop
 C:\Users\ala\.agents\skills\ has a ton of skills for agents to use and yet they never use them for some reason. You need to be using these skills and updating/managing them ccording to family project convention.
 
+## 2026-11-17 — the chain overlay is a drawing, not a mode (0.21.0)
+
+**Owner instruction, verbatim:** *"hmm its kind of unintuitive and the way it interacts with pose mode is kinda shit when I need to be able to adjust the rest pose and I don't like that I can't have the overlay on without nudge mode enabled in pose mode for native blender feel"*
+
+- **`dmf.nudge_mode` is gone.** It forced Pose Mode, started the hand preview, split the viewport into ORTHO panes, and on finish forced Object Mode and restored the saved pose. That restore is what discarded a rest-pose edit, and the forced mode is why the overlay was unavailable for normal Blender work.
+- **The overlay is one independent toggle.** `dmf.chain_overlay` flips `settings.show_nudge_overlay` and nothing else: no mode change, no preview, no pose, action or frame-range save, no view split, no perspective change. It stays on across Object, Edit and Pose Mode until it is toggled off.
+- **Rest edits are native.** Pose Mode, `Pose > Apply > Apply Pose as Rest Pose`, and Edit Mode bone edits run with the overlay on. The probe applies a pose as rest with the overlay on and reads the rest tail move from `[0.5, 0.0, 1.2]` to `[0.4316, 0.1947, 1.1435]` (0.214 m).
+- **The overlay follows the picked bone in either mode.** `nudge_view._selected_name` reads `active_pose_bone`, then `active_bone` (Edit Mode), then the mapped row, and accepts an armature object or its data as the owner.
+- **The split and its timer are removed.** `workbench.start_nudge_compare`, `clear_nudge_compare`, `_configure_nudge_split`, `_configure_nudge_panes`, `_configure_nudge_view`, `_NUDGE_VIEW` and `_NUDGE_TRIES` are deleted. Neither the overlay nor the hand preview touches an area, a local view, a perspective or the active object.
+- **UI.** The Skeleton section is now **Chain overlay** with one **Show overlay** / **Hide overlay** button and the axis, amount, rotate and step controls; the hint names Pose Mode, Edit Mode and Apply Pose as Rest Pose as normal work.
+- **Evidence.** 339 pytest tests pass; compileall, `ui_parity --check` and `ui_prose --check` are clean. `artifacts/probes/nudge_overlay_probe.py` drives the real operator: toggling it in Object Mode leaves the mode, pose, animation data, viewport count and `PERSP` perspective unchanged; Pose Mode follows `hand_L`; a 0.4 rad arm rotation moves the hand and stays; Apply Pose as Rest Pose moves the rest tail 0.214 m; an Edit Mode rest edit moves `hand_L`'s tail to `[0.889, 0.5303, 0.8638]`; the overlay turns off in Pose Mode and the mode stays `POSE`. Screenshots: `artifacts/ui-pass/overlay-pose-mode.png`, `overlay-rest-applied.png`, `overlay-edit-mode.png`, `overlay-off.png`. The probe reports `views: 1`, `error: ''`.
+- **Version and zip.** `0.21.0`; local `dist/hero_retarget_workbench-0.21.0.zip`, 71 files, 527,956 bytes, sha256 `9aedfec94dc14cd42fe358f23c1876e3e3a6c4204deabea5a846521bae6519b8`; it passes `tools/blender_zip_probe.py` with 113 operators, 26 panels, 50 icons and version `0.21.0` (`artifacts/receipts/zip-0210.json`).
+- **Not checked.** Viewport click-selection and the owner's actual model; the probe sets the active bone directly. The CI-built release asset gets its own identity after the tag.
+
 ## 2026-11-17 — nudge mode is Pose Mode with the overlay, and finishing keeps the model (0.20.0)
 
 **Owner instruction, verbatim:** *"also, i noticed when i press enter the custom model disappears, and yeah I was hoping nudge mode would be more like pose mode itself in blender, but just with the overlay"*

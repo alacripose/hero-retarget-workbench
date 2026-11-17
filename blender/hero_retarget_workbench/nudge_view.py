@@ -9,7 +9,7 @@ it is close, so the bone being nudged is always identifiable.
 The old viewport-sized radial field is gone.  Each bone gets a small local halo,
 so a long arm does not wash out the hand.  Drawing is a POST_PIXEL handler; a
 failure is recorded in ``nudge_overlay_error`` and never raised into Blender's
-draw loop.
+draw loop.  The overlay never changes a mode, a pose, a rest bone or an action.
 """
 from __future__ import annotations
 
@@ -173,14 +173,19 @@ def _project(region, region_3d, point: Vector):
 
 
 def _selected_name(settings, armature) -> str:
-    """The bone selected in Pose Mode, else the mapped row being edited.
+    """The bone picked in Pose or Edit Mode, else the mapped row being edited.
 
-    Pose Mode is the control surface now: clicking a bone in the viewport moves
-    the warm/cool chain with it, and the bone list still seeds the first one.
+    The overlay is only a drawing, so Blender owns the mode.  Pose Mode reports
+    ``active_pose_bone``; Edit Mode reports ``active_bone`` from the armature
+    data.  Both drive the chain, and a rest edit stays visible.
     """
-    active = getattr(bpy.context, "active_pose_bone", None)
-    if active is not None and active.id_data == armature:
-        return active.name
+    for attribute in ("active_pose_bone", "active_bone"):
+        active = getattr(bpy.context, attribute, None)
+        if active is None:
+            continue
+        owner = getattr(active, "id_data", None)
+        if owner is armature or owner is armature.data:
+            return active.name
     if settings.bone_map:
         index = max(0, min(int(settings.bone_map_index), len(settings.bone_map) - 1))
         row = settings.bone_map[index]
