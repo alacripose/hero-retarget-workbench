@@ -484,6 +484,9 @@ class DMF_OT_port_mod(Operator):
         if env.game_root is None or env.s2v is None:
             self.report({"ERROR"}, "Set the live game and Source 2 Viewer in Setup first")
             return {"CANCELLED"}
+        if env.csdk_root is None:
+            self.report({"ERROR"}, "Choose the CSDK13 toolchain in Setup so the update can stage into it")
+            return {"CANCELLED"}
         old_path = _abspath(row.path)
         old_vmdl = _mod_vmdl(row)
         old_matches = _mod_matches(settings, row)
@@ -494,6 +497,12 @@ class DMF_OT_port_mod(Operator):
             if settings.update_output
             else _workspace(settings) / "ports"
         )
+        # Name the output before work starts so a failure still shows the addon
+        # and the Stage button points at the tree that was attempted.
+        settings.update_addon_name = addon
+        settings.update_output = str(output)
+        model_policy = settings.update_model_policy
+        preserve_materials = settings.update_preserve_materials
 
         def work(progress):
             progress(0.05, "reading the live hero roster")
@@ -502,7 +511,7 @@ class DMF_OT_port_mod(Operator):
             if hero is None:
                 raise RuntimeError(f"Hero {hero_slug} is not in the live roster")
             progress(0.2, "extracting and migrating")
-            return module["migrate"].update_from_package(
+            result = module["migrate"].update_from_package(
                 env,
                 old_path,
                 output,
@@ -510,19 +519,31 @@ class DMF_OT_port_mod(Operator):
                 hero=hero,
                 old_vmdl=Path(old_vmdl) if old_vmdl else None,
                 old_matches=old_matches,
-                preserve_model=settings.update_model_policy,
-                preserve_materials=settings.update_preserve_materials,
+                preserve_model=model_policy,
+                preserve_materials=preserve_materials,
                 sections=sections,
                 force=True,
             )
+            progress(0.9, f"staging {addon} in {env.csdk_root.name}")
+            installed = module["compile"].stage_content(env, result.output, addon)
+            progress(0.98, "staged for material editing")
+            return result, installed
 
-        def done(result):
+        def done(payload):
+            result, installed = payload
             settings.old_vpk = str(old_path)
             settings.update_addon_name = addon
-            settings.stage_dir = str(result.output)
+            settings.addon_name = addon
+            settings.update_output = str(output)
+            settings.stage_dir = str(env.csdk_root)
             settings.extraction_dir = str(result.new_root)
             actions = ", ".join(f"{name}:{action['action']}" for name, action in result.sections.items()) or "no sections"
-            core.set_status(settings, f"Ported {row.addon} onto {hero_slug}: {actions}", "OK")
+            core.set_status(
+                settings,
+                f"Ported {row.addon} onto {hero_slug}: {actions}; staged {result.material_count} old material assets in {installed}. "
+                "Edit the material files there, then press Compile.",
+                "OK",
+            )
 
         if not _start(settings, f"Porting {row.addon}", work, done, "Port failed"):
             return {"CANCELLED"}

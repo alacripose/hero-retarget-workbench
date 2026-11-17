@@ -1574,7 +1574,7 @@ class DMF_Settings(PropertyGroup):
     )
     update_output: StringProperty(
         name="Update output",
-        description="Stage folder for the migrated addon; blank uses <workspace>/updates",
+        description="Project build folder for the migrated addon; blank uses <workspace>/updates. The CSDK content copy is made separately by Stage update in CSDK",
         subtype="DIR_PATH",
     )
     update_addon_name: StringProperty(
@@ -1598,8 +1598,8 @@ class DMF_Settings(PropertyGroup):
         default=True,
     )
     update_preserve_materials: BoolProperty(
-        name="Preserve old materials",
-        description="Overlay the old addon's vmat and texture assets onto the live extraction",
+        name="Copy old materials",
+        description="Copy the old addon's vmat and texture assets into the update content tree; Stage update in CSDK puts them in the selected CSDK for editing",
         default=True,
     )
     update_replace_output: BoolProperty(

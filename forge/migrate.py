@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from . import modeldoc
+from .fileio import copy_file, walk_files
 from .hashes import blake3_file
 from .live import Hero, LiveError, extract, hero_vmdl_path
 from .paths import Environment
@@ -70,8 +71,12 @@ def _safe_relative(value: str) -> str:
 def _copy(source: Path, destination: Path) -> None:
     if not source.is_file():
         raise MigrationError(f"missing-input: {source}")
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(source, destination)
+    try:
+        copy_file(source, destination)
+    except OSError as error:
+        raise MigrationError(
+            f"copy-failed: {source} -> {destination}: {error}"
+        ) from error
 
 
 def _log(env: Environment, command: list[str], log_path: Path, timeout: int) -> subprocess.CompletedProcess[str]:
@@ -618,13 +623,10 @@ def _old_asset(old_root: Path, old_assets: Path | None, relative: str) -> Path |
 
 
 def _copy_tree(source: Path, destination: Path) -> None:
-    for path in sorted(source.rglob("*")):
-        if not path.is_file() or path.suffix.lower() == ".log":
+    for path, relative in walk_files(source):
+        if relative.suffix.lower() == ".log":
             continue
-        relative = path.relative_to(source)
-        target = destination / relative
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(path, target)
+        _copy(path, destination / relative)
 
 
 def _copy_materials(root: Path, destination: Path) -> tuple[int, int]:
