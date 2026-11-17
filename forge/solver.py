@@ -15,8 +15,22 @@ from __future__ import annotations
 
 SOLVER_SUFFIXES = ("_IKTARGET", "_OFFSET")
 SOLVER_PREFIXES = ("muzzle", "weaponHand")
+HAND_PREFIXES = ("hand_", "finger_")
 
 
 def is_solver_input(name: str) -> bool:
     """True when ``name`` is a target/offset the animgraph solves from."""
     return name.endswith(SOLVER_SUFFIXES) or name.startswith(SOLVER_PREFIXES)
+
+
+def is_hand_deform(name: str) -> bool:
+    """True for a deform hand or finger bone, not a weapon/IK proxy.
+
+    Deadlock's hand chains are short and tightly weighted.  A retarget that
+    copies a hero hand joint's world translation onto a custom hand with a
+    slightly different rest position moves every finger relative to its own
+    palm; even a centimetre is a visible break at the knuckles.  These bones
+    therefore keep their custom head position and take the hero rotation only.
+    """
+    key = (name or "").casefold()
+    return key.startswith(HAND_PREFIXES) and not is_solver_input(name)

@@ -1293,6 +1293,20 @@ class DMF_Settings(PropertyGroup):
         type=bpy.types.Action,
     )
     compare_active: BoolProperty(name="Split compare active", default=False)
+    hand_preview_action: PointerProperty(
+        name="Hand preview action",
+        description=(
+            "Imported hero action played on the custom rig for hand inspection; blank uses "
+            "the Compare action, the selected clip, or the hero's current action"
+        ),
+        type=bpy.types.Action,
+    )
+    hand_preview_active: BoolProperty(
+        name="Hand preview active",
+        description="A non-destructive hand preview is running; Stop restores the actions and pose",
+        default=False,
+    )
+    hand_preview_note: StringProperty(name="Hand preview note", default="")
 
     axis_tick: IntProperty(
         name="Axis tick",
@@ -1695,8 +1709,10 @@ def _refresh_after_load(*_args) -> None:
     """A project saved with packages opens with its visible collection filled."""
     scene = getattr(bpy.context, "scene", None)
     settings = getattr(scene, "dmf", None) if scene is not None else None
-    if settings is not None and settings.mods and not settings.mod_rows:
-        refresh_mod_rows(settings)
+    if settings is not None:
+        settings.hand_preview_active = False
+        if settings.mods and not settings.mod_rows:
+            refresh_mod_rows(settings)
 
 
 def register() -> None:

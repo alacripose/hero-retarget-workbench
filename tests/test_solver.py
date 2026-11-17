@@ -2,7 +2,7 @@
 
 import unittest
 
-from forge.solver import is_solver_input
+from forge.solver import is_hand_deform, is_solver_input
 
 
 class SolverInputTests(unittest.TestCase):
@@ -24,6 +24,12 @@ class SolverInputTests(unittest.TestCase):
     def test_real_limbs_and_the_root_are_not(self):
         for name in ("root_motion", "pelvis", "spine_2", "head", "hand_L", "tail_0", "target_end"):
             self.assertFalse(is_solver_input(name), name)
+
+    def test_hand_deform_chains_exclude_weapon_and_ik_proxies(self):
+        for name in ("hand_L", "hand_R", "finger_index_0_L", "finger_thumb_2_R"):
+            self.assertTrue(is_hand_deform(name), name)
+        for name in ("weaponHand_L", "weaponIK_hand_L", "weapon_hand_R", "arm_lower_L", "muzzle_flash"):
+            self.assertFalse(is_hand_deform(name), name)
 
 
 if __name__ == "__main__":

@@ -495,6 +495,17 @@ class DMF_OT_nudge_bone(Operator):
             return {"CANCELLED"}
         axis = {"X": 0, "Y": 1, "Z": 2}[settings.nudge_axis]
         amount = float(settings.nudge_amount) * int(self.direction)
+        from . import rigops
+
+        if rigops.nudge_hand_preview(
+            settings, entry.source, axis, amount, settings.nudge_rotate
+        ):
+            _status(
+                settings,
+                f"Preview nudge {entry.source} {settings.nudge_axis} {amount:+.4f}; no keys written",
+                "INFO",
+            )
+            return {"FINISHED"}
         if settings.nudge_rotate:
             pose_bone.rotation_mode = "XYZ"
             pose_bone.rotation_euler[axis] += amount
