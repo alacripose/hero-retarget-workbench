@@ -1244,6 +1244,44 @@ class DMF_PT_skeleton(Panel):
         elif not settings.pose_preview:
             _hint(pose, "Previews the hero stance; the rest pose stays unchanged.", "INFO")
 
+        nudge = _section(
+            layout,
+            "Bone nudge",
+            "BONE_DATA",
+            "live preview" if settings.hand_preview_active else "selected row",
+        )
+        nudge.prop(settings, "nudge_axis", text="Axis")
+        nudge.prop(settings, "nudge_amount", text="Amount")
+        nudge.prop(settings, "nudge_rotate", text="Rotate")
+        step = nudge.row(align=True)
+        minus = step.operator("dmf.nudge_bone", text="- Step", icon="REMOVE")
+        minus.direction = -1
+        plus = step.operator("dmf.nudge_bone", text="+ Step", icon="ADD")
+        plus.direction = 1
+
+        preview = _section(
+            layout,
+            "Hand animation preview",
+            "PLAY",
+            "live" if settings.hand_preview_active else "off",
+        )
+        preview.prop_search(settings, "hand_preview_action", bpy.data, "actions", text="Action")
+        controls = preview.row(align=True)
+        controls.operator(
+            "dmf.preview_hands",
+            text="Stop preview" if settings.hand_preview_active else "Preview hands",
+            icon="PAUSE" if settings.hand_preview_active else "PLAY",
+        )
+        controls.operator("dmf.reset_hand_nudges", text="Reset nudges", icon="LOOP_BACK")
+        if settings.hand_preview_note:
+            _hint(preview, settings.hand_preview_note, "INFO")
+        else:
+            _hint(
+                preview,
+                "Pick a hand or finger row, then nudge while the action runs. Stop restores the actions and pose.",
+                "INFO",
+            )
+
         if not settings.bone_map:
             _hint(layout, "No rows yet. Scan the custom rig or add a row.", "QUESTION")
             return
@@ -1372,39 +1410,7 @@ class DMF_PT_skeleton_bones(Panel):
                 "dmf.copy_pose": "Copy pose",
             },
         )
-        nudge = layout.column(align=True)
-        nudge.prop(settings, "nudge_axis", text="Axis")
-        nudge.prop(settings, "nudge_amount", text="Amount")
-        nudge.prop(settings, "nudge_rotate", text="Rotate")
-        step = layout.row(align=True)
-        minus = step.operator("dmf.nudge_bone", text="- Step", icon="REMOVE")
-        minus.direction = -1
-        plus = step.operator("dmf.nudge_bone", text="+ Step", icon="ADD")
-        plus.direction = 1
         _hint(layout, "Alignment changes the bind pose. Rebind weighted meshes.", "INFO")
-
-        preview = _section(
-            layout,
-            "Hand animation preview",
-            "PLAY",
-            "live" if settings.hand_preview_active else "off",
-        )
-        preview.prop_search(settings, "hand_preview_action", bpy.data, "actions", text="Action")
-        controls = preview.row(align=True)
-        controls.operator(
-            "dmf.preview_hands",
-            text="Stop preview" if settings.hand_preview_active else "Preview hands",
-            icon="PAUSE" if settings.hand_preview_active else "PLAY",
-        )
-        controls.operator("dmf.reset_hand_nudges", text="Reset nudges", icon="LOOP_BACK")
-        if settings.hand_preview_note:
-            _hint(preview, settings.hand_preview_note, "INFO")
-        else:
-            _hint(
-                preview,
-                "Pick a hand or finger row, then use the nudge controls while the action runs. Stop restores the actions and pose.",
-                "INFO",
-            )
 
 
 class DMF_PT_weights(Panel):
