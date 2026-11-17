@@ -39,17 +39,19 @@ def record_part(settings, obj) -> bool:
     return True
 
 
-def import_companions(context, settings) -> dict:
-    """Import every other mesh DMX in the hero's folder onto the hero armature.
+def import_companions(context, settings, files=None) -> dict:
+    """Import the model's other render meshes, with or without an armature.
 
     A file only counts as a part when importing it produces a mesh, so a
     clip that shares the hero's prefix is skipped rather than guessed away.
+    ``files`` is the Components-page selection when the caller has one; a
+    model with no armature imports its static parts through the same path.
     """
     armature = settings.target_armature
     folder = hero_folder(settings)
     if folder is None or not folder.is_dir():
         raise RuntimeError("cloth-hero-folder-missing: choose the hero body DMX first")
-    files = clothscan.mesh_files(folder)
+    files = list(files) if files is not None else clothscan.mesh_files(folder)
     if not files:
         raise RuntimeError("cloth-hero-parts-missing: no mesh DMX sits beside the body")
     body_stem = Path(bpy.path.abspath(settings.body_dmx)).stem

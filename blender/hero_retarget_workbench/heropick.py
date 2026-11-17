@@ -101,6 +101,42 @@ def ensure(settings) -> int:
     return refresh(settings)
 
 
+def port_target(slug: str, model: str = "") -> str:
+    """Map a picked model onto a valid `mod_target` enum value, or NONE.
+
+    The picker's rows are every model in the pak, so `hero_slug` is usually a
+    model path, never one of the roster enum's values.  A port target only
+    exists when the picked path belongs to a live hero; assigning the path
+    itself is what raised Blender's enum TypeError on Warden.
+    """
+    value = str(slug or "").replace("\\", "/").strip().casefold()
+    model_path = str(model or "").replace("\\", "/").strip().casefold()
+    items = [(str(row[0]), str(row[2]).replace("\\", "/").strip().casefold()) for row in properties.HERO_ITEMS]
+    for item_slug, _item_model in items:
+        if value == item_slug.casefold() and value != "none":
+            return item_slug
+    for item_slug, item_model in items:
+        if item_slug.casefold() == "none":
+            continue
+        if model_path and model_path == item_model:
+            return item_slug
+    # A roster row can be stored as its model path, and a variant folder can
+    # share the hero's stem (nano_v2/nano.vmdl).  Compare path stems and the
+    # hero folder before giving up on the port target.
+    model_stem = model_path.rsplit("/", 1)[-1].rsplit(".", 1)[0]
+    model_parent = model_path.rsplit("/", 1)[-2] if "/" in model_path else ""
+    for item_slug, item_model in items:
+        if item_slug.casefold() == "none":
+            continue
+        item_stem = item_model.rsplit("/", 1)[-1].rsplit(".", 1)[0]
+        item_parent = item_model.rsplit("/", 1)[-2] if "/" in item_model else ""
+        if model_stem and model_stem == item_stem:
+            return item_slug
+        if model_parent and model_parent == item_parent:
+            return item_slug
+    return "NONE"
+
+
 def choose(settings, index: int) -> str:
     """Point `hero_slug` at one visible row and return the chosen title."""
     rows = settings.hero_rows

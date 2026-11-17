@@ -573,12 +573,19 @@ def choose_body(
                 continue
             scored.append((overlap, path.stat().st_size, path))
         if not scored:
-            raise LiveError(
-                "body-has-no-model-joints: "
-                f"none of {len(pool)} render meshes in {Path(render_meshes[0]).parent.name} "
-                "names a bone of the model's own Skeleton section; the body is a mesh "
-                "skinned to those bone nodes, not an animation document"
-            )
+            # A static prop can have a model Skeleton section and meshes that
+            # carry no joints.  Choosing the largest declared LOD0 mesh keeps
+            # the model importable; the joint check is a preference, not a
+            # reason to fail the whole Source-page import.
+            fallback = [path for path in pool if "lod" not in path.stem.lower()] or pool
+            if not fallback:
+                wanted = {Path(entry).stem.lower() for entry in (render_meshes or ())}
+                fallback = [
+                    path for path in candidates
+                    if (not wanted or path.stem.lower() in wanted)
+                    and "lod" not in path.stem.lower()
+                ] or candidates
+            return max(fallback, key=lambda path: path.stat().st_size) if fallback else None
         scored.sort(key=lambda row: (row[0], row[1]), reverse=True)
         return scored[0][2]
     declared: list[Path] = []
@@ -642,9 +649,15 @@ def body_for_hero_folder(vmdl: Path, dmx: list[Path] | None = None) -> Path | No
     try:
         from . import modeldoc
 
-        for group in modeldoc.body_groups(text):
-            group_meshes.extend(group.meshes)
-            break
+        # A model can carry an optional group (Warden's only group is the
+        # low-violence cage hand) without a DEFAULT group.  Taking the first
+        # group then restricts the body pool to an accessory and leaves zero
+        # render meshes.  Only DEFAULT/BASE narrows the body; otherwise the
+        # model's RenderMeshList is the pool and size decides the body.
+        groups = modeldoc.body_groups(text)
+        default = next((group for group in groups if group.name.casefold() == "default"), None)
+        if default is not None:
+            group_meshes.extend(default.meshes)
     except Exception:
         group_meshes = []
     return choose_body(
@@ -661,21 +674,22 @@ def inventory(root: Path, hero: Hero, *, log: Path | None = None) -> Extraction:
     dmx = sorted(path for path in files if path.suffix.lower() == ".dmx")
     gltf = sorted(path for path in files if path.suffix.lower() in (".gltf", ".glb"))
     materials = sorted(path for path in files if path.suffix.lower() == ".vmat")
-    render: list[str] = []
+    body = None
     if vmdls:
+        # The Components inventory already reads the model's own RenderMeshList
+        # and marks its primary mesh.  Use that same answer here instead of a
+        # second body-matching rule; a static prop or an NPC body is valid.
         try:
-            render = render_mesh_files(vmdls[0].read_text(encoding="utf-8", errors="replace"))
-        except OSError:
-            render = []
-    body = body_for_hero_folder(vmdls[0], dmx) if vmdls else None
-    if body is not None and render:
-        declared = {Path(entry).stem.lower() for entry in render}
-        if body.stem.lower() not in declared:
-            raise LiveError(
-                "body-not-a-render-mesh: "
-                f"{body.name} is not in {vmdls[0].name}'s RenderMeshList; the body is a mesh "
-                "the model renders, never an animation document"
-            )
+            from . import components
+
+            rows = components.inventory(root, vmdl=vmdls[0], include_materials=False)
+            body = next((row.path for row in rows if getattr(row, "primary", False)), None)
+            if body is None and rows:
+                body = rows[0].path
+        except Exception:
+            body = body_for_hero_folder(vmdls[0], dmx)
+    # A model is allowed to be a static prop or a rig without a body.  The
+    # Source page still extracts it; Import model decides what it can build.
     return Extraction(
         hero=hero,
         root=root,
