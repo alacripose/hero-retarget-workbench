@@ -31,6 +31,17 @@ C:\Users\ala\.agents\skills\ has a ton of skills for agents to use and yet they 
 
 Do not delete patch probes.
 
+## 2026-11-17 — accuracy is continuous and follows the selected halo (0.22.4)
+
+**Owner instruction, verbatim:** *"look at the fucking screenshot I pose the heirarchy copy closer to where it needs to be (the fucking red halo to the heroes blue halo) and accuracy doesn't fucking update this is the fucking problem I'm trying to get you to diagnose you piece of shit"*, then *"it's \like if the fucking accuracy measurment is using the pose mode bone instead of the selected bone it's not that fucking hard if you stop jerking me around"*
+
+- **The card and legend already use the selected item, not the active pose bone.** `_metrics` is called with the source resolved from `hierarchy_index`, and `_draw_info` and `_draw_legend` read that selected item. The active pose bone is not read for the percentage. The visible face of the bug was the metric, not the selection.
+- **The metric was clamped to a flat 0.** `min(1.0, max(rotation / 75°, pos_error / (2 * scale)))` returned exactly 1 for every pose past two bone lengths or 75°, so the card showed `0%` across a whole range while the red halo moved.
+- **Accuracy is now continuous.** The position ratio is the selected head distance over the world rest length; the direction ratio is the angle between the selected and target bone directions over 75°. `accuracy = 1 / ((1 + position²) * (1 + direction²))`; the heat uses `error = 1 - accuracy`. The number moves as soon as the halo moves and cannot stick at 0 over a range. The full XYZ rotation rows are unchanged; the percentage uses bone direction so a rest-roll difference does not pin it.
+- **Measured.** `artifacts/probes/accuracy_scale_probe.py` reads `accuracy 99.6` on the 50x object-scale case. The identity overlay probe moves the arm and reads `accuracy_before 97.7`, `accuracy_after 67.0`. `artifacts/ui-pass/overlay-pose-mode.png` shows the card with the continuous value.
+- **Evidence.** 343 pytest tests pass; compileall, `ui_parity --check` (0 duplicates/undrawn) and `ui_prose --check` are clean. The local zip is `dist/hero_retarget_workbench-0.22.4.zip`, 71 files, 529,492 bytes, sha256 `f207c893b4c099cebfbc2857fd237864e4e309931a557a761b3bfebceddd53ce`; `tools/blender_zip_probe.py` passes with 112 operators, 26 panels and version `0.22.4` (`artifacts/receipts/zip-0224.json`).
+- **Not checked.** The owner's real Warden rig; the reproduction uses the scaled synthetic rig and the identity overlay probe. The percentage is a continuous comparison of the selected halo and direction, not a retarget proof.
+
 ## 2026-11-17 — accuracy follows the hierarchy copy's object scale (0.22.3)
 
 **Owner instruction, verbatim:** *"as you can see here despite it knowing that I'm trying to align it to wardens armature, it's not working with the hero heirarchy copy so it's not showing me the acurracy. the hero coordinates fdo work so the accurecy is just not right atm"*
