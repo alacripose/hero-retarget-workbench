@@ -1297,15 +1297,10 @@ class DMF_Settings(PropertyGroup):
         default=False,
     )
     nudge_overlay_error: StringProperty(name="Nudge overlay error", default="")
-    nudge_rest_armature: PointerProperty(
-        name="Nudge rest armature",
-        description="Temporary rest-pose copy shown in the left split while nudge mode runs",
-        type=bpy.types.Object,
-    )
-    nudge_rest_area: StringProperty(
-        name="Nudge rest viewport",
-        description="Screen position of the split pane that shows the temporary rest copy",
-        default="",
+    nudge_active: BoolProperty(
+        name="Nudge mode",
+        description="Pose mode is running with the nudge overlay; pressing Nudge mode again finishes and restores",
+        default=False,
     )
 
     compare_action: PointerProperty(

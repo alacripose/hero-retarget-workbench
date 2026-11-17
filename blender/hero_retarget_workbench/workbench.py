@@ -6,7 +6,6 @@ import re
 
 import bpy
 from bpy.types import Operator
-from mathutils import Matrix, Vector
 
 from . import core, hierarchy_view, proofing, weights
 
@@ -571,41 +570,15 @@ def _compare_objects(settings):
     return left, right
 
 
-# The temporary rest/animation split lives only for the nudge session.  Keeping
-# the state here means the panel stop and the modal exit can remove the same
-# copies instead of leaving a hidden rest duplicate in the .blend.
-_NUDGE_SPLIT = None
-
-
-def _nudge_copy(source):
-    """A cheap, unanimated viewport copy of a custom object.
-
-    The mesh data is shared (the base mesh is already the rest shape), and the
-    armature data is shared while the copy's pose bases are cleared.  No action,
-    key, modifier or rest edit reaches the original object.
-    """
-    if source is None:
-        return None
-    duplicate = source.copy()
-    duplicate.name = f"DMF Nudge Rest {source.name}"
-    duplicate.animation_data_clear()
-    duplicate.parent = None
-    duplicate.matrix_world = source.matrix_world.copy()
-    if duplicate.type == "MESH":
-        duplicate.modifiers.clear()
-    elif duplicate.type == "ARMATURE":
-        for pose_bone in duplicate.pose.bones:
-            for constraint in list(pose_bone.constraints):
-                pose_bone.constraints.remove(constraint)
-            pose_bone.matrix_basis = Matrix.Identity(4)
-    duplicate.hide_render = True
-    duplicate.hide_viewport = False
-    bpy.context.scene.collection.objects.link(duplicate)
-    try:
-        duplicate.hide_set(False)
-    except (AttributeError, RuntimeError):
-        pass
-    return duplicate
+# The nudge split is two ordinary orthographic viewports.  Local view is a
+# per-screen state, not a per-area one, so the old temporary rest copies and
+# pane-by-pane local views could not show rest left and animation right: both
+# panes always showed whichever set was entered last.  Re-entering that local
+# view on exit is what left the owner looking at an empty or hero-only viewport
+# with the custom model gone, so the copies and the local-view juggling are
+# gone and nothing is hidden.
+_NUDGE_VIEW = False
+_NUDGE_TRIES = 0
 
 
 def _configure_nudge_view(area) -> None:
@@ -638,161 +611,70 @@ def _configure_nudge_view(area) -> None:
         pass
 
 
-def _local_view_reset(context, area, objects) -> None:
-    """Leave an old local view before entering the new one."""
-    if area is None or area.spaces.active is None:
-        return
-    if area.spaces.active.local_view is not None:
-        _local_view(context, area, [], False)
-    if objects:
-        _local_view(context, area, objects, True)
-
-
 def _valid_view3d_areas(context):
     """Only laid-out viewports count; a fresh area_split is 0x0 for one tick."""
     return [area for area in _view3d_areas(context) if area.width > 0 and area.height > 0]
 
 
-def _apply_nudge_split(context, state) -> bool:
-    """Bind the rest copies after Blender has laid out the split areas."""
-    areas = sorted(_valid_view3d_areas(context), key=lambda area: (area.x, area.y))
+def _configure_nudge_panes() -> bool:
+    areas = sorted(_valid_view3d_areas(bpy.context), key=lambda area: (area.x, area.y))
     if len(areas) < 2:
         return False
-    left = areas[0]
-    right = areas[-1]
-    try:
-        _local_view_reset(context, left, state["left_objects"])
-        _local_view_reset(context, right, state["right_objects"])
-        _configure_nudge_view(left)
-        _configure_nudge_view(right)
-    except Exception:
-        return False
-    state["left"] = left
-    state["right"] = right
-    state["configured"] = True
-    settings = state["settings"]
-    settings.nudge_rest_armature = state["rest_armature"]
-    settings.nudge_rest_area = f"{left.x}:{left.y}"
-    settings.compare_active = True
-    _status(settings, "Nudge view: rest copy left, animated rig right; both orthographic", "OK")
+    for area in areas[:2]:
+        _configure_nudge_view(area)
     return True
 
 
-def _stop_nudge_timer() -> None:
+def _configure_nudge_split():
+    """Timer callback: configure the panes once Blender has laid them out."""
+    global _NUDGE_TRIES
+    if not _NUDGE_VIEW:
+        return None
+    if _configure_nudge_panes():
+        return None
+    _NUDGE_TRIES += 1
+    return 0.05 if _NUDGE_TRIES <= 40 else None
+
+
+def start_nudge_compare(context, settings):
+    """Split the viewport into two orthographic panes for nudge mode.
+
+    Both panes show the real scene: the custom rig stays selectable and a pose
+    made in Pose Mode is exactly what the overlay measures.  No object is
+    copied, hidden or isolated, so finishing nudge mode cannot remove the
+    custom model from view.  ``screen.area_split`` creates the second area
+    immediately but at zero size until the window lays out, so a fresh split is
+    configured on a short timer.
+    """
+    global _NUDGE_VIEW, _NUDGE_TRIES
+    clear_nudge_compare(context)
+    if settings.custom_armature is None:
+        raise RuntimeError("nudge-view-needs-rig: choose the custom armature first")
+    if len(_valid_view3d_areas(context)) < 2 and len(_view3d_areas(context)) < 2:
+        _split(context)
+    _NUDGE_VIEW = True
+    _NUDGE_TRIES = 0
+    settings.compare_active = True
+    if not _configure_nudge_panes():
+        try:
+            bpy.app.timers.register(_configure_nudge_split, first_interval=0.05)
+        except Exception:
+            _NUDGE_VIEW = False
+            raise
+    _status(settings, "Nudge view: orthographic panes with the navigation gizmo", "OK")
+    return True
+
+
+def clear_nudge_compare(context=None) -> bool:
+    """End the nudge pane setup.  Panes and objects stay exactly as they are."""
+    global _NUDGE_VIEW
+    if not _NUDGE_VIEW:
+        return False
     try:
         bpy.app.timers.unregister(_configure_nudge_split)
     except (ValueError, RuntimeError):
         pass
-
-
-def _configure_nudge_split():
-    """Timer callback: retry until the new split area has a real size."""
-    state = _NUDGE_SPLIT
-    if state is None or state.get("configured"):
-        return None
-    if _apply_nudge_split(bpy.context, state):
-        return None
-    state["tries"] = state.get("tries", 0) + 1
-    if state["tries"] > 40:
-        settings = state.get("settings")
-        if settings is not None:
-            _status(settings, "Nudge view: Blender did not lay out the split viewport", "WARN")
-        return None
-    return 0.05
-
-
-def start_nudge_compare(context, settings):
-    """Open the rest/animation split used by nudge mode.
-
-    Left: a temporary rest copy of the custom mesh/rig.  Right: the original
-    custom mesh/rig, which the hand preview and nudge offsets drive.  Both panes
-    are orthographic and expose Blender's navigation gizmo.
-
-    ``screen.area_split`` creates the second area immediately but a zero-size
-    area until the window lays out.  The first setup attempt therefore happens
-    now when both panes are already valid, and otherwise on a short timer; the
-    old code bound the rest copy to the zero-size area.
-    """
-    global _NUDGE_SPLIT
-    clear_nudge_compare(context)
-    if settings.custom_armature is None:
-        raise RuntimeError("nudge-view-needs-rig: choose the custom armature first")
-    areas = _valid_view3d_areas(context)
-    if len(areas) < 2:
-        if len(_view3d_areas(context)) < 2:
-            _split(context)
-        areas = _valid_view3d_areas(context)
-    if not areas:
-        raise RuntimeError("nudge-view-needs-viewport: open a 3D viewport first")
-    left_original, right_original = _compare_objects(settings)
-    created = []
-    rest_mesh = _nudge_copy(settings.custom_mesh)
-    if rest_mesh is not None:
-        created.append(rest_mesh)
-    rest_armature = _nudge_copy(settings.custom_armature)
-    if rest_armature is not None:
-        created.append(rest_armature)
-    left_objects = [obj for obj in (rest_mesh, rest_armature) if obj is not None]
-    right_objects = [obj for obj in (settings.custom_mesh, settings.custom_armature) if obj is not None]
-    if not right_objects:
-        right_objects = [settings.custom_armature]
-    state = {
-        "settings": settings,
-        "left": None,
-        "right": None,
-        "created": created,
-        "rest_armature": rest_armature,
-        "left_objects": left_objects,
-        "right_objects": right_objects,
-        "left_original": left_original,
-        "right_original": right_original,
-        "configured": False,
-        "tries": 0,
-    }
-    _NUDGE_SPLIT = state
-    if len(areas) >= 2 and _apply_nudge_split(context, state):
-        return state
-    try:
-        _stop_nudge_timer()
-        bpy.app.timers.register(_configure_nudge_split, first_interval=0.05)
-    except Exception:
-        clear_nudge_compare(context)
-        raise
-    return state
-
-
-def clear_nudge_compare(context=None) -> bool:
-    """Remove the temporary rest copies and restore the ordinary compare views."""
-    global _NUDGE_SPLIT
-    state = _NUDGE_SPLIT
-    if state is None:
-        return False
-    _stop_nudge_timer()
-    current = context or bpy.context
-    for area, objects in (
-        (state.get("left"), state.get("left_original")),
-        (state.get("right"), state.get("right_original")),
-    ):
-        if area is None:
-            continue
-        try:
-            if not objects:
-                if area.spaces.active is not None and area.spaces.active.local_view is not None:
-                    _local_view(current, area, [], False)
-            else:
-                _local_view_reset(current, area, objects)
-        except (AttributeError, RuntimeError, TypeError):
-            pass
-    for obj in state.get("created", []):
-        try:
-            bpy.data.objects.remove(obj, do_unlink=True)
-        except (ReferenceError, RuntimeError):
-            pass
-    settings = getattr(getattr(current, "scene", None), "dmf", None)
-    if settings is not None:
-        settings.nudge_rest_armature = None
-        settings.nudge_rest_area = ""
-    _NUDGE_SPLIT = None
+    _NUDGE_VIEW = False
     return True
 
 

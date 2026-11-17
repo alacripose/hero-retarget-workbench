@@ -435,6 +435,7 @@ def start_hand_preview(settings) -> str:
 
 
 def stop_hand_preview(settings) -> bool:
+    settings.nudge_active = False
     if _PREVIEW is None:
         settings.hand_preview_active = False
         _clear_nudge_view()
@@ -757,109 +758,103 @@ def _next_mapped_source(settings, reverse: bool = False) -> str:
     return ""
 
 
+_NUDGE_STARTED_PREVIEW = False
+
+
 class DMF_OT_nudge_mode(Operator):
     bl_idname = "dmf.nudge_mode"
     bl_label = "Nudge Mode"
-    bl_description = "Open the rest/animation split and orthographic view for keyboard nudging; Enter restores and exits"
+    bl_description = "Pose the selected chain in Pose Mode with the warm/cool overlay; press again to finish"
 
-    def _hint(self, settings) -> str:
+    def _hint(self) -> str:
         return (
-            f"Nudge {self.bone or 'a bone'}  |  {settings.nudge_axis} "
-            f"{'rotate' if settings.nudge_rotate else 'translate'} "
-            f"{'relative' if settings.nudge_relative else 'absolute'}  |  "
-            "arrows/+- step  X/Y/Z axis  R rotate  Tab next  Backspace reset  Enter finish"
+            "Nudge mode: pose with Blender's own tools (G/R/S, gizmo). "
+            "Click a bone for its chain; the overlay compares it with the hero. "
+            "Press Nudge mode again to finish and restore the saved pose."
         )
 
-    def _status(self, context) -> None:
+    def _workspace_hint(self, context, text) -> None:
         try:
-            context.workspace.status_text_set(self._hint(context.scene.dmf))
+            context.workspace.status_text_set(text)
         except (AttributeError, TypeError, RuntimeError):
             pass
 
-    def _finish(self, context, *, close_view: bool = False) -> None:
-        try:
-            context.workspace.status_text_set(None)
-        except (AttributeError, TypeError, RuntimeError):
-            pass
-        if close_view:
-            _clear_nudge_view(context)
-        jobs._tag_redraw()
-
-    def _apply(self, settings, sign: float) -> None:
-        if not self.bone:
-            return
-        rotate = bool(settings.nudge_rotate)
-        amount = effective_step(settings, self.bone, rotate) * sign
-        if not nudge_hand_preview(settings, self.bone, {"X": 0, "Y": 1, "Z": 2}[settings.nudge_axis], amount, rotate):
-            raise RigError("nudge-mode-preview-stopped: start the hand preview again")
-
-    def invoke(self, context, event):
-        settings = context.scene.dmf
+    def _enter(self, context, settings) -> None:
+        global _NUDGE_STARTED_PREVIEW
+        if settings.custom_armature is None:
+            raise RigError("nudge-mode-needs-rig: choose the custom armature first")
         selected = _selected_source(settings)
         if not selected:
-            _status(settings, "Select a mapped hand or finger row before entering nudge mode", "ERROR")
-            self.report({"ERROR"}, "No selected mapped bone")
-            return {"CANCELLED"}
+            active = getattr(context, "active_pose_bone", None)
+            selected = active.name if active is not None else ""
+        if not selected:
+            raise RigError("nudge-mode-needs-bone: select a mapped row or a custom bone")
         if _PREVIEW is None:
-            try:
-                start_hand_preview(settings)
-            except Exception as error:
-                _status(settings, str(error), "ERROR")
-                self.report({"ERROR"}, str(error))
-                return {"CANCELLED"}
+            start_hand_preview(settings)
+            _NUDGE_STARTED_PREVIEW = True
         settings.show_nudge_overlay = True
-        self.bone = selected
+        settings.nudge_active = True
+        armature = settings.custom_armature
+        core.select_only(context, [armature])
+        bpy.context.view_layer.objects.active = armature
+        if armature.mode != "POSE":
+            try:
+                bpy.ops.object.mode_set(mode="POSE")
+            except RuntimeError:
+                pass
+        bone = armature.data.bones.get(selected)
+        if bone is not None:
+            # The active bone is what Pose Mode selects; ``Bone.select`` is not
+            # available in every 5.x build this addon loads in.
+            armature.data.bones.active = bone
         try:
             from . import workbench
 
             workbench.start_nudge_compare(context, settings)
         except Exception as error:
             _status(settings, f"Nudge mode: split view unavailable: {error}", "WARN")
-        context.window_manager.modal_handler_add(self)
-        self._status(context)
-        return {"RUNNING_MODAL"}
+        self._workspace_hint(context, self._hint())
 
-    def modal(self, context, event):
-        settings = context.scene.dmf
-        if _PREVIEW is None:
-            self._finish(context, close_view=True)
-            return {"CANCELLED"}
-        if event.type == "ESC" and event.value == "PRESS":
-            self._finish(context)
-            return {"FINISHED"}
-        if event.type in {"RET", "NUMPAD_ENTER"} and event.value == "PRESS":
+    def _leave(self, context, settings) -> None:
+        global _NUDGE_STARTED_PREVIEW
+        self._workspace_hint(context, None)
+        if bpy.context.object is not None and bpy.context.object.mode != "OBJECT":
+            try:
+                bpy.ops.object.mode_set(mode="OBJECT")
+            except RuntimeError:
+                pass
+        if _NUDGE_STARTED_PREVIEW:
             stop_hand_preview(settings)
-            self._finish(context, close_view=True)
-            return {"FINISHED"}
-        if event.value == "PRESS":
-            if event.type in {"X", "Y", "Z"}:
-                settings.nudge_axis = event.type
-                self._status(context)
-                return {"RUNNING_MODAL"}
-            if event.type == "R":
-                settings.nudge_rotate = not settings.nudge_rotate
-                self._status(context)
-                return {"RUNNING_MODAL"}
-            if event.type == "TAB":
-                self.bone = _next_mapped_source(settings, reverse=bool(event.shift))
-                self._status(context)
-                return {"RUNNING_MODAL"}
-            if event.type == "BACK_SPACE":
-                reset_hand_nudges(settings)
-                self._status(context)
-                return {"RUNNING_MODAL"}
+            _NUDGE_STARTED_PREVIEW = False
+        else:
+            _clear_nudge_view(context)
+        settings.show_nudge_overlay = False
+        settings.nudge_active = False
+        jobs._tag_redraw()
+
+    def execute(self, context):
+        settings = context.scene.dmf
         try:
-            factor = 0.2 if event.shift else 1.0
-            if event.type in {"RIGHT_ARROW", "EQUAL", "NUMPAD_PLUS", "WHEELUPMOUSE"}:
-                self._apply(settings, factor)
-            elif event.type in {"LEFT_ARROW", "MINUS", "NUMPAD_MINUS", "WHEELDOWNMOUSE"}:
-                self._apply(settings, -factor)
+            if settings.nudge_active:
+                self._leave(context, settings)
+                _status(
+                    settings,
+                    "Nudge mode finished; the saved pose and actions were restored",
+                    "OK",
+                )
+            else:
+                self._enter(context, settings)
+                _status(
+                    settings,
+                    "Nudge mode: pose the chain in Pose Mode; the overlay heats it against the hero",
+                    "INFO",
+                )
         except Exception as error:
+            self._workspace_hint(context, None)
             _status(settings, str(error), "ERROR")
-            self._finish(context, close_view=True)
+            self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
-        self._status(context)
-        return {"RUNNING_MODAL"}
+        return {"FINISHED"}
 
 
 class DMF_OT_preview_hands(Operator):
