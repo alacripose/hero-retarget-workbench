@@ -1402,6 +1402,7 @@ class DMF_PT_weights(Panel):
         ui_popit.page(layout, settings, "Weights", settings.weight_mode.title(), "MOD_VERTEX_WEIGHT")
 
         layout.prop(settings, "weight_mode", text="Method")
+        _hint(layout, "Mapped groups is the strict choice; surface never adds a bone outside the vertex's own mapped family.", "INFO")
         options = layout.column(align=True)
         options.enabled = not settings.job_running
         options.prop(settings, "max_distance", text="Surface reach")

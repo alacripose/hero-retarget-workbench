@@ -102,6 +102,26 @@ def bone_related(
     return first in ancestors(second) or second in ancestors(first)
 
 
+def bone_family(
+    name: str,
+    parents: Mapping[str, str],
+    children: Mapping[str, Sequence[str]],
+) -> set[str]:
+    """The bone, its parent and its direct children.
+
+    Surface transfer should not jump across a whole limb.  A thigh vertex may
+    blend with the pelvis and the shin, while a finger stays outside that set;
+    the parent/child step is the joint blend a skinned mesh actually needs.
+    """
+    family = {name} if name else set()
+    parent = parents.get(name, "") if name else ""
+    if parent:
+        family.add(parent)
+    if name:
+        family.update(children.get(name, ()))
+    return family
+
+
 def envelope_weights(
     point: Sequence[float],
     segments: Iterable[BoneSegment],

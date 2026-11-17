@@ -223,7 +223,7 @@ def live_checks(settings, options) -> list[Check]:
             continue
         if state in ("MAPPED", "EXTRA", "IGNORED"):
             continue
-        if options.mode in ("HYBRID", "ENVELOPE") and name in armature.data.bones:
+        if options.mode in ("MAPPED", "HYBRID", "ENVELOPE") and name in armature.data.bones:
             # An unrigged custom mesh has no source rows. The solver's output is
             # already a target bone, so it is not an unresolved source group.
             continue

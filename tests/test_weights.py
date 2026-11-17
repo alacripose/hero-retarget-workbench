@@ -3,6 +3,7 @@ import unittest
 from forge.weights import (
     BoneSegment,
     WeightError,
+    bone_family,
     bone_related,
     envelope_weights,
     fold_source,
@@ -62,6 +63,29 @@ class WeightTests(unittest.TestCase):
         self.assertTrue(bone_related("finger_1_L", "hand_L", parents))
         self.assertFalse(bone_related("finger_1_L", "thigh_L", parents))
         self.assertFalse(bone_related("finger_1_L", "shin_L", parents))
+
+    def test_bone_family_is_the_joint_blend_not_the_whole_chain(self):
+        parents = {
+            "pelvis": "",
+            "thigh_L": "pelvis",
+            "shin_L": "thigh_L",
+            "foot_L": "shin_L",
+            "spine_0": "pelvis",
+            "arm_upper_L": "spine_0",
+            "hand_L": "arm_upper_L",
+            "finger_1_L": "hand_L",
+        }
+        children = {}
+        for child, parent in parents.items():
+            if parent:
+                children.setdefault(parent, []).append(child)
+        thigh = bone_family("thigh_L", parents, children)
+        self.assertEqual(thigh, {"pelvis", "thigh_L", "shin_L"})
+        self.assertNotIn("finger_1_L", thigh)
+        pelvis = bone_family("pelvis", parents, children)
+        self.assertNotIn("finger_1_L", pelvis)
+        hand = bone_family("hand_L", parents, children)
+        self.assertIn("finger_1_L", hand)
 
     def test_merge_adds_shared_bones(self):
         merged = merge_weights({"a": 0.5, "b": 0.5}, {"a": 0.25, "c": 0.25})

@@ -259,11 +259,13 @@ it publishes anything.
 8. **Compare** — splits the viewport and creates local views: hero body on the
    left, custom mesh on the right, both driven by the target rig when bound. A
    preview action can be applied to both rigs.
-9. **Solve & Bind** — `HYBRID` uses mapped custom weights as a prior, samples
-   the hero surface near the mesh, and uses mapped bone envelopes for tails,
-   wings, hair and other geometry outside the body. `CUSTOM` and `ENVELOPE` are
-   separate methods. Extra bones can be folded, kept as new hero-rig bones, or
-   dropped. The solve is chunked on a timer, not one blocking `DATA_TRANSFER`.
+9. **Solve & Bind** — `MAPPED` is the strict default: each painted custom group
+   writes only its mapped hero bone, and an unweighted vertex gets the nearest
+   mapped bone family; no hero-surface sample is read. `HYBRID` samples the hero
+   surface but can only add the vertex's own mapped bone, its parent or its
+   direct children. `CUSTOM` and `ENVELOPE` are separate methods. Extra bones can
+   be folded, kept as new hero-rig bones, or dropped. The solve is chunked on a
+   timer, not one blocking `DATA_TRANSFER`.
 10. **Mint Axis Proof** — records the weight artifact with BLAKE3, the claim,
     origin, evidence, tick span, world digest, presenter, ticket and named checks
     (coverage, normalization, influence limit, bone map, binding, extra bones,
