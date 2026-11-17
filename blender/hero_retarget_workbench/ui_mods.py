@@ -277,6 +277,13 @@ class DMF_PT_mods(Panel):
                 text=_project_label(selected),
                 icon="FILE_BLEND",
             )
+            source = detail.row(align=True)
+            source.enabled = not settings.job_running
+            source.operator(
+                "dmf.use_mod_source",
+                text="Use project as source" if selected.kind == "blend" else "Use mod as source",
+                icon="IMPORT",
+            )
             if selected.blends and selected.kind != "blend":
                 detail.label(
                     text=selected.blends.splitlines()[0],

@@ -147,6 +147,7 @@ def main() -> int:
             for group in (
                 dmf.ui.CLASSES,
                 dmf.operators.CLASSES,
+                dmf.pipeline_ops.CLASSES,
                 dmf.workbench.CLASSES,
                 dmf.rules.CLASSES,
                 dmf.poseview.CLASSES,
@@ -168,6 +169,7 @@ def main() -> int:
             value
             for module in (
                 dmf.operators,
+                dmf.pipeline_ops,
                 dmf.workbench,
                 dmf.rules,
                 dmf.poseview,
