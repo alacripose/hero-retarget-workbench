@@ -1476,6 +1476,18 @@ class DMF_PT_weights(Panel):
                 "dmf.bake_custom_rig": "Bake hero to custom",
             },
         )
+        fallback.operator(
+            "dmf.hero_hierarchy_rig",
+            text="Hero hierarchy copy",
+            icon="ARMATURE_DATA",
+        )
+        _hint(
+            fallback,
+            "Hero hierarchy copy keeps the custom rest bones and weights but rebuilds the "
+            "parents from the hero tree, then binds the custom mesh to the copy. Pose the "
+            "copy to line the proposed mesh up with the hero rest pose.",
+            "INFO",
+        )
         _path_row(fallback, settings, "custom_bake_dir", "Bake folder (blank = artifacts)")
         if settings.custom_bake_note:
             _hint(fallback, settings.custom_bake_note, "FILE")

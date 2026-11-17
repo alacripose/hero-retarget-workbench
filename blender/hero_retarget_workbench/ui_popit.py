@@ -415,6 +415,7 @@ _GLYPHS = {
     "dmf.refresh_hierarchy": "FILE_REFRESH",
     "dmf.pick_bone_map": "MOUSE_LMB",
     "dmf.select_hierarchy_bone": "RESTRICT_SELECT_OFF",
+    "dmf.hero_hierarchy_rig": "ARMATURE_DATA",
     "dmf.update_old_addon": "FILE_REFRESH",
     "dmf.add_rule": "ADD",
     "dmf.rule_from_row": "DUPLICATE",

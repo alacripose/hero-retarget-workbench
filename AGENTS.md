@@ -29,6 +29,20 @@ https://github.com/oaustegard/claude-skills/releases (declauding)
 https://github.com/hardikpandya/stop-slop
 <home>\.agents\skills\ has a ton of skills for agents to use and yet they never use them for some reason. You need to be using these skills and updating/managing them ccording to family project convention.
 
+Do not delete patch probes.
+
+## 2026-11-17 — the custom rest rig can be posed on the hero's parent tree (0.22.0)
+
+**Owner instruction, verbatim:** *"so a feature the overlay needs to support is when I am using a remapped armature, so I duplicated the warden armature because the model is mapped to it, but I need to pose the armature to the warden rest mode right? so when I am posing the duplicated hero armature to move the bones I can see how close the proposed hand mesh that doesn't correspond to the positions of the custom hero armature but instead its original armature (which I can't pose because it's got a different hierarchy) so there needs to be a way to duplicate the custom models armature with the hero's armature hierarchy"*
+
+- **`dmf.hero_hierarchy_rig` copies the custom armature, not the hero.** The new object keeps the custom bone names, rest heads/tails/rolls and current pose, so the custom mesh's existing vertex groups and weights drive it untouched. Only the parent edges come from the hero: `forge.rigmap.hero_tree` parents each mapped source under the source of its hero target's nearest mapped ancestor. Unmapped extra bones keep their own parent. A disagreement that would close a cycle cuts that edge instead of handing Blender an invalid tree.
+- **The custom mesh is rebound to the copy.** `_bind_custom` replaces the other armature modifiers with one pointing at the copy, and a mesh parented to the original rig is reparented to the copy with its world transform kept. The original armature stays in the scene and is not modified.
+- **The overlay gets the hero-shaped chain for free.** `settings.custom_armature` becomes the copy; the bone-map pick resolves to the same source names, `_chain` walks the hero parent tree, and no overlay control or mode was added.
+- **UI.** The **Hero hierarchy copy** button is in Weights → Keep the custom rig, below Use mapped names and Bake hero to custom. The hint names the rest bones, weights, parent tree and rebind.
+- **Evidence.** `artifacts/probes/hero_hierarchy_probe.py` reports `parent_before: root`, `parent_after: custom_arm`, `chain_before: [root, custom_hand]`, `chain_after: [root, custom_arm, custom_hand]`, `hand_moved: 0.1777 m`, `mesh_moved: 0.2493 m`, one armature modifier on the copy and the mesh parented to it; the original hand still has parent `root`. `tests/test_rigmap.py` pins the planner (mapped parent, extra bone, cycle cut, unmapped hero root). 343 pytest tests pass; compileall, `ui_parity --check` (WEIGHTS 13 actions, 0 duplicates/undrawn) and `ui_prose --check` are clean. `artifacts/ui-pass/pages/weights.png` shows the button and hint at version `0.22.0`.
+- **Version and zip.** `0.22.0`; local `dist/hero_retarget_workbench-0.22.0.zip`, 71 files, 530,518 bytes, sha256 `1ab074b88c4f222dbd9e6feff8943f88f5efb3beaf61e1633ee2b18297efc58a`; `tools/blender_zip_probe.py` passes with 114 operators, 26 panels, 50 icons and version `0.22.0` (`artifacts/receipts/zip-0220.json`).
+- **Not checked.** The owner's real Warden remapped rig and mesh; the probe uses a synthetic custom rig with a deliberately wrong hand parent. Posing the proposed mesh into the exact Warden rest pose is still an artist step; the copy only makes it possible.
+
 ## 2026-11-17 — the chain overlay highlights the panel pick, not the bone being posed (0.21.1)
 
 **Owner instruction, verbatim:** *"and I still need the highlighted bones in the overlay to be the bones I've chosen in the ui not the pose mode bones I'm posing"*, then *"Don't re-make the overlay into the thing that we use to edit it needs to just be the overlay wtf"*
