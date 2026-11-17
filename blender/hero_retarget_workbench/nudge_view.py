@@ -1,17 +1,15 @@
 """Viewport guides for the hand/bone nudge pass.
 
-The selected bone's rest and current segments are drawn over a screen-space
-radial field: hot at the rest head, cooling toward the edge.  The field radius is
-independent of the model, while its heat is normalised by the selected bone's
-own length, so a finger and an arm read on the same scale.  One active axis
-handle sits on the current head (X, Y or Z); the other axes are not drawn as
-separate gradient lines.
+The selected custom chain is drawn against its mapped hero chain.  Warm halos
+belong to the custom rig; cool halos belong to the hero target.  Each bone's
+warm colour is its position/rotation error: blue when aligned, green/amber as it
+moves away, red when it is far.  A selected bone keeps a warm outline even when
+it is close, so the bone being nudged is always identifiable.
 
-Nudge mode splits the 3D screen into a temporary rest copy on the left and the
-animated custom rig on the right.  The left pane is identified by
-``scene.dmf.nudge_rest_area`` and draws the rest copy's armature.  Drawing is a
-POST_PIXEL handler; a failure is recorded in ``nudge_overlay_error`` and never
-raised into Blender's draw loop.
+The old viewport-sized radial field is gone.  Each bone gets a small local halo,
+so a long arm does not wash out the hand.  Drawing is a POST_PIXEL handler; a
+failure is recorded in ``nudge_overlay_error`` and never raised into Blender's
+draw loop.
 """
 from __future__ import annotations
 
@@ -21,16 +19,20 @@ import blf
 import bpy
 import gpu
 from gpu_extras.batch import batch_for_shader
-from mathutils import Vector
+from mathutils import Matrix, Vector
+
+from forge.solver import is_solver_input
 
 _HANDLER = None
-_FIELD_STEPS = 48
-_FIELD_SEGMENTS = 48
+_FIELD_STEPS = 24
+_FIELD_SEGMENTS = 36
 
 TEXT = (0.88, 0.90, 0.94, 1.0)
 DIM = (0.55, 0.60, 0.68, 1.0)
 REST = (0.42, 0.47, 0.56, 0.80)
-POSED = (1.00, 0.64, 0.20, 1.0)
+WARM = (1.00, 0.52, 0.14, 1.0)
+COOL = (0.20, 0.72, 1.00, 0.95)
+COOL_BRIGHT = (0.48, 0.92, 1.00, 1.0)
 ACTIVE = (1.00, 0.86, 0.30, 1.0)
 PANEL = (0.045, 0.055, 0.070, 0.88)
 BORDER = (0.24, 0.28, 0.34, 1.0)
@@ -90,39 +92,62 @@ def _text(text: str, x: float, y: float, size: float = 11.0, color=TEXT) -> None
     blf.draw(font, text)
 
 
+def _label(text: str, x: float, y: float, size: float = 11.0, color=TEXT) -> None:
+    """A dark-backed label so bone names stay readable over the gradient."""
+    font = 0
+    blf.size(font, size)
+    width, height = blf.dimensions(font, text)
+    _fill(
+        [(x - 4.0, y - 3.0), (x + width + 4.0, y - 3.0), (x + width + 4.0, y + height + 3.0), (x - 4.0, y + height + 3.0)],
+        (0.025, 0.035, 0.050, 0.84),
+    )
+    _text(text, x, y, size, color)
+
+
 def _lerp(first, second, ratio: float):
     return tuple(first[index] + (second[index] - first[index]) * ratio for index in range(4))
 
 
 def _heat(ratio: float):
-    """Slate -> amber -> red, in the same order as the viewport field."""
+    """Blue when aligned, through green/amber, to red when far."""
     ratio = max(0.0, min(1.0, ratio))
-    if ratio < 0.5:
-        return _lerp((0.30, 0.62, 0.92, 0.95), (1.00, 0.76, 0.22, 1.0), ratio * 2.0)
-    return _lerp((1.00, 0.76, 0.22, 1.0), (1.00, 0.26, 0.26, 1.0), (ratio - 0.5) * 2.0)
+    if ratio < 0.35:
+        return _lerp((0.20, 0.62, 1.00, 1.0), (0.30, 0.88, 0.42, 1.0), ratio / 0.35)
+    if ratio < 0.70:
+        return _lerp((0.30, 0.88, 0.42, 1.0), (1.00, 0.76, 0.18, 1.0), (ratio - 0.35) / 0.35)
+    return _lerp((1.00, 0.76, 0.18, 1.0), (1.00, 0.24, 0.22, 1.0), (ratio - 0.70) / 0.30)
 
 
-def _field_color(t: float, hot):
-    """A radial field: hot at the head, green mid, blue-transparent outside."""
-    core = (hot[0], hot[1], hot[2], 0.34)
-    amber = (1.00, 0.78, 0.18, 0.24)
-    green = (0.25, 0.82, 0.42, 0.15)
-    edge = (0.08, 0.22, 0.50, 0.0)
-    if t < 0.34:
-        return _lerp(core, amber, t / 0.34)
-    if t < 0.68:
-        return _lerp(amber, green, (t - 0.34) / 0.34)
-    return _lerp(green, edge, (t - 0.68) / 0.32)
+def _warm_color(error: float, selected: bool):
+    """A selected bone stays warm at rest, then goes red as its error grows."""
+    if not selected:
+        return _heat(error)
+    return _lerp(WARM, _heat(error), min(1.0, error * 2.2))
 
 
-def _radial_field(center, radius: float, hot) -> None:
-    if radius < 2.0:
+def _field_color(t: float, hot, target: bool = False):
+    if target:
+        core = (0.20, 0.72, 1.00, 0.34)
+        mid = (0.16, 0.88, 1.00, 0.16)
+        edge = (0.04, 0.16, 0.42, 0.0)
+    else:
+        core = (hot[0], hot[1], hot[2], 0.34)
+        mid = (1.00, 0.74, 0.16, 0.16)
+        edge = (0.05, 0.16, 0.40, 0.0)
+    if t < 0.38:
+        return _lerp(core, mid, t / 0.38)
+    return _lerp(mid, edge, (t - 0.38) / 0.62)
+
+
+def _radial_field(center, radius: float, hot, *, target: bool = False, strength: float = 1.0) -> None:
+    if radius < 2.0 or strength <= 0.01:
         return
     shader = _shader()
     for ring in range(_FIELD_STEPS - 1, -1, -1):
         inner = radius * ring / _FIELD_STEPS
         outer = radius * (ring + 1) / _FIELD_STEPS
-        color = _field_color((ring + 0.5) / _FIELD_STEPS, hot)
+        color = _field_color((ring + 0.5) / _FIELD_STEPS, hot, target)
+        color = (*color[:3], color[3] * strength)
         coords = []
         for index in range(_FIELD_SEGMENTS + 1):
             angle = 2.0 * math.pi * index / _FIELD_SEGMENTS
@@ -159,30 +184,23 @@ def _selected_name(settings, armature) -> str:
     return active.name if active is not None else ""
 
 
-def _selected_rows(settings, armature):
-    seen = set()
-    names = []
+def _mapping(settings) -> dict[str, str]:
+    result = {}
     for row in settings.bone_map:
-        name = row.source if row.source in armature.pose.bones else row.target
-        if name and name not in seen and name in armature.pose.bones:
-            seen.add(name)
-            names.append(name)
-    selected = _selected_name(settings, armature)
-    if selected and selected not in names:
-        names.insert(0, selected)
-    return selected, names
+        if row.source and row.target:
+            result[row.source] = row.target
+            result.setdefault(row.target, row.target)
+    return result
 
 
-def _bone_points(armature, name: str):
-    bone = armature.data.bones.get(name)
-    pose = armature.pose.bones.get(name)
-    if bone is None or pose is None:
-        return None
-    rest_head = armature.matrix_world @ bone.head_local
-    rest_tail = armature.matrix_world @ bone.tail_local
-    pose_head = armature.matrix_world @ pose.head
-    pose_tail = armature.matrix_world @ pose.tail
-    return bone, pose, rest_head, rest_tail, pose_head, pose_tail
+def _chain(armature, selected: str) -> list[str]:
+    """The selected bone and its ancestors, root first."""
+    names = []
+    pose = armature.pose.bones.get(selected) if selected else None
+    while pose is not None:
+        names.append(pose.name)
+        pose = pose.parent
+    return list(reversed(names))
 
 
 def _rest_area_here(settings) -> bool:
@@ -190,30 +208,109 @@ def _rest_area_here(settings) -> bool:
     return bool(area is not None and settings.nudge_rest_area == f"{area.x}:{area.y}")
 
 
-def _draw_legend(region, settings, hot) -> None:
+def _retarget_axes(hero):
+    """The root-motion rotation the retarget divides out, or identity."""
+    if hero is None:
+        return Matrix.Identity(4)
+    root = hero.pose.bones.get("root_motion")
+    if root is None:
+        return Matrix.Identity(4)
+    try:
+        matrix = root.matrix.to_quaternion().to_matrix().to_4x4()
+        if abs(matrix.determinant()) < 1e-12:
+            return Matrix.Identity(4)
+        return matrix.inverted()
+    except (AttributeError, ValueError, RuntimeError):
+        return Matrix.Identity(4)
+
+
+def _metrics(settings, custom, hero, name: str, mapping: dict[str, str], axes):
+    pose = custom.pose.bones.get(name)
+    if pose is None:
+        return None
+    target_name = mapping.get(name, name)
+    target = hero.pose.bones.get(target_name) if hero is not None and hero.type == "ARMATURE" else None
+    bone = pose.bone
+    custom_head = custom.matrix_world @ pose.head
+    custom_tail = custom.matrix_world @ pose.tail
+    rest_head = custom.matrix_world @ bone.head_local
+    rest_tail = custom.matrix_world @ bone.tail_local
+    if target is None:
+        return {
+            "name": name,
+            "target": target_name,
+            "pose": pose,
+            "target_pose": None,
+            "bone": bone,
+            "custom_head": custom_head,
+            "custom_tail": custom_tail,
+            "rest_head": rest_head,
+            "rest_tail": rest_tail,
+            "target_head": None,
+            "target_tail": None,
+            "pos_error": 0.0,
+            "rot_error": 0.0,
+            "error": 0.0,
+        }
+    # Compare against the same target the retarget solver applies.  The root and
+    # solver proxies keep their authored transforms; other bones divide out root
+    # rotation.  Otherwise root motion makes a correct chain look far away.
+    if target.name == "root_motion" or is_solver_input(target.name):
+        target_matrix = target.matrix.copy()
+    else:
+        target_matrix = axes @ target.matrix
+    target_head = custom.matrix_world @ target_matrix.translation
+    target_tail = custom.matrix_world @ (target_matrix @ Vector((0.0, target.length, 0.0)))
+    custom_world = custom.matrix_world @ pose.matrix
+    target_world = custom.matrix_world @ target_matrix
+    rotation = custom_world.to_quaternion().rotation_difference(target_world.to_quaternion()).angle
+    pos_error = (custom_head - target_head).length
+    scale = max(float(bone.length), float(target.bone.length), 1e-3)
+    error = min(1.0, max(abs(rotation) / math.radians(75.0), pos_error / (2.0 * scale)))
+    return {
+        "name": name,
+        "target": target_name,
+        "pose": pose,
+        "target_pose": target,
+        "bone": bone,
+        "custom_head": custom_head,
+        "custom_tail": custom_tail,
+        "rest_head": rest_head,
+        "rest_tail": rest_tail,
+        "target_head": target_head,
+        "target_tail": target_tail,
+        "pos_error": pos_error,
+        "rot_error": rotation,
+        "error": error,
+    }
+
+
+def _draw_legend(settings, selected_error: float) -> None:
     x = 14.0
     y = 14.0
-    width = 330.0
-    height = 68.0
+    width = 350.0
+    height = 70.0
     _fill([(x, y), (x + width, y), (x + width, y + height), (x, y + height)], PANEL)
     _line(
         [(x, y), (x + width, y), (x + width, y + height), (x, y + height), (x, y)],
         BORDER,
         1.0,
     )
-    _text("Nudge map  rest → posed", x + 9.0, y + height - 16.0, 11.0, TEXT)
-    _radial_field((x + 25.0, y + 31.0), 18.0, hot)
-    _text("field", x + 48.0, y + 35.0, 9.0, DIM)
-    _text("length-normalized", x + 48.0, y + 23.0, 9.0, DIM)
+    _text("Nudge map  warm custom / cool hero", x + 9.0, y + height - 17.0, 11.0, TEXT)
+    _radial_field((x + 22.0, y + 36.0), 15.0, _warm_color(selected_error, True), strength=0.9)
+    _text("custom", x + 42.0, y + 41.0, 9.0, WARM)
+    _radial_field((x + 124.0, y + 36.0), 15.0, COOL, target=True, strength=0.9)
+    _text("hero target", x + 144.0, y + 41.0, 9.0, COOL_BRIGHT)
+    _text("red = far  ·  blue = aligned", x + 9.0, y + 22.0, 9.0, DIM)
     _text(
         f"axis {settings.nudge_axis}  |  {'rotate' if settings.nudge_rotate else 'translate'}  |  "
         f"{'relative' if settings.nudge_relative else 'absolute'}",
-        x + 150.0,
-        y + 29.0,
-        9.5,
+        x + 196.0,
+        y + 22.0,
+        9.0,
         DIM,
     )
-    _text("hot = rest head / cool = outside", x + 9.0, y + 7.0, 9.0, DIM)
+    _text("chain: selected bone and its mapped ancestors", x + 9.0, y + 7.0, 9.0, DIM)
 
 
 def _draw(context) -> None:
@@ -232,71 +329,143 @@ def _draw(context) -> None:
     if armature is None or armature.name not in bpy.data.objects:
         armature = custom
         rest_here = False
-    selected, names = _selected_rows(settings, armature)
+    hero = settings.target_armature
+    if hero is not None and (hero == armature or hero.type != "ARMATURE"):
+        hero = None
+    selected = _selected_name(settings, armature)
+    names = _chain(armature, selected)
     if not names:
         return
+    mapping = _mapping(settings)
+    axes = _retarget_axes(hero)
+    chain = [item for item in (_metrics(settings, armature, hero, name, mapping, axes) for name in names) if item]
+    if not chain:
+        return
+    selected_item = next((item for item in chain if item["name"] == selected), None)
     active_axis = {"X": 0, "Y": 1, "Z": 2}.get(settings.nudge_axis, 0)
-    selected_points = _bone_points(armature, selected) if selected else None
-    field_center = None
-    hot = _heat(0.0)
-    if selected_points is not None:
-        bone, pose, rest_head, rest_tail, pose_head, pose_tail = selected_points
-        delta = (pose_head - rest_head).length
-        hot = _heat(delta / max(bone.length, 1e-4))
-        field_center = _project(region, region_3d, rest_head)
-        if field_center is None:
-            field_center = _project(region, region_3d, pose_head)
 
     gpu.state.blend_set("ALPHA")
-    if field_center is not None:
-        radius = max(70.0, min(region.width, region.height) * 0.52)
-        _radial_field(field_center, radius, hot)
+    # Cool target halos first, then warm custom halos.  Each halo is local to its
+    # bone; the old viewport-sized field hid the hand under the arm's colour.
+    for item in chain:
+        target = item["target_head"]
+        if target is None:
+            continue
+        center = _project(region, region_3d, target)
+        if center is None:
+            continue
+        radius = 22.0 if item is selected_item else 14.0
+        _radial_field(center, radius, COOL, target=True, strength=0.75)
 
-    # The whole map stays readable: every mapped bone gets a rest segment and a
-    # heat dot at its current head.  The selected bone gets the labelled detail.
-    for name in names:
-        points = _bone_points(armature, name)
-        if points is None:
+    for item in chain:
+        center = _project(region, region_3d, item["custom_head"])
+        if center is None:
             continue
-        bone, pose, rest_head, rest_tail, pose_head, pose_tail = points
-        rest_a = _project(region, region_3d, rest_head)
-        rest_b = _project(region, region_3d, rest_tail)
-        pose_a = _project(region, region_3d, pose_head)
-        pose_b = _project(region, region_3d, pose_tail)
-        if rest_a is not None and rest_b is not None:
-            _line([rest_a, rest_b], REST if name == selected else (*REST[:3], 0.35), 1.3)
-        if name != selected and pose_a is not None:
-            _ring(pose_a, 2.2, _heat((pose_head - rest_head).length / max(bone.length, 1e-4)), 1.0)
-        if name != selected or pose_a is None or rest_a is None:
-            continue
-        delta = (pose_head - rest_head).length
-        ratio = delta / max(bone.length, 1e-4)
-        if pose_a is not None and pose_b is not None:
-            _line([pose_a, pose_b], _heat(ratio), 3.0)
-        if (pose_head - rest_head).length > 1e-6:
-            _line([rest_a, pose_a], (0.92, 0.94, 1.0, 0.34), 1.2)
-        _ring(rest_a, 3.2, REST, 1.2)
-        _ring(pose_a, 4.4, POSED, 2.0)
-        _cross(pose_a, 5.0, POSED, 1.8)
-        axis = (pose.x_axis, pose.y_axis, pose.z_axis)[active_axis]
-        axis_length = max(bone.length * 1.1, 0.02)
-        tip = pose_head + Vector(axis) * axis_length
-        tip_2d = _project(region, region_3d, tip)
-        if tip_2d is not None:
-            _line([pose_a, tip_2d], ACTIVE, 2.4)
-            _cross(tip_2d, 3.0, ACTIVE, 1.4)
-            _text(settings.nudge_axis, tip_2d[0] + 5.0, tip_2d[1] + 4.0, 10.0, ACTIVE)
-        angle = pose.matrix_basis.to_quaternion().angle
-        suffix = "  rest" if rest_here else ""
-        _text(
-            f"{name}{suffix}  Δ{delta:.3f}m  {math.degrees(angle):.1f}°",
-            pose_a[0] + 8.0,
-            pose_a[1] + 8.0,
-            11.5,
-            ACTIVE,
+        error = item["error"]
+        radius = (20.0 + 28.0 * error) if item is selected_item else (12.0 + 18.0 * error)
+        _radial_field(
+            center,
+            radius,
+            _warm_color(error, item is selected_item),
+            strength=0.35 + 0.65 * error,
         )
 
-    _draw_legend(region, settings, hot)
+    # The cool chain is the destination.  Draw it behind the warm chain so the
+    # bone being nudged always stays on top.
+    for item in chain:
+        if item["target_head"] is None:
+            continue
+        first = _project(region, region_3d, item["target_head"])
+        second = _project(region, region_3d, item["target_tail"])
+        if first is not None and second is not None:
+            _line(
+                [first, second],
+                COOL_BRIGHT if item is selected_item else (*COOL[:3], 0.68),
+                2.4 if item is selected_item else 1.3,
+            )
+            _ring(first, 2.6 if item is not selected_item else 3.8, COOL, 1.0)
+
+    for item in chain:
+        rest_first = _project(region, region_3d, item["rest_head"])
+        rest_second = _project(region, region_3d, item["rest_tail"])
+        first = _project(region, region_3d, item["custom_head"])
+        second = _project(region, region_3d, item["custom_tail"])
+        color = _warm_color(item["error"], item is selected_item)
+        if rest_first is not None and rest_second is not None:
+            _line([rest_first, rest_second], (*REST[:3], 0.35), 1.0)
+        if first is not None and second is not None:
+            _line([first, second], color, 3.1 if item is selected_item else 1.8)
+        if first is not None:
+            _ring(first, 3.7 if item is selected_item else 2.0, color, 1.4)
+
+    # Keep the destination visible even when the custom and target heads
+    # coincide (hands preserve their head, so translation does not move them
+    # apart).  These cool markers are deliberately drawn after the warm chain.
+    for item in chain:
+        target = item["target_head"]
+        if target is None:
+            continue
+        center = _project(region, region_3d, target)
+        if center is None:
+            continue
+        _ring(center, 6.0 if item is selected_item else 3.0, COOL_BRIGHT, 1.6)
+
+    if selected_item is not None and selected_item["custom_head"] is not None:
+        custom_head = selected_item["custom_head"]
+        custom_point = _project(region, region_3d, custom_head)
+        target_point = (
+            _project(region, region_3d, selected_item["target_head"])
+            if selected_item["target_head"] is not None
+            else None
+        )
+        if custom_point is not None:
+            _ring(custom_point, 8.5, _heat(selected_item["error"]), 2.0)
+            _ring(custom_point, 5.0, WARM, 2.0)
+            _cross(custom_point, 5.0, WARM, 1.8)
+            axis = (selected_item["pose"].x_axis, selected_item["pose"].y_axis, selected_item["pose"].z_axis)[active_axis]
+            axis_length = max(float(selected_item["bone"].length) * 1.1, 0.02)
+            tip = custom_head + Vector(axis) * axis_length
+            tip_point = _project(region, region_3d, tip)
+            if tip_point is not None:
+                _line([custom_point, tip_point], ACTIVE, 2.4)
+                _cross(tip_point, 3.0, ACTIVE, 1.4)
+                _text(settings.nudge_axis, tip_point[0] + 5.0, tip_point[1] + 4.0, 10.0, ACTIVE)
+            if target_point is not None:
+                # The connector is a comparison, not an axis trail: it runs from
+                # the current custom head to the cool target head and fades warm
+                # to cool over the distance.
+                steps = 9
+                for index in range(steps):
+                    start = custom_head.lerp(selected_item["target_head"], index / steps)
+                    end = custom_head.lerp(selected_item["target_head"], (index + 1) / steps)
+                    first = _project(region, region_3d, start)
+                    second = _project(region, region_3d, end)
+                    if first is not None and second is not None:
+                        _line(
+                            [first, second],
+                            _lerp(_heat(selected_item["error"]), COOL, index / max(1, steps - 1)),
+                            1.4,
+                        )
+                if (target_point[0] - custom_point[0]) ** 2 + (target_point[1] - custom_point[1]) ** 2 < 25.0:
+                    _cross(target_point, 4.0, COOL_BRIGHT, 1.4)
+                suffix = " rest" if rest_here else ""
+                _label(
+                    f"{selected_item['name']}{suffix} · {selected_item['error'] * 100.0:.0f}%  "
+                    f"Δ{selected_item['pos_error']:.3f}m {math.degrees(selected_item['rot_error']):.1f}°",
+                    custom_point[0] + 12.0,
+                    custom_point[1] + 13.0,
+                    11.0,
+                    WARM,
+                )
+                _label(
+                    f"→ {selected_item['target']}",
+                    custom_point[0] + 12.0,
+                    custom_point[1] - 15.0,
+                    9.5,
+                    COOL_BRIGHT,
+                )
+
+    _draw_legend(settings, selected_item["error"] if selected_item is not None else 0.0)
 
 
 def draw(_self=None, context=None) -> None:
