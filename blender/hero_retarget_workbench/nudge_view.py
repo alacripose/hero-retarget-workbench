@@ -271,6 +271,13 @@ def _metrics(settings, custom, hero, name: str, mapping: dict[str, str], axes):
     target_world = custom.matrix_world @ target_matrix
     rotation = custom_world.to_quaternion().rotation_difference(target_world.to_quaternion()).angle
     pos_error = (custom_head - target_head).length
+    custom_direction = custom_tail - custom_head
+    target_direction = target_tail - target_head
+    direction_error = (
+        custom_direction.angle(target_direction)
+        if custom_direction.length > 1e-9 and target_direction.length > 1e-9
+        else 0.0
+    )
     # Positions are drawn in the custom object's world frame.  The hierarchy copy
     # inherits that object's scale, so an unscaled rest length compared metres
     # with centimetres and collapsed a small error to 0% accuracy.
@@ -278,7 +285,16 @@ def _metrics(settings, custom, hero, name: str, mapping: dict[str, str], axes):
     custom_length = (frame @ (bone.tail_local - bone.head_local)).length
     target_length = (frame @ (target.bone.tail_local - target.bone.head_local)).length
     scale = max(custom_length, target_length, 1e-3)
-    error = min(1.0, max(abs(rotation) / math.radians(75.0), pos_error / (2.0 * scale)))
+    # A clamped max made every pose past two bone lengths read exactly 0%, so
+    # moving the selected bone closer never changed the number.  The continuous
+    # product falls off with distance and direction but stays readable while the
+    # owner is still moving the bone.
+    position_ratio = pos_error / scale
+    direction_ratio = direction_error / math.radians(75.0)
+    error = 1.0 - 1.0 / (
+        (1.0 + position_ratio * position_ratio)
+        * (1.0 + direction_ratio * direction_ratio)
+    )
     return {
         "name": name,
         "target": target_name,
@@ -295,6 +311,7 @@ def _metrics(settings, custom, hero, name: str, mapping: dict[str, str], axes):
         "target_world": target_world,
         "pos_error": pos_error,
         "rot_error": rotation,
+        "direction_error": direction_error,
         "error": error,
     }
 
