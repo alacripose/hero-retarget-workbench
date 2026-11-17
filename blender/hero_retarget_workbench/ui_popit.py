@@ -395,7 +395,7 @@ _GLYPHS = {
     "dmf.detect_paths": "FILE_REFRESH",
     "dmf.detect": "FILE_REFRESH",
     "dmf.extract": "EXPORT",
-    "dmf.import_hero": "ARMATURE_DATA",
+    "dmf.import_hero": "MESH_DATA",
     "dmf.import_custom": "IMPORT",
     "dmf.fit": "TRANSFORM_ORIGINS",
     "dmf.scan_parts": "FILE_REFRESH",

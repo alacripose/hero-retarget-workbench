@@ -99,6 +99,25 @@ class HeroRosterTests(unittest.TestCase):
             body.write_bytes(b"x" * 100)
             self.assertEqual(choose_body([head, body]).name, body.name)
 
+    def test_a_static_render_mesh_with_no_model_joints_is_still_importable(self):
+        """A prop or NPC can declare a skeleton and carry no skin joints."""
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            body = root / "prop_body.dmx"
+            body.write_text("<!-- dmx encoding text format model 22 -->\n", encoding="utf-8")
+            self.assertEqual(
+                choose_body(
+                    [body],
+                    render_meshes=["prop_body.dmx"],
+                    model_bones={"pelvis"},
+                    body_meshes=[],
+                ).name,
+                body.name,
+            )
+
 
 class ModelRosterTests(unittest.TestCase):
     def test_reads_s2v_model_listing(self):

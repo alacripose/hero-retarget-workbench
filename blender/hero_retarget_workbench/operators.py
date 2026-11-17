@@ -234,8 +234,10 @@ class DMF_OT_choose_hero(Operator):
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
-        settings.mod_target = settings.hero_slug
-        _status(settings, f"Hero: {title} (port target)", "OK")
+        target = heropick.port_target(settings.hero_slug, settings.hero_model_path)
+        settings.mod_target = target
+        note = f"port target {target}" if target != "NONE" else "no port target; model import still works"
+        _status(settings, f"Hero: {title} ({note})", "OK")
         return {"FINISHED"}
 
 
@@ -362,6 +364,8 @@ class DMF_OT_extract(Operator):
                 settings.extraction_dir = str(result.root)
                 settings.hero_model_path = hero.model_path
                 settings.body_dmx = str(result.body_dmx) if result.body_dmx else ""
+                settings.target_armature = None
+                settings.target_body = None
                 if result.vmdl:
                     settings.vmdl = str(result.vmdl)
                 else:
@@ -372,6 +376,8 @@ class DMF_OT_extract(Operator):
                         result.root,
                         f"{Path(hero.model_path).parent.as_posix()}/{Path(settings.body_dmx).name}",
                     )
+                else:
+                    settings.target_dmx_relative = ""
                 settings.vmdl_relative = _logical_relative(
                     settings.vmdl,
                     result.root,
@@ -408,30 +414,63 @@ class DMF_OT_extract(Operator):
 
 class DMF_OT_import_hero(Operator):
     bl_idname = "dmf.import_hero"
-    bl_label = "Import Hero Skeleton"
-    bl_description = "Import the live-extracted hero body DMX with PulseSrcOps"
+    bl_label = "Import Model"
+    bl_description = "Import the selected model's render meshes with PulseSrcOps; a rig is optional"
 
     def execute(self, context):
         settings = context.scene.dmf
         path = Path(bpy.path.abspath(settings.body_dmx)) if settings.body_dmx else None
-        if path is None or not path.is_file():
-            self.report({"ERROR"}, "Choose a hero body DMX from the S2V extraction")
-            return {"CANCELLED"}
+        folder = path.parent if path is not None else (
+            Path(bpy.path.abspath(settings.extraction_dir)) if settings.extraction_dir else None
+        )
+        # Read the selected model the same way the Components page does: its own
+        # RenderMeshList, with the primary mesh first.  This replaces the old
+        # armature/joint matching, so a static prop, an NPC and a hero all import
+        # through one path.  A model with no rig is a normal result, not an error.
+        module = core.core(settings)
+        try:
+            from . import pipeline_ops
+
+            root, vmdl = pipeline_ops._component_source(settings)
+            if root is not None and root.is_dir():
+                component_rows = [
+                    item
+                    for item in module["components"].inventory(
+                        root, vmdl=vmdl, include_materials=False
+                    )
+                    if item.kind == "dmx"
+                ]
+            else:
+                component_rows = []
+        except Exception:
+            component_rows = []
+        primary = next(
+            (item for item in component_rows if getattr(item, "primary", False)),
+            component_rows[0] if component_rows else None,
+        )
         swapped_body = ""
-        # An extraction written before body detection understood numbered body
-        # variants can have a head saved as the body. Repair it from the same
-        # hero folder before the import opens the wrong DMX -- and repair it to the
-        # model's own answer, never to a filename score: `live.choose_body` alone
-        # picked `gigawatt_prisoner_lightning_ball_upper_body.dmx` for Seven, an
-        # ability clip, and the import then reported no armature.  The model's
-        # `Skeleton` bone nodes and `BodyGroupList` decide the body.
-        siblings = sorted(path.parent.glob("*.dmx"))
-        model_vmdl = next(iter(sorted(path.parent.glob("*.vmdl"))), None)
-        chosen = live.body_for_hero_folder(model_vmdl, siblings) if model_vmdl else None
-        if chosen is not None and chosen != path:
-            swapped_body = path.name
-            path = chosen
+        if primary is not None and primary.path.is_file():
+            swapped_body = path.name if path is not None and path != primary.path else ""
+            path = primary.path
             settings.body_dmx = str(path)
+        elif path is None or not path.is_file():
+            # A hand-made folder with no readable vmdl has no render list to read;
+            # keep the existing filename fallback for that case only.
+            if folder and folder.is_dir():
+                path = live.choose_body(sorted(folder.rglob("*.dmx")))
+            if path is not None:
+                settings.body_dmx = str(path)
+        if path is None or not path.is_file() or path.suffix.lower() != ".dmx":
+            _status(settings, "No DMX in this extraction to import", "WARN")
+            self.report({"WARNING"}, "No DMX in this extraction to import")
+            return {"CANCELLED"}
+        # The Components rows are the complete render set, not a match.  Import
+        # every selected part after the primary, with or without a skeleton.
+        companion_paths = [
+            item.path
+            for item in component_rows
+            if item.path != path and item.path.is_file()
+        ]
         before = {obj.name for obj in context.scene.objects}
         try:
             source2.import_dmx(path, append="NEW_ARMATURE", up_axis="Z", forward_axis="-Y")
@@ -440,49 +479,72 @@ class DMF_OT_import_hero(Operator):
             self.report({"ERROR"}, str(error))
             return {"CANCELLED"}
         mesh, arm = _pick_imported(before)
-        if arm is None or mesh is None:
-            _status(settings, "PulseSrcOps found no armature or mesh in the DMX", "ERROR")
-            self.report({"ERROR"}, "The DMX did not contain both a hero armature and a body mesh")
+        if arm is None and mesh is None:
+            _status(settings, f"{path.name} contained no armature or mesh", "WARN")
+            self.report({"WARNING"}, f"{path.name} contained no armature or mesh")
             return {"CANCELLED"}
-        _reset_hero_pose(arm)
+        if arm is not None:
+            _reset_hero_pose(arm)
         settings.target_armature = arm
         settings.target_body = mesh
-        settings.material_source = mesh
-        settings.hero_parts.clear()
-        cloth_ops.record_part(settings, mesh)
+        if mesh is not None:
+            settings.material_source = mesh
+            settings.hero_parts.clear()
+            cloth_ops.record_part(settings, mesh)
         companion = {"imported": [], "skipped": []}
         cloth = {"built": [], "skipped": []}
-        try:
-            companion = cloth_ops.import_companions(context, settings)
-            cloth_ops.scan_chains(settings)
-            # A hero import is not finished while the jacket and hair are only
-            # meshes: the cloth chains are built here, on the mesh each is
-            # skinned to, so the import ends cloth-capable.
-            cloth = cloth_ops.build_import_cloth(settings)
-            settings.cloth_build_skipped = "; ".join(cloth.get("skipped", []))
-        except Exception as error:
-            settings.cloth_build_skipped = str(error)
-            _status(settings, f"Hero body imported; companion parts failed: {error}", "WARN")
-        parts.scan_materials(settings)
+        if mesh is not None:
+            try:
+                from forge.cloth import MeshFile
+
+                files = (
+                    [MeshFile(stem=item.stem, path=item) for item in companion_paths]
+                    if companion_paths
+                    else None
+                )
+                companion = cloth_ops.import_companions(context, settings, files=files)
+                if arm is not None:
+                    cloth_ops.scan_chains(settings)
+                    # A hero import is not finished while the jacket and hair are only
+                    # meshes: the cloth chains are built here, on the mesh each is
+                    # skinned to, so the import ends cloth-capable.
+                    cloth = cloth_ops.build_import_cloth(settings)
+                    settings.cloth_build_skipped = "; ".join(cloth.get("skipped", []))
+                else:
+                    settings.cloth_build_skipped = "no armature; static parts imported, cloth skipped"
+            except Exception as error:
+                settings.cloth_build_skipped = str(error)
+                _status(settings, f"Model mesh imported; companion parts failed: {error}", "WARN")
+        else:
+            settings.cloth_build_skipped = "no body mesh to build cloth on"
+        if mesh is not None:
+            parts.scan_materials(settings)
         # A hero import starts a new clip list.  Reusing the previous hero's rows
         # is how Werewolf clips appeared in Shiv's panel, and it also made the
-        # tail writer operate on actions from the wrong body.
+        # tail writer operate on actions from the wrong body.  A static model has
+        # no skeleton to play clips on, so do not scan a clip list it cannot use.
         settings.clips.clear()
-        try:
-            counts = clipops.scan(settings)
-            settings.clip_auto_note = (
-                f"{len(settings.clips)} clips for {path.parent.name}; "
-                f"AG1 {counts.get('ag1', 0)}, AG2 {counts.get('ag2', 0)}"
-            )
+        if arm is not None:
+            try:
+                counts = clipops.scan(settings)
+                settings.clip_auto_note = (
+                    f"{len(settings.clips)} clips for {path.parent.name}; "
+                    f"AG1 {counts.get('ag1', 0)}, AG2 {counts.get('ag2', 0)}"
+                )
+                settings.clip_note = ""
+            except Exception as error:
+                settings.clips.clear()
+                settings.clip_auto_note = f"No clips loaded for {path.parent.name}: {error}"
+        else:
+            settings.clip_auto_note = f"No armature in {path.parent.name}; skipped clip scan"
             settings.clip_note = ""
-        except Exception as error:
-            settings.clips.clear()
-            settings.clip_auto_note = f"No clips loaded for {path.parent.name}: {error}"
         # The old tail pairing names the previous skeleton's bones.  Keep the
         # discovered sources, but make the new hero pair its own tail.
         settings.tail_bones.clear()
         settings.tail_note = (
             f"{path.parent.name} imported; pair its tail bones to the chosen tail rig"
+            if arm is not None
+            else f"{path.parent.name} has no armature; tail pairing skipped"
         )
         if settings.extraction_dir:
             # A source read from an old package already carries the logical path
@@ -498,7 +560,7 @@ class DMF_OT_import_hero(Operator):
                 Path(bpy.path.abspath(settings.extraction_dir)),
                 fallback,
             )
-        context.view_layer.objects.active = arm
+        context.view_layer.objects.active = mesh or arm
         proofing.bump_tick(settings)
         imported = companion.get("imported") or []
         skipped = companion.get("skipped") or []
@@ -507,12 +569,18 @@ class DMF_OT_import_hero(Operator):
         built_chains = [entry["chain"] for entry in cloth.get("built", [])]
         cloth_note = (
             f"; cloth on {', '.join(built_chains)}" if built_chains else "; no cloth chain built"
-        )
+        ) if arm is not None and mesh is not None else ""
+        if arm is not None and mesh is not None:
+            summary = f"Hero ready: {len(arm.data.bones)} bones, {len(mesh.data.vertices):,} vertices"
+        elif mesh is not None:
+            summary = f"Static mesh ready: {len(mesh.data.vertices):,} vertices; this model has no armature"
+        else:
+            summary = f"Skeleton ready: {len(arm.data.bones)} bones; this model has no body mesh"
         _status(
             settings,
-            f"Hero ready: {len(arm.data.bones)} bones, {len(mesh.data.vertices):,} vertices{detail}{cloth_note}{misses}"
+            summary + detail + cloth_note + misses
             + (f"; used {path.name} instead of {swapped_body}" if swapped_body else ""),
-            "OK" if not skipped else "WARN",
+            "OK" if arm is not None and mesh is not None and not skipped else "WARN",
         )
         return {"FINISHED"}
 

@@ -62,8 +62,8 @@ def _hero_label(settings) -> str:
 def _hero_state(settings) -> str:
     if settings.source_origin:
         if not settings.body_dmx:
-            return "choose body"
-        if settings.target_body is None or settings.target_armature is None:
+            return "import model" if settings.extraction_dir else "choose body"
+        if settings.target_body is None and settings.target_armature is None:
             return "import needed"
         return "imported"
     if not settings.build:
@@ -71,8 +71,8 @@ def _hero_state(settings) -> str:
     if settings.hero_slug in ("", "NONE"):
         return "choose a hero"
     if not settings.body_dmx:
-        return "extract"
-    if settings.target_body is None or settings.target_armature is None:
+        return "import model" if settings.extraction_dir else "extract"
+    if settings.target_body is None and settings.target_armature is None:
         return "import needed"
     return "imported"
 
@@ -177,7 +177,7 @@ def _stage_state(settings) -> dict:
         "build": bool(settings.build),
         "hero": settings.hero_slug not in ("", "NONE"),
         "extract": bool(settings.body_dmx),
-        "import": armature is not None and settings.target_body is not None,
+        "import": armature is not None or settings.target_body is not None,
         "model": mesh is not None,
         "fit": mesh is not None and settings.axis_tick > 0,
         "parts": bool(settings.custom_collection is not None),
@@ -401,7 +401,7 @@ class DMF_PT_source(Panel):
             enabled=not settings.job_running,
             labels={"dmf.detect": "Detect build", "dmf.extract": "Extract hero"},
         )
-        _primary(hero, "dmf.import_hero", "Import hero", "IMPORT", enabled=not settings.job_running)
+        _primary(hero, "dmf.import_hero", "Import model", "IMPORT", enabled=not settings.job_running)
         hero.prop(settings, "target_armature", text="Skeleton")
         hero.prop(settings, "target_body", text="Body")
 

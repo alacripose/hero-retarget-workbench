@@ -76,6 +76,24 @@ class PageParityTests(unittest.TestCase):
         self.assertEqual(heropick.kind_of("Shiv", "models/heroes_staging/shiv/shiv.vmdl_c"), "HERO")
         self.assertEqual(heropick.kind_of("Trooper", "models/npc/trooper.vmdl_c"), "OTHER")
 
+    def test_a_model_path_maps_to_a_valid_port_target_or_none(self):
+        heropick = _heropick()
+        heropick.properties.HERO_ITEMS = [
+            ("NONE", "Choose a hero", "Select a live hero"),
+            ("warden", "Warden", "models/heroes_staging/warden/warden.vmdl_c"),
+        ]
+        self.assertEqual(
+            heropick.port_target(
+                "models/heroes_staging/warden/warden.vmdl_c",
+                "models/heroes_staging/warden/warden.vmdl_c",
+            ),
+            "warden",
+        )
+        self.assertEqual(
+            heropick.port_target("models/npc/trooper/trooper.vmdl_c", "models/npc/trooper/trooper.vmdl_c"),
+            "NONE",
+        )
+
 
 class ListColumnTests(unittest.TestCase):
     def test_every_list_has_a_named_split_and_own_width(self):
