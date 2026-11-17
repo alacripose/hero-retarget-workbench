@@ -228,8 +228,12 @@ def bind_staged_source(
     settings.extraction_dir = str(installed)
     settings.vmdl = str(vmdl)
     settings.vmdl_relative = relative
-    settings.materials_dir = str(installed)
-    settings.custom_materials_dir = str(installed)
+    material_target = str(manifest.get("material_target_dir") or "").replace("\\", "/").strip("/")
+    material_root = installed / material_target if material_target else installed
+    if not material_root.is_dir():
+        material_root = installed
+    settings.materials_dir = str(material_root)
+    settings.custom_materials_dir = str(material_root)
     if stage_root is not None:
         settings.stage_dir = str(stage_root)
     if addon or manifest.get("addon"):

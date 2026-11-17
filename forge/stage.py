@@ -80,6 +80,7 @@ class StageRequest:
     materials: list[MaterialCopy] = field(default_factory=list)
     custom_materials: list[MaterialCopy] = field(default_factory=list)
     extra_files: list[MaterialCopy] = field(default_factory=list)
+    material_target_dir: str = ""
     custom_lods: list[Path] = field(default_factory=list)
     include_extraction: bool = True
 
@@ -160,6 +161,26 @@ def target_lod_relatives(extraction_root: Path, target_dmx_relative: str) -> lis
         if match:
             found.append((int(match.group(1)), path.relative_to(extraction_root.resolve()).as_posix()))
     return [relative for _, relative in sorted(found)]
+
+
+def remap_dmx_material_paths(path: Path, material_target_dir: str) -> int:
+    """Point a DMX's material references at the target model's material folder.
+
+    Old decompiles can carry a doubled path (``.../tokamak/materials/.../tokamak/
+    materials/head.vmat``) and the live hero's LOD slots carry Bebop materials.
+    The vmat file name is the stable part, so every reference is rewritten under
+    the target folder that the same stage compiles.  Only the body and the LOD
+    DMXs are passed here; live weapon and effect meshes keep their own paths.
+    """
+    target = material_target_dir.replace("\\", "/").strip("/")
+    if not target or path.suffix.lower() != ".dmx" or not path.is_file():
+        return 0
+    data = path.read_bytes()
+    pattern = re.compile(rb"(?:[A-Za-z0-9_.\-]+/)+([A-Za-z0-9_.\-]+\.vmat)", re.IGNORECASE)
+    replaced, count = pattern.subn(lambda match: target.encode() + b"/" + match.group(1), data)
+    if count:
+        path.write_bytes(replaced)
+    return count
 
 
 def canonical_lod_relatives(target_dmx_relative: str, count: int) -> list[str]:
@@ -244,12 +265,23 @@ def stage(request: StageRequest) -> Staged:
             _copy(source, root / relative)
             copied_extraction += 1
 
+    target_materials = request.material_target_dir.replace("\\", "/").strip("/")
+
+    def material_destination(relative: str) -> str:
+        # A material root can be the target folder itself, in which case its
+        # inventory names are bare files.  Staging those at the addon root would
+        # leave the body's rewritten target references pointing at nothing.
+        if target_materials and "/" not in relative:
+            return f"{target_materials}/{relative}"
+        return relative
+
     copied_materials = 0
     material_texture_count = 0
     for relative, material in material_by_relative.items():
-        if relative in replacements or relative == vmdl_relative:
+        destination = material_destination(relative)
+        if destination in replacements or destination == vmdl_relative:
             continue
-        _copy(material.source, root / relative)
+        _copy(material.source, root / destination)
         copied_materials += 1
         material_texture_count += int(is_texture_asset(material.source))
 
@@ -261,9 +293,10 @@ def stage(request: StageRequest) -> Staged:
         _safe_relative(material.relative): material for material in request.custom_materials
     }
     for relative, material in custom_by_relative.items():
-        if relative in replacements or relative == vmdl_relative:
+        destination = material_destination(relative)
+        if destination in replacements or destination == vmdl_relative:
             continue
-        _copy(material.source, root / relative)
+        _copy(material.source, root / destination)
         custom_material_count += 1
         custom_material_texture_count += int(is_texture_asset(material.source))
 
@@ -272,6 +305,10 @@ def stage(request: StageRequest) -> Staged:
         if relative in replacements or relative == vmdl_relative:
             continue
         _copy(extra.source, root / relative)
+
+    remap_count = 0
+    for relative in replacements:
+        remap_count += remap_dmx_material_paths(root / relative, request.material_target_dir)
 
     if digest(vmdl_out) != digest(vmdl_source):
         raise StageError("vmdl-changed-during-stage")
@@ -290,8 +327,9 @@ def stage(request: StageRequest) -> Staged:
                 "target_dmx_sha256": digest(target_source),
                 "target_dmx_blake3": blake3_file(target_source),
                 "custom_dmx": target_relative,
-                "custom_dmx_sha256": digest(custom_source),
-                "custom_dmx_blake3": blake3_file(custom_source),
+                "custom_dmx_sha256": digest(custom_out),
+                "custom_dmx_blake3": blake3_file(custom_out),
+                "material_remaps": remap_count,
                 "lods": [
                     {
                         "relative": relative,
@@ -303,6 +341,7 @@ def stage(request: StageRequest) -> Staged:
                 ],
                 "materials": copied_materials,
                 "material_textures": material_texture_count,
+                "material_target_dir": request.material_target_dir,
                 "custom_materials": custom_material_count,
                 "custom_material_textures": custom_material_texture_count,
                 "material_policy": "copied-verbatim",
@@ -320,7 +359,7 @@ def stage(request: StageRequest) -> Staged:
         custom_dmx=custom_out,
         manifest=manifest,
         vmdl_sha256=digest(vmdl_source),
-        custom_sha256=digest(custom_source),
+        custom_sha256=digest(custom_out),
         material_count=copied_materials,
         material_texture_count=material_texture_count,
         custom_material_count=custom_material_count,
@@ -328,7 +367,7 @@ def stage(request: StageRequest) -> Staged:
         custom_lods=staged_lods,
         custom_lod_sha256=[digest(path) for path in staged_lods],
         vmdl_blake3=blake3_file(vmdl_source),
-        custom_blake3=blake3_file(custom_source),
+        custom_blake3=blake3_file(custom_out),
         custom_lod_blake3=[blake3_file(path) for path in staged_lods],
     )
 

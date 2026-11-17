@@ -222,6 +222,27 @@ class StageTests(unittest.TestCase):
             b"custom lod 1",
         )
 
+    def test_target_material_root_rewrites_the_dmx_to_that_folder(self):
+        old_path = b"models/heroes_staging/tokamak/materials/tokamak_head.vmat"
+        self.custom.write_bytes(b"material \"" + old_path + b"\"\n")
+        source = self.root / "target" / "tokamak_head.vmat"
+        source.parent.mkdir(parents=True)
+        source.write_text('"shader" "pbr.vfx"\n', encoding="utf-8")
+        result = stage(
+            self.request(
+                material_target_dir="models/heroes_staging/haze/materials",
+                materials=[MaterialCopy(source, "tokamak_head.vmat")],
+            )
+        )
+        verify(result)
+        self.assertTrue(
+            (result.root / "models/heroes_staging/haze/materials/tokamak_head.vmat").is_file()
+        )
+        self.assertIn(b"models/heroes_staging/haze/materials/tokamak_head.vmat", result.custom_dmx.read_bytes())
+        self.assertNotIn(old_path, result.custom_dmx.read_bytes())
+        manifest = json.loads(result.manifest.read_text(encoding="utf-8"))
+        self.assertEqual(manifest["material_remaps"], 1)
+
     def test_custom_materials_overlay_hero_material_paths(self):
         custom_root = self.root / "custom-materials"
         relative = "materials/haze_body.vmat"

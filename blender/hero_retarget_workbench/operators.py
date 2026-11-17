@@ -1364,6 +1364,7 @@ class DMF_OT_export_stage(Operator):
                 destination=destination,
                 materials=materials,
                 custom_materials=custom_materials,
+                material_target_dir=_model_material_path(settings),
                 custom_lods=exported.lods,
             )
             # The DMX export above must stay on the main thread because it calls
