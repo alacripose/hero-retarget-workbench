@@ -271,7 +271,13 @@ def _metrics(settings, custom, hero, name: str, mapping: dict[str, str], axes):
     target_world = custom.matrix_world @ target_matrix
     rotation = custom_world.to_quaternion().rotation_difference(target_world.to_quaternion()).angle
     pos_error = (custom_head - target_head).length
-    scale = max(float(bone.length), float(target.bone.length), 1e-3)
+    # Positions are drawn in the custom object's world frame.  The hierarchy copy
+    # inherits that object's scale, so an unscaled rest length compared metres
+    # with centimetres and collapsed a small error to 0% accuracy.
+    frame = custom.matrix_world.to_3x3()
+    custom_length = (frame @ (bone.tail_local - bone.head_local)).length
+    target_length = (frame @ (target.bone.tail_local - target.bone.head_local)).length
+    scale = max(custom_length, target_length, 1e-3)
     error = min(1.0, max(abs(rotation) / math.radians(75.0), pos_error / (2.0 * scale)))
     return {
         "name": name,

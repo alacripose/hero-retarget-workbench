@@ -31,6 +31,16 @@ C:\Users\ala\.agents\skills\ has a ton of skills for agents to use and yet they 
 
 Do not delete patch probes.
 
+## 2026-11-17 — accuracy follows the hierarchy copy's object scale (0.22.3)
+
+**Owner instruction, verbatim:** *"as you can see here despite it knowing that I'm trying to align it to wardens armature, it's not working with the hero heirarchy copy so it's not showing me the acurracy. the hero coordinates fdo work so the accurecy is just not right atm"*
+
+- **The bug was mixed units.** `nudge_view` draws the custom and target heads in the custom object's world frame, but normalized the position error with `bone.length` in object space. The hero-hierarchy copy inherits the custom object's scale, so a 2 cm object-space mismatch became 1 m while the bone still measured 0.3 m; the error clamped and the card showed 0% accuracy.
+- **The normalization is now in the drawn frame.** The custom and target rest lengths are transformed by `custom.matrix_world.to_3x3()` before the `pos_error / (2 * scale)` term. The coordinate and rotation rows are unchanged, so the hero coordinates the owner checked still read the same.
+- **Measured.** `artifacts/probes/accuracy_scale_probe.py` builds a 50x-scaled custom rig and a 1x hero with a 2 cm object-space offset. Before the fix it read `accuracy 0.0, pos_error 1.0, error 1.0`; after the fix it reads `accuracy 96.7, pos_error 1.0, error 0.0333`. The identity-scale `nudge_overlay_probe.py` still reads `accuracy_before 84.7, accuracy_after 66.2`, so the pose-update behavior is unchanged.
+- **Evidence.** 343 pytest tests pass; compileall, `ui_parity --check` (0 duplicates/undrawn) and `ui_prose --check` are clean. The local zip is `dist/hero_retarget_workbench-0.22.3.zip`, 71 files, 529,270 bytes, sha256 `fc0a1630a5fb58505a06a4d3fbf3f25bc59c345704846933b65a806fcf0ab0a8`; `tools/blender_zip_probe.py` passes with 112 operators, 26 panels and version `0.22.3` (`artifacts/receipts/zip-0223.json`).
+- **Not checked.** The owner's real Warden rig; the reproduction uses a synthetic 50x object scale and the same `_metrics` path the overlay draws with.
+
 ## 2026-11-17 — the bone tooltip shows live coordinates and accuracy (0.22.2)
 
 **Owner instruction, verbatim:** *"and as well the tooltip over the selected bone needs to be updated, it has this percentage that doesn't seem to update so instead it should be moved a little elsewhere, show the coordinates of the bone you're posing and the bone you're moving it to, including rotation, and the percentage is the accuracy"*
