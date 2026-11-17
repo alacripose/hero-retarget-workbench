@@ -1246,10 +1246,16 @@ class DMF_PT_skeleton(Panel):
 
         nudge = _section(
             layout,
-            "Bone nudge",
+            "Chain overlay",
             "BONE_DATA",
-            "live preview" if settings.hand_preview_active else "selected row",
+            "on" if settings.show_nudge_overlay else "off",
         )
+        nudge.operator(
+            "dmf.chain_overlay",
+            text="Hide overlay" if settings.show_nudge_overlay else "Show overlay",
+            icon="HIDE_OFF",
+        )
+        nudge.prop(settings, "nudge_relative", text="Relative steps")
         nudge.prop(settings, "nudge_axis", text="Axis")
         nudge.prop(settings, "nudge_amount", text="Amount")
         nudge.prop(settings, "nudge_rotate", text="Rotate")
@@ -1258,19 +1264,11 @@ class DMF_PT_skeleton(Panel):
         minus.direction = -1
         plus = step.operator("dmf.nudge_bone", text="+ Step", icon="ADD")
         plus.direction = 1
-        toggles = nudge.row(align=True)
-        toggles.prop(settings, "show_nudge_overlay", text="3D overlay", toggle=True)
-        toggles.prop(settings, "nudge_relative", text="Relative", toggle=True)
-        nudge.operator(
-            "dmf.nudge_mode",
-            text="Finish nudge" if settings.nudge_active else "Nudge mode",
-            icon="MOUSE_MOVE",
-        )
         _hint(
             nudge,
-            "Nudge mode enters Pose Mode on the custom rig with orthographic panes and the gizmo: "
-            "pose with G/R/S, click a bone for its chain. The overlay heats the selected chain warm "
-            "against the cool mapped hero target. Finish restores the saved pose.",
+            "The overlay only draws. Pose Mode, Edit Mode rest edits and Pose > Apply > "
+            "Apply Pose as Rest Pose all work while it is on. It follows the bone picked in "
+            "Pose or Edit Mode, and the mapped row otherwise.",
             "INFO",
         )
         if settings.nudge_overlay_error:

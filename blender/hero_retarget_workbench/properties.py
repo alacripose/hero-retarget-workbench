@@ -1292,16 +1292,14 @@ class DMF_Settings(PropertyGroup):
         default=True,
     )
     show_nudge_overlay: BoolProperty(
-        name="3D nudge overlay",
-        description="Draw the rest-to-posed radial field and active axis handle in the viewport",
+        name="Chain overlay",
+        description=(
+            "Draw the warm/cool chain overlay in the viewport. It only draws, so Object, "
+            "Edit and Pose Mode all keep their normal tools and rest edits"
+        ),
         default=False,
     )
     nudge_overlay_error: StringProperty(name="Nudge overlay error", default="")
-    nudge_active: BoolProperty(
-        name="Nudge mode",
-        description="Pose mode is running with the nudge overlay; pressing Nudge mode again finishes and restores",
-        default=False,
-    )
 
     compare_action: PointerProperty(
         name="Preview action",

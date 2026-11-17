@@ -435,23 +435,11 @@ def start_hand_preview(settings) -> str:
 
 
 def stop_hand_preview(settings) -> bool:
-    settings.nudge_active = False
     if _PREVIEW is None:
         settings.hand_preview_active = False
-        _clear_nudge_view()
         return False
     _PREVIEW.stop()
-    _clear_nudge_view()
     return True
-
-
-def _clear_nudge_view(context=None) -> None:
-    try:
-        from . import workbench
-
-        workbench.clear_nudge_compare(context or bpy.context)
-    except Exception:
-        pass
 
 
 def nudge_hand_preview(settings, bone_name: str, axis: int, amount: float, rotate: bool) -> bool:
@@ -758,102 +746,29 @@ def _next_mapped_source(settings, reverse: bool = False) -> str:
     return ""
 
 
-_NUDGE_STARTED_PREVIEW = False
-
-
-class DMF_OT_nudge_mode(Operator):
-    bl_idname = "dmf.nudge_mode"
-    bl_label = "Nudge Mode"
-    bl_description = "Pose the selected chain in Pose Mode with the warm/cool overlay; press again to finish"
-
-    def _hint(self) -> str:
-        return (
-            "Nudge mode: pose with Blender's own tools (G/R/S, gizmo). "
-            "Click a bone for its chain; the overlay compares it with the hero. "
-            "Press Nudge mode again to finish and restore the saved pose."
-        )
-
-    def _workspace_hint(self, context, text) -> None:
-        try:
-            context.workspace.status_text_set(text)
-        except (AttributeError, TypeError, RuntimeError):
-            pass
-
-    def _enter(self, context, settings) -> None:
-        global _NUDGE_STARTED_PREVIEW
-        if settings.custom_armature is None:
-            raise RigError("nudge-mode-needs-rig: choose the custom armature first")
-        selected = _selected_source(settings)
-        if not selected:
-            active = getattr(context, "active_pose_bone", None)
-            selected = active.name if active is not None else ""
-        if not selected:
-            raise RigError("nudge-mode-needs-bone: select a mapped row or a custom bone")
-        if _PREVIEW is None:
-            start_hand_preview(settings)
-            _NUDGE_STARTED_PREVIEW = True
-        settings.show_nudge_overlay = True
-        settings.nudge_active = True
-        armature = settings.custom_armature
-        core.select_only(context, [armature])
-        bpy.context.view_layer.objects.active = armature
-        if armature.mode != "POSE":
-            try:
-                bpy.ops.object.mode_set(mode="POSE")
-            except RuntimeError:
-                pass
-        bone = armature.data.bones.get(selected)
-        if bone is not None:
-            # The active bone is what Pose Mode selects; ``Bone.select`` is not
-            # available in every 5.x build this addon loads in.
-            armature.data.bones.active = bone
-        try:
-            from . import workbench
-
-            workbench.start_nudge_compare(context, settings)
-        except Exception as error:
-            _status(settings, f"Nudge mode: split view unavailable: {error}", "WARN")
-        self._workspace_hint(context, self._hint())
-
-    def _leave(self, context, settings) -> None:
-        global _NUDGE_STARTED_PREVIEW
-        self._workspace_hint(context, None)
-        if bpy.context.object is not None and bpy.context.object.mode != "OBJECT":
-            try:
-                bpy.ops.object.mode_set(mode="OBJECT")
-            except RuntimeError:
-                pass
-        if _NUDGE_STARTED_PREVIEW:
-            stop_hand_preview(settings)
-            _NUDGE_STARTED_PREVIEW = False
-        else:
-            _clear_nudge_view(context)
-        settings.show_nudge_overlay = False
-        settings.nudge_active = False
-        jobs._tag_redraw()
+class DMF_OT_chain_overlay(Operator):
+    bl_idname = "dmf.chain_overlay"
+    bl_label = "Chain Overlay"
+    bl_description = (
+        "Show or hide the warm/cool chain overlay. It only draws, so the mode, "
+        "the pose, the rest bones and the actions stay yours"
+    )
 
     def execute(self, context):
         settings = context.scene.dmf
-        try:
-            if settings.nudge_active:
-                self._leave(context, settings)
-                _status(
-                    settings,
-                    "Nudge mode finished; the saved pose and actions were restored",
-                    "OK",
-                )
-            else:
-                self._enter(context, settings)
-                _status(
-                    settings,
-                    "Nudge mode: pose the chain in Pose Mode; the overlay heats it against the hero",
-                    "INFO",
-                )
-        except Exception as error:
-            self._workspace_hint(context, None)
-            _status(settings, str(error), "ERROR")
-            self.report({"ERROR"}, str(error))
-            return {"CANCELLED"}
+        settings.show_nudge_overlay = not settings.show_nudge_overlay
+        if not settings.show_nudge_overlay:
+            _status(settings, "Chain overlay off; the pose and rest bones were not touched", "INFO")
+        elif settings.custom_armature is None:
+            _status(settings, "Chain overlay on; choose the custom armature first", "WARN")
+        else:
+            _status(
+                settings,
+                "Chain overlay on; it follows the bone picked in Pose or Edit Mode, "
+                "or the mapped row",
+                "OK",
+            )
+        jobs._tag_redraw()
         return {"FINISHED"}
 
 
@@ -909,7 +824,7 @@ class DMF_OT_bake_custom_rig(Operator):
 
 CLASSES = (
     DMF_OT_use_mapped_names,
-    DMF_OT_nudge_mode,
+    DMF_OT_chain_overlay,
     DMF_OT_preview_hands,
     DMF_OT_reset_hand_nudges,
     DMF_OT_bake_custom_rig,
