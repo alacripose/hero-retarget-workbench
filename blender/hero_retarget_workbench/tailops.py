@@ -307,6 +307,16 @@ from forge.solver import is_hand_deform as _is_hand_deform
 from forge.solver import is_solver_input as _is_solver_input
 
 
+def _inverse(matrix):
+    """A matrix inverse, or ``None`` for a collapsed rest/pose matrix."""
+    try:
+        if abs(matrix.determinant()) < 1e-12:
+            return None
+        return matrix.inverted()
+    except (AttributeError, ValueError, RuntimeError):
+        return None
+
+
 def apply_retarget_pose(target, source, *, preserve_hand_locations: bool = True) -> int:
     """Put ``source``'s evaluated pose on ``target`` by solved matrices.
 
@@ -314,13 +324,18 @@ def apply_retarget_pose(target, source, *, preserve_hand_locations: bool = True)
     Hand and finger deform bones keep the custom head position and take the
     source rotation only: a copied world translation at a short finger joint
     breaks the knuckles even when the rest mismatch is small.
+
+    A zero-scale bone in a decompiled clip makes a pose matrix singular.  That
+    bone keeps its current basis instead of aborting the whole preview; the
+    other bones still solve, so the viewport remains usable and the panel can
+    report the skipped joint.
     """
     root = source.pose.bones.get("root_motion")
-    axes = (
-        root.matrix.to_quaternion().to_matrix().inverted().to_4x4()
-        if root is not None
-        else Matrix.Identity(4)
-    )
+    axes = Matrix.Identity(4)
+    if root is not None:
+        root_axes = _inverse(root.matrix.to_quaternion().to_matrix().to_4x4())
+        if root_axes is not None:
+            axes = root_axes
     desired = {}
     for bone in target.pose.bones:
         sample = source.pose.bones.get(bone.name)
@@ -330,26 +345,43 @@ def apply_retarget_pose(target, source, *, preserve_hand_locations: bool = True)
             desired[bone.name] = sample.matrix.copy()
         else:
             desired[bone.name] = axes @ sample.matrix
+    skipped = 0
     for bone in target.pose.bones:
         rest = bone.bone.matrix_local
         if bone.name not in desired:
             bone.matrix_basis = Matrix.Identity(4)
             continue
-        if bone.parent is None:
-            basis = rest.inverted() @ desired[bone.name]
-        elif bone.parent.name in desired:
-            parent_pose = desired[bone.parent.name]
-            parent_rest = bone.parent.bone.matrix_local
-            basis = (parent_pose @ parent_rest.inverted() @ rest).inverted() @ desired[bone.name]
-        else:
-            basis = (
-                bone.parent.matrix @ bone.parent.bone.matrix_local.inverted() @ rest
-            ).inverted() @ desired[bone.name]
-        if preserve_hand_locations and _is_hand_deform(bone.name):
-            # Keep the custom knuckle at its own rest offset from the parent.
-            basis = basis.to_quaternion().to_matrix().to_4x4()
-        bone.matrix_basis = basis
-    return len(desired)
+        try:
+            rest_inverse = _inverse(rest)
+            if rest_inverse is None:
+                raise ValueError("rest matrix is singular")
+            if bone.parent is None:
+                basis = rest_inverse @ desired[bone.name]
+            elif bone.parent.name in desired:
+                parent_pose = desired[bone.parent.name]
+                parent_rest_inverse = _inverse(bone.parent.bone.matrix_local)
+                if parent_rest_inverse is None:
+                    raise ValueError("parent rest matrix is singular")
+                local_rest = parent_pose @ parent_rest_inverse @ rest
+                local_inverse = _inverse(local_rest)
+                if local_inverse is None:
+                    raise ValueError("parent-space rest matrix is singular")
+                basis = local_inverse @ desired[bone.name]
+            else:
+                parent_rest_inverse = _inverse(bone.parent.bone.matrix_local)
+                if parent_rest_inverse is None:
+                    raise ValueError("parent rest matrix is singular")
+                parent_inverse = _inverse(bone.parent.matrix @ parent_rest_inverse @ rest)
+                if parent_inverse is None:
+                    raise ValueError("live parent matrix is singular")
+                basis = parent_inverse @ desired[bone.name]
+            if preserve_hand_locations and _is_hand_deform(bone.name):
+                # Keep the custom knuckle at its own rest offset from the parent.
+                basis = basis.to_quaternion().to_matrix().to_4x4()
+            bone.matrix_basis = basis
+        except (ValueError, RuntimeError, ZeroDivisionError):
+            skipped += 1
+    return len(desired) - skipped
 
 
 def _bake_body_action(target, source, source_action, label: str):

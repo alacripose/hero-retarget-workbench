@@ -1286,6 +1286,27 @@ class DMF_Settings(PropertyGroup):
         description="Rotate the active pose bone instead of translating it",
         default=False,
     )
+    nudge_relative: BoolProperty(
+        name="Relative step",
+        description="Scale translation steps by the selected bone's length so a short finger and a long arm use the same control",
+        default=True,
+    )
+    show_nudge_overlay: BoolProperty(
+        name="3D nudge overlay",
+        description="Draw the rest-to-posed radial field and active axis handle in the viewport",
+        default=False,
+    )
+    nudge_overlay_error: StringProperty(name="Nudge overlay error", default="")
+    nudge_rest_armature: PointerProperty(
+        name="Nudge rest armature",
+        description="Temporary rest-pose copy shown in the left split while nudge mode runs",
+        type=bpy.types.Object,
+    )
+    nudge_rest_area: StringProperty(
+        name="Nudge rest viewport",
+        description="Screen position of the split pane that shows the temporary rest copy",
+        default="",
+    )
 
     compare_action: PointerProperty(
         name="Preview action",
