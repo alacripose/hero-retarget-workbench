@@ -91,18 +91,6 @@ def _text(text: str, x: float, y: float, size: float = 11.0, color=TEXT) -> None
     blf.draw(font, text)
 
 
-def _label(text: str, x: float, y: float, size: float = 11.0, color=TEXT) -> None:
-    """A dark-backed label so bone names stay readable over the gradient."""
-    font = 0
-    blf.size(font, size)
-    width, height = blf.dimensions(font, text)
-    _fill(
-        [(x - 4.0, y - 3.0), (x + width + 4.0, y - 3.0), (x + width + 4.0, y + height + 3.0), (x - 4.0, y + height + 3.0)],
-        (0.025, 0.035, 0.050, 0.84),
-    )
-    _text(text, x, y, size, color)
-
-
 def _lerp(first, second, ratio: float):
     return tuple(first[index] + (second[index] - first[index]) * ratio for index in range(4))
 
@@ -264,6 +252,8 @@ def _metrics(settings, custom, hero, name: str, mapping: dict[str, str], axes):
             "rest_tail": rest_tail,
             "target_head": None,
             "target_tail": None,
+            "custom_world": custom.matrix_world @ pose.matrix,
+            "target_world": None,
             "pos_error": 0.0,
             "rot_error": 0.0,
             "error": 0.0,
@@ -295,10 +285,82 @@ def _metrics(settings, custom, hero, name: str, mapping: dict[str, str], axes):
         "rest_tail": rest_tail,
         "target_head": target_head,
         "target_tail": target_tail,
+        "custom_world": custom_world,
+        "target_world": target_world,
         "pos_error": pos_error,
         "rot_error": rotation,
         "error": error,
     }
+
+
+def _accuracy(error: float) -> float:
+    return max(0.0, min(100.0, (1.0 - error) * 100.0))
+
+
+def _point_text(point) -> str:
+    return f"x {point.x:+.3f}  y {point.y:+.3f}  z {point.z:+.3f} m"
+
+
+def _rotation_text(matrix) -> str:
+    euler = matrix.to_euler("XYZ")
+    return (
+        f"rx {math.degrees(euler.x):+.1f}°  "
+        f"ry {math.degrees(euler.y):+.1f}°  "
+        f"rz {math.degrees(euler.z):+.1f}°"
+    )
+
+
+def _draw_info(selected_item) -> None:
+    """The selected bone's numbers, kept off the bone itself."""
+    x = 14.0
+    y = 92.0
+    width = 350.0
+    height = 86.0
+    _fill([(x, y), (x + width, y), (x + width, y + height), (x, y + height)], PANEL)
+    _line(
+        [(x, y), (x + width, y), (x + width, y + height), (x, y + height), (x, y)],
+        BORDER,
+        1.0,
+    )
+    target = selected_item["target_pose"]
+    accuracy = _accuracy(selected_item["error"])
+    title = (
+        f"{selected_item['name']} → {selected_item['target']}   accuracy {accuracy:.0f}%"
+        if target is not None
+        else f"{selected_item['name']} · no mapped target"
+    )
+    _text(title, x + 9.0, y + height - 16.0, 10.0, TEXT)
+    _text(
+        f"custom  {_point_text(selected_item['custom_head'])}",
+        x + 9.0,
+        y + height - 34.0,
+        9.0,
+        WARM,
+    )
+    _text(
+        f"        {_rotation_text(selected_item['custom_world'])}",
+        x + 9.0,
+        y + height - 48.0,
+        9.0,
+        WARM,
+    )
+    if target is None:
+        _text("hero    not mapped", x + 9.0, y + height - 64.0, 9.0, DIM)
+        return
+    _text(
+        f"hero    {_point_text(selected_item['target_head'])}",
+        x + 9.0,
+        y + height - 64.0,
+        9.0,
+        COOL_BRIGHT,
+    )
+    _text(
+        f"        {_rotation_text(selected_item['target_world'])}",
+        x + 9.0,
+        y + height - 78.0,
+        9.0,
+        COOL_BRIGHT,
+    )
 
 
 def _draw_legend(selected_error: float) -> None:
@@ -443,22 +505,9 @@ def _draw(context) -> None:
                         )
                 if (target_point[0] - custom_point[0]) ** 2 + (target_point[1] - custom_point[1]) ** 2 < 25.0:
                     _cross(target_point, 4.0, COOL_BRIGHT, 1.4)
-                _label(
-                    f"{selected_item['name']} · {selected_item['error'] * 100.0:.0f}%  "
-                    f"Δ{selected_item['pos_error']:.3f}m {math.degrees(selected_item['rot_error']):.1f}°",
-                    custom_point[0] + 12.0,
-                    custom_point[1] + 13.0,
-                    11.0,
-                    WARM,
-                )
-                _label(
-                    f"→ {selected_item['target']}",
-                    custom_point[0] + 12.0,
-                    custom_point[1] - 15.0,
-                    9.5,
-                    COOL_BRIGHT,
-                )
 
+    if selected_item is not None:
+        _draw_info(selected_item)
     _draw_legend(selected_item["error"] if selected_item is not None else 0.0)
 
 
