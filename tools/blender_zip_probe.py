@@ -153,6 +153,7 @@ def main() -> int:
                 dmf.poseview.CLASSES,
                 dmf.clipops.CLASSES,
                 dmf.cloth_ops.CLASSES,
+                dmf.rigops.CLASSES,
                 dmf.ui_space.CLASSES,
             )
             for cls in group
@@ -175,6 +176,7 @@ def main() -> int:
                 dmf.poseview,
                 dmf.clipops,
                 dmf.cloth_ops,
+                dmf.rigops,
                 dmf.ui_space,
             )
             for name in dir(module)

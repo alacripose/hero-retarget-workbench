@@ -266,6 +266,12 @@ it publishes anything.
    direct children. `CUSTOM` and `ENVELOPE` are separate methods. Extra bones can
    be folded, kept as new hero-rig bones, or dropped. The solve is chunked on a
    timer, not one blocking `DATA_TRANSFER`.
+   When a custom model's own weights are better than any solve, **Use mapped
+   names** renames its mapped bones and vertex groups to the hero names and
+   rebinds the original groups to the custom armature; no weight is written.
+   **Bake hero to custom** does that rename automatically, then bakes every
+   imported hero clip onto the custom armature and writes a custom skeleton and
+   `vnmskel` under the bake folder. Import the clips on Animations first.
 10. **Mint Axis Proof** — records the weight artifact with BLAKE3, the claim,
     origin, evidence, tick span, world digest, presenter, ticket and named checks
     (coverage, normalization, influence limit, bone map, binding, extra bones,

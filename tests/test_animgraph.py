@@ -86,6 +86,18 @@ class AnimGraphTests(unittest.TestCase):
         self.assertEqual(full.count('"tail_0"'), 1)
         self.assertEqual(full.count("1.0,"), 4)
 
+    def test_point_skeleton_changes_only_the_source(self):
+        result = animgraph.point_skeleton(
+            MINIMAL,
+            "models/heroes_staging/h/hero/dmx/mesh/custom_skel.dmx",
+        )
+        self.assertIn(
+            'm_sourceFilename = "models/heroes_staging/h/hero/dmx/mesh/custom_skel.dmx"',
+            result,
+        )
+        self.assertIn('"head"', result)
+        self.assertIn('m_ID = "FullBody"', result)
+
     def test_compiled_outputs_keep_the_document_relative_path(self):
         with tempfile.TemporaryDirectory() as folder:
             content = Path(folder) / "content/citadel_addons/mod"

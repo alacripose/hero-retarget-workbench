@@ -1418,6 +1418,24 @@ class DMF_PT_weights(Panel):
         if settings.unmatched:
             _hint(layout, "Unmapped: " + settings.unmatched, "STATUS_WARNING", alert=True)
 
+        fallback = _section(layout, "Keep the custom rig", "ARMATURE_DATA", "no solve")
+        _hint(
+            fallback,
+            "Rename mapped bones and groups without touching the painted weights. Bake hero clips after importing them on Animations.",
+            "INFO",
+        )
+        ui_popit.glyphs(
+            fallback,
+            ["dmf.use_mapped_names", "dmf.bake_custom_rig"],
+            labels={
+                "dmf.use_mapped_names": "Use mapped names",
+                "dmf.bake_custom_rig": "Bake hero to custom",
+            },
+        )
+        _path_row(fallback, settings, "custom_bake_dir", "Bake folder (blank = artifacts)")
+        if settings.custom_bake_note:
+            _hint(fallback, settings.custom_bake_note, "FILE")
+
         gate = _proof_gate(settings)
         proof = ui_popit.section(
             layout,
