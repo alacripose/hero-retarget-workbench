@@ -17,7 +17,7 @@ from mathutils import Vector, kdtree
 from forge.weights import (
     BoneSegment,
     WeightError,
-    bone_related,
+    bone_family,
     envelope_weights,
     fold_source,
     merge_weights,
@@ -33,7 +33,7 @@ _ACTIVE: "WeightJob | None" = None
 
 @dataclass
 class WeightOptions:
-    mode: str = "HYBRID"
+    mode: str = "MAPPED"
     max_distance: float = 0.35
     falloff: float = 2.0
     max_influences: int = 4
@@ -140,6 +140,10 @@ class WeightSolver:
             bone.name: bone.parent.name if bone.parent else ""
             for bone in self.armature.data.bones
         }
+        self.target_children: dict[str, list[str]] = {}
+        for bone in self.armature.data.bones:
+            if bone.parent:
+                self.target_children.setdefault(bone.parent.name, []).append(bone.name)
         self.source_segments = self._source_segments()
         self.segments = self._target_segments()
         self.allowed_segments = [
@@ -223,46 +227,40 @@ class WeightSolver:
             found.append(BoneSegment(target, tuple(head), tuple(tail)))
         return found
 
-    def _anchor(self, point: Vector, base: dict[str, float] | None = None) -> str:
-        """The target bone the custom vertex belongs to in its own rig.
+    def _region(
+        self,
+        point: Vector,
+        base: dict[str, float] | None = None,
+    ) -> set[str]:
+        """Bones a custom vertex may receive, from its own weights and rig.
 
         A painted/mapped group is the strongest answer: the user already said
-        which bone owns the vertex.  Only an unweighted vertex falls back to the
-        nearest mapped custom bone, and then to target space for an unrigged
-        mesh.  This is what keeps a nearby hand from redefining a thigh vertex.
+        which bone owns the vertex.  The region is that bone, its parent and its
+        direct children, never the whole armature chain.  Only an unweighted
+        vertex falls back to its nearest mapped custom bone, and then to target
+        space for an unrigged mesh.
         """
-        painted = [name for name in (base or {}) if name in self.target_parents]
+        painted = {name for name in (base or {}) if name in self.target_parents}
         if painted:
-            return max(painted, key=self._target_depth)
+            region: set[str] = set()
+            for name in painted:
+                region.update(bone_family(name, self.target_parents, self.target_children))
+            return region
         segments = self.source_segments or self.allowed_segments or self.segments
         if not segments:
-            return ""
+            return set()
         nearest = min(
             segments,
             key=lambda segment: segment_distance(point, segment.head, segment.tail),
         )
-        return nearest.name
+        return bone_family(nearest.name, self.target_parents, self.target_children)
 
-    def _target_depth(self, name: str) -> int:
-        depth = 0
-        current = name
-        seen: set[str] = set()
-        while current and current not in seen:
-            seen.add(current)
-            current = self.target_parents.get(current, "")
-            if current:
-                depth += 1
-        return depth
-
-    def _compatible_segments(self, anchor: str) -> list[BoneSegment]:
-        if not anchor:
-            return self.allowed_segments
-        found = [
-            segment
-            for segment in self.allowed_segments
-            if bone_related(segment.name, anchor, self.target_parents)
-        ]
-        return found or self.allowed_segments
+    def _compatible_segments(self, region: set[str]) -> list[BoneSegment]:
+        # Never widen a known region to the whole rig.  An empty result means the
+        # vertex stays unweighted, which is safer than borrowing a finger for it.
+        if not region:
+            return []
+        return [segment for segment in self.allowed_segments if segment.name in region]
 
     def _target_segments(self) -> list[BoneSegment]:
         segments = []
@@ -346,7 +344,7 @@ class WeightSolver:
             group = self.mesh.vertex_groups.new(name=name)
         return group
 
-    def _surface(self, point: Vector, anchor: str) -> dict[str, float]:
+    def _surface(self, point: Vector, region: set[str]) -> dict[str, float]:
         if self.tree is None or not self.body_weights:
             return {}
         found = self.tree.find_n(point, max(1, self.options.surface_samples))
@@ -358,11 +356,9 @@ class WeightSolver:
             factor = (1.0 / (distance + 1e-6)) ** self.options.falloff
             for name, weight in self.body_weights[index].items():
                 # A nearby hero hand can sit beside the custom thigh in an
-                # A-pose.  A finger is not on the thigh's chain, so the body
-                # sample cannot lend that weight across regions.
-                if name in allowed and (
-                    not anchor or bone_related(name, anchor, self.target_parents)
-                ):
+                # A-pose.  A finger is not in the thigh's local family, so the
+                # body sample cannot lend that weight across regions.
+                if name in allowed and name in region:
                     merged[name] = merged.get(name, 0.0) + weight * factor
         return normalize_weights(merged, max_influences=self.options.max_influences)
 
@@ -385,13 +381,24 @@ class WeightSolver:
             if target:
                 base[target] = base.get(target, 0.0) + weight
         point = self.mesh.matrix_world @ self.mesh.data.vertices[index].co
-        anchor = self._anchor(point, base)
+        region = self._region(point, base)
         if self.options.mode == "CUSTOM":
             result = base
+        elif self.options.mode == "MAPPED":
+            # Strict agreement: the painted groups are the only source of
+            # target weights.  An unweighted vertex gets the local envelope,
+            # never a body surface sample from another region.
+            result = base or envelope_weights(
+                point,
+                self._compatible_segments(region),
+                max_distance=self.options.max_distance,
+                falloff=self.options.falloff,
+                max_influences=self.options.max_influences,
+            )
         elif self.options.mode == "ENVELOPE":
             result = envelope_weights(
                 point,
-                self._compatible_segments(anchor),
+                self._compatible_segments(region),
                 max_distance=self.options.max_distance,
                 falloff=self.options.falloff,
                 max_influences=self.options.max_influences,
@@ -400,13 +407,16 @@ class WeightSolver:
             if base and sum(base.values()) >= 0.35:
                 result = base
             else:
-                surface = self._surface(point, anchor)
+                # Surface samples only fill a vertex whose own groups already
+                # named the region; the custom weights and the hero surface
+                # must agree before a bone is written.
+                surface = self._surface(point, region) if base else {}
                 if surface:
                     result = merge_weights(base, surface)
                 else:
                     result = base or envelope_weights(
                         point,
-                        self._compatible_segments(anchor),
+                        self._compatible_segments(region),
                         max_distance=self.options.max_distance,
                         falloff=self.options.falloff,
                         max_influences=self.options.max_influences,

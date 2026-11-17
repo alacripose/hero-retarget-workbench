@@ -1195,7 +1195,8 @@ class DMF_Settings(PropertyGroup):
         name="Weight method",
         description="How the custom mesh gets hero weights",
         items=[
-            ("HYBRID", "Surface + envelope", "Sample the hero body near the mesh; use bone envelopes for wings, tails, hair and other geometry outside the body"),
+            ("MAPPED", "Mapped groups", "Use only the mapped weights you painted; unweighted vertices use the nearest mapped bone envelope. No body surface sample"),
+            ("HYBRID", "Surface + envelope", "Sample the hero body near the mesh; a sample can only add bones in the vertex's own mapped bone family"),
             ("CUSTOM", "Custom groups", "Use the mapped custom weights only; extra groups follow the extra-bone policy"),
             ("ENVELOPE", "Bone envelope", "Weight every vertex to the nearest mapped bone segments, independent of the hero body surface"),
         ],
