@@ -390,6 +390,56 @@ class MigrationTests(unittest.TestCase):
         manifest = json.loads(result.manifest.read_text(encoding="utf-8"))
         self.assertTrue(manifest["old_assets"])
 
+    def test_update_stages_editable_material_sources(self):
+        old = self.root / "compiled-material-update"
+        compiled = old / "models/test/hero.vmdl_c"
+        compiled.parent.mkdir(parents=True)
+        compiled.write_bytes(b"compiled model bytes")
+        material = old / "models/test/materials/body.vmat_c"
+        material.parent.mkdir(parents=True)
+        material.write_bytes(b"compiled material")
+
+        def fake_run(command, **_kwargs):
+            output = Path(command[command.index("-o") + 1])
+            if "-e" in command:
+                vmat = output / "models/test/materials/body.vmat"
+                vmat.parent.mkdir(parents=True, exist_ok=True)
+                vmat.write_text(
+                    '"Layer0"\n{\n'
+                    '\t"TextureColor1"\t"models/test/materials/body_color.png"\n'
+                    '\t"Compiled Textures"\n\t{\n'
+                    '\t\t"g_tColor"\t"models/test/materials/body_color_png_deadbeef.vtex"\n'
+                    '\t}\n}\n',
+                    encoding="utf-8",
+                )
+                (output / "models/test/materials/body_color_png_deadbeef.png").write_bytes(
+                    b"decoded texture"
+                )
+            else:
+                vmdl = output / "models/test/hero.vmdl"
+                vmdl.parent.mkdir(parents=True, exist_ok=True)
+                vmdl.write_text(document(), encoding="utf-8")
+                (output / RENDER).write_bytes(b"old custom dmx")
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+        with mock.patch("forge.migrate.subprocess.run", side_effect=fake_run):
+            result = update_from_package(
+                Environment(s2v=Path("s2v.exe")),
+                old,
+                self.root / "material-update-out",
+                "material_updated",
+                new_extraction=self.new,
+                new_vmdl=self.new / "models/test/hero.vmdl",
+                preserve_model="live",
+                force=True,
+            )
+
+        self.assertTrue((result.root / "models/test/materials/body.vmat").is_file())
+        self.assertTrue((result.root / "models/test/materials/body_color.png").is_file())
+        manifest = json.loads(result.manifest.read_text(encoding="utf-8"))
+        self.assertEqual(manifest["material_sources"], 1)
+        self.assertEqual(manifest["material_source_textures"], 1)
+
     def test_package_source_fills_the_source_page_without_migrating(self):
         result = resolve_package_source(
             Environment(s2v=Path("s2v.exe")),
@@ -435,9 +485,65 @@ class MigrationTests(unittest.TestCase):
         self.assertEqual(Path(result["root"]).resolve(), decompiled.resolve())
         self.assertEqual(Path(result["vmdl"]).resolve(), (decompiled / "models/test/hero.vmdl").resolve())
         self.assertEqual(Path(result["body_dmx"]).resolve(), (decompiled / RENDER).resolve())
-        self.assertEqual(Path(result["materials_dir"]).resolve(), old.resolve())
+        self.assertEqual(
+            Path(result["materials_dir"]).resolve(),
+            (destination / "materials").resolve(),
+        )
         self.assertEqual(result["material_count"], 1)
         self.assertEqual(result["source"]["kind"], "compiled")
+        self.assertTrue(
+            (destination / "materials/models/test/materials/body.vmat_c").is_file()
+        )
+
+    def test_compiled_materials_become_editable_sources_with_textures(self):
+        old = self.root / "source-materials"
+        compiled = old / "models/test/hero.vmdl_c"
+        compiled.parent.mkdir(parents=True)
+        compiled.write_bytes(b"compiled model bytes")
+        material = old / "models/test/materials/body.vmat_c"
+        material.parent.mkdir(parents=True)
+        material.write_bytes(b"compiled material")
+        texture = old / "models/test/materials/body_color_png_deadbeef.vtex_c"
+        texture.write_bytes(b"compiled texture")
+        destination = self.root / "source-materials-read"
+
+        def fake_run(command, **_kwargs):
+            output = Path(command[command.index("-o") + 1])
+            if "-e" in command:
+                vmat = output / "models/test/materials/body.vmat"
+                vmat.parent.mkdir(parents=True, exist_ok=True)
+                vmat.write_text(
+                    '"Layer0"\n{\n'
+                    '\t"shader"\t"pbr.vfx"\n'
+                    '\t"TextureColor1"\t"models/test/materials/body_color.png"\n'
+                    '\t"Compiled Textures"\n\t{\n'
+                    '\t\t"g_tColor"\t"models/test/materials/body_color_png_deadbeef.vtex"\n'
+                    '\t}\n}\n',
+                    encoding="utf-8",
+                )
+                png = output / "models/test/materials/body_color_png_deadbeef.png"
+                png.write_bytes(b"decoded texture")
+            else:
+                vmdl = output / "models/test/hero.vmdl"
+                vmdl.parent.mkdir(parents=True, exist_ok=True)
+                vmdl.write_text(document(), encoding="utf-8")
+                (output / RENDER).write_bytes(b"old custom dmx")
+            return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+        with mock.patch("forge.migrate.subprocess.run", side_effect=fake_run):
+            result = resolve_package_source(
+                Environment(s2v=Path("s2v.exe")),
+                old,
+                destination,
+                old_vmdl="models/test/hero.vmdl_c",
+            )
+
+        materials = destination / "materials/models/test/materials"
+        self.assertTrue((materials / "body.vmat").is_file())
+        self.assertTrue((materials / "body_color.png").is_file())
+        self.assertEqual((materials / "body_color.png").read_bytes(), b"decoded texture")
+        self.assertEqual(result["material_sources"], 1)
+        self.assertEqual(result["material_source_textures"], 1)
 
     def test_package_source_refuses_a_blend_as_a_source_2_package(self):
         blend = self.root / "project.blend"

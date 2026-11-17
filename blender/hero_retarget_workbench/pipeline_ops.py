@@ -710,13 +710,37 @@ class DMF_OT_port_mod(Operator):
             settings.addon_name = addon
             settings.update_output = str(output)
             settings.stage_dir = str(env.csdk_root)
-            settings.extraction_dir = str(result.new_root)
             actions = ", ".join(f"{name}:{action['action']}" for name, action in result.sections.items()) or "no sections"
+            try:
+                metadata = json.loads(result.manifest.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                metadata = {}
+            recovered = int(metadata.get("material_sources") or 0)
+            source_note = ""
+            try:
+                bound = core.bind_staged_source(
+                    settings,
+                    installed,
+                    addon=addon,
+                    package=old_path,
+                    kind=row.kind,
+                    label=f"old mod {row.addon}",
+                    stage_root=env.csdk_root,
+                )
+                source_note = (
+                    f" Source page now points at {Path(bound['vmdl']).name}"
+                    + (f" with body {Path(bound['body_dmx']).name}." if bound["body_dmx"] else ".")
+                )
+            except Exception as error:
+                settings.extraction_dir = str(result.new_root)
+                source_note = f" Source page binding failed: {error}"
             core.set_status(
                 settings,
                 f"Ported {row.addon} onto {hero_slug}: {actions}; staged {result.material_count} old material assets in {installed}. "
-                "Edit the material files there, then press Compile.",
-                "OK",
+                f"Recovered {recovered} editable material sources. "
+                "Edit the material files there, then press Compile."
+                + source_note,
+                "WARN" if "binding failed" in source_note else "OK",
             )
 
         if not _start(settings, f"Porting {row.addon}", work, done, "Port failed"):

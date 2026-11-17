@@ -319,6 +319,8 @@ def backport_package(
         old_package=Path(package),
         old_source=old_source,
         old_assets=old_assets,
+        env=env,
+        timeout=timeout,
     )
     manifest = result.manifest
     if manifest.is_file():
