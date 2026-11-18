@@ -152,6 +152,23 @@ class DMF_OT_clear_job(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_cancel_job(Operator):
+    bl_idname = "dmf.cancel_job"
+    bl_label = "Cancel background job"
+    bl_description = "Stop the running compile or staging job, or clear a card left by a reload"
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        stopped = jobs.cancel_active()
+        jobs.clear_feedback(settings, force=True)
+        _status(
+            settings,
+            "Cancelling the background job" if stopped else "Cleared the stopped job card",
+            "WARN",
+        )
+        return {"FINISHED"}
+
+
 class DMF_OT_refresh_heroes(Operator):
     bl_idname = "dmf.refresh_heroes"
     bl_label = "Refresh Hero List"
@@ -1486,6 +1503,22 @@ class DMF_OT_compile(Operator):
     bl_label = "Compile with CSDK13"
     bl_description = "Run resourcecompiler in place on the installed addon and leave the compiled files in game/citadel_addons/<addon>, without blocking the viewport"
 
+    def invoke(self, context, event):
+        settings = context.scene.dmf
+        addon = settings.addon_name.strip() or "the open addon"
+        root = core.csdk_addon_root(settings)
+        where = str(root) if root is not None else "the selected CSDK13 install"
+        return context.window_manager.invoke_confirm(
+            self,
+            event,
+            title="Compile with CSDK13?",
+            message=(
+                f"Run resourcecompiler on {addon} in {where}?\n"
+                "It can take several minutes, but it runs in the background and can be cancelled."
+            ),
+            confirm_text="Compile",
+        )
+
     def execute(self, context):
         settings = context.scene.dmf
         stage_dir = core.csdk_addon_root(settings)
@@ -1504,7 +1537,13 @@ class DMF_OT_compile(Operator):
 
             def work(progress):
                 progress(0.25, "running resourcecompiler")
-                return module["compile"].compile_stage(env, stage_dir, addon_name, log_path=log_path)
+                return module["compile"].compile_stage(
+                    env,
+                    stage_dir,
+                    addon_name,
+                    log_path=log_path,
+                    cancel=progress,
+                )
 
             def done(result):
                 if result.returncode:
@@ -1903,6 +1942,7 @@ class DMF_OT_launch_game(Operator):
 CLASSES = (
     DMF_OT_detect_paths,
     DMF_OT_clear_job,
+    DMF_OT_cancel_job,
     DMF_OT_detect,
     DMF_OT_refresh_heroes,
     DMF_OT_browse_folders,

@@ -51,10 +51,17 @@ def walk_files(root: str | Path):
             yield Path(current) / name, relative
 
 
-def copy_tree(source: str | Path, destination: str | Path) -> int:
-    """Copy every file below ``source`` into ``destination``; return the count."""
+def copy_tree(source: str | Path, destination: str | Path, cancel=None) -> int:
+    """Copy every file below ``source`` into ``destination``; return the count.
+
+    ``cancel`` is an optional object with a ``cancelled`` property. Checking it
+    between files makes a long CSDK stage stop without waiting for the copy to
+    finish; the compiler itself is cancelled where its subprocess is attached.
+    """
     copied = 0
     for path, relative in walk_files(source):
+        if cancel is not None and cancel.cancelled:
+            raise RuntimeError("copy-cancelled")
         copy_file(path, Path(destination) / relative)
         copied += 1
     return copied

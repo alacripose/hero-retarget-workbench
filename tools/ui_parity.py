@@ -27,7 +27,7 @@ ADDON = ROOT / "blender" / "hero_retarget_workbench"
 
 # Navigation is a surface, not a feature: the header and the Setup page both
 # offer a way back to the workbench editor on purpose.
-NAVIGATION = {"dmf.open_workbench", "dmf.clear_job", "dmf.cancel_weight_job"}
+NAVIGATION = {"dmf.open_workbench", "dmf.clear_job", "dmf.cancel_job", "dmf.cancel_weight_job"}
 
 PANEL_RE = re.compile(r"^class (DMF_PT_\w+)\(Panel\):", re.M)
 HELPER_RE = re.compile(r"^def (_\w+)\(", re.M)

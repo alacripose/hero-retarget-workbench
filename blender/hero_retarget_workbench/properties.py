@@ -1701,6 +1701,9 @@ def _refresh_after_load(*_args) -> None:
     settings = getattr(scene, "dmf", None) if scene is not None else None
     if settings is not None:
         settings.hand_preview_active = False
+        from . import jobs
+
+        jobs.clear_stale(settings)
         if settings.mods and not settings.mod_rows:
             refresh_mod_rows(settings)
 

@@ -386,7 +386,9 @@ def job(layout, settings):
             row = box.row(align=True)
             row.scale_y = 0.85
             row.label(text=line, icon="BLANK1" if line != log[-1] else "FORWARD")
-    if running and getattr(settings, "job_cancellable", False):
+    if running and getattr(settings, "job_kind", "") == "BACKGROUND":
+        box.operator("dmf.cancel_job", text="Cancel job", icon="CANCEL")
+    elif running and getattr(settings, "job_cancellable", False):
         box.operator("dmf.cancel_weight_job", text="Cancel after this chunk", icon="CANCEL")
     return box
 
