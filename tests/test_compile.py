@@ -1,11 +1,13 @@
 import json
 import subprocess
+import sys
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from forge.compile import CompileError, compile_stage, stage_content
+from forge.compile import CompileError, _run, compile_stage, stage_content
 from forge.paths import Environment
 
 
@@ -44,7 +46,7 @@ class CompileStageTests(unittest.TestCase):
     def tearDown(self):
         self.temp.cleanup()
 
-    def fake_compile(self, env, command, log_path, timeout):
+    def fake_compile(self, env, command, log_path, timeout, cancel=None):
         input_relative = Path(command[command.index("-i") + 1])
         addon = input_relative.parts[1]
         game_addon = env.csdk_root / "game" / "citadel_addons" / addon
@@ -106,7 +108,7 @@ class CompileStageTests(unittest.TestCase):
         old.parent.mkdir(parents=True)
         old.write_bytes(b"old")
 
-        def failed(env, command, log_path, timeout):
+        def failed(env, command, log_path, timeout, cancel=None):
             log_path.write_text("failed", encoding="utf-8")
             return subprocess.CompletedProcess(command, 1, "", "failure")
 
@@ -117,6 +119,42 @@ class CompileStageTests(unittest.TestCase):
         self.assertEqual(result.compiled_files, [])
         self.assertEqual(old.read_bytes(), b"old")
         self.assertTrue((self.content_root / "haze" / "stage.json").is_file())
+
+    def test_cancel_terminates_the_waiting_compiler(self):
+        class Cancel:
+            def __init__(self):
+                self.cancelled = False
+                self.process = None
+
+            def attach(self, process):
+                self.process = process
+
+            def detach(self, process):
+                if self.process is process:
+                    self.process = None
+
+            def cancel(self):
+                self.cancelled = True
+                if self.process is not None and self.process.poll() is None:
+                    self.process.terminate()
+
+        cancel = Cancel()
+        timer = threading.Timer(0.5, cancel.cancel)
+        timer.start()
+        try:
+            with self.assertRaises(CompileError) as raised:
+                _run(
+                    self.env,
+                    [sys.executable, "-c", "import time; time.sleep(30)"],
+                    self.log,
+                    30,
+                    cancel=cancel,
+                )
+        finally:
+            timer.cancel()
+            timer.join(timeout=2)
+        self.assertIn("compile-cancelled", str(raised.exception))
+        self.assertIsNone(cancel.process)
 
     def test_addon_name_cannot_leave_the_addon_root(self):
         with self.assertRaises(CompileError):

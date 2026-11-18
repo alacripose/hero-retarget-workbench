@@ -45,6 +45,17 @@ class JobProgress:
     def __init__(self, job: "BackgroundJob"):
         self._job = job
 
+    @property
+    def cancelled(self) -> bool:
+        return self._job._cancel.is_set()
+
+    def attach(self, process) -> None:
+        """Let a cancel terminate the subprocess the worker is waiting on."""
+        self._job.attach(process)
+
+    def detach(self, process) -> None:
+        self._job.detach(process)
+
     def __call__(self, value: float, message: str = "") -> None:
         self._job.progress(value, message)
 
@@ -75,6 +86,8 @@ class BackgroundJob:
         self._result = None
         self._error: BaseException | None = None
         self._finished = threading.Event()
+        self._cancel = threading.Event()
+        self._process = None
         self._thread = threading.Thread(target=self._run, daemon=True, name="dmf-background")
         self.settings.job_running = True
         self.settings.job_kind = "BACKGROUND"
@@ -88,6 +101,27 @@ class BackgroundJob:
         self._logged = "starting"
         self._thread.start()
         self._timer = bpy.app.timers.register(self._tick, first_interval=0.1, persistent=True)
+
+    def attach(self, process) -> None:
+        with self._lock:
+            self._process = process
+
+    def detach(self, process) -> None:
+        with self._lock:
+            if self._process is process:
+                self._process = None
+
+    def cancel(self) -> None:
+        """Ask the worker to stop and terminate the process it is waiting on."""
+        self._cancel.set()
+        with self._lock:
+            process = self._process
+        if process is not None:
+            try:
+                if process.poll() is None:
+                    process.terminate()
+            except Exception:
+                pass
 
     def progress(self, value: float, message: str = "") -> None:
         with self._lock:
@@ -167,8 +201,25 @@ class BackgroundJob:
             lines = self.settings.job_log.splitlines()[-11:]
             self.settings.job_log = "\n".join([*lines, message])
         if not self._finished.is_set():
+            if self._cancel.is_set():
+                self.settings.job_message = "cancelling"
             _tag_redraw()
             return 0.1
+        if self._cancel.is_set():
+            with self._lock:
+                for row in self._stages.values():
+                    if row["state"] == "RUNNING":
+                        row["state"] = "FAILED"
+                        row["message"] = "cancelled"
+            self._sync_stages()
+            self.settings.job_running = False
+            self.settings.job_progress = 0.0
+            self.settings.job_state = "CANCELLED"
+            self.settings.job_message = "cancelled"
+            self.settings.job_cancellable = False
+            _ACTIVE = None
+            _tag_redraw()
+            return None
         with self._lock:
             for row in self._stages.values():
                 if row["state"] == "RUNNING":
@@ -198,20 +249,51 @@ class BackgroundJob:
         return None
 
 
-def clear_feedback(settings) -> None:
+def clear_feedback(settings, force: bool = False) -> None:
     """Drop the last job's card once its failure can no longer be true.
 
     A running job owns the fields; a finished one is history. Detection and a
-    path edit call this so every page stops repeating an old failure.
+    path edit call this so every page stops repeating an old failure. A cancel
+    passes ``force`` because the saved card must not keep the page disabled
+    while the worker is shutting down.
     """
-    if getattr(settings, "job_running", False):
+    if getattr(settings, "job_running", False) and not force:
         return
+    settings.job_running = False
+    settings.job_kind = ""
     settings.job_state = ""
     settings.job_log = ""
     settings.job_message = ""
     settings.job_progress = 0.0
     settings.job_label = ""
+    settings.job_cancellable = False
     settings.job_stages.clear()
+
+
+def clear_stale(settings) -> bool:
+    """Reset a job card saved into a .blend whose worker no longer exists.
+
+    Blender writes ``job_running`` with the scene. Reopening the file after an
+    interrupted compile otherwise restores a card that disables every button,
+    with no worker left to finish it.
+    """
+    running = bool(getattr(settings, "job_running", False))
+    if not running and getattr(settings, "job_state", "") != "RUNNING":
+        return False
+    active = _ACTIVE
+    if active is not None and getattr(active, "settings", None) is settings:
+        return False
+    clear_feedback(settings, force=True)
+    return True
+
+
+def cancel_active() -> bool:
+    """Cancel the one background job; return false when there is none."""
+    active = _ACTIVE
+    if active is None:
+        return False
+    active.cancel()
+    return True
 
 
 def active() -> BackgroundJob | None:
@@ -234,6 +316,7 @@ def unregister() -> None:
     global _UNLOADING, _ACTIVE
     _UNLOADING = True
     if _ACTIVE is not None:
+        _ACTIVE.cancel()
         try:
             bpy.app.timers.unregister(_ACTIVE._tick)
         except Exception:

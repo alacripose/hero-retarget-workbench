@@ -31,6 +31,18 @@ https://github.com/hardikpandya/stop-slop
 
 Do not delete patch probes.
 
+## 2026-11-17 — a dead compile card clears on reload, and Compile asks first (0.22.6)
+
+**Owner instruction, verbatim:** *"can you find the stray resourceompiler thread running that i accidentally started and kill it and make it so the compile button on the release page asks with a popup instead of just starting instantly"*, with a screenshot of v0.22.4 showing `Compiling with CSDK13` stuck at 25% and no cancel control.
+
+- **The 25% card was saved scene state, not a live thread.** The running Blender had no `dmf-background` thread and no `resourcecompiler` child; only the main thread and the MCP server. The scene still had `job_running=True`, `job_label=Compiling with CSDK13`, `job_progress=0.25`, so every button stayed disabled after every reload.
+- **A reload clears a card whose worker is gone.** `properties._refresh_after_load` calls `jobs.clear_stale`; a saved `job_running`/`RUNNING` state is reset unless the module's active job belongs to that same scene. **Cancel job** (`dmf.cancel_job`) is drawn on any running background card and also clears a stale card with no active worker.
+- **A live compile can actually be stopped.** `BackgroundJob.cancel` sets a cancel event and terminates the subprocess attached by `forge.compile._run`; `compile_stage`/`stage_content` receive the job's progress object and pass it through the VMDL and material compiles and the staging copy. A cancelled run ends in `job_state=CANCELLED`, not DONE or FAILED.
+- **The Release Compile button asks first.** `DMF_OT_compile.invoke` calls `invoke_confirm` with title **Compile with CSDK13?**, the addon name and CSDK folder in the message, and a **Compile** confirm button. The button remains the same operator; UI invocation is the only path that shows the dialog, so scripts that call `execute` still compile directly.
+- **Measured.** 344 pytest tests pass, including a new `forge.compile._run` cancellation test that terminates a sleeping child. `artifacts/probes/job_cancel_probe.py` reports `JOB-CANCEL-PASS {'reload_handler': True, 'operator_cleared': True, 'live_cancelled': True, 'state': 'CANCELLED'}`. `artifacts/probes/compile_confirm_probe.py` reports `COMPILE-CONFIRM-PASS` for the `invoke_confirm` title/message/confirm wiring. compileall, `ui_parity --check` (0 duplicates/undrawn) and `ui_prose --check` are clean.
+- **Evidence.** The local zip is `dist/hero_retarget_workbench-0.22.6.zip`, 71 files, 531,373 bytes, sha256 `36b5b42ff849a2523bcf9bb728244ca1d20292a2fa0865864431bba9f7e849bc`; `tools/blender_zip_probe.py` passes with 113 operators, 26 panels and version `0.22.6` (`artifacts/receipts/zip-0226.json`).
+- **Not checked.** The actual GUI click through the confirmation dialog; Blender's background mode auto-confirms modal dialogs, so only the operator source that the UI invokes was checked. The owner's exact .blend was not reopened here; the stale-state reset was called directly in the probe.
+
 ## 2026-11-17 — a lost custom-rig pointer resolves from the hierarchy copy (0.22.5)
 
 **Owner report, verbatim:** *"then why is it suddenly saying this error when it didn't before and I changed nothing that I did"*, with `Report: Error — hierarchy-copy-needs-custom: choose the custom model's armature`.

@@ -30,24 +30,79 @@ class CompileResult:
     game_addon: Path | None = None
 
 
-def _run(env: Environment, command: list[str], log_path: Path, timeout: int) -> subprocess.CompletedProcess[str]:
-    result = subprocess.run(
-        command,
-        cwd=str(env.csdk_root / "content") if env.csdk_root else None,
-        capture_output=True,
-        text=True,
-        errors="replace",
-        timeout=timeout,
-    )
+def _cancelled(cancel) -> bool:
+    return cancel is not None and bool(getattr(cancel, "cancelled", False))
+
+
+def _write_log(log_path: Path, command: list[str], stdout: str, stderr: str) -> None:
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_path.write_text(
-        "$ " + " ".join(command) + "\n\n" + result.stdout + ("\n" + result.stderr if result.stderr else ""),
+        "$ " + " ".join(command) + "\n\n" + stdout + ("\n" + stderr if stderr else ""),
         encoding="utf-8",
     )
-    return result
 
 
-def compile_vmdl(env: Environment, vmdl: Path, *, log_path: Path, timeout: int = 1800) -> CompileResult:
+def _run(
+    env: Environment,
+    command: list[str],
+    log_path: Path,
+    timeout: int,
+    cancel=None,
+) -> subprocess.CompletedProcess[str]:
+    cwd = str(env.csdk_root / "content") if env.csdk_root else None
+    if cancel is None:
+        result = subprocess.run(
+            command,
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            errors="replace",
+            timeout=timeout,
+        )
+        _write_log(log_path, command, result.stdout, result.stderr or "")
+        return result
+    if _cancelled(cancel):
+        raise CompileError("compile-cancelled")
+    process = subprocess.Popen(
+        command,
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        errors="replace",
+    )
+    cancel.attach(process)
+    try:
+        while True:
+            try:
+                stdout, stderr = process.communicate(timeout=0.2)
+                break
+            except subprocess.TimeoutExpired:
+                if _cancelled(cancel):
+                    process.terminate()
+                    try:
+                        stdout, stderr = process.communicate(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        process.kill()
+                        stdout, stderr = process.communicate()
+                    _write_log(log_path, command, stdout or "", stderr or "")
+                    raise CompileError("compile-cancelled") from None
+    finally:
+        cancel.detach(process)
+    _write_log(log_path, command, stdout or "", stderr or "")
+    if _cancelled(cancel):
+        raise CompileError("compile-cancelled")
+    return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+
+
+def compile_vmdl(
+    env: Environment,
+    vmdl: Path,
+    *,
+    log_path: Path,
+    timeout: int = 1800,
+    cancel=None,
+) -> CompileResult:
     """Compile an absolute vmdl path. Prefer compile_stage for a real addon."""
     if env.resourcecompiler is None or not env.resourcecompiler.is_file():
         raise CompileError("resourcecompiler-missing: choose the CSDK13 root in the addon Setup panel")
@@ -66,7 +121,7 @@ def compile_vmdl(env: Environment, vmdl: Path, *, log_path: Path, timeout: int =
         "-i",
         str(vmdl.resolve()),
     ]
-    result = _run(env, command, log_path, timeout)
+    result = _run(env, command, log_path, timeout, cancel=cancel)
     return CompileResult(command, result.returncode, result.stdout, result.stderr, log_path)
 
 
@@ -88,7 +143,7 @@ def _compiled_paths(addon_root: Path) -> list[Path]:
     ]
 
 
-def stage_content(env: Environment, stage_root: Path, addon_name: str) -> Path:
+def stage_content(env: Environment, stage_root: Path, addon_name: str, cancel=None) -> Path:
     """Copy a staged addon into the selected CSDK content tree without compiling.
 
     The content addon is the editable tree: materials and their source files sit
@@ -103,7 +158,7 @@ def stage_content(env: Environment, stage_root: Path, addon_name: str) -> Path:
         raise CompileError(f"stage-content-missing: {source}")
     content_addon = env.csdk_root / "content" / "citadel_addons" / addon
     if content_addon.resolve() != source.resolve():
-        copy_tree(source, content_addon)
+        copy_tree(source, content_addon, cancel=cancel)
     return content_addon
 
 
@@ -114,6 +169,7 @@ def compile_stage(
     *,
     log_path: Path,
     timeout: int = 1800,
+    cancel=None,
 ) -> CompileResult:
     """Compile the addon in place inside the CSDK13 tree.
 
@@ -158,7 +214,7 @@ def compile_stage(
 
     # Merge into the addon the user already has open in CSDK rather than
     # replacing the folder and its unrelated files.
-    content_addon = stage_content(env, stage_root, addon)
+    content_addon = stage_content(env, stage_root, addon, cancel=cancel)
 
     input_relative = Path("citadel_addons") / addon / vmdl_relative
     command = [
@@ -170,7 +226,7 @@ def compile_stage(
         "-i",
         str(input_relative),
     ]
-    result = _run(env, command, log_path, timeout)
+    result = _run(env, command, log_path, timeout, cancel=cancel)
 
     game_addon = env.csdk_root / "game" / "citadel_addons" / addon
     material_errors: list[str] = []
@@ -179,6 +235,8 @@ def compile_stage(
         target_relative = str(manifest.get("material_target_dir") or "").replace("\\", "/").strip("/")
         material_root = content_addon / target_relative if target_relative else None
         for source in sorted(material_root.glob("*.vmat")) if material_root is not None else []:
+            if _cancelled(cancel):
+                raise CompileError("compile-cancelled")
             material_relative = source.relative_to(content_addon).as_posix()
             material_input = Path("citadel_addons") / addon / material_relative
             material_command = [
@@ -190,7 +248,7 @@ def compile_stage(
                 "-i",
                 str(material_input),
             ]
-            material_result = _run(env, material_command, log_path, timeout)
+            material_result = _run(env, material_command, log_path, timeout, cancel=cancel)
             material_files.extend(
                 path
                 for path in _compiled_paths(game_addon)
