@@ -1255,11 +1255,14 @@ class DMF_PT_skeleton(Panel):
             text="Hide overlay" if settings.show_nudge_overlay else "Show overlay",
             icon="HIDE_OFF",
         )
+        nudge.prop(settings, "target_armature", text="Hero")
+        nudge.operator("dmf.update_overlay", text="Update", icon="FILE_REFRESH")
         _hint(
             nudge,
             "The overlay only draws. Pose Mode, Edit Mode rest edits and Pose > Apply > "
             "Apply Pose as Rest Pose all work while it is on. It highlights the bone picked "
-            "in the bone map or the bone list; the bone being posed does not take it over.",
+            "in the bone map or the bone list; the bone being posed does not take it over. "
+            "Update re-reads the hero skeleton after the armature changes.",
             "INFO",
         )
         if settings.nudge_overlay_error:

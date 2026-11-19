@@ -899,6 +899,50 @@ class DMF_OT_refresh_hierarchy(Operator):
         return {"FINISHED"}
 
 
+class DMF_OT_update_overlay(Operator):
+    bl_idname = "dmf.update_overlay"
+    bl_label = "Update Overlay"
+    bl_description = (
+        "Re-read the hero skeleton after the armature changes and clear a stale "
+        "overlay error; the rig, the pose and the bones are not changed"
+    )
+
+    def execute(self, context):
+        settings = context.scene.dmf
+        custom = settings.custom_armature
+        if custom is None or custom.type != "ARMATURE":
+            message = "Choose the custom armature before updating the overlay"
+            _status(settings, message, "ERROR")
+            self.report({"ERROR"}, message)
+            return {"CANCELLED"}
+        hero = settings.target_armature
+        if hero is not None and hero.type != "ARMATURE":
+            hero = None
+        kept = ""
+        if settings.hierarchy and 0 <= settings.hierarchy_index < len(settings.hierarchy):
+            kept = settings.hierarchy[settings.hierarchy_index].name
+        count = build_hierarchy(settings) if hero is not None else 0
+        if kept:
+            settings.hierarchy_index = hierarchy_index(settings, kept)
+        hierarchy_view.invalidate()
+        settings.nudge_overlay_error = ""
+        if context.area is not None:
+            context.area.tag_redraw()
+        if hero is None:
+            _status(
+                settings,
+                f"Overlay reading {custom.name}; choose the hero skeleton to compare the chain",
+                "WARN",
+            )
+        else:
+            _status(
+                settings,
+                f"Overlay reading {custom.name} against {hero.name}: {count} hero bones",
+                "OK",
+            )
+        return {"FINISHED"}
+
+
 class DMF_OT_select_hierarchy_bone(Operator):
     bl_idname = "dmf.select_hierarchy_bone"
     bl_label = "Select Bone"
@@ -995,6 +1039,7 @@ class DMF_OT_pick_bone_map(Operator):
 CLASSES = (
     DMF_OT_scan_bones,
     DMF_OT_refresh_hierarchy,
+    DMF_OT_update_overlay,
     DMF_OT_select_hierarchy_bone,
     DMF_OT_pick_bone_map,
     DMF_OT_add_bone_entry,

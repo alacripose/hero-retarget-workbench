@@ -371,7 +371,12 @@ def model_root(path: str) -> str:
 
 
 def roster_for_models(paths: list[str], named: list[Hero] | tuple = ()) -> list[Hero]:
-    """One picker row per live model, keeping a hero's own title where the table has it."""
+    """One picker row per live model, path-ordered so a base sits with its parts.
+
+    The hero table's title is kept where it exists, but it is not the sort key.
+    Otherwise `Billy · Punkgoat` sorts under B and leaves the `punkgoat` cluster
+    the picker's folder filter just showed.
+    """
     titles = {hero.model_path.lower(): hero.title for hero in named}
     rows: list[Hero] = []
     seen: set[str] = set()
@@ -386,7 +391,7 @@ def roster_for_models(paths: list[str], named: list[Hero] | tuple = ()) -> list[
             folder = Path(path).parent.name
             title = f"{stem} · {folder}" if folder and folder.lower() != stem.lower() else stem
         rows.append(Hero(slug=path, model_path=path, title=title))
-    return sorted(rows, key=lambda hero: (hero.title.lower(), hero.model_path.lower()))
+    return sorted(rows, key=lambda hero: (hero.model_path.lower(), hero.title.lower()))
 
 
 def list_heroes(env: Environment) -> list[Hero]:
