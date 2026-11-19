@@ -10,6 +10,7 @@ from forge.live import (
     looks_like_body,
     parse_hero_roster,
     parse_model_listing,
+    roster_for_models,
 )
 
 
@@ -167,6 +168,20 @@ not a model
         self.assertNotIn("models/heroes_wip/ratking/ratking_gun.vmdl_c", by_path)
         self.assertNotIn("models/npc/trooper_gibs/trooper_humanoid_gibs.vmdl_c", by_path)
         self.assertNotIn("models/npc/core_amber/core_amber.vmdl_c", by_path)
+
+    def test_picker_order_keeps_a_named_base_beside_its_parts(self):
+        base = "models/heroes_wip/punkgoat/punkgoat.vmdl_c"
+        parts = [
+            "models/heroes_wip/punkgoat/punkgoat_rebuild.vmdl_c",
+            "models/heroes_wip/punkgoat/punkgoat_bat_base.vmdl_c",
+        ]
+        priest = "models/heroes_wip/priest/priest.vmdl_c"
+        rows = roster_for_models(
+            [*parts, base, priest],
+            [Hero("punkgoat", base, "Billy · Punkgoat")],
+        )
+        self.assertEqual([row.model_path for row in rows], [priest, base, *sorted(parts)])
+        self.assertEqual(rows[1].title, "Billy · Punkgoat")
 
     def test_duplicate_roster_paths_collapse_to_one_entry(self):
         path = "models/heroes_staging/nano/nano_v2/nano.vmdl_c"

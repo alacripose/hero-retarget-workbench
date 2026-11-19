@@ -265,10 +265,17 @@ def _metrics(settings, custom, hero, name: str, mapping: dict[str, str], axes):
         target_matrix = target.matrix.copy()
     else:
         target_matrix = axes @ target.matrix
-    target_head = custom.matrix_world @ target_matrix.translation
-    target_tail = custom.matrix_world @ (target_matrix @ Vector((0.0, target.length, 0.0)))
-    custom_world = custom.matrix_world @ pose.matrix
-    target_world = custom.matrix_world @ target_matrix
+    # Each rig is read in its own world frame.  The hero-hierarchy copy shares the
+    # custom object's transform, but a skeleton imported on its own keeps its own
+    # scale and location.  Passing the target through the custom object's matrix
+    # multiplied those coordinates by the custom scale and drew the cool chain
+    # thousands of metres away from the rig.
+    custom_frame = custom.matrix_world
+    hero_frame = hero.matrix_world
+    target_head = hero_frame @ target_matrix.translation
+    target_tail = hero_frame @ (target_matrix @ Vector((0.0, target.length, 0.0)))
+    custom_world = custom_frame @ pose.matrix
+    target_world = hero_frame @ target_matrix
     rotation = custom_world.to_quaternion().rotation_difference(target_world.to_quaternion()).angle
     pos_error = (custom_head - target_head).length
     custom_direction = custom_tail - custom_head
@@ -278,12 +285,11 @@ def _metrics(settings, custom, hero, name: str, mapping: dict[str, str], axes):
         if custom_direction.length > 1e-9 and target_direction.length > 1e-9
         else 0.0
     )
-    # Positions are drawn in the custom object's world frame.  The hierarchy copy
-    # inherits that object's scale, so an unscaled rest length compared metres
-    # with centimetres and collapsed a small error to 0% accuracy.
-    frame = custom.matrix_world.to_3x3()
-    custom_length = (frame @ (bone.tail_local - bone.head_local)).length
-    target_length = (frame @ (target.bone.tail_local - target.bone.head_local)).length
+    # Normalize by each rig's own world-space rest length.  The hierarchy copy
+    # shares the custom object's scale, while an independent import keeps its own,
+    # so one object's frame cannot measure both.
+    custom_length = (custom_frame.to_3x3() @ (bone.tail_local - bone.head_local)).length
+    target_length = (hero_frame.to_3x3() @ (target.bone.tail_local - target.bone.head_local)).length
     scale = max(custom_length, target_length, 1e-3)
     # A clamped max made every pose past two bone lengths read exactly 0%, so
     # moving the selected bone closer never changed the number.  The continuous
