@@ -693,8 +693,8 @@ class DMF_OT_import_hero_parts(Operator):
     bl_idname = "dmf.import_hero_parts"
     bl_label = "Import Hero Parts"
     bl_description = (
-        "Import every other mesh DMX beside the hero body (hair, jacket, glasses, gun) "
-        "onto the hero armature"
+        "Import the hero's other meshes (hair, jacket, glasses, gun) "
+        "onto the hero rig"
     )
 
     def execute(self, context):
@@ -755,8 +755,8 @@ class DMF_OT_join_cloth_chain(Operator):
     bl_idname = "dmf.join_cloth_chain"
     bl_label = "Join Chain to Hero"
     bl_description = (
-        "Copy the selected custom chain's bones into the hero armature in world space "
-        "and hang the first bone from the chosen parent; existing hero bones are never moved"
+        "Add the custom chain to the hero rig at world scale. "
+        "Hero bones stay put"
     )
 
     def execute(self, context):
@@ -782,9 +782,9 @@ class DMF_OT_build_chain_cloth(Operator):
     bl_idname = "dmf.build_chain_cloth"
     bl_label = "Build Cloth on This Chain"
     bl_description = (
-        "Build the selected chain into Blender data: one vertex group per chain bone on the "
-        "hero mesh that is skinned to it, a pin group from the chain root, an ordered bone "
-        "chain, and a cloth modifier driven by that pin group"
+        "Build the chain: bone groups, "
+        "a pin group, and a cloth modifier "
+        "bound to it"
     )
 
     def execute(self, context):
@@ -808,8 +808,8 @@ class DMF_OT_mark_cloth_proxy(Operator):
     bl_idname = "dmf.mark_cloth_proxy"
     bl_label = "Mark Source 2 Cloth"
     bl_description = (
-        "Set this mesh to PulseSrcOps CLOTHPROXY and give it a cloth_enable map so the "
-        "DMX carries Source 2 cloth data instead of only a Blender preview modifier"
+        "Mark the mesh as a PulseSrcOps cloth proxy "
+        "so the DMX carries cloth"
     )
 
     def execute(self, context):

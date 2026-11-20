@@ -363,8 +363,8 @@ class DMF_BoneRule(PropertyGroup):
     delta: IntProperty(
         name="Number",
         description=(
-            "For a series rule: the target's number is the source's number plus this; "
-            "learned from one mapped row, editable by hand"
+            "Series rule: target number equals source number "
+            "plus this offset"
         ),
         default=0,
         update=_rule_changed,
@@ -726,8 +726,8 @@ class DMF_Settings(PropertyGroup):
     s2v_cli: StringProperty(
         name="Source 2 Viewer CLI",
         description=(
-            "Source2Viewer-CLI.exe, or the folder or GUI path whose folder holds it; "
-            "the GUI itself cannot extract VPK files. Saved with this .blend"
+            "Source2Viewer-CLI.exe, or a folder holding it. "
+            "Saved with this .blend"
         ),
         subtype="FILE_PATH",
         update=_paths_edited,
@@ -785,8 +785,8 @@ class DMF_Settings(PropertyGroup):
     vmdl_relative: StringProperty(
         name="vmdl path in content",
         description=(
-            "Logical path for the vmdl copy. It must match the target DMX path; the hero "
-            "selection fills it from the live model path so no hero is baked in here"
+            "Vmdl path of the copy. "
+            "Must match the target DMX path"
         ),
         default="",
     )
@@ -824,7 +824,7 @@ class DMF_Settings(PropertyGroup):
     )
     custom_collection: PointerProperty(
         name="Part collection",
-        description="Blender collection whose mesh objects are the custom model parts. Child collections are included",
+        description="Collection holding the custom parts. Child collections count too",
         type=bpy.types.Collection,
     )
     custom_mesh: PointerProperty(name="Mesh", type=Object, poll=lambda self, obj: obj.type == "MESH")
@@ -878,8 +878,8 @@ class DMF_Settings(PropertyGroup):
     release_slot_number: IntProperty(
         name="Addon pak number",
         description=(
-            "Which pakNN_dir.vpk to install into (1-99); 0 reuses the newest pak already in the "
-            "selected game's addons folder"
+            "Target pakNN_dir.vpk, 1 to 99. "
+            "0 reuses the newest pak"
         ),
         default=0,
         min=0,
@@ -1007,8 +1007,8 @@ class DMF_Settings(PropertyGroup):
     component_merge: BoolProperty(
         name="Register in vmdl",
         description=(
-            "Add each staged DMX as a RenderMeshFile and a BodyGroupChoice so the game can "
-            "switch it, instead of copying files only"
+            "Register each staged DMX as a mesh "
+            "and body-group choice"
         ),
         default=True,
     )
@@ -1060,8 +1060,8 @@ class DMF_Settings(PropertyGroup):
     pose_preview: BoolProperty(
         name="Ref pose",
         description=(
-            "Pose every mapped custom bone in the hero's reference stance, without editing "
-            "the rest pose or writing keys"
+            "Pose mapped bones in the hero's stance. "
+            "No rest edit, no keys"
         ),
         default=False,
         update=_pose_preview_toggle,
@@ -1075,16 +1075,16 @@ class DMF_Settings(PropertyGroup):
     custom_name: StringProperty(
         name="Model name",
         description=(
-            "What this port is called. Imported parts are named from their own file, and a "
-            "prefix left over from the last rig is dropped"
+            "Name for this port. "
+            "Imported parts keep their own file names"
         ),
         default="",
     )
     clips_dir: StringProperty(
         name="Clip folder",
         description=(
-            "Optional folder holding animation DMX clips and their vnmclip pairs. Blank "
-            "auto-discovers clips beside the hero extraction and its .vnmskel"
+            "Clip folder. Blank finds clips "
+            "beside the hero extraction"
         ),
         subtype="DIR_PATH",
     )
@@ -1154,8 +1154,8 @@ class DMF_Settings(PropertyGroup):
     tail_bare_only: BoolProperty(
         name="Tail only (no clips, no skeleton doc)",
         description=(
-            "Ship only the tail: its bones attached to the hero and the tail mesh, with no "
-            "clips, no .vnmskel and no animation blending -- the haze_noskel shape without clips"
+            "Ship the tail and its bones only. "
+            "No clips, no vnmskel"
         ),
         default=False,
     )
@@ -1195,10 +1195,10 @@ class DMF_Settings(PropertyGroup):
         name="Weight method",
         description="How the custom mesh gets hero weights",
         items=[
-            ("MAPPED", "Mapped groups", "Use only the mapped weights you painted; unweighted vertices use the nearest mapped bone envelope. No body surface sample"),
-            ("HYBRID", "Surface + envelope", "Sample the hero body near the mesh; a sample can only add bones in the vertex's own mapped bone family"),
+            ("MAPPED", "Mapped groups", "Painted weights only. Unweighted vertices use the nearest mapped bone"),
+            ("HYBRID", "Surface + envelope", "Sample the hero body. Only the vertex's mapped bone family is added"),
             ("CUSTOM", "Custom groups", "Use the mapped custom weights only; extra groups follow the extra-bone policy"),
-            ("ENVELOPE", "Bone envelope", "Weight every vertex to the nearest mapped bone segments, independent of the hero body surface"),
+            ("ENVELOPE", "Bone envelope", "Weight every vertex to the nearest mapped bone. No body sample"),
         ],
         default="HYBRID",
     )
@@ -1286,8 +1286,8 @@ class DMF_Settings(PropertyGroup):
     hand_preview_action: PointerProperty(
         name="Hand preview action",
         description=(
-            "Imported hero action played on the custom rig for hand inspection; blank uses "
-            "the Compare action, the selected clip, or the hero's current action"
+            "Hero action to preview on the custom rig. "
+            "Blank picks one"
         ),
         type=bpy.types.Action,
     )
@@ -1539,8 +1539,8 @@ class DMF_Settings(PropertyGroup):
     live_lods: BoolProperty(
         name="Use built LODs",
         description=(
-            "Export the LOD meshes built in this file instead of asking PulseSrcOps to "
-            "generate them, so export does not copy the armature per level"
+            "Export the LOD meshes built here; "
+            "do not copy the armature per level"
         ),
         default=False,
     )
@@ -1562,8 +1562,8 @@ class DMF_Settings(PropertyGroup):
     show_bone_map: BoolProperty(
         name="Bone map",
         description=(
-            "Draw the hero skeleton in the 3D viewport at its rest positions: every bone "
-            "head, tail and parent link, coloured by depth, clickable to select"
+            "Draw the hero skeleton in the viewport. "
+            "Click a bone to select it"
         ),
         default=False,
         update=_bone_map_toggle,
@@ -1599,12 +1599,12 @@ class DMF_Settings(PropertyGroup):
     )
     old_vpk: StringProperty(
         name="Old addon VPK",
-        description="A compiled addon VPK or an extracted addon content folder to migrate onto the current live hero",
+        description="Addon VPK or content folder to migrate onto the live hero",
         subtype="FILE_PATH",
     )
     update_old_vmdl: StringProperty(
         name="Old model vmdl",
-        description="Optional old vmdl when the old package has more than one; path may be relative to the old package",
+        description="Old vmdl when the package holds several. May be relative",
         subtype="FILE_PATH",
     )
     update_output: StringProperty(
@@ -1619,7 +1619,7 @@ class DMF_Settings(PropertyGroup):
     )
     update_model_policy: EnumProperty(
         name="Old model",
-        description="Keep the old addon render meshes when they differ from the live hero, always keep them, or use the live meshes",
+        description="Old render meshes: keep when they differ, always, or never",
         items=[
             ("auto", "Preserve custom only", "Keep old meshes when their files differ from the live hero"),
             ("old", "Always old", "Always keep the old render meshes"),
@@ -1634,7 +1634,7 @@ class DMF_Settings(PropertyGroup):
     )
     update_preserve_materials: BoolProperty(
         name="Copy old materials",
-        description="Copy the old addon's vmat and texture assets into the update content tree; Stage update in CSDK puts them in the selected CSDK for editing",
+        description="Copy old vmat and texture assets into the update tree",
         default=True,
     )
     update_replace_output: BoolProperty(

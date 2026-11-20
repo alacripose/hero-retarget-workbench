@@ -79,7 +79,8 @@ screenshot check.
 
 - [x] `202` tests pass.
 - [x] `python tools/ui_parity.py --check` is zero.
-- [x] `python tools/ui_prose.py --check` is zero hits in 28 files.
+- [x] `python tools/ui_prose.py --check` reports zero hits in 30 files under the two-second rule
+  (18 words / 92 characters per UI string, 24 words per sentence).
 - [x] Pages probe draws every registered page without an exception.
 - [x] Editor screenshots at 960 px and 640 px; narrow panels re-wrapped and the
   header status moved into the page body below 650 px.

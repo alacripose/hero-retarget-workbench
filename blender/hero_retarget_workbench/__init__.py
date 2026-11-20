@@ -22,7 +22,7 @@ bl_info = {
     "version": (0, 22, 8),
     "blender": (5, 4, 0),
     "location": "Workbench editor (PR 165087 builds); View3D > Sidebar > Deadlock elsewhere",
-    "description": "Fit and retarget a custom model onto a live Deadlock hero, then install the unchanged S2V vmdl as a CSDK13 addon",
+    "description": "Fit a custom model to a live Deadlock hero, then ship it as a CSDK13 addon",
     "category": "Import-Export",
 }
 

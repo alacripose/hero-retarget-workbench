@@ -649,7 +649,7 @@ def start_custom_bake(settings) -> int:
 class DMF_OT_use_mapped_names(Operator):
     bl_idname = "dmf.use_mapped_names"
     bl_label = "Use Mapped Names"
-    bl_description = "Rename mapped custom bones and vertex groups to the hero names; keep the original weights and bind the custom armature"
+    bl_description = "Rename mapped bones and groups to hero names. Weights stay as painted"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -922,8 +922,8 @@ class DMF_OT_hero_hierarchy_rig(Operator):
     bl_idname = "dmf.hero_hierarchy_rig"
     bl_label = "Hero Hierarchy Rig"
     bl_description = (
-        "Duplicate the custom armature with the hero's parent tree, keep its rest "
-        "bones and pose, and bind the custom mesh to the copy"
+        "Copy the custom rig onto the hero's parent tree. "
+        "Bones and pose stay"
     )
 
     def execute(self, context):
@@ -946,7 +946,7 @@ class DMF_OT_hero_hierarchy_rig(Operator):
 class DMF_OT_bake_custom_rig(Operator):
     bl_idname = "dmf.bake_custom_rig"
     bl_label = "Bake Hero to Custom"
-    bl_description = "Rename mapped bones automatically, bake every imported hero action onto the custom armature, and write a custom skeleton and vnmskel"
+    bl_description = "Rename bones, bake every hero action to the custom rig, write its skeleton"
 
     def execute(self, context):
         settings = context.scene.dmf
