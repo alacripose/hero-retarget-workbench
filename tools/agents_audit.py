@@ -69,6 +69,9 @@ BACKTICK_PATH = re.compile(r"`([A-Za-z0-9_][\w./\\-]*\.(?:vpk|dmx|json|jsonl|py|
 EVIDENCE_ROOT = ("artifacts/", "ledger/", "tools/", "tickets/", "logs/", "blender/", "forge/", "tests/")
 # A section that costs this many lines without a refusal, a receipt or a rule is narrative.
 COST_BUDGET = 60
+# A rule file that has to be read in full keeps a budget a reader can meet. Evidence is unbounded
+# because it lives in AGENTS-LOG.md, which nobody is asked to read in order.
+RULE_BUDGET = 600
 DUPLICATE_WINDOW = 3
 STATE_WITHIN = 150
 
@@ -434,6 +437,20 @@ def main(argv: list[str] | None = None) -> int:
                        "detail": "index matches the file" if not stale else "index is stale; run --index"})
     else:
         checks.append({"name": "A6 index current", "pass": False, "detail": "AGENTS-INDEX.md is missing; run --index"})
+
+    # A7: a rule file holds rules, and "read this in full" is a promise the reader has to be able
+    # to keep. A dated record belongs in AGENTS-LOG.md; the file keeps a line budget so a record
+    # cannot be appended here and quietly turn the rules into a log again.
+    lines = facts["lines"]
+    dated_in_file = len(re.findall(r"(?m)^## \d{4}-\d{2}-\d{2}", text))
+    log_present = (AGENTS.parent / "AGENTS-LOG.md").is_file()
+    shape_ok = lines <= RULE_BUDGET and (dated_in_file == 0 or log_present)
+    checks.append({
+        "name": "A7 rule shape",
+        "pass": shape_ok,
+        "detail": f"{lines} lines of {RULE_BUDGET}, {dated_in_file} dated sections in file, "
+                  f"log {'present' if log_present else 'absent'}",
+    })
 
     passed = sum(1 for row in checks if row["pass"])
     receipt = {

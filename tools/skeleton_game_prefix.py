@@ -263,8 +263,8 @@ def main() -> int:
             emit(name)
         if sorted(walked) != sorted(order):
             raise SystemExit(
-                f"skeleton-walk-incomplete: walked {len(walked)} of {len(order)} joints; "
-                "a name would be dropped from `jointList`"
+                f"skeleton-walk-incomplete: walked {len(walked)} of {len(order)} joints. "
+                "A name would be dropped from `jointList`"
             )
         order = walked
 
