@@ -707,7 +707,7 @@ class DMF_OT_import_clip(Operator):
 class DMF_OT_cancel_clips(Operator):
     bl_idname = "dmf.cancel_clips"
     bl_label = "Stop Importing"
-    bl_description = "Stop the clip queue; clips already imported keep their actions"
+    bl_description = "Stop the clip queue. Imported clips keep their actions"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -731,7 +731,7 @@ class DMF_OT_prefix_clips(Operator):
 class DMF_OT_clear_clips(Operator):
     bl_idname = "dmf.clear_clips"
     bl_label = "Clear Imported"
-    bl_description = "Delete the actions this panel imported; the clip files on disk are not touched"
+    bl_description = "Delete the actions this import created. Clip files on disk stay"
 
     def execute(self, context):
         settings = context.scene.dmf

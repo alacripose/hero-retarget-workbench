@@ -465,7 +465,7 @@ class DMF_OT_copy_pose(Operator):
         source_pose = armature.pose.bones.get(entry.source)
         target_pose = target.pose.bones.get(entry.target)
         if source_pose is None or target_pose is None:
-            self.report({"ERROR"}, "Pose bone is missing; check the mapped names")
+            self.report({"ERROR"}, "Pose bone is missing. Check the mapped names")
             return {"CANCELLED"}
         source_pose.matrix = armature.matrix_world.inverted() @ target.matrix_world @ target_pose.matrix
         bpy.context.view_layer.update()
@@ -557,7 +557,7 @@ class DMF_OT_compare_split(Operator):
 class DMF_OT_compare_clear(Operator):
     bl_idname = "dmf.compare_clear"
     bl_label = "Clear Compare Views"
-    bl_description = "Leave local view in every 3D viewport; the split itself stays"
+    bl_description = "Leave local view in every 3D viewport. The split stays"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -672,7 +672,7 @@ class DMF_OT_assign_active_bone(Operator):
 class DMF_OT_smooth_active_group(Operator):
     bl_idname = "dmf.smooth_active_group"
     bl_label = "Smooth Active Group"
-    bl_description = "Smooth the active group across mesh edges; selected vertices only when a selection exists"
+    bl_description = "Smooth the active group across mesh edges, on selected vertices when a selection exists"
 
     iterations: bpy.props.IntProperty(default=2, min=1, max=8)
 
@@ -837,7 +837,7 @@ class DMF_OT_mint_proof(Operator):
                 _status(settings, f"Proof {proof.artifact_digest[:18]} is current at tick {settings.axis_tick}", "OK")
             else:
                 _status(settings, "Proof refused: " + "; ".join(admission.reasons()), "ERROR")
-                self.report({"WARNING"}, "The proof was written but refused; export stays blocked")
+                self.report({"WARNING"}, "The proof was written but refused. Export stays blocked")
         except Exception as error:
             _status(settings, str(error), "ERROR")
             self.report({"ERROR"}, str(error))
@@ -880,7 +880,7 @@ class DMF_OT_cancel_weight_job(Operator):
 class DMF_OT_refresh_hierarchy(Operator):
     bl_idname = "dmf.refresh_hierarchy"
     bl_label = "Refresh Hierarchy"
-    bl_description = "Read the hero skeleton's bone tree into the hierarchy list; it does not change the rig"
+    bl_description = "Read the hero skeleton's bone tree into the hierarchy list. The rig stays unchanged"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -986,7 +986,7 @@ class DMF_OT_select_hierarchy_bone(Operator):
 class DMF_OT_pick_bone_map(Operator):
     bl_idname = "dmf.pick_bone_map"
     bl_label = "Pick Bone in Map"
-    bl_description = "Click a joint in the bone map to select that bone in the hero rig"
+    bl_description = "Pick a joint in the bone map to select that bone in the hero rig"
 
     def invoke(self, context, event):
         settings = context.scene.dmf

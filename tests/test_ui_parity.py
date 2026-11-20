@@ -131,7 +131,12 @@ class ListColumnTests(unittest.TestCase):
 
 class CopyTests(unittest.TestCase):
     def test_user_facing_strings_pass_the_writing_rules(self):
-        hits = PROSE.scan(sorted((ROOT / "blender" / "hero_retarget_workbench").glob("*.py")))
+        hits, visible = PROSE.scan(sorted((ROOT / "blender" / "hero_retarget_workbench").glob("*.py")))
+        self.assertGreaterEqual(
+            visible,
+            PROSE.MIN_VISIBLE_STRINGS,
+            f"the copy gate read only {visible} strings, below its floor of {PROSE.MIN_VISIBLE_STRINGS}",
+        )
         self.assertEqual([], hits, "\n".join(f"{hit['file']}:{hit['line']} {hit['rule']}" for hit in hits))
 
 

@@ -699,10 +699,7 @@ def _next_mapped_source(settings, reverse: bool = False) -> str:
 class DMF_OT_chain_overlay(Operator):
     bl_idname = "dmf.chain_overlay"
     bl_label = "Chain Overlay"
-    bl_description = (
-        "Show or hide the warm/cool chain overlay. It only draws, so the mode, "
-        "the pose, the rest bones and the actions stay yours"
-    )
+    bl_description = "Show or hide the warm/cool chain overlay. It draws only, so every mode stays yours"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -725,7 +722,7 @@ class DMF_OT_chain_overlay(Operator):
 class DMF_OT_preview_hands(Operator):
     bl_idname = "dmf.preview_hands"
     bl_label = "Preview Hands"
-    bl_description = "Play the chosen hero action on the custom rig without keying; stop restores the pose"
+    bl_description = "Play a hero action on the custom rig without keying. Stop restores the pose"
 
     def execute(self, context):
         settings = context.scene.dmf

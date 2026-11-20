@@ -582,7 +582,7 @@ class DMF_OT_analyze_mod(Operator):
             self.report({"ERROR"}, "Select a package first")
             return {"CANCELLED"}
         if row.kind == "blend":
-            self.report({"ERROR"}, "Blend projects are edited directly; there is no model to analyze")
+            self.report({"ERROR"}, "Blend projects are edited directly, with no model to analyze")
             return {"CANCELLED"}
         hero_slug = _target_slug(settings, row)
         if not hero_slug:
@@ -781,7 +781,7 @@ class DMF_OT_backport_mod(Operator):
     def execute(self, context):
         settings = _settings(context)
         if not settings.backport_experimental:
-            self.report({"ERROR"}, "Enable backport first; it is experimental")
+            self.report({"ERROR"}, "Enable backport first. It is experimental")
             return {"CANCELLED"}
         row = _selected_mod(settings)
         if row is None:
@@ -795,7 +795,7 @@ class DMF_OT_backport_mod(Operator):
         if not relative and not hero_slug:
             self.report(
                 {"ERROR"},
-                "Choose a target hero; the package names no model to search in the target build",
+                "Choose a target hero. The package names no model to search for",
             )
             return {"CANCELLED"}
         module = core.core(settings)
@@ -881,7 +881,7 @@ class DMF_OT_create_mod_project(Operator):
                 self,
                 event,
                 title="Open the mod's Blender project?",
-                message="The current file has unsaved changes. Opening the project replaces it.",
+                message="The current file has unsaved changes. Opening the project replaces it",
                 confirm_text="Open project",
                 icon="WARNING",
             )
@@ -999,7 +999,7 @@ class DMF_OT_install_s2v(Operator):
 class DMF_OT_open_csdk_page(Operator):
     bl_idname = "dmf.open_csdk_page"
     bl_label = "Open CSDK 13 download page"
-    bl_description = "Open the community CSDK13 page; its Google Drive and Mega links are not direct downloads"
+    bl_description = "Open the community CSDK13 page. Its Drive and Mega links are not direct downloads"
 
     def execute(self, context):
         settings = _settings(context)
@@ -1222,7 +1222,7 @@ class DMF_OT_scan_components(Operator):
         module = core.core(settings)
         root, vmdl = _component_source(settings)
         if root is None or not root.is_dir():
-            self.report({"ERROR"}, "Extract a model first; its folder holds the component meshes")
+            self.report({"ERROR"}, "Extract a model first, because its folder holds the component meshes")
             return {"CANCELLED"}
         try:
             found = module["components"].inventory(root, vmdl=vmdl)

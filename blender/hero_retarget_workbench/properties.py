@@ -170,7 +170,7 @@ class DMF_BoneEntry(PropertyGroup):
     source: StringProperty(name="Source", description="Bone or vertex group on your model")
     target: StringProperty(
         name="Target",
-        description="Hero bone this source drives; typing one also answers its mirror",
+        description="Hero bone this source drives, and typing one answers its mirror",
         update=_bone_target_changed,
     )
     state: EnumProperty(
@@ -178,7 +178,7 @@ class DMF_BoneEntry(PropertyGroup):
         description="What this map row does when the solver runs",
         items=[
             ("MAPPED", "Mapped", "Copy this source's weights onto the target bone"),
-            ("UNMATCHED", "Unmatched", "No target chosen; the solver refuses a weighted row"),
+            ("UNMATCHED", "Unmatched", "No target chosen, so the solver refuses a weighted row"),
             ("EXTRA", "Extra", "Keep this bone as an extra appendage, or fold it by policy"),
             ("IGNORED", "Ignored", "Drop this group's weights from the solved mesh"),
         ],
@@ -236,7 +236,7 @@ class DMF_ClothChain(PropertyGroup):
     source_armature: StringProperty(name="Source armature", default="")
     source_mesh: PointerProperty(
         name="Cloth mesh",
-        description="The custom mesh this chain is skinned to; its weights drive the cloth",
+        description="The custom mesh this chain is skinned to, whose weights drive the cloth",
         type=Object,
         poll=lambda self, obj: obj.type == "MESH",
     )
@@ -386,7 +386,7 @@ class DMF_BoneRule(PropertyGroup):
         description="What a row this rule answers becomes",
         items=[
             ("MAPPED", "Mapped", "Map the row onto the target bone"),
-            ("EXTRA", "Extra", "Keep the row as an appendage; the extra-bone policy decides how"),
+            ("EXTRA", "Extra", "Keep the row as an appendage, with the extra-bone policy deciding how"),
             ("IGNORED", "Ignored", "Drop the row's weights"),
         ],
         default="MAPPED",
@@ -428,8 +428,8 @@ class DMF_ClipRow(PropertyGroup):
             ("EDITABLE", "Editable", "A decompiled DMX that can be imported"),
             ("IMPORTED", "Imported", "Imported onto the hero rig as an action"),
             ("WRITTEN", "Written", "The action was written back out as an animation DMX"),
-            ("FAILED", "Failed", "The import or write refused this file; the reason is in the status"),
-            ("OPAQUE", "Opaque", "Compiled game data or a skeleton; listed, never parsed"),
+            ("FAILED", "Failed", "The import or write refused this file, with the reason in the status"),
+            ("OPAQUE", "Opaque", "Compiled game data or a skeleton, listed but never parsed"),
         ],
         default="EDITABLE",
     )
@@ -443,8 +443,8 @@ class DMF_IKRow(PropertyGroup):
     state: EnumProperty(
         name="State",
         items=[
-            ("READY", "Ready", "A limb is suggested; apply the constraints"),
-            ("CHOOSE", "Choose", "No limb was suggested; choose one"),
+            ("READY", "Ready", "A limb is suggested, so apply the constraints"),
+            ("CHOOSE", "Choose", "No limb was suggested, so choose one"),
             ("APPLIED", "Applied", "This addon's IK constraints are on the target"),
             ("MISSING", "Missing", "The chosen limb is not on the armature"),
         ],
@@ -719,7 +719,7 @@ class DMF_Settings(PropertyGroup):
     )
     deadlock_root: StringProperty(
         name="Deadlock install",
-        description="The Steam Deadlock folder that contains game/citadel/gameinfo.gi; saved with this .blend",
+        description="The Steam Deadlock folder that contains game/citadel/gameinfo.gi, saved with this .blend",
         subtype="DIR_PATH",
         update=_paths_edited,
     )
@@ -734,7 +734,7 @@ class DMF_Settings(PropertyGroup):
     )
     csdk_root: StringProperty(
         name="CSDK13 root",
-        description="The CSDK13 folder that contains game/bin/win64/resourcecompiler.exe; saved with this .blend",
+        description="The CSDK13 folder that contains game/bin/win64/resourcecompiler.exe, saved with this .blend",
         subtype="DIR_PATH",
         update=_paths_edited,
     )
@@ -797,19 +797,12 @@ class DMF_Settings(PropertyGroup):
     )
     materials_dir: StringProperty(
         name="Hero material root",
-        description=(
-            "Content root containing the hero's materials tree: models/**/materials/*.vmat "
-            "and the texture images they reference. Paths below this root are preserved. "
-            "Leave blank to use the hero extraction."
-        ),
+        description="Hero materials root at models/**/materials. Blank uses the extraction",
         subtype="DIR_PATH",
     )
     custom_materials_dir: StringProperty(
         name="Custom material root",
-        description=(
-            "Content root containing your model's materials/*.vmat and texture images at "
-            "the same relative paths the model references. Copied after the hero materials."
-        ),
+        description="Your model's materials root, with relative paths kept. Copied after the hero materials",
         subtype="DIR_PATH",
     )
     target_dmx_relative: StringProperty(
@@ -959,26 +952,26 @@ class DMF_Settings(PropertyGroup):
     mod_analysis_source: StringProperty(name="Old model source", default="")
     mod_target_client: StringProperty(
         name="Target client",
-        description="Older game build (install, game, or game/citadel folder); every VPK in it is searched for the hero model",
+        description="Older game build, installed or extracted. Every VPK is searched for the hero model",
         subtype="DIR_PATH",
         default="",
     )
     backport_experimental: BoolProperty(
         name="Enable backport",
-        description="Allow transplanting a mod onto an older client's hero model; experimental",
+        description="Transplant a mod onto an older client's hero model. Experimental",
         default=False,
     )
 
     # Setup page: tools and client installs.
     tools_folder: StringProperty(
         name="Tools folder",
-        description="Where downloaded tools are installed; blank uses <workspace>/tools",
+        description="Downloaded tools folder. Blank uses <workspace>/tools",
         subtype="DIR_PATH",
         default="",
     )
     clients_folder: StringProperty(
         name="Clients folder",
-        description="Folder holding custom CSDK installs; blank uses <workspace>/clients",
+        description="Custom CSDK folder. Blank uses <workspace>/clients",
         subtype="DIR_PATH",
         default="",
     )
@@ -1001,7 +994,7 @@ class DMF_Settings(PropertyGroup):
     )
     component_slot: StringProperty(
         name="Body group",
-        description="Body group the staged meshes become choices of; created when absent",
+        description="Body group the staged meshes join, created when absent",
         default="component",
     )
     component_merge: BoolProperty(
@@ -1015,7 +1008,7 @@ class DMF_Settings(PropertyGroup):
     component_manifest: StringProperty(name="Components manifest", subtype="FILE_PATH", default="")
     material_source: PointerProperty(
         name="Material source",
-        description="Object whose material slots are the source list; defaults to the hero body",
+        description="Object whose material slots are the source list, defaulting to the hero body",
         type=Object,
         poll=lambda self, obj: obj.type == "MESH",
     )
@@ -1033,7 +1026,7 @@ class DMF_Settings(PropertyGroup):
             ("source2-to-blender", "Source 2 to Blender", "Map the Source 2 forward and side axes into Blender"),
             ("gltf-to-source2", "glTF to Source 2", "Map the glTF forward and side axes into Source 2"),
             ("source2-to-gltf", "Source 2 to glTF", "Map the Source 2 forward and side axes into glTF"),
-            ("mirror-x", "Mirror X", "Mirror across X; this flips handedness"),
+            ("mirror-x", "Mirror X", "Mirror across X, which flips handedness"),
         ],
         default="identity",
     )
@@ -1107,10 +1100,7 @@ class DMF_Settings(PropertyGroup):
     )
     clip_export_dir: StringProperty(
         name="Write folder",
-        description=(
-            "Folder the written clips go under; blank writes to <clip folder>/edited, never over "
-            "the extraction itself"
-        ),
+        description="Clip output folder. Blank writes to <clip folder>/edited, never into the extraction",
         subtype="DIR_PATH",
         default="",
     )
@@ -1145,14 +1135,14 @@ class DMF_Settings(PropertyGroup):
     )
     tail_manual: BoolProperty(
         name="Manual channel map",
-        description="Show the per-bone pairing and single-clip writes; the automatic pass does not need them",
+        description="Show per-bone pairing and single-clip writes. The automatic pass skips them",
         default=False,
     )
     tail_note: StringProperty(name="Tail note", default="")
     tail_options: CollectionProperty(type=DMF_TailOption, description="Tail skeletons found in the hero, custom rig, extractions and clips")
     tail_option_index: IntProperty(name="Tail option", default=0)
     tail_bare_only: BoolProperty(
-        name="Tail only (no clips, no skeleton doc)",
+        name="Tail only, no clips and no skeleton doc",
         description=(
             "Ship the tail and its bones only. "
             "No clips, no vnmskel"
@@ -1195,10 +1185,10 @@ class DMF_Settings(PropertyGroup):
         name="Weight method",
         description="How the custom mesh gets hero weights",
         items=[
-            ("MAPPED", "Mapped groups", "Painted weights only. Unweighted vertices use the nearest mapped bone"),
-            ("HYBRID", "Surface + envelope", "Sample the hero body. Only the vertex's mapped bone family is added"),
-            ("CUSTOM", "Custom groups", "Use the mapped custom weights only; extra groups follow the extra-bone policy"),
-            ("ENVELOPE", "Bone envelope", "Weight every vertex to the nearest mapped bone. No body sample"),
+            ("MAPPED", "Mapped groups", "Painted weights only, with the nearest mapped bone for any unweighted vertex"),
+            ("HYBRID", "Surface + envelope", "Sample the hero body, but only inside the vertex's mapped bone family"),
+            ("CUSTOM", "Custom groups", "Use the mapped custom weights, with extra groups following the extra-bone policy"),
+            ("ENVELOPE", "Bone envelope", "Weight every vertex to the nearest mapped bone, with no body sample"),
         ],
         default="HYBRID",
     )
@@ -1254,7 +1244,7 @@ class DMF_Settings(PropertyGroup):
     )
     custom_bake_dir: StringProperty(
         name="Custom bake folder",
-        description="Where the custom-rig clips, skeleton and vnmskel are written; blank uses artifacts/custom-anim",
+        description="Custom-rig output folder. Blank uses artifacts/custom-anim",
         subtype="DIR_PATH",
         default="",
     )
@@ -1269,10 +1259,7 @@ class DMF_Settings(PropertyGroup):
     )
     show_nudge_overlay: BoolProperty(
         name="Chain overlay",
-        description=(
-            "Draw the warm/cool chain overlay in the viewport. It only draws, so Object, "
-            "Edit and Pose Mode all keep their normal tools and rest edits"
-        ),
+        description="Draw the warm/cool chain overlay. It draws only, so every mode keeps its tools",
         default=False,
     )
     nudge_overlay_error: StringProperty(name="Nudge overlay error", default="")
@@ -1293,7 +1280,7 @@ class DMF_Settings(PropertyGroup):
     )
     hand_preview_active: BoolProperty(
         name="Hand preview active",
-        description="A non-destructive hand preview is running; Stop restores the actions and pose",
+        description="A non-destructive hand preview is running, and Stop restores the actions and pose",
         default=False,
     )
     hand_preview_note: StringProperty(name="Hand preview note", default="")
@@ -1334,7 +1321,7 @@ class DMF_Settings(PropertyGroup):
     )
     source_name_width: FloatProperty(
         name="Name width",
-        description="Share of a model row given to the name; the rest holds the VPK folder",
+        description="Name column share, with the rest showing the VPK folder",
         default=0.62,
         min=0.3,
         max=0.9,
@@ -1342,7 +1329,7 @@ class DMF_Settings(PropertyGroup):
     )
     folder_name_width: FloatProperty(
         name="Name width",
-        description="Share of a folder row given to the folder name; the rest holds the model count",
+        description="Name column share, with the rest showing the model count",
         default=0.68,
         min=0.3,
         max=0.9,
@@ -1350,7 +1337,7 @@ class DMF_Settings(PropertyGroup):
     )
     scan_name_width: FloatProperty(
         name="Name width",
-        description="Share of a scan-root row given to the folder; the rest holds the package count",
+        description="Name column share, with the rest showing the package count",
         default=0.66,
         min=0.3,
         max=0.9,
@@ -1358,7 +1345,7 @@ class DMF_Settings(PropertyGroup):
     )
     mods_name_width: FloatProperty(
         name="Name width",
-        description="Share of a package row given to the name; the rest holds kind, hero and date",
+        description="Name column share, with the rest showing kind, hero and date",
         default=0.52,
         min=0.3,
         max=0.85,
@@ -1366,7 +1353,7 @@ class DMF_Settings(PropertyGroup):
     )
     mod_contents_name_width: FloatProperty(
         name="Name width",
-        description="Share of a contents row given to the file; the rest holds its type",
+        description="Name column share, with the rest showing its type",
         default=0.7,
         min=0.3,
         max=0.9,
@@ -1374,7 +1361,7 @@ class DMF_Settings(PropertyGroup):
     )
     mod_matches_name_width: FloatProperty(
         name="Name width",
-        description="Share of a match row given to the installed build; the rest holds the file",
+        description="Build column share, with the file in the remaining width",
         default=0.42,
         min=0.25,
         max=0.85,
@@ -1382,7 +1369,7 @@ class DMF_Settings(PropertyGroup):
     )
     mod_nodes_name_width: FloatProperty(
         name="Name width",
-        description="Share of a node row given to its name; the rest holds the state",
+        description="Name column share, with the rest showing the state",
         default=0.62,
         min=0.3,
         max=0.9,
@@ -1390,7 +1377,7 @@ class DMF_Settings(PropertyGroup):
     )
     mod_diffs_name_width: FloatProperty(
         name="Name width",
-        description="Share of a differing-file row given to the file; the rest holds its state",
+        description="File column share, with the rest showing its state",
         default=0.64,
         min=0.3,
         max=0.9,
@@ -1398,7 +1385,7 @@ class DMF_Settings(PropertyGroup):
     )
     clients_name_width: FloatProperty(
         name="Name width",
-        description="Share of an install row given to the name; the rest holds kind and build",
+        description="Name column share, with the rest showing kind and build",
         default=0.55,
         min=0.3,
         max=0.85,
@@ -1406,7 +1393,7 @@ class DMF_Settings(PropertyGroup):
     )
     components_name_width: FloatProperty(
         name="Name width",
-        description="Share of a component row given to the name; the rest holds kind and size",
+        description="Name column share, with the rest showing kind and size",
         default=0.55,
         min=0.3,
         max=0.85,
@@ -1414,7 +1401,7 @@ class DMF_Settings(PropertyGroup):
     )
     ik_name_width: FloatProperty(
         name="Name width",
-        description="Share of an IK row given to the target; the rest holds the limb it follows",
+        description="Target column share, with the limb it follows in the rest",
         default=0.5,
         min=0.25,
         max=0.85,
@@ -1422,7 +1409,7 @@ class DMF_Settings(PropertyGroup):
     )
     tail_name_width: FloatProperty(
         name="Name width",
-        description="Share of a tail row given to the hero bone; the rest holds the tail bone",
+        description="Hero-bone column share, with the tail bone in the rest",
         default=0.5,
         min=0.25,
         max=0.85,
@@ -1430,7 +1417,7 @@ class DMF_Settings(PropertyGroup):
     )
     bone_name_width: FloatProperty(
         name="Name width",
-        description="Share of a bone-map row given to the source bone; the rest holds target and state",
+        description="Source column share, with target and state in the rest",
         default=0.45,
         min=0.25,
         max=0.85,
@@ -1438,7 +1425,7 @@ class DMF_Settings(PropertyGroup):
     )
     hierarchy_name_width: FloatProperty(
         name="Name width",
-        description="Share of a hierarchy row given to the bone; the rest holds parent and children",
+        description="Bone column share, with parent and children in the rest",
         default=0.5,
         min=0.25,
         max=0.85,
@@ -1446,7 +1433,7 @@ class DMF_Settings(PropertyGroup):
     )
     parts_name_width: FloatProperty(
         name="Name width",
-        description="Share of a part row given to the object; the rest holds vertices and materials",
+        description="Object column share, with vertices and materials in the rest",
         default=0.55,
         min=0.3,
         max=0.85,
@@ -1454,7 +1441,7 @@ class DMF_Settings(PropertyGroup):
     )
     collection_name_width: FloatProperty(
         name="Name width",
-        description="Share of a collection row given to its name; the rest holds mesh and object counts",
+        description="Name column share, with mesh and object counts in the rest",
         default=0.58,
         min=0.3,
         max=0.85,
@@ -1462,7 +1449,7 @@ class DMF_Settings(PropertyGroup):
     )
     source_materials_name_width: FloatProperty(
         name="Name width",
-        description="Share of a source-slot row given to the material; the rest holds its slot",
+        description="Material column share, with its slot in the rest",
         default=0.72,
         min=0.3,
         max=0.9,
@@ -1470,7 +1457,7 @@ class DMF_Settings(PropertyGroup):
     )
     part_materials_name_width: FloatProperty(
         name="Name width",
-        description="Share of a part-slot row given to the material; the rest holds its slot",
+        description="Material column share, with its slot in the rest",
         default=0.72,
         min=0.3,
         max=0.9,
@@ -1478,7 +1465,7 @@ class DMF_Settings(PropertyGroup):
     )
     hero_parts_name_width: FloatProperty(
         name="Name width",
-        description="Share of a hero-part row given to the object; the rest holds type and vertices",
+        description="Object column share, with type and vertices in the rest",
         default=0.55,
         min=0.3,
         max=0.85,
@@ -1486,7 +1473,7 @@ class DMF_Settings(PropertyGroup):
     )
     cloth_name_width: FloatProperty(
         name="Name width",
-        description="Share of a chain row given to the chain; the rest holds type and bone count",
+        description="Chain column share, with type and bone count in the rest",
         default=0.55,
         min=0.3,
         max=0.85,
@@ -1494,7 +1481,7 @@ class DMF_Settings(PropertyGroup):
     )
     rules_name_width: FloatProperty(
         name="Name width",
-        description="Share of a rule row given to the pattern; the rest holds its state",
+        description="Pattern column share, with its state in the rest",
         default=0.65,
         min=0.3,
         max=0.9,
@@ -1502,7 +1489,7 @@ class DMF_Settings(PropertyGroup):
     )
     clips_name_width: FloatProperty(
         name="Name width",
-        description="Share of a clip row given to the clip; the rest holds graph, file type and marks",
+        description="Clip column share, with graph, file type and marks in the rest",
         default=0.52,
         min=0.3,
         max=0.85,
@@ -1523,7 +1510,7 @@ class DMF_Settings(PropertyGroup):
     )
     lod_count: IntProperty(
         name="LOD count",
-        description="Zero matches the hero extraction; otherwise this many LODs are generated",
+        description="Zero matches the hero extraction, otherwise this many LODs are built",
         default=0,
         min=0,
         soft_max=6,
@@ -1538,10 +1525,7 @@ class DMF_Settings(PropertyGroup):
     )
     live_lods: BoolProperty(
         name="Use built LODs",
-        description=(
-            "Export the LOD meshes built here; "
-            "do not copy the armature per level"
-        ),
+        description="Export the LOD meshes built here, without copying the armature per level",
         default=False,
     )
     lod_levels: CollectionProperty(
@@ -1551,7 +1535,7 @@ class DMF_Settings(PropertyGroup):
     lod_index: IntProperty(name="LOD row", default=0)
     lod_tick: IntProperty(
         name="LOD tick",
-        description="Work tick the LOD meshes were built at; a later edit makes them stale",
+        description="Work tick the LOD meshes were built at. A later edit makes them stale",
         default=-1,
     )
     hierarchy: CollectionProperty(
@@ -1561,10 +1545,7 @@ class DMF_Settings(PropertyGroup):
     hierarchy_index: IntProperty(name="Bone row", default=0)
     show_bone_map: BoolProperty(
         name="Bone map",
-        description=(
-            "Draw the hero skeleton in the viewport. "
-            "Click a bone to select it"
-        ),
+        description="Draw the hero skeleton, and picking a bone selects it",
         default=False,
         update=_bone_map_toggle,
     )
@@ -1580,7 +1561,7 @@ class DMF_Settings(PropertyGroup):
     )
     bone_map_labels: BoolProperty(
         name="All names",
-        description="Label every bone; without it only the selected bone, its chain and its children are named",
+        description="Label every bone. Without it only the selected bone, its chain and children are named",
         default=False,
     )
     bone_map_hover: StringProperty(name="Hovered bone", default="")
@@ -1591,10 +1572,7 @@ class DMF_Settings(PropertyGroup):
     )
     addon_name: StringProperty(
         name="Addon name",
-        description=(
-            "CSDK13 addon folder name. Staged to content/citadel_addons/<name>, "
-            "compiled to game/citadel_addons/<name>"
-        ),
+        description="Addon folder name. Staged under content, compiled under game",
         default="my_hero_port",
     )
     old_vpk: StringProperty(
@@ -1604,17 +1582,17 @@ class DMF_Settings(PropertyGroup):
     )
     update_old_vmdl: StringProperty(
         name="Old model vmdl",
-        description="Old vmdl when the package holds several. May be relative",
+        description="Old vmdl when the package holds several. Relative paths are fine",
         subtype="FILE_PATH",
     )
     update_output: StringProperty(
         name="Update output",
-        description="Project build folder for the migrated addon; blank uses <workspace>/updates. The CSDK content copy is made separately by Stage update in CSDK",
+        description="Build folder, blank meaning <workspace>/updates. Stage update copies it to the CSDK",
         subtype="DIR_PATH",
     )
     update_addon_name: StringProperty(
         name="Updated addon",
-        description="Folder name for the migrated addon; blank derives it from the old package",
+        description="Migrated addon folder name, blank deriving it from the old package",
         default="",
     )
     update_model_policy: EnumProperty(
@@ -1629,7 +1607,7 @@ class DMF_Settings(PropertyGroup):
     )
     update_preserve_cloth: BoolProperty(
         name="Preserve cloth/physics",
-        description="Transplant every old cloth/physics section exactly; section names are discovered from the old model, not hard-coded",
+        description="Copy every old cloth/physics section exactly. Section names come from the old model",
         default=True,
     )
     update_preserve_materials: BoolProperty(
@@ -1644,10 +1622,7 @@ class DMF_Settings(PropertyGroup):
     )
     stage_dir: StringProperty(
         name="Install root",
-        description=(
-            "Optional CSDK13 install override. Used only when it contains "
-            "game/bin/win64/resourcecompiler.exe; blank uses the CSDK13 root from Setup"
-        ),
+        description="CSDK13 override, used only when it contains resourcecompiler.exe. Blank uses Setup's root",
         subtype="DIR_PATH",
     )
     status: StringProperty(name="Status", default="Detect the live build to begin")

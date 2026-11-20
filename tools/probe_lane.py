@@ -11,11 +11,16 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from forge.paths import find_blender as resolve_blender  # noqa: E402
 
 
 @dataclass(frozen=True)
@@ -127,7 +132,8 @@ def find_blender(explicit: str = "") -> str:
     for candidate in (explicit, os.environ.get("BLENDER", "")):
         if candidate and Path(candidate).is_file():
             return str(Path(candidate))
-    return shutil.which("blender") or ""
+    resolved = resolve_blender()
+    return str(resolved) if resolved else ""
 
 
 def find_zip() -> str:
