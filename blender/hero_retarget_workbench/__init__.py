@@ -19,9 +19,9 @@ if (_PACKAGE / "_vendor").is_dir() and str(_PACKAGE / "_vendor") not in sys.path
 bl_info = {
     "name": "Hero Retarget Workbench",
     "author": "ala",
-    "version": (0, 22, 8),
+    "version": (0, 22, 9),
     "blender": (5, 4, 0),
-    "location": "Workbench editor (PR 165087 builds); View3D > Sidebar > Deadlock elsewhere",
+    "location": "Workbench editor or View3D > Sidebar > Deadlock",
     "description": "Fit a custom model to a live Deadlock hero, then ship it as a CSDK13 addon",
     "category": "Import-Export",
 }
@@ -162,8 +162,8 @@ def _report_surface() -> None:
     """Say which surface this copy got, and why if it did not get the editor.
 
     The owner kept hitting an editor-less install with no visible reason; the
-    answer belongs in the console and in one file under the user config, not
-    only on a panel nobody opened yet.
+    answer belongs in the console and in one file under the user config, rather
+    than on a panel nobody opened yet.
     """
     message = f"DMF surface={SURFACE} error={EDITOR_ERROR or '-'}"
     print(message, flush=True)

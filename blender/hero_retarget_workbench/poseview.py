@@ -146,7 +146,7 @@ def refresh(settings) -> None:
 class DMF_OT_pose_preview(Operator):
     bl_idname = "dmf.pose_preview"
     bl_label = "Show Ref Pose"
-    bl_description = "Pose every mapped custom bone in the hero's reference stance; no rest edit and no keys"
+    bl_description = "Pose every mapped bone in the hero's reference stance, with no rest edit and no keys"
 
     def execute(self, context):
         settings = context.scene.dmf

@@ -258,7 +258,7 @@ def _surface(layout) -> None:
         return
     layout.operator("dmf.open_workbench", text="Open the Workbench sidebar", icon="VIEW3D")
     layout.label(
-        text="This Blender build cannot register editor types; use the sidebar (N)",
+        text="This Blender build cannot register editor types, so use the sidebar with N",
         icon="INFO",
     )
 
@@ -345,7 +345,7 @@ class DMF_PT_setup(Panel):
         if folder is not None:
             tools.label(text=str(folder), icon="FILE_FOLDER")
         else:
-            _hint(tools, "Set the CSDK folder that holds resourcecompiler.exe.", "QUESTION")
+            _hint(tools, "Set the CSDK folder that holds resourcecompiler.exe", "QUESTION")
         ui_popit.stat(tools, "selected", Path(settings.csdk_root).name if settings.csdk_root else "not set", "TOOL_SETTINGS")
         tools.operator("dmf.refresh_clients", text="Find toolchains", icon="FILE_REFRESH")
 
@@ -371,7 +371,7 @@ class DMF_PT_setup(Panel):
                 icon="IMPORT",
             ).enabled = not settings.job_running
         else:
-            _hint(workspace, "No project open.", "QUESTION")
+            _hint(workspace, "No project open", "QUESTION")
             workspace.prop_enum(settings, "props_page", "MODS", text="Open Mods", icon="PACKAGE")
 
 
@@ -445,7 +445,7 @@ class DMF_PT_source_files(Panel):
         _path_row(layout, settings, "materials_dir", "Hero materials")
         _path_row(layout, settings, "custom_model", "Model file")
         _path_row(layout, settings, "custom_materials_dir", "Model materials")
-        _hint(layout, "Blank uses the extraction folder.", "MATERIAL")
+        _hint(layout, "Blank uses the extraction folder", "MATERIAL")
 
 
 class DMF_PT_update(Panel):
@@ -482,7 +482,7 @@ class DMF_PT_update(Panel):
         stage.operator("dmf.stage_update", text="Stage update in CSDK", icon="FILE_FOLDER")
         _hint(
             box,
-            "The update copies its content tree, including old material files, into the CSDK content addon shown in Setup. Edit those files there; Compile stays a separate step.",
+            "The update copies its content tree into the Setup CSDK addon, then Compile is separate",
             "INFO",
         )
 
@@ -540,14 +540,14 @@ class DMF_PT_parts(Panel):
                 icon="FILE_FOLDER",
             )
         else:
-            _hint(collection_box, "No Blender collections in this file.", "QUESTION")
+            _hint(collection_box, "No Blender collections in this file", "QUESTION")
         ui_popit.glyphs(
             collection_box,
             ["dmf.use_active_collection", "dmf.scan_parts"],
             labels={"dmf.use_active_collection": "Use active", "dmf.scan_parts": "Scan parts"},
         )
         if not settings.parts:
-            _hint(collection_box, "Choose a collection and scan it.", "QUESTION")
+            _hint(collection_box, "Choose a collection and scan it", "QUESTION")
         else:
             ui_popit.column_header(
                 collection_box,
@@ -572,7 +572,7 @@ class DMF_PT_parts(Panel):
                 ui_popit.stat(collection_box, "part", part.name, "OBJECT_DATA")
                 collection_box.operator("dmf.use_part", text="Use selected part", icon="OBJECT_DATA")
             else:
-                _hint(collection_box, "Selected object is gone. Scan again.", "ERROR", alert=True)
+                _hint(collection_box, "Selected object is gone, so scan again", "ERROR", alert=True)
 
 
 class DMF_PT_parts_materials(Panel):
@@ -596,10 +596,10 @@ class DMF_PT_parts_materials(Panel):
         layout.prop(settings, "material_source", text="Source")
         ui_popit.glyphs(layout, ["dmf.scan_materials"], labels={"dmf.scan_materials": "Scan slots"})
         if settings.material_source is None:
-            _hint(layout, "Set a source object, then scan its slots.", "QUESTION")
+            _hint(layout, "Set a source object, then scan its slots", "QUESTION")
             return
         if settings.custom_mesh is None:
-            _hint(layout, "Choose an active part before assigning slots.", "QUESTION")
+            _hint(layout, "Choose an active part before assigning slots", "QUESTION")
             return
         ui_popit.micro(layout, "Source slots", "IMPORT")
         ui_popit.column_header(
@@ -674,7 +674,7 @@ class DMF_PT_cloth(Panel):
         _chips(box, settings, "cloth_source", (("HERO", "Hero"), ("CUSTOM", "Custom rig")))
         if settings.cloth_source == "CUSTOM":
             if settings.custom_armature is None:
-                _hint(box, "Choose your model's rig first.", "QUESTION")
+                _hint(box, "Choose your model's rig first", "QUESTION")
             else:
                 box.label(
                     text=f"{settings.custom_armature.name}: {len(settings.custom_armature.data.bones)} bones",
@@ -702,7 +702,7 @@ class DMF_PT_cloth(Panel):
             row.label(text=f"{len(settings.hero_parts)}", icon="OBJECT_DATA")
             ui_popit.name_width(box, settings, "hero_parts_name_width")
         else:
-            _hint(box, "Import the hero to bring in hair, jacket and the rest.", "QUESTION")
+            _hint(box, "Import the hero to bring in hair, jacket and the rest", "QUESTION")
 
         built_rows = [row for row in settings.cloth_chains if row.target_mesh is not None]
         if built_rows:
@@ -763,7 +763,7 @@ class DMF_PT_cloth(Panel):
                     box.label(text=f"{chain.joined} bones joined to the hero", icon="CHECKMARK")
                 _hint(
                     box,
-                    "Join copies this chain into the hero armature; the vnmskel stays out of the pack.",
+                    "Join copies this chain into the hero armature, without the vnmskel",
                     "INFO",
                 )
             actions = ["dmf.build_chain_cloth", "dmf.build_all_cloth"]
@@ -784,7 +784,7 @@ class DMF_PT_cloth(Panel):
             else:
                 _hint(
                     box,
-                    "Build writes chain vertex groups, a root pin group, and a cloth modifier on the hero mesh.",
+                    "Build writes chain vertex groups, a root pin group, and a cloth modifier on the hero mesh",
                     "INFO",
                 )
 
@@ -825,7 +825,7 @@ class DMF_PT_rules(Panel):
         if not settings.bone_rules:
             _hint(
                 box,
-                "Add a rule by hand, or write one from the selected bone-map row.",
+                "Add a rule by hand, or write one from the selected bone-map row",
                 "QUESTION",
             )
             return
@@ -849,7 +849,7 @@ class DMF_PT_rules(Panel):
         if caught:
             box.label(text=f"{len(caught)} unanswered rows match", icon="CHECKMARK")
         else:
-            _hint(box, "No unanswered row matches this pattern yet.", "INFO")
+            _hint(box, "No unanswered row matches this pattern yet", "INFO")
         _hint(box, bonerules.describe(rules.rule_of(rule)), "INFO")
 
         ui_popit.column_header(
@@ -996,13 +996,13 @@ def _draw_tail(layout, settings) -> None:
     )
     _hint(
         box,
-        "Adds the selected tail to imported clips, writes each DMX, and compiles against the hero skeleton. The vnmskel stays out of the pack.",
+        "Adds the chosen tail to imported clips, compiles them, and leaves the vnmskel unpacked",
         "INFO",
     )
     if not imported:
         _hint(
             box,
-            f"The importer adds {hero or 'this hero'}'s clips when you press the action.",
+            f"The importer adds {hero or 'this hero'}'s clips when the action runs",
             "QUESTION",
         )
 
@@ -1071,7 +1071,6 @@ class DMF_PT_animations(Panel):
         layout.use_property_decorate = False
 
         ui_popit.job(layout, settings)
-        layout.label(text="Animation tools are incomplete.", icon="INFO")
         imported = sum(1 for row in settings.clips if row.state == "IMPORTED")
         box = ui_popit.page(
             layout,
@@ -1095,7 +1094,7 @@ class DMF_PT_animations(Panel):
             box,
             "from",
             settings.clip_auto_note or settings.clips_dir or settings.extraction_dir
-            or "scan a hero",
+            or "no hero scanned",
             "FILE_FOLDER",
         )
         ui_popit.stat(box, "write to", settings.clip_export_dir or "not set", "EXPORT")
@@ -1110,7 +1109,7 @@ class DMF_PT_animations(Panel):
         if not settings.clips:
             _hint(
                 box,
-                "Extract a hero, then scan. Clip folders and the vnmskel are found automatically.",
+                "Extract a hero, then scan, and clip folders are found automatically",
                 "QUESTION",
             )
             return
@@ -1224,7 +1223,7 @@ class DMF_PT_skeleton(Panel):
             ("EXTRA", "Extra"), ("IGNORED", "Ignored"),
         ))
         if settings.bone_rules:
-            _hint(layout, "Scan applies your rules to unmatched names.", "INFO")
+            _hint(layout, "Scan applies your rules to unmatched names", "INFO")
         if settings.rule_fill_running:
             filling = layout.row(align=True)
             filling.label(
@@ -1242,7 +1241,7 @@ class DMF_PT_skeleton(Panel):
         if settings.pose_preview_error:
             _hint(pose, settings.pose_preview_error, "ERROR", alert=True)
         elif not settings.pose_preview:
-            _hint(pose, "Previews the hero stance; the rest pose stays unchanged.", "INFO")
+            _hint(pose, "Previews the hero stance, leaving the rest pose unchanged", "INFO")
 
         nudge = _section(
             layout,
@@ -1259,10 +1258,7 @@ class DMF_PT_skeleton(Panel):
         nudge.operator("dmf.update_overlay", text="Update", icon="FILE_REFRESH")
         _hint(
             nudge,
-            "The overlay only draws. Pose Mode, Edit Mode rest edits and Pose > Apply > "
-            "Apply Pose as Rest Pose all work while it is on. It highlights the bone picked "
-            "in the bone map or the bone list; the bone being posed does not take it over. "
-            "Update re-reads the hero skeleton after the armature changes.",
+            "The overlay only draws and follows the bone picked in the bone map or list",
             "INFO",
         )
         if settings.nudge_overlay_error:
@@ -1285,12 +1281,12 @@ class DMF_PT_skeleton(Panel):
         else:
             _hint(
                 preview,
-                "Pick a hand or finger row to follow it while the action runs. Stop restores the actions and pose.",
+                "Pick a hand or finger row, and Stop restores the actions and pose",
                 "INFO",
             )
 
         if not settings.bone_map:
-            _hint(layout, "No rows yet. Scan the custom rig or add a row.", "QUESTION")
+            _hint(layout, "No rows yet, so scan the custom rig or add one", "QUESTION")
             return
         index = max(0, min(settings.bone_map_index, len(settings.bone_map) - 1))
         entry = settings.bone_map[index]
@@ -1417,7 +1413,7 @@ class DMF_PT_skeleton_bones(Panel):
                 "dmf.copy_pose": "Copy pose",
             },
         )
-        _hint(layout, "Alignment changes the bind pose. Rebind weighted meshes.", "INFO")
+        _hint(layout, "Alignment changes the bind pose, so rebind weighted meshes", "INFO")
 
 
 class DMF_PT_weights(Panel):
@@ -1438,7 +1434,7 @@ class DMF_PT_weights(Panel):
         ui_popit.page(layout, settings, "Weights", settings.weight_mode.title(), "MOD_VERTEX_WEIGHT")
 
         layout.prop(settings, "weight_mode", text="Method")
-        _hint(layout, "Mapped groups is the strict choice; surface never adds a bone outside the vertex's own mapped family.", "INFO")
+        _hint(layout, "Mapped groups is the strict choice, limited to the vertex's own mapped family", "INFO")
         options = layout.column(align=True)
         options.enabled = not settings.job_running
         options.prop(settings, "max_distance", text="Surface reach")
@@ -1457,7 +1453,7 @@ class DMF_PT_weights(Panel):
         fallback = _section(layout, "Keep the custom rig", "ARMATURE_DATA", "no solve")
         _hint(
             fallback,
-            "Rename mapped bones and groups without touching the painted weights. Bake hero clips after importing them on Animations.",
+            "Renames mapped bones and groups, leaving every painted weight as it is",
             "INFO",
         )
         ui_popit.glyphs(
@@ -1475,12 +1471,10 @@ class DMF_PT_weights(Panel):
         )
         _hint(
             fallback,
-            "Hero hierarchy copy keeps the custom rest bones and weights but rebuilds the "
-            "parents from the hero tree, then binds the custom mesh to the copy. Pose the "
-            "copy to line the proposed mesh up with the hero rest pose.",
+            "Rebuilds the hero parent tree on the custom rest bones and rebinds the mesh",
             "INFO",
         )
-        _path_row(fallback, settings, "custom_bake_dir", "Bake folder (blank = artifacts)")
+        _path_row(fallback, settings, "custom_bake_dir", "Bake folder, blank means artifacts")
         if settings.custom_bake_note:
             _hint(fallback, settings.custom_bake_note, "FILE")
 
@@ -1501,7 +1495,7 @@ class DMF_PT_weights(Panel):
                 right.alignment = "RIGHT"
                 right.label(text=check.token)
         else:
-            _hint(proof, "No proof minted yet.", "QUESTION")
+            _hint(proof, "No proof minted yet", "QUESTION")
         if settings.proof_digest:
             ui_popit.stat(proof, "BLAKE3", settings.proof_digest, "LOCKED")
         ui_popit.glyphs(
@@ -1606,9 +1600,9 @@ class DMF_PT_handoff(Panel):
         if folder is not None:
             addon.label(text=str(folder), icon="FILE_FOLDER")
         else:
-            _hint(addon, "No addon folder: set CSDK13 in Setup and a name.", "QUESTION")
+            _hint(addon, "No addon folder: set CSDK13 in Setup and a name", "QUESTION")
         if settings.body_dmx and not settings.vmdl:
-            _hint(addon, "No S2V vmdl set; choose it under Files.", "STATUS_WARNING", alert=True)
+            _hint(addon, "No S2V vmdl set, so choose one under Files", "STATUS_WARNING", alert=True)
 
         built = [row for row in settings.lod_levels if row.object is not None]
         if built:
@@ -1626,7 +1620,7 @@ class DMF_PT_handoff(Panel):
         _primary(addon, "dmf.compile", "Compile", "PLAY", enabled=not settings.job_running)
         _hint(
             addon,
-            "This is the only compile button. Release packs what it produces.",
+            "Release packs the compiled addon",
             "INFO",
         )
 
@@ -1668,7 +1662,7 @@ class DMF_PT_handoff_paths(Panel):
             right.alignment = "RIGHT"
             right.label(text=f"{row.vertices:,}v")
         if settings.lod_levels and settings.lod_tick != settings.axis_tick:
-            _hint(lod, "Weights or fit changed; rebuild so the LODs match.", "STATUS_WARNING", alert=True)
+            _hint(lod, "Weights or fit changed, so rebuild to match the LODs", "STATUS_WARNING", alert=True)
 
 
 class DMF_PT_release(Panel):
@@ -1714,7 +1708,7 @@ def _draw_write(layout, settings) -> None:
         layout.label(text=f"{written} clips written", icon="CHECKMARK")
     _hint(
         layout,
-        "Writes Model 22 DMX clips with visual keys and the original frame range. Pack the clip, not the vnmskel.",
+        "Writes Model 22 DMX clips with visual keys and the original frame range, not the vnmskel",
         "INFO",
     )
 

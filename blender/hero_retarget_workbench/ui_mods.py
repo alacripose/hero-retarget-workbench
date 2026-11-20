@@ -108,8 +108,8 @@ class DMF_PT_setup_tools(Panel):
             use.operator("dmf.use_client", text="Use for extraction", icon="CHECKMARK")
             use.operator("dmf.use_backport_client", text="Use for backport", icon="LOOP_BACK")
         else:
-            _hint(csdk, "Scan Steam libraries or add a game folder.", "QUESTION")
-            _hint(csdk, "A compiler host builds; a game with Citadel VPKs accepts backports.", "INFO")
+            _hint(csdk, "Scan Steam libraries or add a game folder", "QUESTION")
+            _hint(csdk, "A compiler host builds, while a game with Citadel VPKs accepts backports", "INFO")
 
 
 class DMF_PT_setup_toolchains(Panel):
@@ -150,7 +150,7 @@ class DMF_PT_setup_toolchains(Panel):
                 if row.tool_active:
                     chain.label(text=row.path, icon="FILE_FOLDER")
         else:
-            _hint(chain, "Find clients lists every compiler host and its build.", "INFO")
+            _hint(chain, "Find clients lists every compiler host and its build", "INFO")
         row = chain.row(align=True)
         row.operator("dmf.open_csdk_page", text="Get CSDK", icon="URL")
         row.operator("dmf.install_csdk", text="Install zip", icon="FILEBROWSER")
@@ -204,7 +204,7 @@ class DMF_PT_mods(Panel):
             remove.alert = True
             remove.operator("dmf.remove_scan_root", text="Remove", icon="REMOVE")
         else:
-            _hint(scan, "No scan folders yet.", "QUESTION")
+            _hint(scan, "No scan folders yet", "QUESTION")
             scan.operator("dmf.add_scan_root", text="Add folder", icon="ADD")
         if settings.scan_roots:
             scan.prop(settings, "scan_since", text="Since")
@@ -246,9 +246,9 @@ class DMF_PT_mods(Panel):
             )
             ui_popit.name_width(found, settings, "mods_name_width")
             if not settings.mod_rows:
-                _hint(found, "No packages of this type in the last scan.", "INFO")
+                _hint(found, "No packages of this type in the last scan", "INFO")
         else:
-            _hint(found, "Add a folder and scan for VPKs, addon folders and blends.", "QUESTION")
+            _hint(found, "Add a folder and scan for VPKs, addon folders and blends", "QUESTION")
 
         if settings.mod_rows:
             selected = settings.mod_rows[min(settings.mod_index, len(settings.mod_rows) - 1)]
@@ -329,7 +329,7 @@ class DMF_PT_mods(Panel):
                 )
                 ui_popit.name_width(contents, settings, "mod_contents_name_width")
                 if not settings.mod_content_rows:
-                    _hint(contents, "No files of this type in the package.", "INFO")
+                    _hint(contents, "No files of this type in the package", "INFO")
 
             if settings.mod_match_rows:
                 matches = _section(
@@ -385,7 +385,7 @@ class DMF_PT_mods(Panel):
                     rows=6,
                 )
                 ui_popit.name_width(nodes, settings, "mod_nodes_name_width")
-                _hint(nodes, "Check the sections to copy from the old model. Mesh policy still controls the old DMX files.")
+                _hint(nodes, "Check the old-model sections to copy, and Mesh policy still controls old DMX files")
 
             if settings.mod_diffs:
                 diffs = _section(
@@ -416,7 +416,7 @@ class DMF_PT_mods(Panel):
                 if len(properties.HERO_ITEMS) > 1:
                     actions.prop(settings, "mod_target", text="Target hero")
                 else:
-                    _hint(actions, "Detect the live build on Setup to choose a target hero.")
+                    _hint(actions, "Detect the live build on Setup to choose a target hero")
                 row = actions.row(align=True)
                 row.operator("dmf.analyze_mod", text="Analyze", icon="VIEWZOOM")
                 row.operator("dmf.port_mod", text="Update to latest", icon="FILE_REFRESH")
@@ -429,7 +429,7 @@ class DMF_PT_mods(Panel):
                         icon="LOOP_BACK",
                     )
             else:
-                _hint(actions, "Blend projects are edited directly; update does not apply.", "INFO")
+                _hint(actions, "Blend projects are edited directly, so update does not apply", "INFO")
             _hint(
                 actions,
                 settings.mod_analysis_note
@@ -481,7 +481,7 @@ class DMF_PT_components(Panel):
             )
             ui_popit.name_width(source, settings, "components_name_width")
         else:
-            _hint(source, "Extract a model first; its render meshes appear here.", "QUESTION")
+            _hint(source, "Extract a model first, and its render meshes appear here", "QUESTION")
 
         target = _section(layout, "Stage beside a mod", "MODIFIER", settings.component_slot or "no body group")
         target.prop(settings, "component_addon", text="Addon")
@@ -491,7 +491,7 @@ class DMF_PT_components(Panel):
         target.prop(settings, "component_slot", text="Body group")
         _hint(
             target,
-            "Adds selected components as RenderMeshFiles and BodyGroup choices; the body stays.",
+            "Adds selected components as RenderMeshFiles and BodyGroup choices, keeping the body",
             "INFO",
         )
         target.operator("dmf.stage_components", text="Stage selected", icon="IMPORT")

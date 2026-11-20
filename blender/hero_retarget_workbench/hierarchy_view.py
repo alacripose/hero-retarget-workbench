@@ -283,7 +283,7 @@ def _draw(context) -> None:
             SELECTED,
         )
     else:
-        _label("Click a joint to select its bone", x + 10.0, y + 10.0, 10.5, TEXT_DIM)
+        _label("Pick a joint to select its bone", x + 10.0, y + 10.0, 10.5, TEXT_DIM)
 
 
 def draw(_self=None, context=None) -> None:

@@ -692,10 +692,7 @@ def build_import_cloth(settings) -> dict:
 class DMF_OT_import_hero_parts(Operator):
     bl_idname = "dmf.import_hero_parts"
     bl_label = "Import Hero Parts"
-    bl_description = (
-        "Import the hero's other meshes (hair, jacket, glasses, gun) "
-        "onto the hero rig"
-    )
+    bl_description = "Import the hero's hair, jacket, glasses and gun onto the rig"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -832,7 +829,7 @@ class DMF_OT_mark_cloth_proxy(Operator):
 class DMF_OT_build_all_cloth(Operator):
     bl_idname = "dmf.build_all_cloth"
     bl_label = "Build Every Cloth Chain"
-    bl_description = "Build every chain whose name reads like cloth (coat, hair, sleeve, jacket) on its mesh"
+    bl_description = "Build every cloth chain on its mesh, such as coat, hair, sleeve and jacket"
 
     def execute(self, context):
         settings = context.scene.dmf

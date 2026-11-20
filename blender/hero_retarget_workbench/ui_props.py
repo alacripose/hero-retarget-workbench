@@ -264,7 +264,7 @@ class DMF_PT_props_main(Panel):
         )
         if not editor:
             layout.label(
-                text="This Blender build cannot register editor types; pages open here",
+                text="This Blender build cannot register editor types, so pages open here",
                 icon="INFO",
             )
         error = ui.surface_error()

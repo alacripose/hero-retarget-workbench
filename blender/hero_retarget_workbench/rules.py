@@ -452,7 +452,7 @@ class DMF_OT_learn_rules(Operator):
 class DMF_OT_stop_rules(Operator):
     bl_idname = "dmf.stop_rules"
     bl_label = "Stop Answering"
-    bl_description = "Stop the rule fill; the rows already answered keep their targets"
+    bl_description = "Stop the rule fill. Answered rows keep their targets"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -463,7 +463,7 @@ class DMF_OT_stop_rules(Operator):
 class DMF_OT_apply_rules(Operator):
     bl_idname = "dmf.apply_rules"
     bl_label = "Apply Rules"
-    bl_description = "Apply every rule to the rows that have no target; a mapped row is never overwritten"
+    bl_description = "Apply every rule to rows with no target. Mapped rows are never overwritten"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -543,7 +543,7 @@ class DMF_OT_remove_rule(Operator):
 class DMF_OT_clear_rules(Operator):
     bl_idname = "dmf.clear_rules"
     bl_label = "Clear Rules"
-    bl_description = "Remove every rule; the bone map itself is untouched"
+    bl_description = "Remove every rule. The bone map itself stays"
 
     def execute(self, context):
         settings = context.scene.dmf

@@ -261,7 +261,7 @@ class DMF_OT_bake_ik(Operator):
 class DMF_OT_clear_ik(Operator):
     bl_idname = "dmf.clear_ik"
     bl_label = "Clear IK Constraints"
-    bl_description = "Remove only the IK constraints this addon added; bones and keys stay"
+    bl_description = "Remove only the IK constraints this addon added. Bones and keys stay"
 
     def execute(self, context):
         settings = context.scene.dmf

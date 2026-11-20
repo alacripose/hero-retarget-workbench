@@ -200,7 +200,7 @@ class DMF_OT_browse_folders(Operator):
     def draw(self, context):
         settings = context.scene.dmf
         layout = self.layout
-        layout.label(text="Every folder comes from the detected pak roster.", icon="FILE_FOLDER")
+        layout.label(text="Every folder comes from the detected pak roster", icon="FILE_FOLDER")
         ui_popit.column_header(
             layout,
             settings.folder_name_width,
@@ -432,7 +432,7 @@ class DMF_OT_extract(Operator):
 class DMF_OT_import_hero(Operator):
     bl_idname = "dmf.import_hero"
     bl_label = "Import Model"
-    bl_description = "Import the selected model's render meshes with PulseSrcOps; a rig is optional"
+    bl_description = "Import the selected model's render meshes with PulseSrcOps. A rig is optional"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -758,7 +758,7 @@ class DMF_OT_use_collection(Operator):
 class DMF_OT_scan_parts(Operator):
     bl_idname = "dmf.scan_parts"
     bl_label = "Scan Parts"
-    bl_description = "Scan the selected collection and child collections for mesh parts; do not assign materials"
+    bl_description = "Scan the selected collection and child collections for mesh parts. Materials are untouched"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -877,7 +877,7 @@ class DMF_OT_clear_part_material(Operator):
 class DMF_OT_retarget(Operator):
     bl_idname = "dmf.retarget"
     bl_label = "Solve & Bind"
-    bl_description = "Map the custom groups, solve surface/envelope weights in timer chunks, and attach the hero armature"
+    bl_description = "Map the custom groups, solve weights in chunks, and attach the hero armature"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -1157,7 +1157,7 @@ class DMF_OT_clear_lods(Operator):
 class DMF_OT_export_stage(Operator):
     bl_idname = "dmf.export_stage"
     bl_label = "Export & Stage"
-    bl_description = "Join every mesh in the custom collection, export it as one DMX, then install the addon at content/citadel_addons/<addon> in the CSDK13 root with the unchanged S2V vmdl and its materials"
+    bl_description = "Join the custom collection into one DMX and stage it in the CSDK13 addon with the S2V vmdl"
 
     def _export(
         self,
@@ -1501,7 +1501,7 @@ class DMF_OT_export_stage(Operator):
 class DMF_OT_compile(Operator):
     bl_idname = "dmf.compile"
     bl_label = "Compile with CSDK13"
-    bl_description = "Run resourcecompiler in place on the installed addon and leave the compiled files in game/citadel_addons/<addon>, without blocking the viewport"
+    bl_description = "Run resourcecompiler on the installed addon and keep the output in game/citadel_addons"
 
     def invoke(self, context, event):
         settings = context.scene.dmf
@@ -1513,8 +1513,8 @@ class DMF_OT_compile(Operator):
             event,
             title="Compile with CSDK13?",
             message=(
-                f"Run resourcecompiler on {addon} in {where}?\n"
-                "It can take several minutes, but it runs in the background and can be cancelled."
+                f"Compile {addon} in {where}?\n"
+                "It runs in the background and can be cancelled"
             ),
             confirm_text="Compile",
         )
@@ -1573,7 +1573,7 @@ class DMF_OT_compile(Operator):
 class DMF_OT_pick_old_vpk(Operator):
     bl_idname = "dmf.pick_old_vpk"
     bl_label = "Choose old addon"
-    bl_description = "Select an old addon VPK or an extracted addon folder; the live hero is read separately"
+    bl_description = "Select an old addon VPK or folder. The live hero is read separately"
     filepath: StringProperty(subtype="FILE_PATH")
 
     def invoke(self, context, event):
@@ -1603,7 +1603,7 @@ class DMF_OT_pick_old_vmdl(Operator):
 class DMF_OT_update_old_addon(Operator):
     bl_idname = "dmf.update_old_addon"
     bl_label = "Import & update old addon"
-    bl_description = "Extract an old addon, update its hero model to the live game's vmdl, and preserve its cloth/physics and custom assets"
+    bl_description = "Update an old addon to the live vmdl and keep its cloth, physics and assets"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -1748,7 +1748,7 @@ class DMF_OT_stage_update(Operator):
         if not source.is_dir():
             self.report(
                 {"ERROR"},
-                f"No updated addon at {source}; run Import & update first",
+                f"No updated addon at {source}. Run Import & update first",
             )
             return {"CANCELLED"}
         if settings.job_running or jobs.is_running():
@@ -1832,7 +1832,7 @@ class DMF_OT_apply_model_name(Operator):
 class DMF_OT_pick_vmdl(Operator):
     bl_idname = "dmf.pick_vmdl"
     bl_label = "Choose vmdl"
-    bl_description = "Select an S2V-extracted vmdl; staging copies it unchanged"
+    bl_description = "Select an S2V-extracted vmdl. Staging copies it unchanged"
     filepath: StringProperty(subtype="FILE_PATH")
 
     def invoke(self, context, event):
