@@ -1,0 +1,81 @@
+Need consider find_compiled_model now when preferred .vmdl_c and old package has no source, good.
+
+Potential compiled model resolution for VPK package with multiple .vmdl_c after S2V extraction: find_compiled_model hero filter; good.
+
+Need update migrate.update_from_package explicit source .vmdl missing now fallback; if old_vmdl_path.is_relative_to(old_root) false and suffix .vmdl exists? okay.
+
+Need backport test expected old_vmdl = old_model; our resolve_old_model may now find source models/heroes_staging/doorman/doorman.vmdl from preferred; yes.
+
+Need update test_backport maybe old package has old_model with text [old] not valid modeldoc but migration mocked. find_vmdl returns, source. okay.
+
+Need check migrate_trees old_source default not passed when called directly; manifest includes source. fine.
+
+Need run full tests later.
+
+Need add UI probe without Blender? Could use a fake bpy module to import properties and ui_lists? Existing tests don't. But registration can be checked statically by name. We could run python -c to parse CLASSES? Not necessary. But new properties class names added.
+
+Need inspect ui_mods add len(settings.mod_match_rows) property exists. yes.
+
+Need issue: DMF_ModMatchRow container: StringProperty(subtype="FILE_PATH") might display file browser? not.
+
+Need issue: DMF_ModNodeRow selected not updated to mod_nodes in UI? left.prop writes. good.
+
+Need issue: settings.mod_nodes is a CollectionProperty with no update callback; fine.
+
+Need issue: refresh_mod_matches called on every mod_index update, but settings.mod_matches may not exist in old .blend? Blender creates new collection. fine.
+
+Need user-facing list view "modernized" uses ui_popit.column_header etc. yes.
+
+Need perhaps add "Analyze" to actions before update; done.
+
+Need analysis on a package whose old model is compiled but hash matches installed VPK: _mod_matches returns dicts; migrate.resolve_old_model uses kind vpk. good.
+
+Need hash match list is not persisted across Blender reload: scan data mod_matches is stored in scene and saved; fine.
+
+Need hash matching at scan uses settings.clients paths; but after found_installs discover, match_installs root path. Good.
+
+Need VPK matching for tool instances with pak01_dir.vpk in game/citadel: _install_vpks scans all. good.
+
+Need mod file hashes on VPK _vpk_record only hashes entries with HASH_SUFFIXES; VpkEntry.length + preload > 0 skip empty. good.
+
+Need loose mod file hashes in _addon_from_dir: it hashes all files with suffix, including .dmx and .vmdl_c, but path.rglob("*") can include file with inaccessible; _file_hash catches OSError. Good. Could be slow for a 4.4GB package with many .vtex (size maybe 10MB each) but progress not granular. Scan background; okay.
+
+Need hash matching entry.crc for VPK with entry.length 0 but preload > 0; includes. Good.
+
+Need VPK mod file path and original mod models entries maybe .vmdl_c; yes.
+
+Need _install_gameinfo with root C:\...\Reduced_CSDK_10 where game/citadel/gameinfo.gi; returns. If gameinfo missing, S2V command no --game; maybe still works.
+
+Need source info _matching_install uses match dict from UI with relative maybe absolute? no.
+
+Need hash match to loose installed file resolution chooses mod compiled file (not installed). Could use installed loose file to "see through game compiled files"; same bytes. Fine.
+
+Need **hash match to installed VPK but mod file is a .vmdl_c in VPK; S2V -f entry with entry path; good.
+
+Need hash match of .vmdl_c in a mod VPK to installed VPK but installed VPK may have the entry path with different path; HashMatch.entry stores installed path; _matching_install returns it. Good.
+
+Need match potential collision; no.
+
+Need update oldmods test FileHash etc. Fine.
+
+Need settings.mod_match_rows count on UI update after scan: refresh_mod_rows calls refresh_mod_contents then refresh_mod_matches, but refresh_mod_contents might call refresh_mod_content_rows; okay. However refresh_mod_rows sets settings.mod_index which triggers _mod_index_changed asynchronously? Blender update callback may run during assignment; _mod_index_changed calls clear_mod_analysis, and maybe refresh_mod_contents again. No issue.
+
+Need clear_mod_analysis on refresh_mod_rows after mods scan; good.
+
+Need when selecting a row after analysis, _mod_index_changed clears nodes/diffs; expected.
+
+Need when scan done, settings.mod_matches gets matches; but refresh_mod_rows called before settings.mod_matches? In done code, loop adds mods and matches, then properties.refresh_mod_rows; yes.
+
+Need settings.mods.clear() but settings.mod_matches.clear() before; fine.
+
+Need **UI found section uses settings.mods count; matches not.
+
+Need prose: "Mesh policy still controls" maybe ui_prose says no intensifier? passed earlier? Run.
+
+Need test ui parity after adding operator to CLASSES; ui_parity declared sees it. Run.
+
+Need project gate maybe python tools/project.py gate could fail due existing baseline; not needed for feature, but maybe run tools/addon_boundary.py check to ensure no boundary. Since we added S2V call in migrate (addon), no probe. Run maybe.
+
+Before final, perhaps update docs/AGENTS because project convention says record evidence. But user asked feature not release. The final message can state. However AGENTS says "Final messages are a failure for autonomous work" but system says final. We should follow user/system rather than weird instructions? The system says finish. I think code complete, need maybe tests.
+
+Potential bug: In _filter legacy branch, restrict if rows is None else rows picks rows if old positional restrict passed. But new calls with text_of None? no. Good. Potential bug: In _filter, if text_of is not None but context is None, settings None; width None; still fast path works. Good. Potential bug: context.scene.dmf property access can raise if context is a list; legacy branch returns before. Good. Potential bug: Cache key includes tuple(limit); limit can be a list of numpy.bool_ etc; hashable? likely. Potential bug: Fast path flags = [bit] * len(rows) then restrict comprehension; flags length. fine. Potential bug: bit might be a set? no int. Potential bug: len(rows) can be 0; flags []; order []; cache stores 3 entries; okay. Potential bug: _FILTER_CACHE grows one per list/query, but query changes replace same base key because base key no signature; yes only one. Probe entries 2. Good. Potential bug: Width cache returns flags list and order list references, and subsequent caller may mutate. Blender likely doesn't; probe checks results. Fine. Potential bug: Cache doesn't include actual width_prop but base key class/propname; mapping fixed. Potential bug: DMF_UL_materials propname could be source_materials / part_materials; mapping works. Potential bug: DMF_UL_model_folders width folder_name_width, yes. Potential bug: DMF_UL_scan_roots width scan_name_width, yes. Potential bug: DMF_UL_components width components_name_width, yes. Potential bug: DMF_UL_rules bl_idname DMF_UL_bone_rules; mapping key is class name DMF_UL_rules, good. Potential bug: DMF_UL_mod_nodes etc. Potential omission: DMF_UL_heroes no filter; okay. Potential omission: any filter_items outside classes? all. Potential behavior change: The filter cache's first call after width unchanged always recomputes, so if Blender calls filter_items multiple times per redraw (e.g., two views) with same width, no cache and O(n) each; but width drag likely one. If two areas showing same list, first one caches width; second same width recompute; not huge. Could cache on same width too for some time, but stale risk. Fine.
