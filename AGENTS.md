@@ -31,6 +31,16 @@ C:\Users\ala\.agents\skills\ has a ton of skills for agents to use and yet they 
 
 Do not delete patch probes.
 
+## 2026-11-20 — every visible string is under the two-second rule
+
+**Owner instruction, verbatim:** *"Please update every user visible text and prose item in the blender addon with the 2-second scanning rule."*
+
+- **The rule has one source.** Brass Meridian's PROSE.md says one sentence carries one idea, a sentence is at most 24 words, and a UI string is at most 18 words and 92 characters; filler words are banned. The owner's `tickets/TICKET-0035-vpk-tracker-live-history.md` carries the same rule for the tracker: a string that cannot be scanned in two seconds is simplified, not explained. `tools/ui_prose.py` now applies that budget to this addon.
+- **The gate reads the strings a user reads, not the source.** A second AST pass collects only `bl_label` and `bl_description`, property `name` and `description`, enum item labels and descriptions, the `bl_info` entry, and the arguments of `hint`, `bubble`, `section`, `title`, `page`, `stat`, `label`, `operator`, `prop`, `prop_enum`, `invoke_confirm` and `report`. A visible string over 18 words or 92 characters, a sentence over 24 words, and an "if ... then" construction are refused. Module and function docstrings stay outside the budget because they are never drawn.
+- **Every hit was rewritten, not waived.** 57 hits across 10 files became 0: 49 over the UI budget and 8 over the sentence budget. The wording keeps the fact and drops the clause: `Join, decimate and keep the LOD meshes in this file, bound to the hero rig, so export reuses them instead of regenerating them` became `Build LOD meshes in this file so export reuses them`. Engine refusal messages are unchanged, because they are diagnostics and stay exact.
+- **Evidence.** `python tools/ui_prose.py --selftest` passes 7 planted checks (19-word string, 25-word sentence, conditional, banned filler, enum item, bl_info, clean string); `python tools/ui_prose.py --check` reports 0 hits in 30 files; `python tools/ui_parity.py --check` reports 0 duplicates and 0 undrawn actions; `python -m compileall -q blender/hero_retarget_workbench` passes; `python -m pytest -q` passes 363 tests.
+- **Not checked.** The reworded text was not drawn in a live Blender session, so no screenshot confirms the shorter lines wrap well in the sidebar or the Workbench editor. `dist/` was not rebuilt and no release was cut for this copy pass.
+
 ## 2026-11-17 — a dead compile card clears on reload, and Compile asks first (0.22.6)
 
 **Owner instruction, verbatim:** *"can you find the stray resourceompiler thread running that i accidentally started and kill it and make it so the compile button on the release page asks with a popup instead of just starting instantly"*, with a screenshot of v0.22.4 showing `Compiling with CSDK13` stuck at 25% and no cancel control.
@@ -3914,6 +3924,11 @@ citation that is not listed here, so the list cannot quietly rot as more files d
 | `artifacts/skeleton/shiv_tailbones_bind.dmx` | cited at line 2022 | removed by the recorded disk cleanup |
 | `tools/clip_rig_space.py` | cited at line 202 | removed by the recorded disk cleanup |
 | `tools/port_target.py` | cited at line 2376 | removed by the recorded disk cleanup |
+| `artifacts/ports/seven-addon/port/seven_tail.vpk` | cited at line 690 | not on disk; artifacts/ is git-ignored |
+| `artifacts/ports/seven-addon/port/seven_tailbones.dmx` | cited at line 833 | not on disk; artifacts/ is git-ignored |
+| `artifacts/golden/tail-vnmclip-gate/dmx/mesh/shiv_tailbones.dmx` | cited at line 2734 | not on disk; artifacts/ is git-ignored |
+| `artifacts/haze-tail/haze_tail_selected.vpk` | cited at line 3638 | not on disk; artifacts/ is git-ignored |
+| `artifacts/agents.head.md` | cited at line 3975 | not on disk; artifacts/ is git-ignored |
 
 
 ## 2026-11-15 — how this file is read now: an audit, an index, and an additive resynthesis

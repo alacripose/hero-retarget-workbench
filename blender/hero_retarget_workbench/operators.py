@@ -86,7 +86,7 @@ def _reset_hero_pose(armature) -> None:
 class DMF_OT_detect_paths(Operator):
     bl_idname = "dmf.detect_paths"
     bl_label = "Detect Installed Tools"
-    bl_description = "Fill the Setup fields from Steam, PATH, the environment, and any paths already set in this file"
+    bl_description = "Fill Setup from Steam, PATH and this file's saved paths"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -261,7 +261,7 @@ class DMF_OT_choose_hero(Operator):
 class DMF_OT_detect(Operator):
     bl_idname = "dmf.detect"
     bl_label = "Detect Live Build"
-    bl_description = "Find the live Deadlock install and list its heroes through Source 2 Viewer without blocking the viewport"
+    bl_description = "Find the live install and list its heroes in the background"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -335,7 +335,7 @@ class DMF_OT_detect(Operator):
 class DMF_OT_extract(Operator):
     bl_idname = "dmf.extract"
     bl_label = "Extract Hero"
-    bl_description = "Run Source 2 Viewer on the selected live hero off the main thread and collect its extracted files"
+    bl_description = "Extract the selected hero with Source 2 Viewer, off the main thread"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -776,7 +776,7 @@ class DMF_OT_scan_parts(Operator):
 class DMF_OT_use_part(Operator):
     bl_idname = "dmf.use_part"
     bl_label = "Use Active Part"
-    bl_description = "Make the selected collection row the active custom part for fit, weights, materials and export"
+    bl_description = "Make the selected row the active part for fit, weights and export"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -820,7 +820,7 @@ class DMF_OT_scan_materials(Operator):
 class DMF_OT_assign_material(Operator):
     bl_idname = "dmf.assign_material"
     bl_label = "Assign Selected Material"
-    bl_description = "Replace the selected active-part material slot with the selected source slot; never copies every slot"
+    bl_description = "Copy the source slot into the active part's selected slot only"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -1123,8 +1123,8 @@ class DMF_OT_build_lods(Operator):
     bl_idname = "dmf.build_lods"
     bl_label = "Build LODs"
     bl_description = (
-        "Join, decimate and keep the LOD meshes in this file, bound to the hero rig, "
-        "so export reuses them instead of regenerating them"
+        "Build LOD meshes in this file "
+        "so export reuses them"
     )
 
     def execute(self, context):
@@ -1731,7 +1731,7 @@ class DMF_OT_update_old_addon(Operator):
 class DMF_OT_stage_update(Operator):
     bl_idname = "dmf.stage_update"
     bl_label = "Stage update in CSDK"
-    bl_description = "Copy the updated addon content tree, including its old material files, into the selected CSDK for editing; it does not compile"
+    bl_description = "Copy the updated content into the CSDK for editing. It does not compile"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -1810,7 +1810,7 @@ class DMF_OT_stage_update(Operator):
 class DMF_OT_apply_model_name(Operator):
     bl_idname = "dmf.apply_model_name"
     bl_label = "Name Model"
-    bl_description = "Rename the imported collection, rig and parts from the model name, dropping an old rig prefix"
+    bl_description = "Name the import's collection, rig and parts after the model"
 
     def execute(self, context):
         settings = context.scene.dmf

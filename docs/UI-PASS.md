@@ -19,7 +19,10 @@ two, chips are real buttons, and advanced panels stay folded. The full checklist
 - `impeccable` (Operate mode): scanability, native expectations, no wizard.
 - `stop-slop` (github.com/hardikpandya/stop-slop) and `declauding`
   (github.com/oaustegard/claude-skills): no em dashes, no filler openers, no intensifier adverbs, no
-  "not just" staging, no stock marketing words. `tools/ui_prose.py` enforces the shared set.
+  "not just" staging, no stock marketing words.
+- The two-second rule: one idea per sentence, at most 24 words per sentence, and at most 18 words
+  and 92 characters per UI string; filler is banned. `tools/ui_prose.py` enforces both sets on the
+  strings the addon draws.
 
 ## Page parity
 
@@ -241,4 +244,7 @@ action drawn that no operator declares. `tests/test_ui_parity.py` pins the same 
 ## Copy
 
 `python tools/ui_prose.py --check` runs the writing rules and `tests/test_ui_parity.py` fails on a hit.
-The pass removed every em dash and every "actually", "really" and "literally" from the addon's strings.
+The budget is the two-second rule: one idea per sentence, 24 words per sentence, 18 words and 92
+characters per UI string, filler banned. It reads only the strings a user sees, including enum items
+and `bl_info`. The pass removed every em dash and every "actually", "really" and "literally" from
+the addon's strings.

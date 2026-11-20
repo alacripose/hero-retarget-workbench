@@ -179,7 +179,7 @@ def scan_bone_map(settings) -> int:
 class DMF_OT_scan_bones(Operator):
     bl_idname = "dmf.scan_bones"
     bl_label = "Scan Bone Map"
-    bl_description = "Match every custom bone or group by exact name, alias, or normalized name; never guess a nearest bone"
+    bl_description = "Match bones by exact name, alias, or normalized name. No guessing"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -242,7 +242,7 @@ class DMF_OT_remove_bone_entry(Operator):
 class DMF_OT_mark_extra(Operator):
     bl_idname = "dmf.mark_extra"
     bl_label = "Mark Extra"
-    bl_description = "Keep this source as an appendage; the extra-bone policy decides whether it is copied or folded"
+    bl_description = "Keep this source as an appendage. The extra-bone policy decides the rest"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -295,7 +295,7 @@ class DMF_OT_clear_target(Operator):
 class DMF_OT_rename_bones(Operator):
     bl_idname = "dmf.rename_bones"
     bl_label = "Rename Source to Target"
-    bl_description = "Rename the custom bone and its matching vertex group; refuses a name that is already occupied"
+    bl_description = "Rename the bone and its vertex group. Refuses a taken name"
 
     def execute(self, context):
         settings = context.scene.dmf
@@ -903,8 +903,8 @@ class DMF_OT_update_overlay(Operator):
     bl_idname = "dmf.update_overlay"
     bl_label = "Update Overlay"
     bl_description = (
-        "Re-read the hero skeleton after the armature changes and clear a stale "
-        "overlay error; the rig, the pose and the bones are not changed"
+        "Re-read the hero skeleton and clear a stale error. "
+        "Bones stay"
     )
 
     def execute(self, context):

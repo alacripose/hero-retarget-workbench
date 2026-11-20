@@ -520,7 +520,7 @@ def _start_package_source(settings, context, package: Path, row=None) -> bool:
 class DMF_OT_use_mod_source(Operator):
     bl_idname = "dmf.use_mod_source"
     bl_label = "Use mod as source"
-    bl_description = "Read the selected old package as a Source-page model, body and material set without updating it to the live hero"
+    bl_description = "Open the old package as a Source-page model. No live-hero update"
 
     def execute(self, context):
         settings = _settings(context)
@@ -545,7 +545,7 @@ class DMF_OT_use_mod_source(Operator):
 class DMF_OT_use_project_source(Operator):
     bl_idname = "dmf.use_project_source"
     bl_label = "Use project as source"
-    bl_description = "Use the package the active project was created from, or the open Blender scene, as the Source-page model"
+    bl_description = "Use the project's own package, or the open scene, as the Source model"
 
     def execute(self, context):
         settings = _settings(context)
@@ -1163,7 +1163,7 @@ class DMF_OT_use_backport_client(Operator):
 class DMF_OT_use_toolchain(Operator):
     bl_idname = "dmf.use_toolchain"
     bl_label = "Use this toolchain"
-    bl_description = "Compile and pack with the selected install's resourcecompiler, separately from the game files"
+    bl_description = "Compile and pack with the selected install's resourcecompiler"
 
     index: IntProperty(name="Toolchain", default=-1)
 
@@ -1276,8 +1276,8 @@ class DMF_OT_stage_components(Operator):
     bl_idname = "dmf.stage_components"
     bl_label = "Stage selected components"
     bl_description = (
-        "Copy the selected component files into the component addon and, when a target vmdl "
-        "is chosen, register each DMX as a render mesh and a body-group choice"
+        "Copy the components. With a target vmdl, "
+        "register each DMX as a mesh"
     )
 
     def execute(self, context):

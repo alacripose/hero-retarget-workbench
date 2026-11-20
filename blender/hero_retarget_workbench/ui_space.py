@@ -327,8 +327,8 @@ class DMF_OT_open_workbench(Operator):
     bl_idname = "dmf.open_workbench"
     bl_label = "Open Workbench Surface"
     bl_description = (
-        "Open the Workbench in its own editor area, page buttons in its header; "
-        "on builds without custom editor types, open the 3D viewport sidebar"
+        "Open the Workbench editor. "
+        "Elsewhere, open it in the 3D sidebar"
     )
 
     def execute(self, context):

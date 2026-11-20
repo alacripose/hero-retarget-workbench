@@ -2195,9 +2195,9 @@ class DMF_OT_build_tail_animation(Operator):
     bl_idname = "dmf.build_tail_animation"
     bl_label = "Add Tail And Compile Clips"
     bl_description = (
-        "Append the selected tail's bones, key its matching source motion into every "
-        "imported hero clip, write each gameplay source DMX, then compile the paired "
-        "vnmclips with CSDK13; the skeleton itself is not shipped"
+        "Add the tail and its motion to every clip, "
+        "compile the vnmclips. "
+        "No skeleton ships"
     )
 
     def execute(self, context):
@@ -2220,8 +2220,8 @@ class DMF_OT_publish_tail_anims(Operator):
     bl_idname = "dmf.publish_tail_anims"
     bl_label = "Compile Already-Tailed Clips"
     bl_description = (
-        "Write every already-keyed gameplay source DMX, prepare the compiler skeleton, "
-        "and compile the paired vnmclips without shipping a vnmskel"
+        "Write keyed source DMX, prepare the skeleton, "
+        "compile the vnmclips"
     )
 
     def execute(self, context):
@@ -2253,7 +2253,7 @@ class DMF_OT_publish_tail_anims(Operator):
 class DMF_OT_blend_tail_all(Operator):
     bl_idname = "dmf.blend_tail_all"
     bl_label = "Write This Hero's Clip Tails"
-    bl_description = "Write every imported clip from the current hero onto the tail armature; other heroes' clips are ignored (experimental)"
+    bl_description = "Write the current hero's clips onto the tail rig. Experimental"
 
     def execute(self, context):
         settings = context.scene.dmf

@@ -632,8 +632,8 @@ class DMF_OT_bake_clips(Operator):
     bl_idname = "dmf.bake_clips"
     bl_label = "Bake And Write Clips"
     bl_description = (
-        "Bake every imported action with visual keying, clear this addon's IK constraints, "
-        "and write each one as a Model 22 DMX for ModelDoc"
+        "Bake every imported action to a Model 22 DMX "
+        "with visual keys and no IK"
     )
 
     def execute(self, context):
