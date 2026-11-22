@@ -49,6 +49,11 @@ The owner's corrections, verbatim:
   `[dl-openshell] mount: shell mounted from base_hud without a server`, then
   `[Openlock] bar chain: Taskbar:0x0 < OpenlockStandaloneHost:0x0 < CitadelHudRoot:0x0`.
 
+- `node tools/tests/boot-carrier-test.js` → 9 checks, 0 failures. The test stands the component
+  tree up in JavaScript: a 0x0 `CitadelHudRoot` with no parent, a laid-out `HudContent` child, an
+  optional shipped anchor and an optional Deadworks host. It proves the carrier rule (ancestor with
+  a box, else nearest laid-out descendant, else outermost with its box stated) and the yield.
+
 ## Open limit
 
 The standalone mount lands in a `CitadelHud` component root that has no parent and no box, so the
