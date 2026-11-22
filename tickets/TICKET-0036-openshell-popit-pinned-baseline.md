@@ -721,3 +721,8 @@ its profile and its ±1 tolerance unchanged.
    next closed-client pass.
 4. **The Pages build from `e1d1975` was not observed yet** at the time of writing; the local subpath
    render is the proof of the fix, and the live URL is the follow-up check.
+
+**Item 4 closed the same hour.** The Pages build from `e1d1975` was loaded and measured:
+`https://alacripose.github.io/popit-shell/` now reports 8 surfaces carrying `--clip`, 8
+`.contour-frame` paths drawn and 0 failed requests — the live landing page draws the contour. The
+earlier reading was 0 clips, 0 frames and a failed `https://alacripose.github.io/contour.json`.
