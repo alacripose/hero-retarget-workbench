@@ -626,3 +626,98 @@ closed-client install is what puts it on screen, and the capture belongs to that
 **Gates, all exit 0:** contour 11/0 · options 9/0 · options selftest 7/0 · archive on the built VPK
 9/0 · landing `--check` ok · chrome 107/0 · contour-test 74/0 · dashboard 61/0 · `check_shell_clicks`
 ok (7 reachable).
+
+## Twelfth pass — 2026-11-22: the card is two lines, the frame reaches the edge, and the bar is the accepted bar
+
+**The card is the reference's card now, and the row keeps its whole text.** The name line is the
+row's own text (`row.text = text`, untouched) and the second line is a separate `.ViewMeta` label
+that names what the row is — a window's lane, so it reads `SHELL WINDOW`. Nothing is split and
+nothing is dropped: `check_shell_clicks` still reports ok, 7 reachable, with its four source needles
+in place. The card's leading mark is no longer the typed `●`/`○` in the text: it is a drawn contour
+chip, 9×11 at `left 17 top 5`, brass-lit (`.ViewGlyph`), because a typed codepoint in the chrome is
+exactly what `check_shell_clicks` refuses (`typed window glyph 'glyph.text' is back`) and the
+reference draws its ▶ as a shape. A card with a meta line takes `surfaces.plate.card_px` 43.2; a row
+without one keeps the pin's 22.
+
+**The pinned application, ported from the reference and not restated.** `popit-shell:ui/contour.js`
+draws the frame on a surface the clip sits outside of: `CLIP_PAD 0.5` outside the frame, `FRAME_PAD
+1.5` inside it, a 1 px stroke with both halves whole. The slices now do the same — the painter draws
+on a box inflated by `OVERHANG = 1` and places it back over the host, so the frame lands on the host's
+own edge instead of 1–2 px inside it and the crown keeps every row. Two defects fell out of porting
+it, both found by looking at the render rather than at the numbers:
+
+1. **A layer belonged to its host, but `layerFor` accepted any descendant.** With the card's glyph
+   chip in place, the card's paint pass found the chip's layer and painted the card's 451 px
+   silhouette *inside* the 9 px chip, which filled the card with the chip's brass. The layer is a
+   direct child or it is created; the cards' fills now read `#23211c`, and the chosen one `#302a1f`.
+2. **The outline read as clipped because the plate's side ink was wrong.** `.WindowTitle` was at
+   `3.78px 36px 8.64px 36px`, and 36 is the stylesheet's unused `--ink-x: 40px` default read as if it
+   were laid out; `windowScale` sets `--ink-x` from the contour's own corner (10), so the reference
+   draws 9. The plate is 9 now, the title sits at x 29 against the reference's 27, and a duplicate
+   `.WindowTitle` rule that had been shadowed was left alone.
+
+**Rendered comparison, not a reading of CSS.** The reference was captured at 640×560
+(`pins/start-window-reference-640x560.png`) and the generated sandbox page at the same frame
+(`pins/start-window-640x560.png`). What the comparison changed:
+
+- the card fill measures `(46,40,30)` against the reference's `(43,38,29)`; the ink is the reference's
+  42 per cent; the chosen card lights its outline to `#d9b779` as `.card.on` does;
+- the totals line read `30rows` because a Label trims a leading space — the gap is a margin now, and
+  the line always states both numbers (`30 rows · 30 shown`), as the reference's totals do;
+- a *ghost title*: every hidden frame stacked its plate over the visible one, because the pinned
+  sheet declared `.WindowFrame .WindowTitle { visibility: visible }`. A collapsed window re-showed
+  its own title strip; the rule is gone and the title follows its frame;
+- the clock read `05:04`; it is the reference's readout now, `22 Nov  05:12`, dim at 13.44.
+- **Still deliberate:** the reference right-aligns each card's detail in a second column. That column
+  is the per-builder facts panel (item 1 below), not window chrome, and the name line stays the row's
+  own whole text.
+
+**The bar is the accepted bar.** `popit-shell:ui/bar.css` is the authority, read value by value: the
+strip is `48` high with `5.12` by `17.6` of padding, a brass wash `#b08d571f` into `#0f1113` at 55 per
+cent and no keyline; Start is `93` wide at `x 18`, brass-lit at 13.44 with 0.96 of tracking; a tab is
+36 high, 64 to 224 wide, `5.76` apart, paper at 6 per cent over ink with the ink at 0.45 and hover at
+0.85; the clock is 108.8 wide and dim. Three things were still the old black-chip vocabulary in the
+render and are fixed: the bar's `gradient()` was dropped by the browser witness (the adapter now
+translates it, so the wash is in the picture), the keyline under the strip the reference does not
+draw is gone, and the build readout wrapped to three lines over the clock — it is one ellipsised line
+(`pins/taskbar-1280.png`). The clock is a readout, not a chip: it is a Label, so slices added to it
+are its children and paint after its own text — a contoured clock drew an empty cell. It keeps the
+reference's box and type and takes no ink.
+
+**The published landing page did not draw its contour, and it does now.** The live
+`https://alacripose.github.io/popit-shell/` served the page and `contour.js` and `contour.json`, and
+still rendered eight bare rectangles: the module fetched `/contour.json`, which on a project Pages
+site is the *domain* root, and got a 404 — `performance.getEntriesByType('resource')` named
+`https://alacripose.github.io/contour.json` as the failed request. The module now fetches the drawing
+beside itself (`new URL("contour.json", import.meta.url)`), in `ui/contour.js` and in the published
+`docs/contour.js`. Verified by serving the repository over HTTP and loading the page from a subpath:
+8 surfaces carry `--clip`, 8 `.contour-frame` paths are drawn, 0 failed requests. Pushed to
+`popit-shell` `e1d1975`; the Pages build from it is the next observation (item 4).
+
+**The witness is refitted to the pin, and nothing was loosened.** `browser-minimal-shell` expected
+`title height 30` and `control 26x22`, numbers older than the pinned 36 px plate and this build's
+`.FormPopit .WindowButton` 20×20. It now reads the pin (`pins/contour-pin.json`, `surfaces.plate`):
+title 36 · control 20×20 · row 22 and card 43.2 for every `.ViewRowBox` that carries a `.ViewAction`
+· Start 93 at `x 18` (`bar_metrics`) — three assertions it did not have. `title 30` and `26x22` were
+the stale numbers; no check was disabled, skipped or widened, and the pin gained the `surfaces` block
+those numbers are cited from.
+
+**Gates, all exit 0:** contour 11/0 · options 9/0 · options selftest 7/0 · landing `--check` ok ·
+chrome 107/0 · contour-test 76/0 · dashboard 61/0 · boot-carrier 12/0 · `check_shell_clicks` ok ·
+`browser-minimal-shell` HELD (exit 0). Two checks were *taught* the pinned application rather than
+loosened: `contour-gate C6` now reads the overhang form of the painter (ink on the inflated edge, fill
+one stroke in, `overhang >= clip_pad`), and `contour-test` models the same inflated box and shift, with
+its profile and its ±1 tolerance unchanged.
+
+**Open limits, named.**
+
+1. **The facts column** is the start window's selection inspector and every family window body is
+   built by its own builder: it is builder content, not window chrome, and is not added here.
+2. **The archive was not rebuilt.** `install.ps1 -BuildOnly` reached `compile` and failed with
+   `-Live is only valid for the CSDK10 tools tree; a game install is a packed archive` while Deadlock
+   runs from that tree (record `shell/alpha-shell/build.json`, stage compile, state failed). The last
+   built archive is still `fe46d967…`. The archive gate is therefore **not claimed** for this pass.
+3. **Nothing is claimed in game.** The rendered capture is the evidence; the install belongs to the
+   next closed-client pass.
+4. **The Pages build from `e1d1975` was not observed yet** at the time of writing; the local subpath
+   render is the proof of the fix, and the live URL is the follow-up check.

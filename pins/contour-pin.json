@@ -1,7 +1,7 @@
 {
   "schema": "openlock.contour-pin/2",
-  "at": "2026-11-22T04:35:00+00:00",
-  "what": "the window crown is cut to the pinned profile, and the window is really resized through the shell's own pointer drag in two states",
+  "at": "2026-11-22T10:20:00+00:00",
+  "what": "the window crown is cut to the pinned profile, the window is really resized through the shell's own pointer drag, and the start window and the bar are compared as rendered images against the popit reference",
   "authority": {
     "docs/contour.json": "6810368a4a85fafb5c5e951883e85a1669080b5206a1adec2561b375575e07a3",
     "docs/family-look.json": "778ccb695225275da0b0e13e62453dcd023764e97593d3d2803247b49bf1fea3",
@@ -144,7 +144,10 @@
     "activated": "c788bab89ecdf8115639ec8f676515ee5231e1c782777167278d78693bcbbe8c",
     "drag": "48784345adcecada8be184e953912217814f92e620bb8f9331c74ee45dccdaf4",
     "resized": "0f68fd475b5349d1fa45f3db1038ab77ee937b651968fdd7a38560899ac79a88",
-    "pin": "c0236e887529b694ef9c030a6f9c9fc5d87c244ee1dfd2058b81530e48b3b99f"
+    "pin": "c0236e887529b694ef9c030a6f9c9fc5d87c244ee1dfd2058b81530e48b3b99f",
+    "start_window": "f7626b0275e0ff24253a8d448cb817e1e7a01e19ca89cb65d496b07bcce498a1",
+    "start_window_reference": "9788bb984617ef92666153eaf3da656875393f58646d66c725f44095817bd6f4",
+    "taskbar": "30d1ba23dde376bc93d492d7737e3196ee020c8beec0634393ff4244d49b8d29"
   },
   "states": {
     "idle": "closed: 5x8 chamfer, 1 px ink, the plate's fill, cut by pads() at frame pad 1.5",
@@ -158,10 +161,36 @@
     "contour": "11/0",
     "options": "9/0",
     "options-selftest": "7/0",
-    "archive": "9/0",
     "landing-check": "ok",
-    "chrome": "99",
-    "contour-test": "74/0",
-    "boot-carrier": "12/0"
+    "chrome": 107,
+    "contour-test": "76/0",
+    "dashboard": "61/0",
+    "boot-carrier": "12/0",
+    "browser-minimal-shell": "held",
+    "check_shell_clicks": "ok"
+  },
+  "surfaces": {
+    "plate": {
+      "title_px": 36,
+      "control_px": 20,
+      "row_px": 22,
+      "card_px": 43.2,
+      "authority": "this build: .WindowTitle 36, .FormPopit .WindowButton 20x20, .ViewRowBox 22, .HasMeta 43.2; the reference renders the same shapes at its own --u"
+    },
+    "card": {
+      "glyph": "a drawn contour chip, 9x11, brass-lit; no codepoint in the chrome",
+      "meta_px": 10.26,
+      "meta_tracking_px": 0.37,
+      "name_px": 13.44,
+      "fill": "#23211c",
+      "fill_on": "#302a1f"
+    },
+    "application": {
+      "clip_pad": 0.5,
+      "frame_pad": 1.5,
+      "stroke_px": 1,
+      "overhang_px": 1,
+      "rule": "the silhouette is drawn on a surface inflated by the overhang and placed back over the host, so the frame lands on the host edge with both halves of its stroke inside the clip"
+    }
   }
 }

@@ -15,5 +15,11 @@
   "addon boundary selftest": "pass",
   "release skeleton identity": "fail",
   "release installed pak": "skip",
-  "probe lane": "skip"
+  "probe: cloth": "skip",
+  "probe: pages": "skip",
+  "probe: tail-ui": "skip",
+  "probe: tail auto": "skip",
+  "receipt tail-live.json": "fail",
+  "receipt probe-zip.json": "pass",
+  "probe lane": "fail"
 }
