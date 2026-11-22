@@ -488,3 +488,47 @@ the previous pass's fill work — was found and removed; hover and active now re
 **Gates, all exit 0:** contour 11/0 · options 9/0 · options selftest 7/0 · archive on the installed
 VPK (`74AC6E61ACAFBE2CA461C49DE1A10E892B8CEB9CEDABC3F31965FFBFB589EB59`) 9/0 · landing `--check` ok ·
 chrome 99 · contour-test 74/0 · boot-carrier 12/0 · `check_shell_clicks` ok.
+
+## 2026-11-22 (tenth pass) — the corner drag and the resize are real, and the pin is one artifact set
+
+**The press path, found rather than re-logged.** The previous pass pressed the grip and nothing happened,
+because `makeDraggable` bound `onmousedown`/`onmouseup`/`onactivate` while this client dispatches a press
+on a hittable panel as **`onmouseactivate`** — the event `addControl` binds, and the reason the bar's
+cells answer and a window's chrome did not. The grip, the move handle and the drag strip now bind
+`onmouseactivate` too (guarded so a press during a drag is ignored and the poll keeps the release), and
+`beginPointerDrag` runs. A press on the south-east grip now begins the poll and the window follows it.
+
+**Both states are real resizes while the shell is live, measured by the log and the pixels:**
+
+| state | window box | how | corner arc | ink | fill |
+|---|---|---|---|---|---|
+| idle | 640x520 at (26,77) | launch | 5 x 8 px | 1 px | (33,27,23) |
+| drag | 823x689 → 833x698 at (26,77) | pointer presses the SE grip and drags to (830,740) | 5 x 8 px | 1 px | (34,27,23) |
+| resized | 1177x395 → 1072x380 → 815x348 at (622,642) | second pointer drag of the SE grip to (690,610) | 5 x 8 px | 1 px | (28,28,23) |
+| activated | 640x520 at (130,133) | cell press restored the window | 5 x 8 px | 1 px | (27,26,22) |
+
+The interpolated boxes (`823x689`, `1072x380`, `815x348`) are the drag's own signature: a restore writes
+one rect, a drag writes a series as the poll moves. Each box is re-cut — `band=11 slices=48` at every
+step — and the crown at each is the pinned profile: `7.67 − 2×1.5 = 4.67 → 5 px` across and
+`11 − 3 = 8` rows down, 1 px ink of `#b08d576b`, fill the plate's `#1b1a16` (measured 27–34 in red,
+which is the title wash over the plate's fill and the capture's rounding). `states.drag` and
+`states.resized` in `contour-pin.json` therefore point at captures of genuinely different windows, not
+a redraw at 640x520.
+
+**The pin is one artifact set.** `pins/` now holds exactly `contour-pin.png`, `contour-pin.json` and the
+five per-state captures the pin hashes; the diagnostic crops (`check-*.png`, `corner-*.png`,
+`probe-*.png`, `win-*.png`, `bar-*-zoom.png`, `window-resized.png`, `game-print.png`) moved to
+`artifacts/diagnostics/contour-2026-11-22/` rather than being deleted. Every image sha256 in the pin
+re-verifies against disk, as do `docs/contour.json` and `docs/family-look.json`; the installed archive is
+`559D7B01A7529BA7EDC1D5F599EA41CCBF295E13C2E934269EDEC097D78D9F8C`. Schema stays
+`openlock.contour-pin/2`: the pin's shape did not change, only its evidence.
+
+**Unchanged:** Start 93 px with no host padding (`start=93 tab0=85 gap=5.6 startx=18 tab0x=117`), cells
+85x36 / 82x36 / 188x36 / 218x36 `band=11 slices=48`, rows 130x22 / 99x22 / 96x22 `band=7 slices=28`,
+`.WindowsButton` and the build-hash cell untouched, `docs/family-look.json`'s surface list unchanged, and
+no window file gained a contour number — crown, plate inset, band and fill all come from `padsOf`/
+`pads()` and `band()`.
+
+**Gates, all exit 0:** contour 11/0 · options 9/0 · options selftest 7/0 · archive 9/0 · landing
+`--check` ok · chrome 99 · contour-test 74/0 · boot-carrier 12/0 · `check_shell_clicks` ok. The
+pre-existing `project.py gate` probe-lane failure is still recorded in `STATUS.md`, not hidden.

@@ -1,7 +1,7 @@
 {
   "schema": "openlock.contour-pin/2",
-  "at": "2026-11-22T04:00:00+00:00",
-  "what": "the window crown is cut to the pinned profile in every captured state; the corner drag does not change the window's box in this client and that is recorded open",
+  "at": "2026-11-22T04:35:00+00:00",
+  "what": "the window crown is cut to the pinned profile, and the window is really resized through the shell's own pointer drag in two states",
   "authority": {
     "docs/contour.json": "6810368a4a85fafb5c5e951883e85a1669080b5206a1adec2561b375575e07a3",
     "docs/family-look.json": "778ccb695225275da0b0e13e62453dcd023764e97593d3d2803247b49bf1fea3",
@@ -21,7 +21,7 @@
       ".WindowsButton",
       ".Clock"
     ],
-    "runtime_pads": "OpenlockContour.pads() = clip 0.5, frame 1.5, stroke 1; plateInsets() reads OpenlockContour.band(h) for the title/meta/body inset, so no plate carries its own number"
+    "runtime_pads": "OpenlockContour.pads() = clip 0.5, frame 1.5, stroke 1; plateInsets() reads OpenlockContour.band(h); no window file carries a contour number"
   },
   "rendered": {
     "band_px": {
@@ -44,42 +44,92 @@
     },
     "bar_metrics": "bar=1920x48 start=93 tab0=85 gap=5.6 windows=90 clock=109 tabs=3 startx=18 tab0x=117 gapExact=5.6",
     "contour_log": [
+      "contour 640x520 band=11 slices=48 drawn",
+      "contour 823x689 band=11 slices=48 drawn",
+      "contour 833x698 band=11 slices=48 drawn",
+      "contour 1177x395 band=11 slices=48 drawn",
+      "contour 1072x380 band=11 slices=48 drawn",
+      "contour 815x348 band=11 slices=48 drawn",
       "contour 130x22 band=7 slices=28 drawn",
       "contour 99x22 band=7 slices=28 drawn",
-      "contour 96x22 band=7 slices=28 drawn",
-      "contour 85x36 band=11 slices=48 drawn",
-      "contour 82x36 band=11 slices=48 drawn",
-      "contour 188x36 band=11 slices=48 drawn",
-      "contour 218x36 band=11 slices=48 drawn",
-      "contour 300x66 band=11 slices=48 drawn",
-      "contour 640x520 band=11 slices=48 drawn"
+      "contour 96x22 band=7 slices=28 drawn"
     ],
     "window_crown_measured": {
-      "corner_px": {
-        "arc_width": 5,
-        "arc_height": 8
-      },
       "reference_corner_px": {
         "width": 7.67,
         "height": 11.0
       },
-      "arithmetic": "the captured arc is the pinned corner cut at the frame pad: 7.67 - 2*1.5 = 4.67 -> 5 px across, 11 - 3 = 8 px down",
+      "cut_at_frame_pad_px": {
+        "across": 5,
+        "down": 8
+      },
       "ink_px": 1,
-      "fill_rgb": [
-        28,
-        26,
-        22
-      ],
-      "fill_hex": "#1c1a16",
+      "pinned_ink": "#b08d576b",
       "pinned_fill": "#1b1a16",
-      "note": "one point off in each channel, which is the capture's colour rounding; the sheet value is #1b1a16",
       "states": {
-        "idle": "chamfer 5x8, ink 1 px, fill #1c1a16",
-        "hover": "chamfer 5x8, ink 1 px, fill #1c1a16",
-        "activated": "chamfer 5x8, ink 1 px, fill #1c1a16",
-        "drag": "chamfer 5x8, ink 1 px, fill #1c1a16",
-        "resized": "chamfer 5x8, ink 1 px, fill #1c1a16"
-      }
+        "idle": {
+          "window": "640x520 at (26,77)",
+          "top_edge_run_px": 617,
+          "chamfer_px": [
+            5,
+            8
+          ],
+          "ink_px": 1,
+          "fill_rgb": [
+            33,
+            27,
+            23
+          ],
+          "resized": false
+        },
+        "drag": {
+          "window": "833x698 after a pointer drag of the south-east grip",
+          "top_edge_run_px": 810,
+          "chamfer_px": [
+            5,
+            8
+          ],
+          "ink_px": 1,
+          "fill_rgb": [
+            34,
+            27,
+            23
+          ],
+          "resized": true
+        },
+        "resized": {
+          "window": "1177x395 after a second pointer drag of the south-east grip at (622,642)",
+          "top_edge_run_px": 1173,
+          "chamfer_px": [
+            5,
+            8
+          ],
+          "ink_px": 1,
+          "fill_rgb": [
+            28,
+            28,
+            23
+          ],
+          "resized": true
+        },
+        "activated": {
+          "window": "640x520 at (130,133) after the cell press restored it",
+          "top_edge_run_px": 617,
+          "chamfer_px": [
+            5,
+            8
+          ],
+          "ink_px": 1,
+          "fill_rgb": [
+            27,
+            26,
+            22
+          ],
+          "resized": true
+        }
+      },
+      "arithmetic": "the pinned 7.67x11.00 corner cut at frame_pad 1.5 is 7.67-3 = 4.67 -> 5 px across and 11-3 = 8 rows down; that is what every measured capture reads",
+      "note": "the fill reads (27,26,22) on a fresh plate and up to (34,27,23) where the title wash sits over it; the sheet value is #1b1a16 and the ink is #b08d576b"
     },
     "bar_measured": {
       "cell_fill": "#1d1e1f (paper 6 per cent over ink)",
@@ -87,23 +137,23 @@
       "hover_fill": "unchanged from idle; the ink lights and the fill does not move"
     }
   },
-  "installed_vpk": "74ac6e61acafbe2ca461c49de1a10e892b8ceb9cedabc3f31965ffbfb589eb59",
+  "installed_vpk": "559d7b01a7529ba7edc1d5f599ea41ccbf295e13c2e934269edec097d78d9f8c",
   "images": {
-    "idle": "d4867498be80e483fb9b5f8c577a59386eb7094ca866f413a26b90bc4de90b1b",
-    "hover": "b1f4668834a582d1353a2002199950564c54db806df4ab1ebf883cae0709b12c",
-    "activated": "9d6945b35e3d7eff448962719d2893e9340ca09d9e2021ecf5cb13184bbcf63a",
-    "drag": "932a7f873e0d62b830083e0e0a5a41e092164d7d82cb70baf7fd5fc2fc3cf720",
-    "resized": "dbd4112647d1bf358d2d63507b5091e8468df18c16234ae5e0a44a87b6163fb7",
-    "pin": "f3b37a32e9be0cb35bf5f790e89d6ffb4e40efe6cc68f930b4076b7f31efe3c1"
+    "idle": "a0fccb707ca3171ff7a20d3a79770642287a599ab5296545d7f7333f3b5ada9f",
+    "hover": "ccfb7e8479737636b8947fd1f65cf780ca1413b541acf016b38e3783521c05c0",
+    "activated": "c788bab89ecdf8115639ec8f676515ee5231e1c782777167278d78693bcbbe8c",
+    "drag": "48784345adcecada8be184e953912217814f92e620bb8f9331c74ee45dccdaf4",
+    "resized": "0f68fd475b5349d1fa45f3db1038ab77ee937b651968fdd7a38560899ac79a88",
+    "pin": "c0236e887529b694ef9c030a6f9c9fc5d87c244ee1dfd2058b81530e48b3b99f"
   },
   "states": {
-    "idle": "closed: a 5x8 chamfer with 1 px ink and the plate's #1c1a16 fill, cut by pads() at frame pad 1.5",
-    "hover": "closed: the same crown, and the bar's hover moves the ink only (fill identical to idle)",
-    "activated": "closed: the same crown, and the active cell is brass 16 per cent over ink inside the outline",
-    "drag": "open: the corner drag is performed, and the crown is still the profile, but this client never delivered the press to the grip, so the window's box did not change (no size line in the log and the frame stays 640x520 at (26,77))",
-    "resized": "open for the same reason: no box change to re-cut. The crown was proven to re-cut by construction (plateInsets runs inside every draw, and the log carries 640x520, 640x440, 300x66 and 300x51 frames, each with band 11 and the measured corner)"
+    "idle": "closed: 5x8 chamfer, 1 px ink, the plate's fill, cut by pads() at frame pad 1.5",
+    "hover": "closed: the bar's hover lights the ink only; the cell fill does not move",
+    "activated": "closed: the active cell is brass 16 per cent over ink inside the outline, and the window restored at (130,133) keeps the 5x8 crown",
+    "drag": "closed: a pointer press on the south-east grip now starts the drag (this client dispatches the press as onmouseactivate), and the window resized live from 640x520 to 833x698 with the crown re-cut at every step",
+    "resized": "closed: a second pointer drag of the south-east grip resized the window again, through 1177x395 and 1072x380 to 815x348, and the crown at (622,642) is the same 5x8 with 1 px ink"
   },
-  "next": "the frame's grips answer onmousedown and now also onactivate, but this client delivers neither to a window frame over the hideout; the drag/resize gesture needs a client whose window layer takes presses, or a keyboard resize path",
+  "next": "nothing open in the crown; the pointer route works because the grips bind onmouseactivate, which is the event this client delivers",
   "gates": {
     "contour": "11/0",
     "options": "9/0",
