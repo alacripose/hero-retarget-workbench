@@ -784,3 +784,39 @@ build: cold incognito and the returning profile (which had the previous build ca
 installing) both report build `c720d9ba3a`, 8 clipped surfaces, 8 `.contour-frame` paths, 0 failed
 requests; `index.html`, `contour.js` and `sw.js` served are byte-identical to the committed files.
 Pushed `popit-shell` `265262b`; `ls-remote` matches.
+
+## Fourteenth pass — 2026-11-22: the dl-openshell page gets the family prose read and the evidence
+
+The landing page at `https://alacripose.github.io/dl-openshell/` still described the shell as it was
+before the pinned contour, and its sentences had never been read by the family's checkers. Both are
+now part of the page, in `openlock` `b4e740a`.
+
+**The prose is read, and the refusals are the record.** `tools/landing_prose.py` takes every visible
+sentence out of `landing/index.html` — block prose only, never a code label, a sample or a drawing —
+and reads it with `deadlock-model-forge/tools/ui_prose.py`'s rule set and
+`brass-meridian/tools/prose.mjs`. `landing/prose.json` seals the sentence digest and every verdict;
+`--check` fails when the page's prose is not the sealed prose; `--selftest` proves a planted
+"seamless, robust" sentence is refused by the same path. The reading of 296 sentences found
+**29 refusals**: fourteen sentences over the family's 24 words, thirteen of the same over prose.mjs's
+own budget, the word *actually*, and one em dash. They are published on the page beside the sentences
+that earned them. The copy was not rewritten to make the checkers quiet: the owner's prose is not
+mine to replace, and a refusal that is edited away is a refusal that is not evidence.
+
+**The page carries the pinned measurements.** A new Evidence section prints, from the record and the
+run that produced each number: the pin's 36 px title, 20x20 control, 22 px row, 43.2 px card, 93 px
+Start at x 18, and the 0.5 / 1.5 / 1 stroke and overhang; the gate counts 11/0, 9/0, 76/0, 107/0,
+61/0 and the browser probe HELD; the family baseline `e507d355` and its BLAKE3 `4a6e012e` over 28
+files; and the live game build 6861. The hero's version line names the popit baseline and the current
+build, replacing the stale `game build 6821`, and the audit line reads 2026-11-22 against the pinned
+contour.
+
+**Rendered, not asserted.** The page served from `landing/` at 127.0.0.1:8795 draws 41 contoured
+surfaces with 41 `.contour-frame` paths, 0 failed requests, and the prose record live: "296 sentences,
+3112 words, longest 34, 29 refusals", with 29 rows printed under it.
+
+**Gates, all exit 0:** contour 11/0 · options 9/0 · contour-test 76/0 · chrome 107/0 · dashboard 61/0
+· `check_shell_clicks` ok · `landing.py --check` ok (which now also runs the prose check) ·
+`landing_prose.py --check` ok · `browser-minimal-shell` HELD. Nothing was disabled or widened: the
+prose tool refuses the page's own long sentences rather than the page being shortened to fit.
+
+Published by the repository's own `pages.yml` on `landing/**`; pushed `b4e740a`, `ls-remote` matches.
