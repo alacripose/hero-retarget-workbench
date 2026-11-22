@@ -149,3 +149,55 @@ two remaining paths are named: mount through the Deadworks UI channel (`openlock
 `openlock_ui open`) so the shell is loaded into the live HUD, or put the anchor into the layout the
 match actually draws. Both need a decision the owner holds: whether the client should run with the
 Deadworks host, or whether a match-HUD layout override is acceptable.
+
+## 2026-11-22 (fourth pass) — the bar was retired behind an inverted pair, and the blue was not Popit
+
+**The owner's reading was the fix.** *"the changes that added the cloud bar and deprecated the old
+openshell taskbar is the reason why nothing draws, we have to bring in the new popit shell taskbar in
+place of it"* — and it is exactly what the source said once read:
+
+```js
+// The taskbar is retired. … no code path brings it back: the lower cloud band is the shell's only rail.
+function showTaskbar() { taskbar.style.opacity = "0"; taskbar.style.visibility = "collapse"; }
+function hideTaskbar() { taskbar.style.visibility = "visible"; taskbar.style.opacity = "1"; }
+```
+
+`showTaskbar()` was called on every pointer move, on every tab choice and on every expand, and each
+call collapsed the strip. `render()` set `visibility: visible` and the next mouse move took it away,
+and an idle timer (`lastInteractionAt > 5000`) hid it as well. The one element the owner saw for five
+hours was the preload strip overflowing a collapsed bar.
+
+**What changed.** `showTaskbar()` shows and `hideTaskbar()` collapses; every render asserts the bar;
+the idle timer no longer hides it (the pinned client's strip is on screen whether the pointer moved);
+`chrome-test` grew four checks that read the pair out of the source (98 checks, 0 failures).
+
+**The blue was the old Popit, not the popit shell.** The scheme the client defaults to was
+`SchemePopit` from `shell/alpha-shell/themes/popit.theme`, which still carried the LittleBigPlanet
+blue (`#1F6E96F2`, `#267AA4F2`, cream edge, green accent) — so the window body painted blue through
+`.ContourFill`. `popit.theme` now carries the inks the shell at `F:/Documents/popit-shell` actually
+draws with (`ui/bar.css`, `ui/style.css`: ink `#0f1113`, paper `#e6dbc2`, brass `#b08d57`, brass-lit
+`#d9b779`, dim `#8b8778`), `openlock_pinned.css` declares the bar and the plate in the same inks, and
+`tools/gen_shell_theme.py` (already painting `.ContourInk`/`.ContourFill`) regenerated
+`openlock_schemes.css`: 9 schemes, default popit, 0 refusals.
+
+**Measured in the running client.** Installed `AA1EEFD4FF9533DF53320E467889846CE71D04105ABFE868650B2F17200F3EC3`
+(archive passes all nine `--archive` facts), launched the normal path, pressed through the menu, and
+the live log reads:
+
+```
+[Openlock] bar chain: Taskbar:1920x48 < OpenlockStandaloneHost:1920x1080 < CitadelHudRoot:1920x1080
+```
+
+No panel in the chain is 0×0, and the shell draws in the hideout: an ink window with a brass contour,
+an uppercase brass-lit title over a keyline, brass list rows, and the 48 px bar with `Start`,
+`Windows`, the build cell and the clock across the top. The boot's own settle pass is what gets there
+(`settle: host laid out 1920x1080 at step 3`); the bar's first measurement is 0 because it is read
+before layout, and the later passes report 1920×48.
+
+**Gates.** contour 10/0 · options 9/0 · options selftest 7/0 · `--archive` on the installed VPK 9/0 ·
+landing `--check` ok · chrome 98 · contour-test 53/0 · boot-carrier 12/0.
+
+**Open.** The window body is still faintly translucent over the game (its fill comes from the contour
+slice), the bar's cell spacing is the shell's own 6 px rather than the Popit shell's 5.76 px, and the
+`Windows` cell is wider than the Popit's `max-width` of seven cap units. Those are look refinements,
+not blockers; the surface and the inks are the new Popit shell's.
