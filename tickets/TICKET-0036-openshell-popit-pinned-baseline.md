@@ -773,3 +773,14 @@ chrome 107/0 · dashboard 61/0 · `check_shell_clicks` ok · openlock landing `-
 brass-meridian/openlock package formats were not touched.
 
 Pushed `popit-shell` `39f046c`; `ls-remote` matches.
+
+### Addendum: the names follow the served bytes
+
+The first cut hashed the working copy, so the module URL carried a name derived from this checkout's
+CRLF and not from the file Pages serves. `digest()` now hashes the newline-normalised bytes; the
+published build is `c720d9ba3a`, the page asks for `contour.js?v=395d41fe2b`, and `395d41fe2b` is the
+sha256 of `https://alacripose.github.io/popit-shell/contour.js` as served. Re-verified on the new
+build: cold incognito and the returning profile (which had the previous build cached and a worker
+installing) both report build `c720d9ba3a`, 8 clipped surfaces, 8 `.contour-frame` paths, 0 failed
+requests; `index.html`, `contour.js` and `sw.js` served are byte-identical to the committed files.
+Pushed `popit-shell` `265262b`; `ls-remote` matches.
