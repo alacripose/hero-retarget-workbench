@@ -532,3 +532,97 @@ no window file gained a contour number — crown, plate inset, band and fill all
 **Gates, all exit 0:** contour 11/0 · options 9/0 · options selftest 7/0 · archive 9/0 · landing
 `--check` ok · chrome 99 · contour-test 74/0 · boot-carrier 12/0 · `check_shell_clicks` ok. The
 pre-existing `project.py gate` probe-lane failure is still recorded in `STATUS.md`, not hidden.
+
+## 2026-11-22 (eleventh pass) — the plate every family window now carries
+
+**The owner's reading, verbatim:** *"get the opnelock shell upo to the popit shell and it's pinned
+application in design and contour so all family windows can be updated to the pinned application
+start menu window deisgn in popit shell"*.
+
+**What the pinned application actually is.** `F:/Documents/popit-shell` at `e507d355`, `ui/index.html`
+and `ui/style.css`: the start-menu window is one plate — the uppercase brass-lit title at 3.6u with
+1.1u of tracking over a keyline, then `.totals` (dim 2.1u with the numbers in brass-lit), then
+`.find` (an uppercase brass label at 1.8u with 0.35u of tracking beside a field at 2.3u, painted
+black at 42 per cent) — over a body of cards, each card a paper wash over the ink, each card's ink
+brass 42 per cent, hover brass-lit, and the chosen card brass 14 per cent. At the plate's unit of
+5.4 those are 19.44 / 11.34 / 9.72 / 12.42, which is what `openlock_pinned.css` now declares.
+
+**What changed, and why it is one place.** The plate is built in `createFrame`, so every window
+frame in the shell carries it:
+
+- `WindowPlate` holds `WindowCounts` (the number of rows the body built, in brass-lit 11.34 beside
+  the word in dim 11.34) and `WindowFindRow` (the `Find` label and a contoured field). The plate is
+  inset by `plateInsets()` from `OpenlockContour.band(h)` like the title, meta and body, so it
+  carries no crown number of its own.
+- The field is one filter, `filterFrame`: a row whose own text holds the query stays, every other
+  row collapses, nothing is deleted, and the plate states how many are shown. Rows publish their
+  text as `data-row-text`; a row built before the plate existed is read from its labels instead.
+  The client's press event is the one this build dispatches, so the field has three routes to the
+  same function: `ontextentrychanged`, `oninputsubmit`, and the half-second poll that already runs
+  (one property read per open window). A build that dispatches neither event still filters.
+- A heading is a group's name, not an entry: `rowXd(..., "ViewHeading")` marks its box `ViewHead`,
+  the count and the filter skip it, and the pinned sheet draws it as an uppercase brass word at
+  10.8 with 1.89 of tracking over no fill — the reference's group head, not a card.
+- A card is the reference's paint: `#23211c` (the paper wash over the plate's `#1b1a16`) with the
+  ink at `#b08d576b`, hover leaving the paint and lighting the ink, and the chosen row `.On` at
+  `#302a1f` (brass 14 per cent over the same ink, the reference's `.card.on`). The fill needed
+  `.ShellRoot .WindowFrame .ViewRowBox .ContourFill` because the plate's own fill rule is three
+  classes deep and was painting every card the bare plate.
+- Row text is the reference's three sizes: the card name at 13.44, prose at 13.44, secondary at
+  11.34 dim, all inset 3 by 10 (the reference's `--ink-y` 3 and `--ink-x` at a 22 px card).
+
+**Measured in a real browser, not asserted.** `python tools/shell_sandbox_surface.py` writes
+`docs/shell-minimal.html` from the real sheets, data and script, and Chromium reads it back:
+
+| fact | measured |
+|---|---|
+| frame | 640x560 |
+| title strip | 36 px (the pin's plate) |
+| plate | 48 px tall, 624 wide, 36 px side ink |
+| counts | 14 px row, `30 rows  ·  30 shown`, number `rgb(217,183,121)` at 11.34, words dim |
+| Find | label 9.72 px with 1.89 tracking; field 514x22, padding 0 8.64, text 12.42 |
+| card | 451 px wide, fill `rgb(35,33,28)` = `#23211c`, ink `rgba(176,141,87,0.42)` = `#b08d576b`, 24 contour slices |
+| heading | 17 px, no fill, uppercase brass |
+
+The count and the shown count are one line while the field is empty (the dot and the shown pair
+collapse), which is the reference's totals line: the number in brass, the word in dim.
+
+**Filtering is proved, not described.** `chrome-test` grew eight checks built on the same fake tree
+the shell boots in: thirteen frames carry a plate; the plated frame that owns rows counts them
+(358 cards in the catalog window); a query collapses every row it does not match and the plate
+reports `0` shown; clearing the field restores every row; filtering deletes none; a heading is not
+counted or filtered as a row. `chrome-test` is 107 checks, 0 failures.
+
+**Unchanged, re-measured.** The crown is still the pinned profile: no row changed size (rows remain
+22 px, `band=7`), so `pins/contour-pin.json`'s measured rows and crowns still describe this build.
+Start stays 93 px, the 48 px bar, the `.WindowsButton` and build-hash cells, the cell sizes
+85x36 / 82x36 / 188x36 / 218x36 and `docs/family-look.json`'s surface list are untouched, and no
+window file gained a contour number.
+
+**Built and gated, not installed.** `install.ps1 -BuildOnly` compiled 27 Panorama resources and
+packed `dist/openlock_ui/pak01_dir.vpk`, **2,794,796 bytes**, sha256
+`fe46d967842e46b7384b232077d4620d4e03fd63dc4b4a444d21f01734798435`, with its archive gate inline
+(9 checks, 0 failures). The install tree still carries `559d7b01…` because the owner is in the
+client: a game install refuses while a client runs from that tree, and `-Live` is only valid for the
+CSDK tools tree (`-Live is only valid for the CSDK10 tools tree; a game install is a packed
+archive`). **Open limit:** no in-game capture of the plate this pass for that reason; the next
+closed-client install is what puts it on screen, and the capture belongs to that pass.
+
+**Still different from the pinned application, named rather than hidden.**
+
+1. **The facts column.** The reference's right-hand column (Kind / Folder / Target for the chosen
+   row) is the start window's own selection inspector, not window chrome: every family window body
+   is built by its own builder, and wrapping those in a second column is a layout change to each
+   one. It is the next step, not silently dropped.
+2. **The two-line card.** The reference's card stacks the name over a brass meta line; our rows
+   carry one line of text, and `check_shell_clicks` requires the row's Label to keep that text
+   (`row.text = text`) because it is the row's own name. Splitting a row into name/detail/meta would
+   move that contract, so the card keeps one line inside the reference's box, ink and states.
+3. **The browser witness is refused, and was before this pass.** `browser-minimal-shell` reports
+   `title height 36 != 30` and `control WindowButton is 20x20, expected 26x22`; stashing this pass's
+   four files and regenerating the page reproduces the same refusal exactly, so the probe's expected
+   numbers predate the pinned 36 px plate. Recorded, not fitted to this pass.
+
+**Gates, all exit 0:** contour 11/0 · options 9/0 · options selftest 7/0 · archive on the built VPK
+9/0 · landing `--check` ok · chrome 107/0 · contour-test 74/0 · dashboard 61/0 · `check_shell_clicks`
+ok (7 reachable).
