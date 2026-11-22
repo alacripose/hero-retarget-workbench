@@ -1,0 +1,238 @@
+$ <home>\Downloads\Reduced_CSDK_13\game\bin\win64\resourcecompiler.exe -nop4 -f -game <home>\Downloads\Reduced_CSDK_13\game\citadel -i citadel_addons\shiv_tail\models\heroes_staging\shiv\shiv.vmdl
+
+Creating render device for graphics adapter 0 'NVIDIA GeForce RTX 2070 SUPER' [VendorId 0x10DE / DeviceId 0x1E84]: 32.0.16.1742
+- citadel_addons\shiv_tail\models\heroes_staging\shiv\shiv.vmdl
+RESOURCE COMPILE WARNING: Anim: ability_shiv_dash : "Activity Name" attribute should not be used when using AnimGraph, reset value to default if possible.
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_reliquary_gem.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary_gem.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_reliquary.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_legs.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_legs.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_legs_ult.vmat!
+resourcecompiler: Could not find variant material data for "body"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_skin.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_skin.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_skin_ult.vmat!
+resourcecompiler: Could not find variant material data for "body"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_body.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_body.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_body_ult.vmat!
+resourcecompiler: Could not find variant material data for "body"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_head.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_head.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_head_ult.vmat!
+resourcecompiler: Could not find variant material data for "body"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_mods.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_mods.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_gun.vmat!
+RESOURCE COMPILE WARNING: Mesh 'gun' referencing missing material 'models/heroes_staging/shiv/materials/shiv_gun.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_glasses.vmat!
+RESOURCE COMPILE WARNING: Mesh 'glasses' referencing missing material 'models/heroes_staging/shiv/materials/shiv_glasses.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_head.vmat!
+RESOURCE COMPILE WARNING: Mesh 'hair' referencing missing material 'models/heroes_staging/shiv/materials/shiv_head.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_head_ult.vmat!
+resourcecompiler: Could not find variant material data for "hair"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_hair.vmat!
+RESOURCE COMPILE WARNING: Mesh 'hair' referencing missing material 'models/heroes_staging/shiv/materials/shiv_hair.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_hair_ult.vmat!
+resourcecompiler: Could not find variant material data for "hair"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_jacket.vmat!
+RESOURCE COMPILE WARNING: Mesh 'jacket' referencing missing material 'models/heroes_staging/shiv/materials/shiv_jacket.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_jacket_ult.vmat!
+resourcecompiler: Could not find variant material data for "jacket"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_reliquary_gem.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary_gem.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_reliquary.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_legs.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_legs.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_legs_ult.vmat!
+resourcecompiler: Could not find variant material data for "body_lod1"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_skin.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_skin.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_skin_ult.vmat!
+resourcecompiler: Could not find variant material data for "body_lod1"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_body.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_body.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_body_ult.vmat!
+resourcecompiler: Could not find variant material data for "body_lod1"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_head.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_head.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_head_ult.vmat!
+resourcecompiler: Could not find variant material data for "body_lod1"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_mods.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_mods.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_gun.vmat!
+RESOURCE COMPILE WARNING: Mesh 'gun_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_gun.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_glasses.vmat!
+RESOURCE COMPILE WARNING: Mesh 'glasses_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_glasses.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_head.vmat!
+RESOURCE COMPILE WARNING: Mesh 'hair_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_head.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_head_ult.vmat!
+resourcecompiler: Could not find variant material data for "hair_lod1"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_hair.vmat!
+RESOURCE COMPILE WARNING: Mesh 'hair_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_hair.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_hair_ult.vmat!
+resourcecompiler: Could not find variant material data for "hair_lod1"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_jacket.vmat!
+RESOURCE COMPILE WARNING: Mesh 'jacket_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_jacket.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_jacket_ult.vmat!
+resourcecompiler: Could not find variant material data for "jacket_lod1"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_reliquary_gem.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary_gem.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_reliquary.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_legs.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_legs.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_legs_ult.vmat!
+resourcecompiler: Could not find variant material data for "body_lod2"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_skin.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_skin.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_skin_ult.vmat!
+resourcecompiler: Could not find variant material data for "body_lod2"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_body.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_body.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_body_ult.vmat!
+resourcecompiler: Could not find variant material data for "body_lod2"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_head.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_head.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_head_ult.vmat!
+resourcecompiler: Could not find variant material data for "body_lod2"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_mods.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_mods.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_gun.vmat!
+RESOURCE COMPILE WARNING: Mesh 'gun_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_gun.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_glasses.vmat!
+RESOURCE COMPILE WARNING: Mesh 'glasses_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_glasses.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_hair.vmat!
+RESOURCE COMPILE WARNING: Mesh 'hair_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_hair.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_hair_ult.vmat!
+resourcecompiler: Could not find variant material data for "hair_lod2"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_jacket.vmat!
+RESOURCE COMPILE WARNING: Mesh 'jacket_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_jacket.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/shiv/materials/shiv_jacket_ult.vmat!
+resourcecompiler: Could not find variant material data for "jacket_lod2"!
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/werewolf/materials/werewolf_lower.vmat!
+RESOURCE COMPILE WARNING: Mesh 'tail' referencing missing material 'models/heroes_wip/werewolf/materials/werewolf_lower.vmat'
+
+     0/   1 (elapsed  7.421):  <home>\Downloads\Reduced_CSDK_13\content\citadel_addons\shiv_tail\models\heroes_staging\shiv\shiv.vmdl
+Compile of 1 file(s) matching nonrecursive specification "<home>\Downloads\Reduced_CSDK_13\content\citadel_addons\shiv_tail\models\heroes_staging\shiv\shiv.vmdl" took 7.421 seconds
+
+---------------------------------------------------------------------
+ 37 Compile WARNINGS
+ These may represent problems, but will not cause the compile to fail.
+ Look for "RESOURCE COMPILE WARNING:" in the log above.
+---------------------------------------------------------------------
+  "Activity Name" attribute should not be used when using AnimGraph, reset value to default if possible.
+  Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary_gem.vmat'
+
+  Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary.vmat'
+
+  Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_legs.vmat'
+
+  Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_skin.vmat'
+
+  Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_body.vmat'
+
+  Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_head.vmat'
+
+  Mesh 'body' referencing missing material 'models/heroes_staging/shiv/materials/shiv_mods.vmat'
+
+  Mesh 'gun' referencing missing material 'models/heroes_staging/shiv/materials/shiv_gun.vmat'
+
+  Mesh 'glasses' referencing missing material 'models/heroes_staging/shiv/materials/shiv_glasses.vmat'
+
+  Mesh 'hair' referencing missing material 'models/heroes_staging/shiv/materials/shiv_head.vmat'
+
+  Mesh 'hair' referencing missing material 'models/heroes_staging/shiv/materials/shiv_hair.vmat'
+
+  Mesh 'jacket' referencing missing material 'models/heroes_staging/shiv/materials/shiv_jacket.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary_gem.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_legs.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_skin.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_body.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_head.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_mods.vmat'
+
+  Mesh 'gun_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_gun.vmat'
+
+  Mesh 'glasses_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_glasses.vmat'
+
+  Mesh 'hair_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_head.vmat'
+
+  Mesh 'hair_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_hair.vmat'
+
+  Mesh 'jacket_lod1' referencing missing material 'models/heroes_staging/shiv/materials/shiv_jacket.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary_gem.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_reliquary.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_legs.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_skin.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_body.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_head.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_mods.vmat'
+
+  Mesh 'gun_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_gun.vmat'
+
+  Mesh 'glasses_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_glasses.vmat'
+
+  Mesh 'hair_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_hair.vmat'
+
+  Mesh 'jacket_lod2' referencing missing material 'models/heroes_staging/shiv/materials/shiv_jacket.vmat'
+
+  Mesh 'tail' referencing missing material 'models/heroes_wip/werewolf/materials/werewolf_lower.vmat'
+
+
+-----------------------------------------------------------------
+ WARNING: 1 compiled, 0 failed, 0 skipped, 0m:09s
+-----------------------------------------------------------------

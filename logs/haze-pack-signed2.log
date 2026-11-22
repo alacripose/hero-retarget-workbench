@@ -1,0 +1,6 @@
+GATE ADMIT haze_tail: model 144 joints, skeleton 131, tail 9
+PROOF (no verdict) 3.13_3.13.3824.0_x64__qbz5n2kfra8p0\Lib\pathlib\_local.py", line 385, in relative_to
+    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+ValueError: 'artifacts\\proofs\\haze_tail_signed.proof.json' is not in the subpath of '<home>\\Documents\\deadlock-model-forge'
+
+refused proof-not-verified: the pak cannot be signed against the gated bytes; see <home>\Documents\deadlock-model-forge\artifacts\proofs\haze_tail_signed.proof.json

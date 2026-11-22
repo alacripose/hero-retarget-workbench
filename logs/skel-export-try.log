@@ -1,0 +1,31 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+RIG shiv_skel 140
+
+PulseSrcOps exporting DMF Skel Export
+ planning:0.0010
+ Post Bake:0.3583
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-tail-anim\probe-skel\DMF_Skel_Export.dmx
+    DMX Bones:0.0185
+    DMX Animation setup:0.0376
+Frames: 
+- Writing DMX...
+    DMX write:0.1188
+ _run_dmx_writer:0.1751
+ WARNING: Consider renaming "DMF Skel Export_temp_base": in Source 2, model names can contain only lower-case characters, digits, and/or underscores.
+0 Errors and 1 Warnings
+Warning: Consider renaming "DMF Skel Export_temp_base": in Source 2, model names can contain only lower-case characters, digits, and/or underscores.
+1 files exported in 0.5 seconds with 0 Errors and 1 Warnings
+Info: 1 files exported in 0.5 seconds with 0 Errors and 1 Warnings
+RESULT {'FINISHED'}
+FILES [WindowsPath('<home>/Documents/deadlock-model-forge/artifacts/shiv-tail-anim/probe-skel/DMF_Skel_Export.dmx')]
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

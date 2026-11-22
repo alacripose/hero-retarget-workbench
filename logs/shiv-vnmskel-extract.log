@@ -1,0 +1,10 @@
+--- Dumping decompiled files...
+Found "Deadlock" from "D:\SteamLibrary\steamapps\common\Deadlock\game\citadel\gameinfo.gi"
+Preloading vpk "D:\SteamLibrary\steamapps\common\Deadlock\game\citadel/addons\pak01_dir.vpk"
+Added folder "D:\SteamLibrary\steamapps\common\Deadlock\game\citadel/addons" to game search paths
+Added folder "D:\SteamLibrary\steamapps\common\Deadlock\game\citadel" to game search paths
+Preloading vpk "D:\SteamLibrary\steamapps\common\Deadlock\game\core\pak01_dir.vpk"
+Added folder "D:\SteamLibrary\steamapps\common\Deadlock\game\core" to game search paths
+--- Dump written to "<home>\Documents\deadlock-model-forge\artifacts\shiv-tail-anim\models\heroes_staging\shiv\shiv.vnmskel"
+--- Dump written to "<home>\Documents\deadlock-model-forge\artifacts\shiv-tail-anim\models\heroes_staging\shiv\dmx/mesh/shiv_skel.dmx"
+--- Wrote 2 files

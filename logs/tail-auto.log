@@ -1,0 +1,528 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_body.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "shiv_body"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 1.8 seconds
+Info: Imported 1 files in 1.8 seconds
+
+DMX IMPORTER: now working on shiv_glasses2.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing mesh "shiv_glasses2"
+- New material: shiv_glasses.vmat
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on shiv_gun1.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing mesh "shiv_gun1"
+- New material: shiv_gun.vmat
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on shiv_hair3.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing mesh "shiv_hair3"
+- New material: shiv_hair.vmat
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on shiv_jacket4.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing mesh "shiv_jacket4"
+- New material: shiv_jacket.vmat
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on aim_weapon_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in aim_weapon_idle.
+Importing DMX animation "aim_weapon_idle"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: aim_weapon_idle contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 31 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in aim_weapon_idle.
+Warning: aim_weapon_idle contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.4 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.4 seconds with 0 Errors and 2 Warnings
+PROBE target aim_weapon_idle: state=IMPORTED action='aim_weapon_idle'
+
+DMX IMPORTER: now working on cast_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in cast_start.
+Importing DMX animation "cast_start"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: cast_start contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 21 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in cast_start.
+Warning: cast_start contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.3 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.3 seconds with 0 Errors and 2 Warnings
+PROBE target cast_start: state=IMPORTED action='cast_start'
+
+DMX IMPORTER: now working on flinch_back.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in flinch_back.
+Importing DMX animation "flinch_back"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: flinch_back contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 16 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in flinch_back.
+Warning: flinch_back contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+PROBE target flinch_back: state=IMPORTED action='flinch_back'
+
+DMX IMPORTER: now working on in_air_loop_apex.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in in_air_loop_apex.
+Importing DMX animation "in_air_loop_apex"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: in_air_loop_apex contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 31 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in in_air_loop_apex.
+Warning: in_air_loop_apex contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.4 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.4 seconds with 0 Errors and 2 Warnings
+PROBE target in_air_loop_apex: state=IMPORTED action='in_air_loop_apex'
+
+DMX IMPORTER: now working on abrams_abrams_face_model1.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "abrams_abrams_face_model1"
+- New material: abrams_head.vmat
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on flinch_melee_left_add.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "flinch_melee_left_add"
+- Imported 16 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on familiar_wip_8inf_body8.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "familiar_wip_8inf_body8"
+- New material: familiar_body.vmat
+Imported 1 files in 1.5 seconds
+Info: Imported 1 files in 1.5 seconds
+
+DMX IMPORTER: now working on flinch_melee_left_add.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "flinch_melee_left_add"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on in_air_stun_intro.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "in_air_stun_intro"
+- Imported 40 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on inferno_hero_emote_idle_01.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "inferno_hero_emote_idle_01"
+- Imported 151 frames of animation
+Imported 1 files in 1.8 seconds
+Info: Imported 1 files in 1.8 seconds
+
+DMX IMPORTER: now working on run_to_stop_crouch.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "run_to_stop_crouch"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on ratking_minion_rat_pack_run_01.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "ratking_minion_rat_pack_run_01"
+- Imported 21 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on werewolf_werewolf_model.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "werewolf_werewolf_model"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 3.9 seconds
+Info: Imported 1 files in 3.9 seconds
+
+DMX IMPORTER: now working on abrams_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on archer_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on baba_pigeon_transform_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+
+DMX IMPORTER: now working on dragon_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+
+DMX IMPORTER: now working on familiar_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on fencer_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on grey_talon_owl_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+
+DMX IMPORTER: now working on inferno_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on nano_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on ratking_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on tengu_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+
+DMX IMPORTER: now working on crow_open_wing_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+
+DMX IMPORTER: now working on viper_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on werewolf_transform_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+
+DMX IMPORTER: now working on werewolf_werewolf_model.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "werewolf_werewolf_model"
+Imported 1 files in 4.1 seconds
+Info: Imported 1 files in 4.1 seconds
+
+DMX IMPORTER: now working on aim_weapon_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in aim_weapon_idle.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in aim_weapon_idle.
+Importing DMX animation "aim_weapon_idle"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: aim_weapon_idle contains 2 bones not present in DMF Tail tail. Check the console for a list.
+- Imported 61 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in aim_weapon_idle.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in aim_weapon_idle.
+Warning: aim_weapon_idle contains 2 bones not present in DMF Tail tail. Check the console for a list.
+Imported 1 files in 0.6 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.6 seconds with 0 Errors and 3 Warnings
+
+DMX IMPORTER: now working on cast_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in cast_start.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in cast_start.
+Importing DMX animation "cast_start"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: cast_start contains 2 bones not present in DMF Tail tail. Check the console for a list.
+- Imported 20 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in cast_start.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in cast_start.
+Warning: cast_start contains 2 bones not present in DMF Tail tail. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+
+DMX IMPORTER: now working on flinch_back.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in flinch_back.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in flinch_back.
+Importing DMX animation "flinch_back"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: flinch_back contains 2 bones not present in DMF Tail tail. Check the console for a list.
+- Imported 16 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in flinch_back.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in flinch_back.
+Warning: flinch_back contains 2 bones not present in DMF Tail tail. Check the console for a list.
+Imported 1 files in 0.3 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.3 seconds with 0 Errors and 3 Warnings
+
+DMX IMPORTER: now working on in_air_loop_apex.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in in_air_loop_apex.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in in_air_loop_apex.
+Importing DMX animation "in_air_loop_apex"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: in_air_loop_apex contains 2 bones not present in DMF Tail tail. Check the console for a list.
+- Imported 67 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in in_air_loop_apex.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in in_air_loop_apex.
+Warning: in_air_loop_apex contains 2 bones not present in DMF Tail tail. Check the console for a list.
+Imported 1 files in 0.7 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.7 seconds with 0 Errors and 3 Warnings
+{
+  "probe": "tail-auto",
+  "extraction": "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\datafiles\\hero_retarget_workbench\\artifacts\\extractions\\shiv",
+  "checks": {
+    "hero_imported": true,
+    "hero_name": "shiv_body",
+    "target_clips": [
+      "aim_weapon_idle",
+      "cast_start",
+      "flinch_back",
+      "in_air_loop_apex"
+    ],
+    "tail_source": "werewolf / tail",
+    "tail_source_path": "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\datafiles\\hero_retarget_workbench\\artifacts\\extractions\\werewolf\\models\\heroes_wip\\werewolf\\werewolf_werewolf_model.dmx",
+    "tail_source_bones": 7,
+    "imported_rows": [
+      [
+        "aim_weapon_idle",
+        "IMPORTED",
+        "aim_weapon_idle"
+      ],
+      [
+        "cast_start",
+        "IMPORTED",
+        "cast_start"
+      ],
+      [
+        "flinch_back",
+        "IMPORTED",
+        "flinch_back"
+      ],
+      [
+        "in_air_loop_apex",
+        "IMPORTED",
+        "in_air_loop_apex"
+      ]
+    ],
+    "queued": 4,
+    "auto_stopped": true,
+    "updated": 4,
+    "skipped": 0,
+    "failed": 0,
+    "note": "DMF Tail tail: added tail to 4 clips",
+    "hero_tail_bones": [
+      "tail_0",
+      "tail_1",
+      "tail_2",
+      "tail_3",
+      "tail_4",
+      "tail_5",
+      "tail_end"
+    ],
+    "clip_tail_bones": {
+      "aim_weapon_idle": [
+        "tail_0",
+        "tail_1",
+        "tail_2",
+        "tail_3",
+        "tail_4",
+        "tail_5",
+        "tail_end"
+      ],
+      "cast_start": [
+        "tail_0",
+        "tail_1",
+        "tail_2",
+        "tail_3",
+        "tail_4",
+        "tail_5",
+        "tail_end"
+      ],
+      "flinch_back": [
+        "tail_0",
+        "tail_1",
+        "tail_2",
+        "tail_3",
+        "tail_4",
+        "tail_5",
+        "tail_end"
+      ],
+      "in_air_loop_apex": [
+        "tail_0",
+        "tail_1",
+        "tail_2",
+        "tail_3",
+        "tail_4",
+        "tail_5",
+        "tail_end"
+      ]
+    },
+    "clip_motion": {
+      "aim_weapon_idle": {
+        "tail_0": false,
+        "tail_1": false,
+        "tail_2": false,
+        "tail_3": false,
+        "tail_4": false,
+        "tail_5": false,
+        "tail_end": false
+      },
+      "cast_start": {
+        "tail_0": false,
+        "tail_1": false,
+        "tail_2": false,
+        "tail_3": false,
+        "tail_4": false,
+        "tail_5": false,
+        "tail_end": false
+      },
+      "flinch_back": {
+        "tail_0": false,
+        "tail_1": false,
+        "tail_2": false,
+        "tail_3": false,
+        "tail_4": false,
+        "tail_5": false,
+        "tail_end": false
+      },
+      "in_air_loop_apex": {
+        "tail_0": true,
+        "tail_1": true,
+        "tail_2": true,
+        "tail_3": true,
+        "tail_4": true,
+        "tail_5": true,
+        "tail_end": false
+      }
+    },
+    "moving_clips": [
+      "in_air_loop_apex"
+    ]
+  },
+  "errors": [],
+  "disabled_installed": [],
+  "unshadowed": {
+    "path_entries": [
+      "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\scripts\\addons"
+    ],
+    "modules": []
+  },
+  "ok": true
+}
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

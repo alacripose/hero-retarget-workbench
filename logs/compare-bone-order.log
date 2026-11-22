@@ -1,0 +1,21 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+STOCK COUNT 140 FIRST ['root_motion', 'pelvis', 'spine_0', 'spine_1', 'spine_2', 'spine_3', 'neck_0', 'head', 'hair_0', 'hair_1', 'hair_2', 'hair_3'] TAIL ['reliquary_0', 'reliquary_1', 'arm_L_IKTARGET', 'weaponHand_L', 'arm_R_IKTARGET', 'weaponHand_R', 'leg_L_OFFSET', 'leg_L_IKTARGET', 'leg_R_OFFSET', 'leg_R_IKTARGET']
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+TAIL147 COUNT 147 FIRST ['root_motion', 'pelvis', 'spine_0', 'spine_1', 'spine_2', 'spine_3', 'neck_0', 'head', 'hair_0', 'hair_1', 'hair_2', 'hair_3'] TAIL ['tail_5', 'tail_end', 'arm_L_IKTARGET', 'weaponHand_L', 'arm_R_IKTARGET', 'weaponHand_R', 'leg_L_OFFSET', 'leg_L_IKTARGET', 'leg_R_OFFSET', 'leg_R_IKTARGET']
+FIRST_DIFF 132 arm_L_IKTARGET tail_0
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+
+Blender quit

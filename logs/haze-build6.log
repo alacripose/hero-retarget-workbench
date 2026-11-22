@@ -1,0 +1,1572 @@
+00:00.094  reports          | WARNING File written by newer Blender binary (504.6), expect loss of data!
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -824.605524
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=editor error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 1.19 ms!
+DMF surface=editor error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on haze_body.dmx
+- Loading DMX...
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "haze_body"
+- New material: haze_backpack.vmat
+- New material: hazev2_head.vmat
+- New material: hazev2.vmat
+- New material: hazev2_headsmoke.vmat
+Imported 1 files in 2.3 seconds
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Info: Imported 1 files in 2.3 seconds
+
+DMX IMPORTER: now working on haze_haze_gun_l1.dmx
+- Loading DMX...
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing mesh "haze_haze_gun_l1"
+- New material: haze_v2_gun.vmat
+Imported 1 files in 0.5 seconds
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on haze_haze_gun_r2.dmx
+- Loading DMX...
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing mesh "haze_haze_gun_r2"
+Imported 1 files in 0.6 seconds
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on haze_holster_both_guns.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Importing DMX animation "haze_holster_both_guns"
+- Imported 28 frames of animation
+Imported 1 files in 0.2 seconds
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on haze_hull.dmx
+- Loading DMX...
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\datamodel.py", line 338, in __getitem__
+    return super().__getitem__(item)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^
+KeyError: 'normal$0'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\imports\importer.py", line 120, in execute
+    count = self.read_file(filepath)
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\imports\importer.py", line 784, in read_file
+    return self.readDMX(filepath, self.properties.upAxis, self.properties.rotMode)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\imports\importer.py", line 373, in readDMX
+    ifile = _dmx.read_file(parsed)
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\imports\dmx.py", line 516, in read_file
+    out.meshes = read_meshes(parsed)
+                 ~~~~~~~~~~~^^^^^^^^
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\imports\dmx.py", line 315, in read_meshes
+    walk(parsed.DmeModel)
+    ~~~~^^^^^^^^^^^^^^^^^
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\imports\dmx.py", line 311, in walk
+    walk(subelem, matrix, last_bone)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\imports\dmx.py", line 311, in walk
+    walk(subelem, matrix, last_bone)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\imports\dmx.py", line 313, in walk
+    meshes.append(_read_mesh(parsed, elem, matrix, last_bone))
+                  ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\imports\dmx.py", line 339, in _read_mesh
+    values=DmeVertexData[keywords['norm']],
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\datamodel.py", line 340, in __getitem__
+    raise AttributeError("No attribute \"{}\" on {}".format(item,self)) from e
+bl_ext.user_default.pulse_src_ops.datamodel.AttributeError: 'Invalid DMX file: No attribute "normal$0" on <Datamodel element "bind" (DmeVertexData)>'
+00:08.891  bpy.rna          | ERROR Python script error in IMPORT_SCENE_OT_kst_dmx.execute
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error: Python: Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\datamodel.py", line 338, in __getitem__
+    return super().__getitem__(item)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^
+KeyError: 'normal$0'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\imports\importer.py", line 120, in execute
+    count = self.read_file(filepath)
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_src_ops\imports\importer.py", line 784, in read_file
+    return self.readDMX(filepath, self.properties.upAxis, self.properties.rotMode)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\pulse_sr... truncated
+DMX IMPORTER: now working on haze_unholster_both_guns.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Importing DMX animation "haze_unholster_both_guns"
+- Imported 10 frames of animation
+Imported 1 files in 0.1 seconds
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on haze_unholster_right_gun_from_item.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Importing DMX animation "haze_unholster_right_gun_from_item"
+- Imported 18 frames of animation
+Imported 1 files in 0.2 seconds
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on item_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_stand_idle.
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Importing DMX animation "item_stand_idle"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: item_stand_idle contains 2 bones not present in haze_body. Check the console for a list.
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+- Imported 20 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_stand_idle.
+Warning: item_stand_idle contains 2 bones not present in haze_body. Check the console for a list.
+Imported 1 files in 0.3 seconds with 0 Errors and 2 Warnings
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Info: Imported 1 files in 0.3 seconds with 0 Errors and 2 Warnings
+PORT import item_stand_idle: IMPORTED 'item_stand_idle'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+
+DMX IMPORTER: now working on tengu_skel.dmx
+- Loading DMX...
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on item_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Importing DMX animation "item_stand_idle"
+- Imported 61 frames of animation
+Imported 1 files in 0.4 seconds
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting haze_body
+ planning:0.0005
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+ Post Bake:0.4077
+- <home>\Documents\deadlock-model-forge\artifacts\haze-tail\build\item_stand_idle.dmx
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+    DMX Bones:0.0344
+    DMX Animation setup:0.0398
+Frames: ...................
+- Writing DMX...
+    DMX write:0.2458
+ _run_dmx_writer:0.3204
+1 files exported in 0.7 seconds
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Info: 1 files exported in 0.7 seconds
+
+PulseSrcOps exporting DMF Skeleton Export
+ planning:0.0016
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+ Post Bake:1.9725
+- <home>\Documents\deadlock-model-forge\artifacts\haze-tail\build\models\heroes_staging\haze\dmx\mesh\DMF_Skeleton_Export.dmx
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+    DMX Bones:0.0215
+    DMX object setup:0.2567
+    DMX verts:0.1600
+    DMX loops:1.7749
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+    DMX Source 2 vertex data:1.6274
+    DMX insert:0.0735
+Polygons: ...................................................
+    DMX polys:1.2200
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Shapes:     DMX object setup:0.1012
+    DMX verts:0.0254
+    DMX loops:0.3970
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+    DMX Source 2 vertex data:0.5340
+    DMX insert:0.0156
+Polygons: ...................................................
+    DMX polys:0.2813
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Shapes:     DMX object setup:0.0501
+    DMX verts:0.0291
+    DMX loops:0.3852
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+    DMX Source 2 vertex data:0.5644
+    DMX insert:0.0128
+Polygons: ...................................................
+    DMX polys:0.2897
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Shapes: - Writing DMX...
+    DMX write:0.4699
+ _run_dmx_writer:8.2899
+ WARNING: Consider renaming "DMF Skeleton Export_temp_base": in Source 2, model names can contain only lower-case characters, digits, and/or underscores.
+0 Errors and 1 Warnings
+Warning: Consider renaming "DMF Skeleton Export_temp_base": in Source 2, model names can contain only lower-case characters, digits, and/or underscores.
+1 files exported in 10.3 seconds with 0 Errors and 1 Warnings
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Error in bpy.app.handlers.depsgraph_update_post[0]:
+Traceback (most recent call last):
+  File "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions\user_default\cgmatter_nodes\__init__.py", line 288, in depsgraph_update_post_handler_E4628
+    handler_6E7E2.append(bpy.types.SpaceNodeEditor.draw_handler_add(sna_drawnodecount_40889, (), 'WINDOW', 'POST_PIXEL'))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'SpaceNodeEditor' has no attribute 'draw_handler_add'
+Info: 1 files exported in 10.3 seconds with 0 Errors and 1 Warnings
+{
+  "probe": "tail-port",
+  "extraction": "<home>\\Documents\\deadlock-model-forge\\artifacts\\ports\\haze_tac9\\new-live",
+  "tail_source_query": "tengu",
+  "checks": {
+    "hero": "haze_body",
+    "body": "<home>\\Documents\\deadlock-model-forge\\artifacts\\ports\\haze_tac9\\new-live\\models\\heroes_staging\\haze\\haze_body.dmx",
+    "bones": 120,
+    "imported": [
+      "item_stand_idle"
+    ],
+    "tail_source": "tengu tengu_v2 / tail",
+    "tail_source_path": "artifacts\\tail-src-tengu\\models\\heroes_staging\\tengu\\tengu_v2\\dmx\\mesh\\tengu_skel.dmx",
+    "tail_source_bones": 8,
+    "updated": 1,
+    "skipped": 0,
+    "failed": 0,
+    "tail_note": "DMF Tail tail: added tail to 1 clips",
+    "hero_bones_after": 128,
+    "hero_tail_bones": [
+      "tail_0",
+      "tail_1",
+      "tail_2",
+      "tail_3",
+      "tail_4",
+      "tail_5",
+      "tail_6",
+      "tail_7"
+    ],
+    "written": [
+      {
+        "clip": "item_stand_idle",
+        "bytes": 216758
+      }
+    ],
+    "tail_motion": {
+      "item_stand_idle": {
+        "bones": 8,
+        "moves": true,
+        "frames": [
+          0,
+          19
+        ]
+      }
+    },
+    "moving": [
+      "item_stand_idle"
+    ],
+    "compile_docs": [
+      "item_stand_idle"
+    ],
+    "hero_root": "<home>\\Documents\\deadlock-model-forge\\artifacts\\ports\\haze_tac9\\new-live\\models\\heroes_staging\\haze",
+    "skeleton": "artifacts\\haze-tail\\build\\models\\heroes_staging\\haze\\dmx\\mesh\\haze_tailbones.dmx"
+  },
+  "errors": [
+    "item_stand_idle: action missing",
+    "compile: FileNotFoundError: [Errno 2] No such file or directory: 'artifacts\\\\haze-tail\\\\build\\\\models\\\\heroes_staging\\\\haze\\\\clips\\\\item_stand_idle.dmx'"
+  ],
+  "disabled_installed": [
+    "hero_retarget_workbench"
+  ],
+  "unshadowed": {
+    "path_entries": [
+      "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\scripts\\addons\\hero_retarget_workbench",
+      "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\scripts\\addons"
+    ],
+    "modules": [
+      "forge",
+      "forge.clips",
+      "forge.tails",
+      "forge.hashes",
+      "forge.proof",
+      "forge.weights",
+      "forge.cloth",
+      "forge.rigmap",
+      "forge.ik",
+      "forge.paths",
+      "forge.live",
+      "forge.naming",
+      "forge.bonerules",
+      "forge.posematch",
+      "forge.tailimage",
+      "forge.stageflow",
+      "forge.uilist"
+    ]
+  },
+  "ok": false
+}
+{
+  "hero": "haze_body",
+  "body": "<home>\\Documents\\deadlock-model-forge\\artifacts\\ports\\haze_tac9\\new-live\\models\\heroes_staging\\haze\\haze_body.dmx",
+  "bones": 120,
+  "imported": [
+    "item_stand_idle"
+  ],
+  "tail_source": "tengu tengu_v2 / tail",
+  "tail_source_path": "artifacts\\tail-src-tengu\\models\\heroes_staging\\tengu\\tengu_v2\\dmx\\mesh\\tengu_skel.dmx",
+  "tail_source_bones": 8,
+  "updated": 1,
+  "skipped": 0,
+  "failed": 0,
+  "tail_note": "DMF Tail tail: added tail to 1 clips",
+  "hero_bones_after": 128,
+  "hero_tail_bones": [
+    "tail_0",
+    "tail_1",
+    "tail_2",
+    "tail_3",
+    "tail_4",
+    "tail_5",
+    "tail_6",
+    "tail_7"
+  ],
+  "written": [
+    {
+      "clip": "item_stand_idle",
+      "bytes": 216758
+    }
+  ],
+  "tail_motion": {
+    "item_stand_idle": {
+      "bones": 8,
+      "moves": true,
+      "frames": [
+        0,
+        19
+      ]
+    }
+  },
+  "moving": [
+    "item_stand_idle"
+  ],
+  "compile_docs": [
+    "item_stand_idle"
+  ],
+  "hero_root": "<home>\\Documents\\deadlock-model-forge\\artifacts\\ports\\haze_tac9\\new-live\\models\\heroes_staging\\haze",
+  "skeleton": "artifacts\\haze-tail\\build\\models\\heroes_staging\\haze\\dmx\\mesh\\haze_tailbones.dmx"
+}
+[Blender Buddy] unregister: Server not running.
+INFO: Ucupaint 2.4.9 is unregistered!
+[36m[FNPORTING] [0mShutdown Server

@@ -1,0 +1,23 @@
+Creating render device for graphics adapter 0 'NVIDIA GeForce RTX 2070 SUPER' [VendorId 0x10DE / DeviceId 0x1E84]: 32.0.16.1742
+- citadel_addons\haze_tail\models\heroes_staging\haze\clips\item_stand_idle.vnmclip
+CDmSerializerBinary: Attribute 'times' of element 'vector3 log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'quaternion log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'vector3 log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'quaternion log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'vector3 log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'quaternion log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'vector3 log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'quaternion log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'vector3 log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'quaternion log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'vector3 log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'quaternion log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'vector3 log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'quaternion log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'vector3 log' read as 'float_array' but expected 'time_array'
+CDmSerializerBinary: Attribute 'times' of element 'quaternion log' read as 'float_array' but expected 'time_array'
+- citadel_addons\haze_tail\models\heroes_staging\haze\haze.vnmskel
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:01s
+-----------------------------------------------------------------

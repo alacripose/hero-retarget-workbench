@@ -1,0 +1,147 @@
+:root {
+  --ground: #101216;
+  --surface: #171a20;
+  --raised: #1f232b;
+  --line: #2a2f39;
+  --ink: #e8e6e1;
+  --muted: #9aa0aa;
+  --whole: #7ee0a3;
+  --annotated: #e6c86e;
+  --lossy: #e08a5a;
+  --shorthand: #e0533f;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--ground);
+  color: var(--ink);
+  font: 14px/1.5 "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+h1 { font-size: 16px; margin: 0; letter-spacing: 0.02em; }
+header p { margin: 0; color: var(--muted); font-size: 12px; }
+.status { margin-left: auto; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+main {
+  display: grid;
+  grid-template-columns: 340px 1fr 360px;
+  min-height: 0;
+}
+
+.panel {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  overflow: auto;
+  background: var(--surface);
+}
+
+.input { border-right: 1px solid var(--line); }
+.detail { border-left: 1px solid var(--line); }
+
+label, h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0; }
+
+textarea {
+  flex: 1;
+  min-height: 220px;
+  resize: vertical;
+  background: var(--ground);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  font: 12px/1.6 "IBM Plex Mono", "Cascadia Mono", monospace;
+}
+
+.repair textarea { min-height: 140px; }
+
+/* The comment box sits under the pasted prose and stays a fixed height, so the prose keeps
+   the space it needs while the comment is always reachable. */
+textarea.comment {
+  flex: 0 0 auto;
+  min-height: 86px;
+  font: 13px/1.5 "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+button {
+  background: var(--raised);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+button:hover { border-color: #3b4250; }
+button.ghost { background: transparent; }
+
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.ladder { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip, .dot { border-radius: 999px; }
+.chip { font-size: 11px; padding: 3px 9px; color: #101216; }
+.chip.whole, .dot.whole { background: var(--whole); }
+.chip.annotated, .dot.annotated { background: var(--annotated); }
+.chip.lossy, .dot.lossy { background: var(--lossy); }
+.chip.shorthand, .dot.shorthand { background: var(--shorthand); }
+
+.hint, .muted { color: var(--muted); font-size: 12px; margin: 0; }
+.small { font-size: 11px; }
+
+.viewport { position: relative; min-width: 0; }
+#scene { position: absolute; inset: 0; }
+
+.overlay {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+.legend { display: flex; gap: 14px; font-size: 11px; color: var(--muted); }
+.legend span { display: flex; align-items: center; gap: 6px; }
+.dot { width: 9px; height: 9px; display: inline-block; }
+.tip { margin: 0; font-size: 11px; color: var(--muted); }
+
+.detail-body { display: flex; flex-direction: column; gap: 8px; }
+.line-text {
+  background: var(--ground);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  font: 12px/1.6 "IBM Plex Mono", "Cascadia Mono", monospace;
+  white-space: pre-wrap;
+}
+
+.gaps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.gaps li { border-left: 3px solid var(--lossy); padding: 4px 0 4px 8px; font-size: 12px; }
+.gaps code { color: var(--annotated); }
+
+.notes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.notes li {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--raised);
+  font-size: 12px;
+}
+.notes li.question { border-color: #4a3f6b; }
+.notes li.comment { border-color: #2f4f3f; }
+.notes li time { color: var(--muted); font-size: 10px; display: block; margin-top: 4px; }

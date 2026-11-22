@@ -1,0 +1,20 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+Importing DMX animation "weapon_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.2 seconds
+Info: Imported 1 files in 1.2 seconds
+CLIP artifacts/probes/clip-decompile/weapon_stand_idle.dmx BONES 168 RANGE (0.0, 120.0)
+ROOT pose.bones["root_motion"].location 0 [0.0, 0.0, 0.0] [0.0, 0.0]
+ROOT pose.bones["root_motion"].location 1 [0.0, 0.0, 0.0] [0.0, 0.0]
+ROOT pose.bones["root_motion"].location 2 [0.0, 0.0, 0.0] [0.0, 0.0]
+ROOT pose.bones["root_motion"].rotation_euler 0 [1.5708, 1.5708, 1.5708] [1.5708, 1.5708]
+ROOT pose.bones["root_motion"].rotation_euler 1 [-0.0, -0.0, -0.0] [-0.0, -0.0]
+ROOT pose.bones["root_motion"].rotation_euler 2 [1.5708, 1.5708, 1.5708] [1.5708, 1.5708]
+TAIL ['tail_0', 'tail_1', 'tail_2', 'tail_3', 'tail_4', 'tail_5', 'tail_end']
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

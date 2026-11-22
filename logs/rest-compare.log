@@ -1,0 +1,35 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_body_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 2.7 seconds
+Info: Imported 1 files in 2.7 seconds
+
+DMX IMPORTER: now working on shiv_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+BODY 168 SKEL 140
+DIFFS [('hair_0', 0.0018, (4.265, 1.465, 98.026), (4.265, 1.465, 98.024)), ('hair_1', 0.0031, (6.628, 2.289, 98.287), (6.628, 2.289, 98.284)), ('hair_2', 0.0046, (8.866, 2.438, 97.138), (8.866, 2.438, 97.134)), ('hair_3', 0.0064, (10.379, 1.811, 94.75), (10.378, 1.811, 94.744)), ('arm_lower_L', 0.0013, (0.36, 15.787, 65.566), (0.36, 15.787, 65.565)), ('hand_L', 0.002, (7.876, 21.359, 58.0), (7.876, 21.358, 57.998)), ('finger_thumb_0_L', 0.0029, (10.921, 20.574, 57.132), (10.921, 20.573, 57.13)), ('finger_thumb_1_L', 0.0039, (11.846, 20.475, 55.419), (11.845, 20.474, 55.416)), ('finger_thumb_2_L', 0.0051, (12.488, 20.696, 53.643), (12.487, 20.694, 53.638)), ('finger_index_meta_L', 0.0029, (10.201, 21.629, 57.698), (10.201, 21.628, 57.695)), ('finger_index_0_L', 0.004, (12.24, 23.095, 54.727), (12.24, 23.093, 54.723)), ('finger_index_1_L', 0.0051, (13.075, 23.361, 52.042), (13.074, 23.359, 52.038)), ('finger_index_2_L', 0.0065, (12.998, 22.412, 50.878), (12.997, 22.409, 50.872)), ('finger_middle_meta_L', 0.0029, (9.206, 22.004, 57.645), (9.205, 22.003, 57.642)), ('finger_middle_0_L', 0.0039, (10.922, 23.703, 54.401), (10.922, 23.702, 54.398)), ('finger_middle_1_L', 0.0051, (11.622, 24.174, 51.305), (11.621, 24.172, 51.3)), ('finger_middle_2_L', 0.0064, (11.376, 22.98, 50.219), (11.375, 22.977, 50.214)), ('finger_ring_meta_L', 0.0029, (8.186, 22.361, 57.32), (8.186, 22.36, 57.317)), ('finger_ring_0_L', 0.0039, (9.586, 24.171, 53.976), (9.586, 24.169, 53.972)), ('finger_ring_1_L', 0.005, (10.008, 24.576, 51.563), (10.008, 24.574, 51.559))] count 67
+
+DMX IMPORTER: now working on shiv_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

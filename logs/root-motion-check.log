@@ -1,0 +1,27 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.5 seconds
+Info: Imported 1 files in 1.5 seconds
+FILE weapon_stand_idle.dmx ACTIONS [('shiv_body', 1512)]
+ ROOT 9 [('pose.bones["root_motion"].location', 0, 121), ('pose.bones["root_motion"].location', 1, 121), ('pose.bones["root_motion"].location', 2, 121), ('pose.bones["root_motion"].rotation_euler', 0, 121), ('pose.bones["root_motion"].rotation_euler', 1, 121), ('pose.bones["root_motion"].rotation_euler', 2, 121)]
+  KEYS [(0.0, 0.0), (1.0, 0.0), (2.0, 0.0), (3.0, 0.0), (4.0, 0.0)]
+  KEYS [(0.0, 0.0), (1.0, 0.0), (2.0, 0.0), (3.0, 0.0), (4.0, 0.0)]
+  KEYS [(0.0, 0.0), (1.0, 0.0), (2.0, 0.0), (3.0, 0.0), (4.0, 0.0)]
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+FILE item_run_center.dmx ACTIONS []
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

@@ -1,0 +1,81 @@
+Creating render device for graphics adapter 0 'NVIDIA GeForce RTX 2070 SUPER' [VendorId 0x10DE / DeviceId 0x1E84]: 32.0.16.1742
+ExecutablePath: <home>\Downloads\Reduced_CSDK_13\game\bin\win64
+ModGameSubdir: citadel
+Search Paths:
+---------------
+Path ID:             File Path:
+ADDONS               "<home>\Downloads\Reduced_CSDK_13\game\citadel_addons\" 
+CONTENT              "<home>\Downloads\Reduced_CSDK_13\content\citadel_addons\shiv_tail_anim\" 
+CONTENT              "<home>\Downloads\Reduced_CSDK_13\content\citadel\" 
+CONTENT              "<home>\Downloads\Reduced_CSDK_13\content\core\" 
+CONTENTADDONS        "<home>\Downloads\Reduced_CSDK_13\content\citadel_addons\" 
+CONTENTROOT          "<home>\Downloads\Reduced_CSDK_13\content\" 
+DEFAULT_WRITE_PATH   "<home>\Downloads\Reduced_CSDK_13\game\citadel_addons\shiv_tail_anim\" 
+DEFAULT_WRITE_PATH   "<home>\Downloads\Reduced_CSDK_13\game\citadel\" 
+EXECUTABLE_PATH      "<home>\Downloads\Reduced_CSDK_13\game\bin\win64\" 
+EXECUTABLE_PATH      "<home>\Downloads\Reduced_CSDK_13\game\bin\" 
+GAME                 "<home>\Downloads\Reduced_CSDK_13\game\citadel_addons\shiv_tail_anim\" 
+GAME                 "<home>\Downloads\Reduced_CSDK_13\game\citadel\" 
+GAME                 "<home>\Downloads\Reduced_CSDK_13\game\core\" 
+GAMEBIN              "<home>\Downloads\Reduced_CSDK_13\game\citadel\bin\win64\" 
+GAMEBIN              "<home>\Downloads\Reduced_CSDK_13\game\citadel\bin\" 
+GAMEBIN              "<home>\Downloads\Reduced_CSDK_13\game\core\bin\win64\" 
+GAMEBIN              "<home>\Downloads\Reduced_CSDK_13\game\core\bin\" 
+GAMEROOT             "<home>\Downloads\Reduced_CSDK_13\game\" 
+LOCAL                "" 
+MOD                  "<home>\Downloads\Reduced_CSDK_13\game\citadel\" 
+MOD                  "<home>\Downloads\Reduced_CSDK_13\game\core\" 
+OFFICIAL_ADDONS      "<home>\Downloads\Reduced_CSDK_13\game\citadel_community_addons\" 
+PLATFORM             "<home>\Downloads\Reduced_CSDK_13\game\core\" 
+SHADER_SOURCE        "<home>\Downloads\Reduced_CSDK_13\src\shaders\citadel\" 
+SHADER_SOURCE        "<home>\Downloads\Reduced_CSDK_13\src\shaders\core\" 
+SHADER_SOURCE        "<home>\Downloads\Reduced_CSDK_13\src\shaders\citadel_community_addons\" 
+SHADER_SOURCE_MOD    "<home>\Downloads\Reduced_CSDK_13\src\shaders\citadel\" 
+SHADER_SOURCE_ROOT   "<home>\Downloads\Reduced_CSDK_13\src\shaders\" 
+---------------
+Found 1 file(s) matching nonrecursive specification "<home>/Downloads/Reduced_CSDK_13/content/citadel_addons/shiv_tail_anim/models/heroes_staging/shiv/clips/weapon_stand_idle.vnmclip"
+Split target filename "<home>\Downloads\Reduced_CSDK_13\content\citadel_addons\shiv_tail_anim\models\heroes_staging\shiv\clips\weapon_stand_idle.vnmclip" into:
+  ContentRoot = "<home>/Downloads/Reduced_CSDK_13/content/"
+  ModName = "citadel_addons/shiv_tail_anim"
+  RelativePath = "models/heroes_staging/shiv/clips/weapon_stand_idle.vnmclip"
+<home>\Downloads\Reduced_CSDK_13\content\citadel_addons\shiv_tail_anim\models\heroes_staging\shiv\clips\weapon_stand_idle.vnmclip:
+Split target filename "<home>/downloads/reduced_csdk_13/content/citadel_addons/shiv_tail_anim/models/heroes_staging/shiv/shiv.vnmskel" into:
+  ContentRoot = "<home>/Downloads/Reduced_CSDK_13/content/"
+  ModName = "citadel_addons/shiv_tail_anim"
+  RelativePath = "models/heroes_staging/shiv/shiv.vnmskel"
+<home>/downloads/reduced_csdk_13/content/citadel_addons/shiv_tail_anim/models/heroes_staging/shiv/shiv.vnmskel:
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Next resource weak-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Wrote to: <home>\downloads\reduced_csdk_13\game\citadel_addons\shiv_tail_anim\models\heroes_staging\shiv\shiv.vnmskel_c
+
+Missing Bones in animation, using reference pose instead: 'weaponHand_L' 'weaponHand_R' 
+ - Next resource strong-references: models/heroes_staging/shiv/shiv.vnmskel)
+ - Wrote to: <home>\downloads\reduced_csdk_13\game\citadel_addons\shiv_tail_anim\models\heroes_staging\shiv\clips\weapon_stand_idle.vnmclip_c
+
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:01s
+-----------------------------------------------------------------

@@ -1,0 +1,7 @@
+artifacts/haze-tail/merged2/ability_bullet_flurry.dmx count 353 unique 106
+  first ['root_motion', 'leg_L_OFFSET', 'leg_L_IKTARGET', 'leg_R_OFFSET', 'leg_R_IKTARGET'] tail ['tail_0', 'tail_1', 'tail_2', 'tail_3', 'tail_4', 'tail_5', 'tail_6', 'tail_7', 'tail_7']
+artifacts/haze-tail/bodies/ability_bullet_flurry.dmx count 98 unique 98
+  first ['root_motion', 'leg_L_OFFSET', 'leg_L_IKTARGET', 'leg_R_OFFSET', 'leg_R_IKTARGET'] tail []
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)
+
+Blender quit

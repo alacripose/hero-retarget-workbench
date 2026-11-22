@@ -1,0 +1,186 @@
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -31646.834928
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 0.66 ms!
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Importing mesh "werewolf_werewolf_model.001"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 8.3 seconds
+00:14.672  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\rest.png'
+Info: Imported 1 files in 8.3 seconds
+POSE-RENDER rest -> <home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\rest.png (784332 b) bounds {'lo': [-32.38, -27.13, -0.04], 'hi': [22.5, 25.48, 102.1], 'ortho': 117.46}
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on primary_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_idle.
+Importing DMX animation "primary_idle"
+- Imported 121 frames of animation
+0 Errors and 1 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_idle.
+Imported 1 files in 1.0 seconds with 0 Errors and 1 Warnings
+00:25.031  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\idle-shipped.png'
+Info: Imported 1 files in 1.0 seconds with 0 Errors and 1 Warnings
+POSE-RENDER idle-shipped frame 40 -> <home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\idle-shipped.png bounds {'lo': [-29.53, -16.79, -20.03], 'hi': [17.24, 98.2, 96.31], 'ortho': 133.79}
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.7 seconds
+Info: Imported 1 files in 8.7 seconds
+
+DMX IMPORTER: now working on primary_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_idle.
+Importing DMX animation "primary_idle"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: primary_idle contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 121 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_idle.
+Warning: primary_idle contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.8 seconds with 0 Errors and 2 Warnings
+00:35.062  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\idle-game.png'
+Info: Imported 1 files in 0.8 seconds with 0 Errors and 2 Warnings
+POSE-RENDER idle-game frame 40 -> <home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\idle-game.png bounds {'lo': [-20.03, -29.53, -1.17], 'hi': [23.26, 17.24, 98.2], 'ortho': 114.28}
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.7 seconds
+Info: Imported 1 files in 8.7 seconds
+
+DMX IMPORTER: now working on slide_getup.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in slide_getup.
+Importing DMX animation "slide_getup"
+- Imported 13 frames of animation
+0 Errors and 1 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in slide_getup.
+Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
+00:44.422  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\tail-shipped.png'
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
+POSE-RENDER tail-shipped frame 8 -> <home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\tail-shipped.png bounds {'lo': [-12.68, -17.48, -51.89], 'hi': [79.06, 26.5, 96.31], 'ortho': 170.43}
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.0 seconds
+Info: Imported 1 files in 9.0 seconds
+
+DMX IMPORTER: now working on slide_getup.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in slide_getup.
+Importing DMX animation "slide_getup"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: slide_getup contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 13 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in slide_getup.
+Warning: slide_getup contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+00:54.109  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\tail-game.png'
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+POSE-RENDER tail-game frame 8 -> <home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\tail-game.png bounds {'lo': [-51.9, -16.79, -39.41], 'hi': [18.69, 79.07, 96.31], 'ortho': 156.08}
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.6 seconds
+Info: Imported 1 files in 8.6 seconds
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Importing DMX animation "item_run_center"
+- Imported 21 frames of animation
+0 Errors and 1 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Imported 1 files in 0.3 seconds with 0 Errors and 1 Warnings
+01:03.531  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\lift-shipped.png'
+Info: Imported 1 files in 0.3 seconds with 0 Errors and 1 Warnings
+POSE-RENDER lift-shipped frame 10 -> <home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\lift-shipped.png bounds {'lo': [-47.08, -16.79, -30.01], 'hi': [19.14, 91.81, 96.31], 'ortho': 145.27}
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.9 seconds
+Info: Imported 1 files in 8.9 seconds
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Importing DMX animation "item_run_center"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: item_run_center contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 21 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Warning: item_run_center contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+01:13.187  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\lift-game.png'
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+POSE-RENDER lift-game frame 10 -> <home>\Documents\deadlock-model-forge\artifacts\visual\shiv-compare\lift-game.png bounds {'lo': [-39.39, -47.07, -0.16], 'hi': [13.88, 19.14, 96.31], 'ortho': 110.94}
+POSE-RENDER done 7 images, 0 failed
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+[Blender Buddy] unregister: Server not running.
+INFO: Ucupaint 2.4.9 is unregistered!
+[36m[FNPORTING] [0mShutdown Server

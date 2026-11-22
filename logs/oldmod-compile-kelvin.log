@@ -1,0 +1,565 @@
+$ <home>\Downloads\Reduced_CSDK_13\game\bin\win64\resourcecompiler.exe -nop4 -f -game <home>\Downloads\Reduced_CSDK_13\game\citadel -i citadel_addons\kelvin_janitor_updated\models\heroes_staging\kelvin_v2\kelvin.vmdl
+
+Creating render device for graphics adapter 0 'NVIDIA GeForce RTX 2070 SUPER' [VendorId 0x10DE / DeviceId 0x1E84]: 32.0.16.1742
+- citadel_addons\kelvin_janitor_updated\models\heroes_staging\kelvin_v2\kelvin.vmdl
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod1 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: body_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+RESOURCE COMPILE WARNING: RenderMesh: gun_lod2 : Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_lower.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_lower.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_backpack.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_backpack.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_upper.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_upper.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_eye.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_eye.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_head.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_head.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin/materials/kelvin_gun.vmat!
+RESOURCE COMPILE WARNING: Mesh 'gun' referencing missing material 'models/heroes_staging/kelvin/materials/kelvin_gun.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_lower.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_lower.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_backpack.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_backpack.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_upper.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_upper.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_eye.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_eye.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_head.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_head.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin/materials/kelvin_gun.vmat!
+RESOURCE COMPILE WARNING: Mesh 'gun_lod1' referencing missing material 'models/heroes_staging/kelvin/materials/kelvin_gun.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_lower.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_lower.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_backpack.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_backpack.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_upper.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_upper.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_head.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_head.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/kelvin/materials/kelvin_gun.vmat!
+RESOURCE COMPILE WARNING: Mesh 'gun_lod2' referencing missing material 'models/heroes_staging/kelvin/materials/kelvin_gun.vmat'
+
+21 of 21 driving bones have too few influences and were switched to simplified single-polygon shape-fit mode: { dangly_a_1_L dangly_a_end_L canister_a_end_L canister_end_L dangly_b_1_R dangly_b_end_R canister_b_end_L pouch_end_r back_strap_a_end_L dangly_a_1_R dangly_a_end_R back_strap_a_end_R}
+0 matrices will shape-fit complex deformations: {}
+     0/   1 (elapsed  8.708):  <home>\Downloads\Reduced_CSDK_13\content\citadel_addons\kelvin_janitor_updated\models\heroes_staging\kelvin_v2\kelvin.vmdl
+Compile of 1 file(s) matching nonrecursive specification "<home>\Downloads\Reduced_CSDK_13\content\citadel_addons\kelvin_janitor_updated\models\heroes_staging\kelvin_v2\kelvin.vmdl" took 8.708 seconds
+
+---------------------------------------------------------------------
+ 248 Compile WARNINGS
+ These may represent problems, but will not cause the compile to fail.
+ Look for "RESOURCE COMPILE WARNING:" in the log above.
+---------------------------------------------------------------------
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Invalid skinning bone index :: -1, valid range [0, 0], Mesh Skinning Index :: 130
+  Mesh 'body' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_lower.vmat'
+
+  Mesh 'body' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_backpack.vmat'
+
+  Mesh 'body' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_upper.vmat'
+
+  Mesh 'body' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_eye.vmat'
+
+  Mesh 'body' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_head.vmat'
+
+  Mesh 'gun' referencing missing material 'models/heroes_staging/kelvin/materials/kelvin_gun.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_lower.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_backpack.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_upper.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_eye.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_head.vmat'
+
+  Mesh 'gun_lod1' referencing missing material 'models/heroes_staging/kelvin/materials/kelvin_gun.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_lower.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_backpack.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_upper.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/kelvin_explorer/materials/kelvin_explorer_head.vmat'
+
+  Mesh 'gun_lod2' referencing missing material 'models/heroes_staging/kelvin/materials/kelvin_gun.vmat'
+
+
+-----------------------------------------------------------------
+ WARNING: 1 compiled, 0 failed, 0 skipped, 0m:09s
+-----------------------------------------------------------------

@@ -1,0 +1,414 @@
+$ <home>\Downloads\Reduced_CSDK_13\game\bin\win64\resourcecompiler.exe -nop4 -f -game <home>\Downloads\Reduced_CSDK_13\game\citadel -i citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\doorman.vmdl
+
+Creating render device for graphics adapter 0 'NVIDIA GeForce RTX 2070 SUPER' [VendorId 0x10DE / DeviceId 0x1E84]: 32.0.16.1742
+- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\doorman.vmdl
+RESOURCE COMPILE WARNING: RenderMeshFile: doorman_lod1 : DMF_joined_export_002_lod1 (mesh 1/1): 6 joint weights per vertex, max 4
+RESOURCE COMPILE WARNING: RenderMeshFile: doorman_lod2 : DMF_joined_export_002_lod2 (mesh 1/1): 6 joint weights per vertex, max 4
+RESOURCE COMPILE WARNING: RenderMeshFile: doorman_lod3 : DMF_joined_export_002_lod3 (mesh 1/1): 8 joint weights per vertex, max 4
+- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\head.vmat
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\body_normal_1002_png_28ac136d.vtex
+       Read 2 Input(s): 318ms
+       Ran Texture Processors: 12ms
+       Generated Mips and Output: 124ms
+       Encoding 2048x2048x1 texture to BC7 (Q=3): 3118ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_color_tga_96b3aa03.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\body_base_color_1002_png_7067dbd4.vtex
+       Read 1 Input(s): 69ms
+       Generated Mips and Output: 36ms
+       Encoding 2048x2048x1 texture to BC7 (Q=3): 256ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\head_vmat_g_tnproutlinemask_73100e5a.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\body_base_color_1002_png_b4ef3019.vtex
+       Read 2 Input(s): 47ms
+       Generated Mips and Output: 42ms
+       Encoding 2048x2048x1 texture to BC7 (Q=3): 255ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\head_vmat_g_tambientocclusion_2105c0a6.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\head_vmat_g_ttintmaskrimlightmask_4ea53fc4.vtex
+       Read 2 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\lenses.vmat
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\lenses_vmat_g_tglass_2b2ebb3f.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\lenses_vmat_g_tnormalroughness_2984f4a9.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_color_tga_96b3aa03.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\lenses_vmat_g_tnprtransmissivecolor_ffc09775.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\lenses_vmat_g_tambientocclusion_2105c0a6.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\lenses_vmat_g_tcolor_e334b493.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\lenses_vmat_g_ttintmaskrimlightmask_4c581a98.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\lenses_vmat_g_tselfillummask_aa0db6d7.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\de_mods_2.vmat
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\deserteagle_chrome_skin_base_color_png_3f3d3fbc.vtex
+       Read 2 Input(s): 310ms
+       Ran Texture Processors: 35ms
+       Generated Mips and Output: 431ms
+       Encoding 4096x4096x1 texture to BC7 (Q=3): 7192ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_color_tga_96b3aa03.vtex
+       Read 2 Input(s): 3ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\deserteagle_chrome_skin_base_color_png_7d55be0c.vtex
+       Read 1 Input(s): 248ms
+       Generated Mips and Output: 118ms
+       Encoding 4096x4096x1 texture to BC7 (Q=3): 2765ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\deserteagle_chrome_skin_base_color_png_68e71380.vtex
+       Read 2 Input(s): 526ms
+       Generated Mips and Output: 220ms
+       Encoding 4096x4096x1 texture to BC7 (Q=3): 2891ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_ao_tga_559f1ac6.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_mask_tga_8d0774e6.vtex
+       Read 2 Input(s): 3ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\hair.vmat
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\hair_vmat_g_tnormalroughness_d52512a9.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_color_tga_96b3aa03.vtex
+       Read 2 Input(s): 3ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\hair_vmat_g_tnprtransmissivecolor_beaaf5c2.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\hair_vmat_g_tnproutlinemask_2b2ebb3f.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\hair_vmat_g_tcolor_43ad91b7.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\hair_vmat_g_tambientocclusion_2105c0a6.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\hair_vmat_g_ttintmaskrimlightmask_f739107d.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\body.vmat
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\body_normal_1001_png_95ac5056.vtex
+       Read 2 Input(s): 415ms
+       Ran Texture Processors: 37ms
+       Generated Mips and Output: 1115ms
+       Encoding 4096x4096x1 texture to BC7 (Q=3): 11150ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_color_tga_96b3aa03.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\body_base_color_1001_png_492c8d0a.vtex
+       Read 1 Input(s): 245ms
+       Generated Mips and Output: 115ms
+       Encoding 4096x4096x1 texture to BC7 (Q=3): 618ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\body_vmat_g_tnproutlinemask_2b2ebb3f.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\body_base_color_1001_png_659f4221.vtex
+       Read 2 Input(s): 243ms
+       Generated Mips and Output: 159ms
+       Encoding 4096x4096x1 texture to BC7 (Q=3): 719ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\body_vmat_g_tambientocclusion_2105c0a6.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\body_vmat_g_ttintmaskrimlightmask_4ea53fc4.vtex
+       Read 2 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_keyglow.vmat
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\abstract\abstract_self_illum_gradient_png_5323738c.vtex
+       Read 3 Input(s): 13ms
+       Generated Mips and Output: 19ms
+       Encoding 512x512x1 texture to BC7 (Q=3): 19ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_keyglow_vmat_g_tnormalroughness_53b47c48_png_8bc5ff2d.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_keyglow_vmat_g_taltcolor_reveal_a6fa566d.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_ao_tga_559f1ac6.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_metal_tga_9e174e3d.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat!
+RESOURCE COMPILE WARNING: Mesh 'reload_door' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_door.vmat!
+RESOURCE COMPILE WARNING: Mesh 'reload_door' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat!
+RESOURCE COMPILE WARNING: Mesh 'parry_door' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_door.vmat!
+RESOURCE COMPILE WARNING: Mesh 'parry_door' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_hair.vmat
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_hair_vmat_g_tnormalroughness_53b47c48_png_c8f282a3.vtex
+       Read 2 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_color_tga_756019c2.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_hair_vmat_g_tnprtransmissivecolor_c4eb8133.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_hair_vmat_g_tnproutlinemask_c409eeec.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_hair_vmat_g_tcolor_7d46cca1.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_ao_tga_559f1ac6.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_hair_vmat_g_ttintmaskrimlightmask_f739107d_png_72f13b92.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_head.vmat
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_head_vmat_g_tnormalroughness_53b47c48_png_7bf50deb.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_head_color_png_ae1afeb4.vtex
+       Read 2 Input(s): 119ms
+       Generated Mips and Output: 57ms
+       Encoding 2048x2048x1 texture to BC7 (Q=3): 688ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_head_vmat_g_tnprtransmissivecolor_8a309c13.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_head_vmat_g_tnproutlinemask_3bd6505a.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_head_color_png_aae29383.vtex
+       Read 2 Input(s): 120ms
+       Generated Mips and Output: 55ms
+       Encoding 2048x2048x1 texture to BC7 (Q=3): 633ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_head_ao_png_ca5aebeb.vtex
+       Read 1 Input(s): 68ms
+       Generated Mips and Output: 15ms
+       Encoding 2048x2048x1 texture to ATI1N (Q=3): 65ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\materials\default\default_mask_tga_2aa88af4.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\materials\doorman_head_emissive_png_99d32092.vtex
+       Read 1 Input(s): 64ms
+       Generated Mips and Output: 21ms
+       Encoding 2048x2048x1 texture to ATI1N (Q=3): 48ms
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat!
+RESOURCE COMPILE WARNING: Mesh 'reload_door_lod1' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_door.vmat!
+RESOURCE COMPILE WARNING: Mesh 'reload_door_lod1' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat!
+RESOURCE COMPILE WARNING: Mesh 'parry_door_lod1' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_door.vmat!
+RESOURCE COMPILE WARNING: Mesh 'parry_door_lod1' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+Mesh contains 6 blend weights per vertex;  truncating to 4
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat!
+RESOURCE COMPILE WARNING: Mesh 'reload_door_lod2' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_door.vmat!
+RESOURCE COMPILE WARNING: Mesh 'reload_door_lod2' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat!
+RESOURCE COMPILE WARNING: Mesh 'parry_door_lod2' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_door.vmat!
+RESOURCE COMPILE WARNING: Mesh 'parry_door_lod2' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+Mesh contains 8 blend weights per vertex;  truncating to 4
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat!
+RESOURCE COMPILE WARNING: Mesh 'reload_door_lod3' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_door.vmat!
+RESOURCE COMPILE WARNING: Mesh 'reload_door_lod3' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat!
+RESOURCE COMPILE WARNING: Mesh 'parry_door_lod3' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_wip/doorman/materials/doorman_door.vmat!
+RESOURCE COMPILE WARNING: Mesh 'parry_door_lod3' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+     0/   1 (elapsed 46.083):  <home>\Downloads\Reduced_CSDK_13\content\citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\doorman.vmdl
+Compile of 1 file(s) matching nonrecursive specification "<home>\Downloads\Reduced_CSDK_13\content\citadel_addons\dmf_build_thicc_mayu_v3_bzrzcjnx\models\heroes_wip\doorman_v2\doorman.vmdl" took 46.083 seconds
+
+---------------------------------------------------------------------
+ 19 Compile WARNINGS
+ These may represent problems, but will not cause the compile to fail.
+ Look for "RESOURCE COMPILE WARNING:" in the log above.
+---------------------------------------------------------------------
+  DMF_joined_export_002_lod1 (mesh 1/1): 6 joint weights per vertex, max 4
+  DMF_joined_export_002_lod2 (mesh 1/1): 6 joint weights per vertex, max 4
+  DMF_joined_export_002_lod3 (mesh 1/1): 8 joint weights per vertex, max 4
+  Mesh 'reload_door' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+  Mesh 'reload_door' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+  Mesh 'parry_door' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+  Mesh 'parry_door' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+  Mesh 'reload_door_lod1' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+  Mesh 'reload_door_lod1' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+  Mesh 'parry_door_lod1' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+  Mesh 'parry_door_lod1' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+  Mesh 'reload_door_lod2' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+  Mesh 'reload_door_lod2' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+  Mesh 'parry_door_lod2' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+  Mesh 'parry_door_lod2' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+  Mesh 'reload_door_lod3' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+  Mesh 'reload_door_lod3' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+  Mesh 'parry_door_lod3' referencing missing material 'models/heroes_wip/doorman/materials/doorman_gundoor_portal.vmat'
+
+  Mesh 'parry_door_lod3' referencing missing material 'models/heroes_wip/doorman/materials/doorman_door.vmat'
+
+
+-----------------------------------------------------------------
+ WARNING: 1 compiled, 0 failed, 0 skipped, 0m:46s
+-----------------------------------------------------------------

@@ -1,0 +1,81 @@
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -65687.531056
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 0.52 ms!
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_body.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "shiv_body"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 1.7 seconds
+Info: Imported 1 files in 1.7 seconds
+
+DMX IMPORTER: now working on shiv_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+ACTION weapon_stand_idle SRC 140 BODY 161 FCURVES 840
+0 pelvis src (58.747, 0.977, -2.04) body (0.0, 0.0, 61.52)
+0 head src (86.312, -0.507, -0.435) body (1.534, -0.0, 89.306)
+0 arm_upper_L src (79.287, 6.114, 7.294) body (-2.443, 9.977, 78.605)
+0 arm_lower_L src (67.37, 13.846, 10.437) body (0.36, 15.787, 65.565)
+0 hand_L src (78.251, 14.474, 5.339) body (7.876, 21.358, 57.998)
+0 arm_upper_R src (74.358, -10.325, -7.606) body (-1.668, -11.42, 77.323)
+0 leg_upper_L src (55.322, 4.992, 0.302) body (-0.363, 4.428, 57.833)
+30 pelvis src (58.599, 0.977, -1.53) body (0.0, 0.0, 61.52)
+30 head src (86.17, -0.579, 0.105) body (1.534, -0.0, 89.306)
+30 arm_upper_L src (79.127, 5.795, 8.023) body (-2.443, 9.977, 78.605)
+30 arm_lower_L src (67.1, 13.388, 11.083) body (0.36, 15.787, 65.565)
+30 hand_L src (78.134, 14.222, 6.355) body (7.876, 21.358, 57.998)
+30 arm_upper_R src (74.22, -10.094, -7.47) body (-1.668, -11.42, 77.323)
+30 leg_upper_L src (55.176, 4.955, 0.876) body (-0.363, 4.428, 57.833)
+Traceback (most recent call last):
+  File "C:\Program Files (x86)\Steam\steamapps\common\Blender\5.4\scripts\modules\addon_utils.py", line 601, in disable
+    mod.unregister()
+    ~~~~~~~~~~~~~~^^
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\scripts\addons\hero_retarget_workbench\__init__.py", line 197, in unregister
+    ui_space.unregister_operators()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\scripts\addons\hero_retarget_workbench\ui_space.py", line 388, in unregister_operators
+    bpy.utils.unregister_class(cls)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+RuntimeError: unregister_class(...):, missing bl_rna attribute from '_RNAMeta' instance (may not be registered)
+[Blender Buddy] unregister: Server not running.
+INFO: Ucupaint 2.4.9 is unregistered!
+Exception in module unregister(): '<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\scripts\\addons\\hero_retarget_workbench\\__init__.py'
+[36m[FNPORTING] [0mShutdown Server
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+
+Blender quit

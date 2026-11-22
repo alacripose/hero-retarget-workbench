@@ -1,0 +1,207 @@
+BODY-COPY cast_loop
+BODY-COPY flinch_left
+BODY-COPY flinch_back
+BODY-COPY flinch_right
+BODY-COPY melee_dash
+BODY-COPY melee_dash_down
+BODY-COPY melee_hit_down
+BODY-COPY melee_in_air_dash_down
+BODY-COPY melee_in_air_hit_down
+BODY-COPY melee_in_air_start_down
+BODY-COPY melee_start_down
+BODY-COPY melee_hit
+BODY-COPY melee_in_air_dash
+BODY-COPY melee_in_air_hit
+BODY-COPY melee_in_air_start
+BODY-COPY melee_dash_up
+BODY-COPY melee_hit_up
+BODY-COPY melee_in_air_dash_up
+BODY-COPY melee_in_air_hit_up
+BODY-COPY melee_in_air_start_up
+BODY-DECOMPILE melee_start <- melee_up_start.dmx
+BODY-DECOMPILE melee_start_up <- melee_up_start.dmx
+BODY-COPY aim_weapon_crouch.vnmclip+non_additive
+BODY-COPY aim_weapon_crouch_down.vnmclip+non_additive
+BODY-COPY aim_weapon_crouch_up.vnmclip+non_additive
+BODY-COPY aim_weapon_idle.vnmclip+non_additive
+BODY-COPY aim_weapon_idle_down.vnmclip+non_additive
+BODY-COPY aim_weapon_idle_up.vnmclip+non_additive
+BODY-COPY corner_lean_crouch.vnmclip+non_additive
+BODY-COPY corner_lean_crouch_run.vnmclip+non_additive
+BODY-COPY corner_lean_run.vnmclip+non_additive
+BODY-COPY corner_lean_stand.vnmclip+non_additive
+BODY-COPY flinch_back.vnmclip+non_additive
+BODY-COPY flinch_left.vnmclip+non_additive
+BODY-COPY flinch_right.vnmclip+non_additive
+BODY-COPY landing_impact_crouch.vnmclip+non_additive
+BODY-COPY landing_impact_idle.vnmclip+non_additive
+BODY-COPY loco_lean_back.vnmclip+non_additive
+BODY-COPY loco_lean_center.vnmclip+non_additive
+BODY-COPY loco_lean_forward.vnmclip+non_additive
+BODY-COPY loco_lean_left.vnmclip+non_additive
+BODY-COPY loco_lean_right.vnmclip+non_additive
+BODY-COPY run_to_stop_crouch.vnmclip+non_additive
+BODY-COPY run_to_stop_stand.vnmclip+non_additive
+BODY-COPY shoot_alt_idle.vnmclip+non_additive
+BODY-COPY shoot_idle.vnmclip+non_additive
+BODY-COPY shiv_dagger
+BODY-COPY ability_shiv_dash
+BODY-COPY ability_dash_start
+BODY-DECOMPILE ability_shiv_killingblow_idle <- ability_slash_attack.dmx
+BODY-DECOMPILE ability_shiv_killingblow_slash <- ability_slash_attack.dmx
+BODY-COPY ability_shiv_killingblow_leap
+BODY-DECOMPILE corner_lean_crouch <- corner_lean_crouch.dmx
+BODY-DECOMPILE corner_lean_crouch_run <- corner_lean_crouch.dmx
+BODY-DECOMPILE corner_lean_run <- corner_lean_stand.dmx
+BODY-DECOMPILE corner_lean_stand <- corner_lean_stand.dmx
+BODY-COPY knockdown_medium_loop
+BODY-COPY aim_weapon_slide
+BODY-COPY cast_channeling_end
+BODY-COPY cast_channeling_loop
+BODY-COPY cast_channeling_start
+BODY-COPY cast_end
+BODY-COPY cast_start
+BODY-COPY aim_weapon_in_air
+BODY-COPY in_air_loop_apex
+BODY-COPY in_air_loop_down
+BODY-COPY knockdown_in_air_start
+BODY-COPY knockdown_in_air_loop
+BODY-COPY item_crouch_idle
+BODY-COPY item_crouch_run_center
+BODY-COPY item_crouch_run_e
+BODY-COPY item_crouch_run_n
+BODY-COPY item_crouch_run_ne
+BODY-COPY item_crouch_run_nw
+BODY-COPY item_crouch_run_s
+BODY-COPY item_crouch_run_se
+BODY-COPY item_crouch_run_sw
+BODY-COPY item_crouch_run_w
+BODY-COPY item_run_center
+BODY-COPY item_run_e
+BODY-COPY item_run_n
+BODY-COPY item_run_ne
+BODY-COPY item_run_nw
+BODY-COPY item_run_s
+BODY-COPY item_run_se
+BODY-COPY item_run_sw
+BODY-COPY item_run_w
+BODY-COPY item_stand_idle
+BODY-COPY jump_ground
+BODY-COPY landing_impact_idle
+BODY-COPY landing_impact_crouch
+BODY-COPY jump_forced
+BODY-COPY knockdown_large_start
+BODY-COPY knockdown_large_getup
+BODY-COPY knockdown_large_loop
+BODY-COPY dash_ground
+BODY-COPY lift_loop
+BODY-COPY loco_lean_center
+BODY-COPY loco_lean_right
+BODY-COPY loco_lean_forward
+BODY-COPY loco_lean_back
+BODY-COPY loco_lean_left
+BODY-DECOMPILE melee_quick_1 <- melee_combo_hit_one.dmx
+BODY-DECOMPILE melee_quick_1_down <- melee_combo_hit_one.dmx
+BODY-DECOMPILE melee_quick_1_up <- melee_combo_hit_one.dmx
+BODY-COPY melee_quick_2
+BODY-COPY out_of_combat_run_center
+BODY-COPY out_of_combat_run_e
+BODY-COPY out_of_combat_run_n
+BODY-COPY out_of_combat_run_ne
+BODY-COPY out_of_combat_run_nw
+BODY-COPY out_of_combat_run_s
+BODY-COPY out_of_combat_run_se
+BODY-COPY out_of_combat_run_sw
+BODY-COPY out_of_combat_run_w
+BODY-DECOMPILE parry <- parry_shiv.dmx
+BODY-DECOMPILE parry_success <- parry_shiv.dmx
+BODY-COPY dash_air_forward
+BODY-COPY dash_air_back
+BODY-COPY dash_air_left
+BODY-COPY dash_air_right
+BODY-COPY shoot_alt_idle
+BODY-COPY aim_weapon_crouch_run
+BODY-COPY weapon_crouch_idle
+BODY-COPY reload_crouch_idle
+BODY-COPY weapon_crouch_run_center
+BODY-DECOMPILE out_of_combat_crouch_run_e <- primary_crouch_walk_e.dmx
+BODY-DECOMPILE weapon_crouch_run_e <- primary_crouch_walk_e.dmx
+BODY-DECOMPILE zoomed_crouch_run_e <- primary_crouch_walk_e.dmx
+BODY-DECOMPILE out_of_combat_crouch_run_n <- primary_crouch_walk_n.dmx
+BODY-DECOMPILE weapon_crouch_run_n <- primary_crouch_walk_n.dmx
+BODY-DECOMPILE zoomed_crouch_run_n <- primary_crouch_walk_n.dmx
+BODY-DECOMPILE out_of_combat_crouch_run_ne <- primary_crouch_walk_ne.dmx
+BODY-DECOMPILE weapon_crouch_run_ne <- primary_crouch_walk_ne.dmx
+BODY-DECOMPILE zoomed_crouch_run_ne <- primary_crouch_walk_ne.dmx
+BODY-DECOMPILE out_of_combat_crouch_run_w <- primary_crouch_walk_nw.dmx
+BODY-DECOMPILE weapon_crouch_run_nw <- primary_crouch_walk_nw.dmx
+BODY-DECOMPILE zoomed_crouch_run_w <- primary_crouch_walk_nw.dmx
+BODY-DECOMPILE out_of_combat_crouch_run_s <- primary_crouch_walk_s.dmx
+BODY-DECOMPILE weapon_crouch_run_s <- primary_crouch_walk_s.dmx
+BODY-DECOMPILE zoomed_crouch_run_s <- primary_crouch_walk_s.dmx
+BODY-DECOMPILE out_of_combat_crouch_run_se <- primary_crouch_walk_se.dmx
+BODY-DECOMPILE weapon_crouch_run_se <- primary_crouch_walk_se.dmx
+BODY-DECOMPILE zoomed_crouch_run_se <- primary_crouch_walk_se.dmx
+BODY-DECOMPILE out_of_combat_crouch_run_sw <- primary_crouch_walk_sw.dmx
+BODY-DECOMPILE weapon_crouch_run_sw <- primary_crouch_walk_sw.dmx
+BODY-DECOMPILE zoomed_crouch_run_sw <- primary_crouch_walk_sw.dmx
+BODY-COPY run_to_stop_crouch
+BODY-DECOMPILE out_of_combat_crouch_run_nw <- primary_crouch_walk_w.dmx
+BODY-DECOMPILE weapon_crouch_run_w <- primary_crouch_walk_w.dmx
+BODY-DECOMPILE zoomed_crouch_run_nw <- primary_crouch_walk_w.dmx
+BODY-COPY shoot_idle
+BODY-COPY weapon_stand_idle
+BODY-COPY mantle_128
+BODY-COPY mantle_32
+BODY-COPY mantle_64
+BODY-COPY mantle_96
+BODY-DECOMPILE reload_crouch_idle_quick <- primary_reload.dmx
+BODY-DECOMPILE reload_crouch_run_quick <- primary_reload.dmx
+BODY-DECOMPILE reload_idle <- primary_reload.dmx
+BODY-DECOMPILE reload_idle_quick <- primary_reload.dmx
+BODY-DECOMPILE reload_in_air_quick <- primary_reload.dmx
+BODY-DECOMPILE reload_run_quick <- primary_reload.dmx
+BODY-DECOMPILE reload_slide_quick <- primary_reload.dmx
+BODY-COPY weapon_run_center
+BODY-COPY weapon_run_e
+BODY-COPY weapon_run_n
+BODY-COPY weapon_run_ne
+BODY-COPY weapon_run_nw
+BODY-COPY reload_run
+BODY-COPY weapon_run_s
+BODY-COPY weapon_run_se
+BODY-COPY weapon_run_sw
+BODY-COPY run_to_stop_stand
+BODY-COPY weapon_run_w
+BODY-COPY aim_weapon_run
+BODY-COPY rope_climb_down
+BODY-COPY rope_climb_idle
+BODY-COPY rope_climb_up
+BODY-COPY sleep_idle
+BODY-DECOMPILE aim_weapon_crouch <- shiv_weapon_crouch_aim_sweep.dmx
+BODY-DECOMPILE aim_weapon_crouch_down <- shiv_weapon_crouch_aim_sweep.dmx
+BODY-DECOMPILE aim_weapon_crouch_up <- shiv_weapon_crouch_aim_sweep.dmx
+BODY-DECOMPILE aim_weapon_idle <- shiv_weapon_stand_aim_sweep.dmx
+BODY-DECOMPILE aim_weapon_idle_down <- shiv_weapon_stand_aim_sweep.dmx
+BODY-DECOMPILE aim_weapon_idle_up <- shiv_weapon_stand_aim_sweep.dmx
+BODY-COPY shopping_idle
+BODY-COPY slide_loop
+BODY-COPY slide_getup
+BODY-COPY slide_start
+BODY-COPY knockdown_small
+BODY-COPY knockdown_medium_start
+BODY-COPY throw
+BODY-COPY turn_left
+BODY-COPY turn_right
+BODY-COPY turn_crouch_left
+BODY-COPY turn_crouch_right
+BODY-COPY ui_hero_select
+BODY-COPY wall_attach_forward
+BODY-COPY wall_attach_left
+BODY-COPY wall_attach_right
+BODY-COPY zipline_tethered_reeling_loop
+BODY-COPY zipline_awaiting_tether
+BODY-COPY jump_zipline
+BODY-COPY zipline_attached_start
+BODY-COPY zipline_attached_loop
+BODIES 156 copied, 50 decompiled, 0 failed in 44s

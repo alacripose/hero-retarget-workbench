@@ -1,0 +1,111 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on familiar_wip_8inf_body8.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "familiar_wip_8inf_body8"
+- New material: familiar_body.vmat
+Imported 1 files in 1.4 seconds
+Info: Imported 1 files in 1.4 seconds
+
+DMX IMPORTER: now working on familiar_wip_balloon4.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing mesh "familiar_wip_balloon4"
+- New material: familiar_pillowballoon.vmat
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on familiar_wip_clothes1.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing mesh "familiar_wip_clothes1"
+- New material: familiar_clothes.vmat
+- New material: familiar_watchglass.vmat
+- Imported 1 cloth vertex group(s) as a cloth proxy mesh
+Imported 1 files in 1.4 seconds
+Info: Imported 1 files in 1.4 seconds
+
+DMX IMPORTER: now working on familiar_wip_head5.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing mesh "familiar_wip_head5"
+- New material: familiar_head.vmat
+Importing mesh "familiar_wip_head5"
+- New material: familiar_eyes.vmat
+Importing mesh "familiar_wip_head5"
+Imported 1 files in 1.9 seconds
+Info: Imported 1 files in 1.9 seconds
+
+DMX IMPORTER: now working on familiar_wip_hull.dmx
+- Loading DMX...
+Traceback (most recent call last):
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\datamodel.py", line 338, in __getitem__
+    return super().__getitem__(item)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^
+KeyError: 'normal$0'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\imports\importer.py", line 120, in execute
+    count = self.read_file(filepath)
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\imports\importer.py", line 784, in read_file
+    return self.readDMX(filepath, self.properties.upAxis, self.properties.rotMode)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\imports\importer.py", line 373, in readDMX
+    ifile = _dmx.read_file(parsed)
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\imports\dmx.py", line 516, in read_file
+    out.meshes = read_meshes(parsed)
+                 ~~~~~~~~~~~^^^^^^^^
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\imports\dmx.py", line 315, in read_meshes
+    walk(parsed.DmeModel)
+    ~~~~^^^^^^^^^^^^^^^^^
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\imports\dmx.py", line 311, in walk
+    walk(subelem, matrix, last_bone)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\imports\dmx.py", line 311, in walk
+    walk(subelem, matrix, last_bone)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\imports\dmx.py", line 313, in walk
+    meshes.append(_read_mesh(parsed, elem, matrix, last_bone))
+                  ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\imports\dmx.py", line 339, in _read_mesh
+    values=DmeVertexData[keywords['norm']],
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\datamodel.py", line 340, in __getitem__
+    raise AttributeError("No attribute \"{}\" on {}".format(item,self)) from e
+bl_ext.user_default.pulse_src_ops.datamodel.AttributeError: 'Invalid DMX file: No attribute "normal$0" on <Datamodel element "bind" (DmeVertexData)>'
+00:08.000  bpy.rna          | ERROR Python script error in IMPORT_SCENE_OT_kst_dmx.execute
+Error: Python: Traceback (most recent call last):
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\datamodel.py", line 338, in __getitem__
+    return super().__getitem__(item)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^
+KeyError: 'normal$0'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\imports\importer.py", line 120, in execute
+    count = self.read_file(filepath)
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_src_ops\imports\importer.py", line 784, in read_file
+    return self.readDMX(filepath, self.properties.upAxis, self.properties.rotMode)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<home>\AppData\Roaming\Blender Foundation\Blender\5.4\extensions\user_default\pulse_sr... truncated
+DMX IMPORTER: now working on familiar_wip_pillow3.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing mesh "familiar_wip_pillow3"
+- New material: familiar_accessories.vmat
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on familiar_wip_weapon2.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing mesh "familiar_wip_weapon2"
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAILUI PASS hero-import: {'FINISHED'}

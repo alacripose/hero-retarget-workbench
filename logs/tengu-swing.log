@@ -1,0 +1,281 @@
+
+DMX IMPORTER: now working on aim_item_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_item_idle"
+- Imported 51 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL aim_item_idle.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on aim_item_idle_down.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_item_idle_down"
+- Imported 51 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL aim_item_idle_down.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on aim_item_idle_up.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_item_idle_up"
+- Imported 51 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL aim_item_idle_up.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on aim_out_of_combat_crouch.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_out_of_combat_crouch"
+- Imported 51 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL aim_out_of_combat_crouch.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on aim_out_of_combat_crouch_down.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_out_of_combat_crouch_down"
+- Imported 51 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL aim_out_of_combat_crouch_down.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on aim_out_of_combat_crouch_up.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_out_of_combat_crouch_up"
+- Imported 51 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL aim_out_of_combat_crouch_up.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on aim_out_of_combat_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_out_of_combat_idle"
+- Imported 51 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL aim_out_of_combat_idle.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on aim_out_of_combat_idle_down.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_out_of_combat_idle_down"
+- Imported 51 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL-FAIL aim_out_of_combat_idle_down.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on aim_out_of_combat_idle_up.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_out_of_combat_idle_up"
+- Imported 51 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL aim_out_of_combat_idle_up.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on aim_weapon_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_weapon_idle"
+- Imported 51 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL aim_weapon_idle.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on aim_weapon_idle_down.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_weapon_idle_down"
+- Imported 51 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL aim_weapon_idle_down.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on aim_weapon_idle_up.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "aim_weapon_idle_up"
+- Imported 51 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL aim_weapon_idle_up.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on airdrop_lean_left.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "airdrop_lean_left"
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+TAIL-FAIL airdrop_lean_left.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on airdrop_lean_right.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "airdrop_lean_right"
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+TAIL-FAIL airdrop_lean_right.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on airdrop_pitch_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "airdrop_pitch_center"
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+TAIL-FAIL airdrop_pitch_center.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on airdrop_pitch_down.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "airdrop_pitch_down"
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+TAIL-FAIL airdrop_pitch_down.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on airdrop_pitch_up.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "airdrop_pitch_up"
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+TAIL-FAIL airdrop_pitch_up.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on falling_grace_aim_vert.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "falling_grace_aim_vert"
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+TAIL-FAIL falling_grace_aim_vert.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on land_impact_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "land_impact_idle"
+- Imported 33 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL-FAIL land_impact_idle.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on loco_lean_back.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "loco_lean_back"
+- Imported 41 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL-FAIL loco_lean_back.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on loco_lean_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "loco_lean_center"
+- Imported 41 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL-FAIL loco_lean_center.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on loco_lean_forward.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "loco_lean_forward"
+- Imported 41 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL-FAIL loco_lean_forward.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on loco_lean_left.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "loco_lean_left"
+- Imported 41 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL-FAIL loco_lean_left.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on loco_lean_right.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "loco_lean_right"
+- Imported 41 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL-FAIL loco_lean_right.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on run_to_stop_stand.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "run_to_stop_stand"
+- Imported 25 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL-FAIL run_to_stop_stand.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on shoot_lean_crouch.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "shoot_lean_crouch"
+- Imported 31 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL-FAIL shoot_lean_crouch.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on shoot_lean_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "shoot_lean_idle"
+- Imported 31 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL-FAIL shoot_lean_idle.dmx: 'Action' object has no attribute 'fcurves'
+
+DMX IMPORTER: now working on weapon_shoot.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "weapon_shoot"
+- Imported 16 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+TAIL-FAIL weapon_shoot.dmx: 'Action' object has no attribute 'fcurves'
+TAIL done 0 clips, 0 with a moving tail, 28 failed
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

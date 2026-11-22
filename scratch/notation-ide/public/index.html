@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notation IDE — crudity gap</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/vendor/three.module.js",
+          "three/addons/": "/vendor/addons/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>Notation IDE</h1>
+      <p>Paste prose on the left. The spine on the right shows each line on the crudity ladder.</p>
+      <span id="status" class="status">ready</span>
+    </header>
+
+    <main>
+      <section class="panel input">
+        <label for="prose">Prose</label>
+        <textarea id="prose" spellcheck="false" placeholder="Paste the prose you want read line by line."></textarea>
+        <div class="row">
+          <button id="analyse">Analyse</button>
+          <button id="sample" class="ghost">Load a shorthand sample</button>
+          <button id="clear" class="ghost">Clear</button>
+        </div>
+        <label for="comment">Comment to the agent</label>
+        <textarea id="comment" class="comment" spellcheck="true" placeholder="Type what you want said about the line you are looking at."></textarea>
+        <div class="row">
+          <button id="send">Send comment</button>
+          <span id="sent" class="muted small"></span>
+        </div>
+        <div class="ladder" id="ladder">
+          <span class="chip whole">whole</span>
+          <span class="chip annotated">annotated</span>
+          <span class="chip lossy">lossy</span>
+          <span class="chip shorthand">shorthand</span>
+        </div>
+        <p class="hint">Shorthand is a refusal: a bold lead with no rule, a pointer where the reasoning was, a counter dump where a sentence was.</p>
+      </section>
+
+      <section class="viewport">
+        <div id="scene"></div>
+        <div class="overlay" id="overlay">
+          <div class="legend">
+            <span><i class="dot whole"></i>whole</span>
+            <span><i class="dot annotated"></i>annotated</span>
+            <span><i class="dot lossy"></i>lossy</span>
+            <span><i class="dot shorthand"></i>shorthand</span>
+          </div>
+          <p class="tip">Drag to orbit. Click a node to open its line.</p>
+        </div>
+      </section>
+
+      <section class="panel detail">
+        <h2>Line</h2>
+        <div id="detail" class="detail-body"><p class="muted">No line selected.</p></div>
+        <div id="repair" class="repair" hidden>
+          <label for="fixed">Repair, in full prose</label>
+          <textarea id="fixed" spellcheck="false"></textarea>
+          <button id="save">Save the pair</button>
+          <p class="muted small">Saved pairs are the training rows for the Debian judge.</p>
+        </div>
+
+        <h2>Notes from the agent</h2>
+        <ul id="notes" class="notes"></ul>
+        <p id="pairs" class="muted small">0 pairs</p>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

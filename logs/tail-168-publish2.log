@@ -1,0 +1,57 @@
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -64837.246271
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 0.57 ms!
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_body.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "shiv_body"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 2.4 seconds
+Info: Imported 1 files in 2.4 seconds
+
+DMX IMPORTER: now working on werewolf_werewolf_model.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "werewolf_werewolf_model"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 3.8 seconds
+Info: Imported 1 files in 3.8 seconds
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_stand_idle.
+Importing DMX animation "weapon_stand_idle"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: weapon_stand_idle contains 2 bones not present in shiv_body. Check the console for a list.

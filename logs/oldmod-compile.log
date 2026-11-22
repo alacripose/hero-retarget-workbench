@@ -1,0 +1,39 @@
+$ <home>\Downloads\Reduced_CSDK_13\game\bin\win64\resourcecompiler.exe -nop4 -f -game <home>\Downloads\Reduced_CSDK_13\game\citadel -i citadel_addons\haze_tac9_updated\models\heroes_staging\haze\haze.vmdl
+
+Creating render device for graphics adapter 0 'NVIDIA GeForce RTX 2070 SUPER' [VendorId 0x10DE / DeviceId 0x1E84]: 32.0.16.1742
+- citadel_addons\haze_tac9_updated\models\heroes_staging\haze\haze.vmdl
+RESOURCE COMPILE ERROR: LODGroup : LODGroup references unknown mesh: 'haze_gun_l'
+RESOURCE COMPILE ERROR: LODGroup : LODGroup references unknown mesh: 'haze_gun_r'
+RESOURCE COMPILE ERROR: LODGroup : LODGroup references unknown mesh: 'body_lod1'
+RESOURCE COMPILE ERROR: LODGroup : LODGroup references unknown mesh: 'haze_gun_l_lod1'
+RESOURCE COMPILE ERROR: LODGroup : LODGroup references unknown mesh: 'haze_gun_r_lod1'
+RESOURCE COMPILE ERROR: LODGroup : LODGroup references unknown mesh: 'body_lod2'
+RESOURCE COMPILE ERROR: LODGroup : LODGroup references unknown mesh: 'haze_gun_l_lod2'
+RESOURCE COMPILE ERROR: LODGroup : LODGroup references unknown mesh: 'haze_gun_r_lod2'
+RESOURCE COMPILE ERROR: LODGroup : LODGroup references unknown mesh: 'body_lod3'
+RESOURCE COMPILE ERROR: LODGroup : LODGroup references unknown mesh: 'haze_gun_l_lod3'
+RESOURCE COMPILE ERROR: LODGroup : LODGroup references unknown mesh: 'haze_gun_r_lod3'
+                                                                      [FAIL]
+     0/   1 (elapsed  6.494):  <home>\Downloads\Reduced_CSDK_13\content\citadel_addons\haze_tac9_updated\models\heroes_staging\haze\haze.vmdl
+Compile of 1 file(s) matching nonrecursive specification "<home>\Downloads\Reduced_CSDK_13\content\citadel_addons\haze_tac9_updated\models\heroes_staging\haze\haze.vmdl" took 6.494 seconds
+
+---------------------------------------------------------------------
+ 11 Compile ERRORS
+ These errors will cause the compile to fail.
+ Look for "RESOURCE COMPILE ERROR:" in the log above.
+---------------------------------------------------------------------
+  LODGroup references unknown mesh: 'haze_gun_l'
+  LODGroup references unknown mesh: 'haze_gun_r'
+  LODGroup references unknown mesh: 'body_lod1'
+  LODGroup references unknown mesh: 'haze_gun_l_lod1'
+  LODGroup references unknown mesh: 'haze_gun_r_lod1'
+  LODGroup references unknown mesh: 'body_lod2'
+  LODGroup references unknown mesh: 'haze_gun_l_lod2'
+  LODGroup references unknown mesh: 'haze_gun_r_lod2'
+  LODGroup references unknown mesh: 'body_lod3'
+  LODGroup references unknown mesh: 'haze_gun_l_lod3'
+  LODGroup references unknown mesh: 'haze_gun_r_lod3'
+
+-----------------------------------------------------------------
+ ERROR: 0 compiled, 1 failed, 0 skipped, 0m:07s
+-----------------------------------------------------------------

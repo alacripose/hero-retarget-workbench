@@ -1,0 +1,7 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+00:01.718  blend            | Read blend: "<home>\AppData\Local\Temp\dmf-zip-probe-t_moovi3\path-config.blend"
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+OPERATORS registered=79 panels=20
+Info: Saved as "path-config.blend"
+{"blake3_module": "<home>\\AppData\\Local\\Temp\\dmf-zip-probe-t_moovi3\\hero_retarget_workbench\\_vendor\\blake3\\__init__.py", "files": 63, "icons_checked": 55, "operators": 79, "panels": 20, "path_config_saved": true, "path_detect_operator": true, "path_namespace_isolated": true, "result": "pass", "s2v_gui_rejected": true, "version": "0.13.2", "workbench_operators": 28, "zip": "<home>\\Documents\\deadlock-model-forge\\dist\\hero_retarget_workbench-0.13.2.zip", "zip_blake3": "blake3:01202eef16b1d879eda00c8c4b071d18ce8c24b617bd64c636369f7970497234", "zip_bytes": 437824, "zip_sha256": "910f712a7508a8f988f28e1ce0271d46590b4e48edaa581034f1eaf5139399c1"}

@@ -1,0 +1,100 @@
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -32430.082998
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 0.50 ms!
+POSE-COMPARE importing artifacts/tail-animgraph/shiv/models/heroes_staging/shiv/dmx/mesh/shiv_tailbones.dmx
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Importing mesh "werewolf_werewolf_model.001"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 8.4 seconds
+Info: Imported 1 files in 8.4 seconds
+POSE-COMPARE imported left: 3 objects
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.1 seconds
+Info: Imported 1 files in 9.1 seconds
+POSE-COMPARE imported right: 3 objects
+
+DMX IMPORTER: now working on primary_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_idle.
+Importing DMX animation "primary_idle"
+- Imported 121 frames of animation
+0 Errors and 1 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_idle.
+Imported 1 files in 0.9 seconds with 0 Errors and 1 Warnings
+Info: Imported 1 files in 0.9 seconds with 0 Errors and 1 Warnings
+Imported 0 files in 0.0 seconds
+Error: Format of primary_idle.dmx not recognised
+Info: Imported 0 files in 0.0 seconds
+POSE-COMPARE FAIL idle: Error: Format of primary_idle.dmx not recognised
+
+
+DMX IMPORTER: now working on slide_getup.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in slide_getup.
+Importing DMX animation "slide_getup"
+- Imported 13 frames of animation
+0 Errors and 1 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in slide_getup.
+Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
+Imported 0 files in 0.0 seconds
+Error: Format of slide_getup.dmx not recognised
+Info: Imported 0 files in 0.0 seconds
+POSE-COMPARE FAIL tail: Error: Format of slide_getup.dmx not recognised
+
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Importing DMX animation "item_run_center"
+- Imported 21 frames of animation
+0 Errors and 1 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
+Imported 0 files in 0.0 seconds
+Error: Format of item_run_center.dmx not recognised
+Info: Imported 0 files in 0.0 seconds
+POSE-COMPARE FAIL lift: Error: Format of item_run_center.dmx not recognised
+
+POSE-COMPARE done 0 renders, 3 failed
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+[Blender Buddy] unregister: Server not running.
+INFO: Ucupaint 2.4.9 is unregistered!
+[36m[FNPORTING] [0mShutdown Server

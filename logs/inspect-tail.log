@@ -1,0 +1,52 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on werewolf_werewolf_model.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "werewolf_werewolf_model"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 4.5 seconds
+Info: Imported 1 files in 4.5 seconds
+HERO werewolf rig werewolf_werewolf_model bones 209 meshes [('werewolf_werewolf_model.001', 54348, 7)]
+BONE werewolf pelvis (-0.19, 0.0, 62.26)
+BONE werewolf spine_0 (0.52, 0.0, 64.09)
+BONE werewolf tail_0 (-6.36, 0.0, 61.24)
+BONE werewolf tail_1 (-11.81, 0.0, 56.38)
+BONE werewolf tail_end (-31.59, 0.0, 34.44)
+MESH werewolf werewolf_werewolf_model.001 tailgroups ['tail_1', 'tail_0', 'tail_2', 'tail_3', 'tail_4', 'tail_5'] attrs [('tangent$0', 'CORNER', 'BYTE_COLOR'), ('VertexPaintTintColor$0', 'CORNER', 'BYTE_COLOR'), ('texcoord$0', 'CORNER', 'FLOAT2'), ('texcoord$1', 'CORNER', 'FLOAT2'), ('.uv_select_vert', 'CORNER', 'BOOLEAN'), ('.uv_select_edge', 'CORNER', 'BOOLEAN'), ('.uv_select_face', 'FACE', 'BOOLEAN'), ('material_index', 'FACE', 'INT'), ('position', 'POINT', 'FLOAT_VECTOR'), ('.edge_verts', 'EDGE', 'INT32_2D'), ('.corner_vert', 'CORNER', 'INT'), ('.corner_edge', 'CORNER', 'INT'), ('custom_normal', 'CORNER', 'INT16_2D'), ('sharp_edge', 'EDGE', 'BOOLEAN')]
+TAILVERTS werewolf 1081
+TAILBOUNDS (-32.38, -8.67, 29.23) (-5.03, 9.04, 62.61)
+TAILMATS [0]
+
+DMX IMPORTER: now working on shiv_body.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "shiv_body"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 2.1 seconds
+Info: Imported 1 files in 2.1 seconds
+HERO shiv rig shiv_body bones 161 meshes [('shiv_body.001', 35077, 7)]
+BONE shiv pelvis (0.0, 0.0, 61.52)
+BONE shiv spine_0 (0.26, 0.0, 62.57)
+BONE shiv tail_0 None
+BONE shiv tail_1 None
+BONE shiv tail_end None
+MESH shiv shiv_body.001 tailgroups [] attrs [('tangent$0', 'CORNER', 'BYTE_COLOR'), ('texcoord$0', 'CORNER', 'FLOAT2'), ('.uv_select_vert', 'CORNER', 'BOOLEAN'), ('.uv_select_edge', 'CORNER', 'BOOLEAN'), ('.uv_select_face', 'FACE', 'BOOLEAN'), ('material_index', 'FACE', 'INT'), ('position', 'POINT', 'FLOAT_VECTOR'), ('.edge_verts', 'EDGE', 'INT32_2D'), ('.corner_vert', 'CORNER', 'INT'), ('.corner_edge', 'CORNER', 'INT'), ('custom_normal', 'CORNER', 'INT16_2D'), ('sharp_edge', 'EDGE', 'BOOLEAN')]
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

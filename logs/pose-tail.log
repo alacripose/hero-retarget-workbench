@@ -1,0 +1,135 @@
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -30159.58071
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 0.48 ms!
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Importing mesh "werewolf_werewolf_model.001"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 8.2 seconds
+Info: Imported 1 files in 8.2 seconds
+
+DMX IMPORTER: now working on dash_air_left.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "dash_air_left"
+- Imported 51 frames of animation
+Imported 1 files in 0.7 seconds
+00:15.063  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash4-shipped-000.png'
+00:15.203  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash4-shipped-090.png'
+00:15.344  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash4-shipped-180.png'
+00:15.484  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash4-shipped-270.png'
+Info: Imported 1 files in 0.7 seconds
+POSE-RENDER dash4-shipped frame 4 z[32.3,96.3] x[-20.7,18.9] y[-56.8,37.9]
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on primary_airdash_left.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_airdash_left.
+Importing DMX animation "primary_airdash_left"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: primary_airdash_left contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 51 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_airdash_left.
+Warning: primary_airdash_left contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.4 seconds with 0 Errors and 2 Warnings
+00:25.094  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash4-game-000.png'
+00:25.234  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash4-game-090.png'
+00:25.375  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash4-game-180.png'
+00:25.516  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash4-game-270.png'
+Info: Imported 1 files in 0.4 seconds with 0 Errors and 2 Warnings
+POSE-RENDER dash4-game frame 4 z[32.3,96.3] x[-28.6,17.1] y[-56.8,37.9]
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.4 seconds
+Info: Imported 1 files in 8.4 seconds
+
+DMX IMPORTER: now working on dash_air_left.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "dash_air_left"
+- Imported 51 frames of animation
+Imported 1 files in 0.6 seconds
+00:34.969  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash10-shipped-000.png'
+00:35.109  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash10-shipped-090.png'
+00:35.250  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash10-shipped-180.png'
+00:35.406  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash10-shipped-270.png'
+Info: Imported 1 files in 0.6 seconds
+POSE-RENDER dash10-shipped frame 10 z[29.6,96.3] x[-12.7,43.0] y[-26.6,28.6]
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.3 seconds
+Info: Imported 1 files in 8.3 seconds
+
+DMX IMPORTER: now working on primary_airdash_left.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_airdash_left.
+Importing DMX animation "primary_airdash_left"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: primary_airdash_left contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 51 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_airdash_left.
+Warning: primary_airdash_left contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.4 seconds with 0 Errors and 2 Warnings
+00:44.531  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash10-game-000.png'
+00:44.672  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash10-game-090.png'
+00:44.828  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash10-game-180.png'
+00:44.953  render           | Saved: '<home>\Documents\deadlock-model-forge\artifacts\visual\tail-check\dash10-game-270.png'
+Info: Imported 1 files in 0.4 seconds with 0 Errors and 2 Warnings
+POSE-RENDER dash10-game frame 10 z[29.6,96.3] x[-30.9,43.0] y[-26.6,29.5]
+POSE-RENDER done 4 figures, 0 failed
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+[Blender Buddy] unregister: Server not running.
+INFO: Ucupaint 2.4.9 is unregistered!
+[36m[FNPORTING] [0mShutdown Server

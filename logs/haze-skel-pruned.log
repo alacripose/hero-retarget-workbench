@@ -1,0 +1,23 @@
+Creating render device for graphics adapter 0 'NVIDIA GeForce RTX 2070 SUPER' [VendorId 0x10DE / DeviceId 0x1E84]: 32.0.16.1742
+- citadel_addons\haze_tail\models\heroes_staging\haze\haze.vnmskel
+RESOURCE COMPILE ERROR: Load error: Line 132: Invalid member name ']' (before "m_weights")
+Line 92: Invalid data for member 'm_primaryWeightList'
+Line 132: Expected value or ']' (before "m_weights")
+Line 88: Invalid data for member 'm_boneMaskSetDefinitions'
+
+                                                                      [FAIL]
+
+---------------------------------------------------------------------
+ 1 Compile ERRORS
+ These errors will cause the compile to fail.
+ Look for "RESOURCE COMPILE ERROR:" in the log above.
+---------------------------------------------------------------------
+  Load error: Line 132: Invalid member name ']' (before "m_weights")
+Line 92: Invalid data for member 'm_primaryWeightList'
+Line 132: Expected value or ']' (before "m_weights")
+Line 88: Invalid data for member 'm_boneMaskSetDefinitions'
+
+
+-----------------------------------------------------------------
+ ERROR: 0 compiled, 1 failed, 0 skipped, 0m:01s
+-----------------------------------------------------------------

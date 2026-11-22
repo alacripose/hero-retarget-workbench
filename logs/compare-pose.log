@@ -1,0 +1,35 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on primary_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.0 seconds
+Info: Imported 1 files in 1.0 seconds
+RIG primary_idle.dmx BONES 140 RANGE (0.0, 120.0)
+root_motion head (0.0, 0.0, 0.0) quat (0.5, 0.5, 0.5, 0.5)
+pelvis head (58.747, 0.977, -2.04) quat (0.9056, -0.3481, -0.0869, -0.2262)
+spine_0 head (59.827, 0.978, -2.047) quat (0.8986, -0.424, -0.0602, -0.0951)
+head head (86.312, -0.507, -0.435) quat (0.9637, -0.0594, -0.0003, 0.2603)
+arm_upper_L head (79.287, 6.114, 7.294) quat (0.1639, -0.2521, -0.9365, 0.1805)
+leg_upper_L head (55.322, 4.992, 0.302) quat (0.1163, 0.124, -0.028, 0.985)
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+Importing DMX animation "weapon_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.9 seconds
+Info: Imported 1 files in 1.9 seconds
+RIG weapon_stand_idle.dmx BONES 168 RANGE (0.0, 120.0)
+root_motion head (0.0, 0.0, 0.0) quat (0.5, 0.5, 0.5, 0.5)
+pelvis head (0.977, -2.04, 58.747) quat (0.1222, -0.5572, -0.4353, -0.6965)
+spine_0 head (0.978, -2.047, 59.827) quat (0.1597, -0.6439, -0.3149, -0.6788)
+head head (-0.507, -0.435, 86.312) quat (0.5822, -0.6418, -0.3221, -0.3813)
+arm_upper_L head (6.114, 7.294, 79.287) quat (0.4221, 0.7665, 0.3339, -0.3505)
+leg_upper_L head (4.992, 0.302, 55.322) quat (0.5987, -0.5027, 0.3583, 0.5104)
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

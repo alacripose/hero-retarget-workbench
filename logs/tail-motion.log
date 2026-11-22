@@ -1,0 +1,603 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on werewolf_werewolf_model.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "werewolf_werewolf_model"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 3.7 seconds
+Info: Imported 1 files in 3.7 seconds
+
+DMX IMPORTER: now working on werewolf_weapon_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "werewolf_weapon_stand_idle"
+- Imported 57 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_stand_idle.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_stand_idle.
+Importing DMX animation "weapon_stand_idle"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: weapon_stand_idle contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 57 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_stand_idle.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_stand_idle.
+Warning: weapon_stand_idle contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.7 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.7 seconds with 0 Errors and 3 Warnings
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in item_run_center.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in item_run_center.
+Importing DMX animation "item_run_center"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: item_run_center contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 17 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in item_run_center.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in item_run_center.
+Warning: item_run_center contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+
+DMX IMPORTER: now working on in_air_loop_apex.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in in_air_loop_apex.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in in_air_loop_apex.
+Importing DMX animation "in_air_loop_apex"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: in_air_loop_apex contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 67 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in in_air_loop_apex.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in in_air_loop_apex.
+Warning: in_air_loop_apex contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.5 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.5 seconds with 0 Errors and 3 Warnings
+
+DMX IMPORTER: now working on flinch_back.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in flinch_back.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in flinch_back.
+Importing DMX animation "flinch_back"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: flinch_back contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 16 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in flinch_back.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in flinch_back.
+Warning: flinch_back contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+
+DMX IMPORTER: now working on cast_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in cast_start.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in cast_start.
+Importing DMX animation "cast_start"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: cast_start contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 20 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in cast_start.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in cast_start.
+Warning: cast_start contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.3 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.3 seconds with 0 Errors and 3 Warnings
+
+DMX IMPORTER: now working on aim_weapon_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in aim_weapon_idle.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in aim_weapon_idle.
+Importing DMX animation "aim_weapon_idle"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: aim_weapon_idle contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 61 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in aim_weapon_idle.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in aim_weapon_idle.
+Warning: aim_weapon_idle contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.5 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.5 seconds with 0 Errors and 3 Warnings
+
+DMX IMPORTER: now working on shiv_body_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 2.5 seconds
+Info: Imported 1 files in 2.5 seconds
+
+DMX IMPORTER: now working on shiv_primary_stand_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "shiv_primary_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.6 seconds
+Info: Imported 1 files in 1.6 seconds
+
+DMX IMPORTER: now working on shiv_item_run_center.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "shiv_item_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_stand_idle.
+Importing DMX animation "weapon_stand_idle"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: weapon_stand_idle contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 121 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_stand_idle.
+Warning: weapon_stand_idle contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.9 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.9 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Importing DMX animation "item_run_center"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: item_run_center contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 21 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Warning: item_run_center contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.4 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.4 seconds with 0 Errors and 2 Warnings
+{
+  "checks": {},
+  "errors": [],
+  "source_rig": {
+    "name": "werewolf_werewolf_model",
+    "bones": 209,
+    "tail": [
+      "tail_0",
+      "tail_1",
+      "tail_2",
+      "tail_3",
+      "tail_4",
+      "tail_5",
+      "tail_end"
+    ]
+  },
+  "source": {
+    "werewolf_weapon_stand_idle": {
+      "frames": [
+        0,
+        56,
+        [
+          0,
+          14,
+          28,
+          42,
+          56
+        ]
+      ],
+      "moving": {
+        "tail_0": true,
+        "tail_1": true,
+        "tail_2": true,
+        "tail_3": true,
+        "tail_4": true,
+        "tail_5": true,
+        "tail_end": false
+      },
+      "deltas": {
+        "tail_0": 0.14960647,
+        "tail_1": 0.1026099,
+        "tail_2": 0.10956245,
+        "tail_3": 0.07792552,
+        "tail_4": 0.08990777,
+        "tail_5": 0.31222326,
+        "tail_end": 0.0
+      },
+      "max_delta": 0.31222326,
+      "path": "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\datafiles\\hero_retarget_workbench\\artifacts\\extractions\\werewolf\\models\\heroes_wip\\werewolf\\werewolf_weapon_stand_idle.dmx"
+    },
+    "werewolf_item_run_center": {
+      "missing": "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\datafiles\\hero_retarget_workbench\\artifacts\\extractions\\werewolf\\models\\heroes_wip\\werewolf\\werewolf_item_run_center.dmx"
+    },
+    "weapon_stand_idle": {
+      "frames": [
+        0,
+        56,
+        [
+          0,
+          14,
+          28,
+          42,
+          56
+        ]
+      ],
+      "moving": {
+        "tail_0": true,
+        "tail_1": true,
+        "tail_2": true,
+        "tail_3": true,
+        "tail_4": true,
+        "tail_5": true,
+        "tail_end": false
+      },
+      "deltas": {
+        "tail_0": 0.14979891,
+        "tail_1": 0.10267329,
+        "tail_2": 0.10964846,
+        "tail_3": 0.07801332,
+        "tail_4": 0.08996157,
+        "tail_5": 0.31242983,
+        "tail_end": 0.0
+      },
+      "max_delta": 0.31242983,
+      "path": "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\datafiles\\hero_retarget_workbench\\artifacts\\extractions\\werewolf\\models\\heroes_wip\\werewolf\\dmx\\animation\\weapon_stand_idle.dmx"
+    },
+    "item_run_center": {
+      "frames": [
+        0,
+        16,
+        [
+          0,
+          4,
+          8,
+          12,
+          16
+        ]
+      ],
+      "moving": {
+        "tail_0": true,
+        "tail_1": true,
+        "tail_2": true,
+        "tail_3": true,
+        "tail_4": true,
+        "tail_5": true,
+        "tail_end": false
+      },
+      "deltas": {
+        "tail_0": 0.53464572,
+        "tail_1": 0.24742385,
+        "tail_2": 0.42142303,
+        "tail_3": 0.60600927,
+        "tail_4": 1.11358397,
+        "tail_5": 0.14397495,
+        "tail_end": 0.0
+      },
+      "max_delta": 1.11358397,
+      "path": "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\datafiles\\hero_retarget_workbench\\artifacts\\extractions\\werewolf\\models\\heroes_wip\\werewolf\\dmx\\animation\\item_run_center.dmx"
+    },
+    "in_air_loop_apex": {
+      "frames": [
+        0,
+        66,
+        [
+          0,
+          16,
+          33,
+          49,
+          66
+        ]
+      ],
+      "moving": {
+        "tail_0": true,
+        "tail_1": true,
+        "tail_2": true,
+        "tail_3": true,
+        "tail_4": true,
+        "tail_5": true,
+        "tail_end": false
+      },
+      "deltas": {
+        "tail_0": 0.21696318,
+        "tail_1": 0.0997119,
+        "tail_2": 0.07796787,
+        "tail_3": 0.27499577,
+        "tail_4": 0.29041558,
+        "tail_5": 0.31355298,
+        "tail_end": 0.0
+      },
+      "max_delta": 0.31355298,
+      "path": "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\datafiles\\hero_retarget_workbench\\artifacts\\extractions\\werewolf\\models\\heroes_wip\\werewolf\\dmx\\animation\\in_air_loop_apex.dmx"
+    },
+    "flinch_back": {
+      "frames": [
+        0,
+        15,
+        [
+          0,
+          3,
+          7,
+          11,
+          15
+        ]
+      ],
+      "moving": {
+        "tail_0": false,
+        "tail_1": false,
+        "tail_2": false,
+        "tail_3": false,
+        "tail_4": false,
+        "tail_5": false,
+        "tail_end": false
+      },
+      "deltas": {
+        "tail_0": 0.0,
+        "tail_1": 0.0,
+        "tail_2": 0.0,
+        "tail_3": 0.0,
+        "tail_4": 0.0,
+        "tail_5": 0.0,
+        "tail_end": 0.0
+      },
+      "max_delta": 0.0,
+      "path": "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\datafiles\\hero_retarget_workbench\\artifacts\\extractions\\werewolf\\models\\heroes_wip\\werewolf\\dmx\\animation\\flinch_back.dmx"
+    },
+    "cast_start": {
+      "frames": [
+        0,
+        19,
+        [
+          0,
+          4,
+          9,
+          14,
+          19
+        ]
+      ],
+      "moving": {
+        "tail_0": false,
+        "tail_1": false,
+        "tail_2": false,
+        "tail_3": false,
+        "tail_4": false,
+        "tail_5": false,
+        "tail_end": false
+      },
+      "deltas": {
+        "tail_0": 0.0,
+        "tail_1": 0.0,
+        "tail_2": 0.0,
+        "tail_3": 0.0,
+        "tail_4": 0.0,
+        "tail_5": 0.0,
+        "tail_end": 0.0
+      },
+      "max_delta": 0.0,
+      "path": "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\datafiles\\hero_retarget_workbench\\artifacts\\extractions\\werewolf\\models\\heroes_wip\\werewolf\\dmx\\animation\\cast_start.dmx"
+    },
+    "aim_weapon_idle": {
+      "frames": [
+        0,
+        60,
+        [
+          0,
+          15,
+          30,
+          45,
+          60
+        ]
+      ],
+      "moving": {
+        "tail_0": false,
+        "tail_1": false,
+        "tail_2": false,
+        "tail_3": false,
+        "tail_4": false,
+        "tail_5": false,
+        "tail_end": false
+      },
+      "deltas": {
+        "tail_0": 0.0,
+        "tail_1": 0.0,
+        "tail_2": 0.0,
+        "tail_3": 0.0,
+        "tail_4": 0.0,
+        "tail_5": 0.0,
+        "tail_end": 0.0
+      },
+      "max_delta": 0.0,
+      "path": "<home>\\AppData\\Roaming\\Blender Foundation\\Blender\\5.4\\datafiles\\hero_retarget_workbench\\artifacts\\extractions\\werewolf\\models\\heroes_wip\\werewolf\\clips\\aim_weapon_idle.dmx"
+    }
+  },
+  "built_rig": {
+    "name": "shiv_body",
+    "bones": 168,
+    "tail": [
+      "tail_0",
+      "tail_1",
+      "tail_2",
+      "tail_3",
+      "tail_4",
+      "tail_5",
+      "tail_end"
+    ]
+  },
+  "built": {
+    "shiv_primary_stand_idle": {
+      "frames": [
+        0,
+        120,
+        [
+          0,
+          30,
+          60,
+          90,
+          120
+        ]
+      ],
+      "moving": {
+        "tail_0": true,
+        "tail_1": true,
+        "tail_2": true,
+        "tail_3": true,
+        "tail_4": true,
+        "tail_5": true,
+        "tail_end": true
+      },
+      "deltas": {
+        "tail_0": 0.14979891,
+        "tail_1": 0.10267324,
+        "tail_2": 0.10964851,
+        "tail_3": 0.07801324,
+        "tail_4": 0.08996158,
+        "tail_5": 0.31243017,
+        "tail_end": 5.72e-06
+      },
+      "max_delta": 0.31243017
+    },
+    "shiv_item_run_center": {
+      "frames": [
+        0,
+        20,
+        [
+          0,
+          5,
+          10,
+          15,
+          20
+        ]
+      ],
+      "moving": {
+        "tail_0": true,
+        "tail_1": true,
+        "tail_2": true,
+        "tail_3": true,
+        "tail_4": true,
+        "tail_5": true,
+        "tail_end": true
+      },
+      "deltas": {
+        "tail_0": 0.53464568,
+        "tail_1": 0.24740365,
+        "tail_2": 0.42142231,
+        "tail_3": 0.60589061,
+        "tail_4": 1.11358604,
+        "tail_5": 0.14397507,
+        "tail_end": 5.73e-06
+      },
+      "max_delta": 1.11358604
+    }
+  },
+  "animgraph": {
+    "clips/weapon_stand_idle": {
+      "frames": [
+        0,
+        120,
+        [
+          0,
+          30,
+          60,
+          90,
+          120
+        ]
+      ],
+      "moving": {
+        "tail_0": false,
+        "tail_1": false,
+        "tail_2": false,
+        "tail_3": false,
+        "tail_4": false,
+        "tail_5": false,
+        "tail_end": false
+      },
+      "deltas": {
+        "tail_0": 0.0,
+        "tail_1": 0.0,
+        "tail_2": 0.0,
+        "tail_3": 0.0,
+        "tail_4": 0.0,
+        "tail_5": 0.0,
+        "tail_end": 0.0
+      },
+      "max_delta": 0.0
+    },
+    "clips/item_run_center": {
+      "frames": [
+        0,
+        20,
+        [
+          0,
+          5,
+          10,
+          15,
+          20
+        ]
+      ],
+      "moving": {
+        "tail_0": false,
+        "tail_1": false,
+        "tail_2": false,
+        "tail_3": false,
+        "tail_4": false,
+        "tail_5": false,
+        "tail_end": false
+      },
+      "deltas": {
+        "tail_0": 0.0,
+        "tail_1": 0.0,
+        "tail_2": 0.0,
+        "tail_3": 0.0,
+        "tail_4": 0.0,
+        "tail_5": 0.0,
+        "tail_end": 0.0
+      },
+      "max_delta": 0.0
+    }
+  },
+  "ok": false
+}
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)

@@ -1,0 +1,24 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_body.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "shiv_body"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 1.7 seconds
+Info: Imported 1 files in 1.7 seconds
+ROOTS (WindowsPath('<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv'), WindowsPath('<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv/models/heroes_staging/shiv'))
+DOCS 138 ['ability_dash_start', 'ability_shiv_dash', 'ability_shiv_killingblow_leap']
+ROWS_BEFORE 0
+CREATED 138 ROWS_AFTER 138 FIRSTSTATE NEW FIRSTPATH <home>\AppData\Roaming\Blender Foundation\Blender\5.4\datafiles\hero_retarget_workbench\artifacts\extractions\shiv\models\heroes_staging\shiv\clips\ability_dash_start.dmx
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

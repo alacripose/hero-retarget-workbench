@@ -1,0 +1,3 @@
+$ <home>\Downloads\cli-windows-x64\Source2Viewer-CLI.exe -i artifacts\ab\release-tree-b --vpk_create artifacts\ab\rebuild-b.vpk -q
+
+--- Packed 267 files into "<home>\Documents\deadlock-model-forge\artifacts\ab\rebuild-b.vpk"

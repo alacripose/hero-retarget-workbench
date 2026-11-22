@@ -1,0 +1,308 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_body.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "shiv_body"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 1.3 seconds
+Info: Imported 1 files in 1.3 seconds
+
+DMX IMPORTER: now working on werewolf_werewolf_model.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "werewolf_werewolf_model"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 2.9 seconds
+Info: Imported 1 files in 2.9 seconds
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_stand_idle.
+Importing DMX animation "weapon_stand_idle"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: weapon_stand_idle contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 121 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_stand_idle.
+Warning: weapon_stand_idle contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.7 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.7 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_stand_idle.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_stand_idle.
+Importing DMX animation "weapon_stand_idle"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: weapon_stand_idle contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 57 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_stand_idle.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_stand_idle.
+Warning: weapon_stand_idle contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.5 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.5 seconds with 0 Errors and 3 Warnings
+TAILED weapon_stand_idle {'frames': 121, 'bones': 7}
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Importing DMX animation "item_run_center"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: item_run_center contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 21 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Warning: item_run_center contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in item_run_center.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in item_run_center.
+Importing DMX animation "item_run_center"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: item_run_center contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 17 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in item_run_center.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in item_run_center.
+Warning: item_run_center contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+TAILED item_run_center {'frames': 21, 'bones': 7}
+
+DMX IMPORTER: now working on in_air_loop_apex.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in in_air_loop_apex.
+Importing DMX animation "in_air_loop_apex"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: in_air_loop_apex contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 31 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in in_air_loop_apex.
+Warning: in_air_loop_apex contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on in_air_loop_apex.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in in_air_loop_apex.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in in_air_loop_apex.
+Importing DMX animation "in_air_loop_apex"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: in_air_loop_apex contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 67 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in in_air_loop_apex.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in in_air_loop_apex.
+Warning: in_air_loop_apex contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.5 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.5 seconds with 0 Errors and 3 Warnings
+TAILED in_air_loop_apex {'frames': 31, 'bones': 7}
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.3523
+- <home>\Documents\deadlock-model-forge\artifacts\tail-animgraph\shiv\models\heroes_staging\shiv\clips\weapon_stand_idle.dmx
+    DMX Bones:0.0309
+    DMX Animation setup:0.0744
+Frames: ........................................................................................................................
+- Writing DMX...
+    DMX write:0.8987
+ _run_dmx_writer:1.0043
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.3679
+- <home>\Documents\deadlock-model-forge\artifacts\tail-animgraph\shiv\models\heroes_staging\shiv\clips\item_run_center.dmx
+    DMX Bones:0.0892
+    DMX Animation setup:0.0355
+Frames: ....................
+- Writing DMX...
+    DMX write:0.2776
+ _run_dmx_writer:0.4026
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.3619
+- <home>\Documents\deadlock-model-forge\artifacts\tail-animgraph\shiv\models\heroes_staging\shiv\clips\in_air_loop_apex.dmx
+    DMX Bones:0.0278
+    DMX Animation setup:0.0364
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.3676
+ _run_dmx_writer:0.4321
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+WRITTEN {
+  "root": "<home>\\Documents\\deadlock-model-forge\\artifacts\\tail-animgraph\\shiv",
+  "written": [
+    {
+      "label": "weapon_stand_idle",
+      "source": "<home>\\Documents\\deadlock-model-forge\\artifacts\\tail-animgraph\\shiv\\models\\heroes_staging\\shiv\\clips\\weapon_stand_idle.dmx"
+    },
+    {
+      "label": "item_run_center",
+      "source": "<home>\\Documents\\deadlock-model-forge\\artifacts\\tail-animgraph\\shiv\\models\\heroes_staging\\shiv\\clips\\item_run_center.dmx"
+    },
+    {
+      "label": "in_air_loop_apex",
+      "source": "<home>\\Documents\\deadlock-model-forge\\artifacts\\tail-animgraph\\shiv\\models\\heroes_staging\\shiv\\clips\\in_air_loop_apex.dmx"
+    }
+  ],
+  "docs": [
+    "ClipDoc(label='weapon_stand_idle', vnmclip=WindowsPath('<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv/models/heroes_staging/shiv/clips/weapon_stand_idle.vnmclip'), source_relative='models/heroes_staging/shiv/clips/weapon_stand_idle.dmx', source=WindowsPath('<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv/models/heroes_staging/shiv/clips/weapon_stand_idle.dmx'), preview=WindowsPath('<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv/models/heroes_staging/shiv/clips/weapon_stand_idle.dmx'))",
+    "ClipDoc(label='item_run_center', vnmclip=WindowsPath('<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv/models/heroes_staging/shiv/clips/item_run_center.vnmclip'), source_relative='models/heroes_staging/shiv/clips/item_run_center.dmx', source=WindowsPath('<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv/models/heroes_staging/shiv/clips/item_run_center.dmx'), preview=WindowsPath('<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv/models/heroes_staging/shiv/clips/item_run_center.dmx'))",
+    "ClipDoc(label='in_air_loop_apex', vnmclip=WindowsPath('<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv/models/heroes_staging/shiv/clips/in_air_loop_apex.vnmclip'), source_relative='models/heroes_staging/shiv/clips/in_air_loop_apex.dmx', source=WindowsPath('<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv/models/heroes_staging/shiv/clips/in_air_loop_apex.dmx'), preview=WindowsPath('<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv/models/heroes_staging/shiv/clips/in_air_loop_apex.dmx'))"
+  ]
+}
+
+DMX IMPORTER: now working on shiv_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on in_air_loop_apex.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "in_air_loop_apex"
+- Imported 31 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_skel
+ planning:0.0005
+ Post Bake:0.3038
+- <home>\Documents\deadlock-model-forge\artifacts\tail-animgraph\shiv\models\heroes_staging\shiv\clips\weapon_stand_idle.001.dmx
+    DMX Bones:0.0276
+    DMX Animation setup:0.0707
+Frames: ........................................................................................................................
+- Writing DMX...
+    DMX write:0.9028
+ _run_dmx_writer:1.0014
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+
+PulseSrcOps exporting shiv_skel
+ planning:0.0004
+ Post Bake:0.3781
+- <home>\Documents\deadlock-model-forge\artifacts\tail-animgraph\shiv\models\heroes_staging\shiv\clips\item_run_center.001.dmx
+    DMX Bones:0.0364
+    DMX Animation setup:0.0298
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3585
+ _run_dmx_writer:0.4250
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+
+PulseSrcOps exporting shiv_skel
+ planning:0.0004
+ Post Bake:0.3173
+- <home>\Documents\deadlock-model-forge\artifacts\tail-animgraph\shiv\models\heroes_staging\shiv\clips\in_air_loop_apex.001.dmx
+    DMX Bones:0.0351
+    DMX Animation setup:0.0318
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.3266
+ _run_dmx_writer:0.3938
+1 files exported in 0.7 seconds
+Info: 1 files exported in 0.7 seconds
+
+PulseSrcOps exporting DMF Skeleton Export
+ planning:0.0010
+ bake:    2.3930
+ WARNING: Multiple armatures detected: "werewolf_werewolf_model.001" is bound to "werewolf_werewolf_model", but "shiv_skel" already selected "shiv_skel" as the export skeleton - only "shiv_skel" will be used
+ Post Bake:0.2701
+- <home>\Documents\deadlock-model-forge\artifacts\tail-animgraph\shiv\models\heroes_staging\shiv\dmx\mesh\DMF_Skeleton_Export.dmx
+    DMX Bones:0.0182
+    DMX object setup:0.1855
+    DMX verts:0.1754
+    DMX loops:1.8595
+    DMX Source 2 vertex data:3.0316
+    DMX insert:0.0847
+Polygons: ...................................................
+    DMX polys:1.2235
+Shapes: - Writing DMX...
+    DMX write:0.5157
+ _run_dmx_writer:7.0944
+ WARNING: Consider renaming "DMF Skeleton Export_temp_base": in Source 2, model names can contain only lower-case characters, digits, and/or underscores.
+0 Errors and 2 Warnings
+Warning: Multiple armatures detected: "werewolf_werewolf_model.001" is bound to "werewolf_werewolf_model", but "shiv_skel" already selected "shiv_skel" as the export skeleton - only "shiv_skel" will be used
+Warning: Consider renaming "DMF Skeleton Export_temp_base": in Source 2, model names can contain only lower-case characters, digits, and/or underscores.
+1 files exported in 9.8 seconds with 0 Errors and 2 Warnings
+Info: 1 files exported in 9.8 seconds with 0 Errors and 2 Warnings
+PUBLISHED 3 3 0 <home>\Downloads\Reduced_CSDK_13\game\citadel_addons\shiv_tail_147_test
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

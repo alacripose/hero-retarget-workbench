@@ -1,0 +1,1467 @@
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -32919.891691
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 0.57 ms!
+
+DMX IMPORTER: now working on ability_dash_start.dmx
+- Loading DMX...
+Importing DMX animation "ability_dash_start"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL ability_dash_start swing=0.000
+
+DMX IMPORTER: now working on ability_shiv_dash.dmx
+- Loading DMX...
+Importing DMX animation "ability_shiv_dash"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL ability_shiv_dash swing=0.000
+
+DMX IMPORTER: now working on ability_shiv_killingblow_idle.dmx
+- Loading DMX...
+Importing DMX animation "ability_shiv_killingblow_idle"
+- Imported 36 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL ability_shiv_killingblow_idle swing=0.445
+
+DMX IMPORTER: now working on ability_shiv_killingblow_leap.dmx
+- Loading DMX...
+Importing DMX animation "ability_shiv_killingblow_leap"
+- Imported 43 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL ability_shiv_killingblow_leap swing=0.000
+
+DMX IMPORTER: now working on ability_shiv_killingblow_slash.dmx
+- Loading DMX...
+Importing DMX animation "ability_shiv_killingblow_slash"
+- Imported 30 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL ability_shiv_killingblow_slash swing=0.000
+
+DMX IMPORTER: now working on aim_weapon_crouch.dmx
+- Loading DMX...
+Importing DMX animation "aim_weapon_crouch"
+- Imported 31 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL aim_weapon_crouch swing=0.000
+
+DMX IMPORTER: now working on aim_weapon_crouch_down.dmx
+- Loading DMX...
+Importing DMX animation "aim_weapon_crouch_down"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL aim_weapon_crouch_down swing=0.000
+
+DMX IMPORTER: now working on aim_weapon_crouch_run.dmx
+- Loading DMX...
+Importing DMX animation "aim_weapon_crouch_run"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL aim_weapon_crouch_run swing=0.422
+
+DMX IMPORTER: now working on aim_weapon_crouch_up.dmx
+- Loading DMX...
+Importing DMX animation "aim_weapon_crouch_up"
+- Imported 26 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL aim_weapon_crouch_up swing=0.000
+
+DMX IMPORTER: now working on aim_weapon_idle.dmx
+- Loading DMX...
+Importing DMX animation "aim_weapon_idle"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL aim_weapon_idle swing=0.000
+
+DMX IMPORTER: now working on aim_weapon_idle_down.dmx
+- Loading DMX...
+Importing DMX animation "aim_weapon_idle_down"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL aim_weapon_idle_down swing=0.000
+
+DMX IMPORTER: now working on aim_weapon_idle_up.dmx
+- Loading DMX...
+Importing DMX animation "aim_weapon_idle_up"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL aim_weapon_idle_up swing=0.000
+
+DMX IMPORTER: now working on aim_weapon_in_air.dmx
+- Loading DMX...
+Importing DMX animation "aim_weapon_in_air"
+- Imported 10 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL aim_weapon_in_air swing=0.422
+
+DMX IMPORTER: now working on aim_weapon_run.dmx
+- Loading DMX...
+Importing DMX animation "aim_weapon_run"
+- Imported 10 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL aim_weapon_run swing=0.422
+
+DMX IMPORTER: now working on aim_weapon_slide.dmx
+- Loading DMX...
+Importing DMX animation "aim_weapon_slide"
+- Imported 10 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL aim_weapon_slide swing=0.422
+
+DMX IMPORTER: now working on cast_channeling_end.dmx
+- Loading DMX...
+Importing DMX animation "cast_channeling_end"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL cast_channeling_end swing=0.000
+
+DMX IMPORTER: now working on cast_channeling_loop.dmx
+- Loading DMX...
+Importing DMX animation "cast_channeling_loop"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL cast_channeling_loop swing=0.000
+
+DMX IMPORTER: now working on cast_channeling_start.dmx
+- Loading DMX...
+Importing DMX animation "cast_channeling_start"
+- Imported 6 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL cast_channeling_start swing=0.000
+
+DMX IMPORTER: now working on cast_end.dmx
+- Loading DMX...
+Importing DMX animation "cast_end"
+- Imported 19 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL cast_end swing=0.000
+
+DMX IMPORTER: now working on cast_loop.dmx
+- Loading DMX...
+Importing DMX animation "cast_loop"
+- Imported 51 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL cast_loop swing=0.000
+
+DMX IMPORTER: now working on cast_start.dmx
+- Loading DMX...
+Importing DMX animation "cast_start"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL cast_start swing=0.000
+
+DMX IMPORTER: now working on corner_lean_crouch.dmx
+- Loading DMX...
+Importing DMX animation "corner_lean_crouch"
+- Imported 11 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL corner_lean_crouch swing=0.000
+
+DMX IMPORTER: now working on corner_lean_crouch_run.dmx
+- Loading DMX...
+Importing DMX animation "corner_lean_crouch_run"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL corner_lean_crouch_run swing=0.000
+
+DMX IMPORTER: now working on corner_lean_run.dmx
+- Loading DMX...
+Importing DMX animation "corner_lean_run"
+- Imported 11 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL corner_lean_run swing=0.000
+
+DMX IMPORTER: now working on corner_lean_stand.dmx
+- Loading DMX...
+Importing DMX animation "corner_lean_stand"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL corner_lean_stand swing=0.000
+
+DMX IMPORTER: now working on dash_air_back.dmx
+- Loading DMX...
+Importing DMX animation "dash_air_back"
+- Imported 46 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+TAIL dash_air_back swing=3.038
+
+DMX IMPORTER: now working on dash_air_forward.dmx
+- Loading DMX...
+Importing DMX animation "dash_air_forward"
+- Imported 51 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL dash_air_forward swing=1.924
+
+DMX IMPORTER: now working on dash_air_left.dmx
+- Loading DMX...
+Importing DMX animation "dash_air_left"
+- Imported 51 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL dash_air_left swing=1.890
+
+DMX IMPORTER: now working on dash_air_right.dmx
+- Loading DMX...
+Importing DMX animation "dash_air_right"
+- Imported 51 frames of animation
+Imported 1 files in 0.9 seconds
+Info: Imported 1 files in 0.9 seconds
+TAIL dash_air_right swing=1.194
+
+DMX IMPORTER: now working on dash_ground.dmx
+- Loading DMX...
+Importing DMX animation "dash_ground"
+- Imported 53 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL dash_ground swing=2.359
+
+DMX IMPORTER: now working on flinch_back.dmx
+- Loading DMX...
+Importing DMX animation "flinch_back"
+- Imported 16 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL flinch_back swing=0.000
+
+DMX IMPORTER: now working on flinch_left.dmx
+- Loading DMX...
+Importing DMX animation "flinch_left"
+- Imported 16 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL flinch_left swing=0.000
+
+DMX IMPORTER: now working on flinch_right.dmx
+- Loading DMX...
+Importing DMX animation "flinch_right"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL flinch_right swing=0.000
+
+DMX IMPORTER: now working on in_air_loop_apex.dmx
+- Loading DMX...
+Importing DMX animation "in_air_loop_apex"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL in_air_loop_apex swing=0.650
+
+DMX IMPORTER: now working on in_air_loop_down.dmx
+- Loading DMX...
+Importing DMX animation "in_air_loop_down"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL in_air_loop_down swing=1.100
+
+DMX IMPORTER: now working on item_crouch_idle.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.7 seconds
+Info: Imported 1 files in 1.7 seconds
+TAIL item_crouch_idle swing=0.000
+
+DMX IMPORTER: now working on item_crouch_run_center.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_run_center"
+- Imported 35 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL item_crouch_run_center swing=0.000
+
+DMX IMPORTER: now working on item_crouch_run_e.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_run_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL item_crouch_run_e swing=0.000
+
+DMX IMPORTER: now working on item_crouch_run_n.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_run_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL item_crouch_run_n swing=0.000
+
+DMX IMPORTER: now working on item_crouch_run_ne.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_run_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL item_crouch_run_ne swing=0.000
+
+DMX IMPORTER: now working on item_crouch_run_nw.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_run_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL item_crouch_run_nw swing=0.000
+
+DMX IMPORTER: now working on item_crouch_run_s.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_run_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.9 seconds
+Info: Imported 1 files in 0.9 seconds
+TAIL item_crouch_run_s swing=0.000
+
+DMX IMPORTER: now working on item_crouch_run_se.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_run_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL item_crouch_run_se swing=0.000
+
+DMX IMPORTER: now working on item_crouch_run_sw.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_run_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL item_crouch_run_sw swing=0.000
+
+DMX IMPORTER: now working on item_crouch_run_w.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_run_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL item_crouch_run_w swing=0.000
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+Importing DMX animation "item_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL item_run_center swing=0.826
+
+DMX IMPORTER: now working on item_run_e.dmx
+- Loading DMX...
+Importing DMX animation "item_run_e"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL item_run_e swing=1.173
+
+DMX IMPORTER: now working on item_run_n.dmx
+- Loading DMX...
+Importing DMX animation "item_run_n"
+- Imported 21 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL item_run_n swing=1.124
+
+DMX IMPORTER: now working on item_run_ne.dmx
+- Loading DMX...
+Importing DMX animation "item_run_ne"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL item_run_ne swing=1.164
+
+DMX IMPORTER: now working on item_run_nw.dmx
+- Loading DMX...
+Importing DMX animation "item_run_nw"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL item_run_nw swing=1.369
+
+DMX IMPORTER: now working on item_run_s.dmx
+- Loading DMX...
+Importing DMX animation "item_run_s"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL item_run_s swing=1.050
+
+DMX IMPORTER: now working on item_run_se.dmx
+- Loading DMX...
+Importing DMX animation "item_run_se"
+- Imported 21 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL item_run_se swing=1.388
+
+DMX IMPORTER: now working on item_run_sw.dmx
+- Loading DMX...
+Importing DMX animation "item_run_sw"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL item_run_sw swing=0.719
+
+DMX IMPORTER: now working on item_run_w.dmx
+- Loading DMX...
+Importing DMX animation "item_run_w"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL item_run_w swing=0.723
+
+DMX IMPORTER: now working on item_stand_idle.dmx
+- Loading DMX...
+Importing DMX animation "item_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.7 seconds
+Info: Imported 1 files in 1.7 seconds
+TAIL item_stand_idle swing=0.447
+
+DMX IMPORTER: now working on jump_forced.dmx
+- Loading DMX...
+Importing DMX animation "jump_forced"
+- Imported 27 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL jump_forced swing=0.443
+
+DMX IMPORTER: now working on jump_ground.dmx
+- Loading DMX...
+Importing DMX animation "jump_ground"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL jump_ground swing=1.498
+
+DMX IMPORTER: now working on jump_zipline.dmx
+- Loading DMX...
+Importing DMX animation "jump_zipline"
+- Imported 45 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL jump_zipline swing=0.000
+
+DMX IMPORTER: now working on knockdown_in_air_loop.dmx
+- Loading DMX...
+Importing DMX animation "knockdown_in_air_loop"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL knockdown_in_air_loop swing=0.000
+
+DMX IMPORTER: now working on knockdown_in_air_start.dmx
+- Loading DMX...
+Importing DMX animation "knockdown_in_air_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL knockdown_in_air_start swing=0.000
+
+DMX IMPORTER: now working on knockdown_large_getup.dmx
+- Loading DMX...
+Importing DMX animation "knockdown_large_getup"
+- Imported 51 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL knockdown_large_getup swing=0.000
+
+DMX IMPORTER: now working on knockdown_large_loop.dmx
+- Loading DMX...
+Importing DMX animation "knockdown_large_loop"
+- Imported 11 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL knockdown_large_loop swing=0.000
+
+DMX IMPORTER: now working on knockdown_large_start.dmx
+- Loading DMX...
+Importing DMX animation "knockdown_large_start"
+- Imported 50 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+TAIL knockdown_large_start swing=0.000
+
+DMX IMPORTER: now working on knockdown_medium_loop.dmx
+- Loading DMX...
+Importing DMX animation "knockdown_medium_loop"
+- Imported 27 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL knockdown_medium_loop swing=0.000
+
+DMX IMPORTER: now working on knockdown_medium_start.dmx
+- Loading DMX...
+Importing DMX animation "knockdown_medium_start"
+- Imported 20 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL knockdown_medium_start swing=0.000
+
+DMX IMPORTER: now working on knockdown_small.dmx
+- Loading DMX...
+Importing DMX animation "knockdown_small"
+- Imported 30 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+TAIL knockdown_small swing=0.000
+
+DMX IMPORTER: now working on landing_impact_crouch.dmx
+- Loading DMX...
+Importing DMX animation "landing_impact_crouch"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL landing_impact_crouch swing=0.268
+
+DMX IMPORTER: now working on landing_impact_idle.dmx
+- Loading DMX...
+Importing DMX animation "landing_impact_idle"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL landing_impact_idle swing=1.224
+
+DMX IMPORTER: now working on lift_loop.dmx
+- Loading DMX...
+Importing DMX animation "lift_loop"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL lift_loop swing=0.000
+
+DMX IMPORTER: now working on loco_lean_back.dmx
+- Loading DMX...
+Importing DMX animation "loco_lean_back"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL loco_lean_back swing=0.000
+
+DMX IMPORTER: now working on loco_lean_center.dmx
+- Loading DMX...
+Importing DMX animation "loco_lean_center"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL loco_lean_center swing=0.000
+
+DMX IMPORTER: now working on loco_lean_forward.dmx
+- Loading DMX...
+Importing DMX animation "loco_lean_forward"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL loco_lean_forward swing=0.000
+
+DMX IMPORTER: now working on loco_lean_left.dmx
+- Loading DMX...
+Importing DMX animation "loco_lean_left"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL loco_lean_left swing=0.000
+
+DMX IMPORTER: now working on loco_lean_right.dmx
+- Loading DMX...
+Importing DMX animation "loco_lean_right"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL loco_lean_right swing=0.000
+
+DMX IMPORTER: now working on mantle_128.dmx
+- Loading DMX...
+Importing DMX animation "mantle_128"
+- Imported 41 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL mantle_128 swing=1.159
+
+DMX IMPORTER: now working on mantle_32.dmx
+- Loading DMX...
+Importing DMX animation "mantle_32"
+- Imported 24 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL mantle_32 swing=0.511
+
+DMX IMPORTER: now working on mantle_64.dmx
+- Loading DMX...
+Importing DMX animation "mantle_64"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL mantle_64 swing=0.918
+
+DMX IMPORTER: now working on mantle_96.dmx
+- Loading DMX...
+Importing DMX animation "mantle_96"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL mantle_96 swing=1.884
+
+DMX IMPORTER: now working on melee_dash.dmx
+- Loading DMX...
+Importing DMX animation "melee_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL melee_dash swing=0.000
+
+DMX IMPORTER: now working on melee_dash_down.dmx
+- Loading DMX...
+Importing DMX animation "melee_dash_down"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL melee_dash_down swing=0.430
+
+DMX IMPORTER: now working on melee_dash_up.dmx
+- Loading DMX...
+Importing DMX animation "melee_dash_up"
+- Imported 8 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL melee_dash_up swing=0.430
+
+DMX IMPORTER: now working on melee_hit.dmx
+- Loading DMX...
+Importing DMX animation "melee_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL melee_hit swing=0.000
+
+DMX IMPORTER: now working on melee_hit_down.dmx
+- Loading DMX...
+Importing DMX animation "melee_hit_down"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL melee_hit_down swing=0.445
+
+DMX IMPORTER: now working on melee_hit_up.dmx
+- Loading DMX...
+Importing DMX animation "melee_hit_up"
+- Imported 22 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL melee_hit_up swing=0.445
+
+DMX IMPORTER: now working on melee_in_air_dash.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL melee_in_air_dash swing=0.000
+
+DMX IMPORTER: now working on melee_in_air_dash_down.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_dash_down"
+- Imported 8 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL melee_in_air_dash_down swing=0.430
+
+DMX IMPORTER: now working on melee_in_air_dash_up.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_dash_up"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL melee_in_air_dash_up swing=0.430
+
+DMX IMPORTER: now working on melee_in_air_hit.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL melee_in_air_hit swing=0.000
+
+DMX IMPORTER: now working on melee_in_air_hit_down.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_hit_down"
+- Imported 22 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL melee_in_air_hit_down swing=0.445
+
+DMX IMPORTER: now working on melee_in_air_hit_up.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_hit_up"
+- Imported 22 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL melee_in_air_hit_up swing=0.445
+
+DMX IMPORTER: now working on melee_in_air_start.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL melee_in_air_start swing=0.000
+
+DMX IMPORTER: now working on melee_in_air_start_down.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_start_down"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL melee_in_air_start_down swing=0.435
+
+DMX IMPORTER: now working on melee_in_air_start_up.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_start_up"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL melee_in_air_start_up swing=0.435
+
+DMX IMPORTER: now working on melee_quick_1.dmx
+- Loading DMX...
+Importing DMX animation "melee_quick_1"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL melee_quick_1 swing=0.000
+
+DMX IMPORTER: now working on melee_quick_1_down.dmx
+- Loading DMX...
+Importing DMX animation "melee_quick_1_down"
+- Imported 19 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL melee_quick_1_down swing=0.447
+
+DMX IMPORTER: now working on melee_quick_1_up.dmx
+- Loading DMX...
+Importing DMX animation "melee_quick_1_up"
+- Imported 19 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL melee_quick_1_up swing=0.447
+
+DMX IMPORTER: now working on melee_quick_2.dmx
+- Loading DMX...
+Importing DMX animation "melee_quick_2"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL melee_quick_2 swing=0.000
+
+DMX IMPORTER: now working on melee_start.dmx
+- Loading DMX...
+Importing DMX animation "melee_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL melee_start swing=0.000
+
+DMX IMPORTER: now working on melee_start_down.dmx
+- Loading DMX...
+Importing DMX animation "melee_start_down"
+- Imported 16 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL melee_start_down swing=0.435
+
+DMX IMPORTER: now working on melee_start_up.dmx
+- Loading DMX...
+Importing DMX animation "melee_start_up"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL melee_start_up swing=0.435
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_e.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_crouch_run_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL out_of_combat_crouch_run_e swing=0.447
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_n.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_crouch_run_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL out_of_combat_crouch_run_n swing=0.447
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_ne.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_crouch_run_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL out_of_combat_crouch_run_ne swing=0.447
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_nw.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_crouch_run_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL out_of_combat_crouch_run_nw swing=0.447
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_s.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_crouch_run_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL out_of_combat_crouch_run_s swing=0.447
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_se.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_crouch_run_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL out_of_combat_crouch_run_se swing=0.447
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_sw.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_crouch_run_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL out_of_combat_crouch_run_sw swing=0.447
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_w.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_crouch_run_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL out_of_combat_crouch_run_w swing=0.447
+
+DMX IMPORTER: now working on out_of_combat_run_center.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_center"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL out_of_combat_run_center swing=0.000
+
+DMX IMPORTER: now working on out_of_combat_run_e.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_e"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL out_of_combat_run_e swing=0.000
+
+DMX IMPORTER: now working on out_of_combat_run_n.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_n"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL out_of_combat_run_n swing=1.693
+
+DMX IMPORTER: now working on out_of_combat_run_ne.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_ne"
+- Imported 19 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL out_of_combat_run_ne swing=1.693
+
+DMX IMPORTER: now working on out_of_combat_run_nw.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_nw"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL out_of_combat_run_nw swing=1.693
+
+DMX IMPORTER: now working on out_of_combat_run_s.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_s"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL out_of_combat_run_s swing=0.000
+
+DMX IMPORTER: now working on out_of_combat_run_se.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_se"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL out_of_combat_run_se swing=0.000
+
+DMX IMPORTER: now working on out_of_combat_run_sw.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_sw"
+- Imported 19 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL out_of_combat_run_sw swing=0.000
+
+DMX IMPORTER: now working on out_of_combat_run_w.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_w"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL out_of_combat_run_w swing=0.000
+
+DMX IMPORTER: now working on parry.dmx
+- Loading DMX...
+Importing DMX animation "parry"
+- Imported 35 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL parry swing=0.000
+
+DMX IMPORTER: now working on parry_success.dmx
+- Loading DMX...
+Importing DMX animation "parry_success"
+- Imported 33 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL parry_success swing=0.000
+
+DMX IMPORTER: now working on reload_crouch_idle.dmx
+- Loading DMX...
+Importing DMX animation "reload_crouch_idle"
+- Imported 51 frames of animation
+Imported 1 files in 0.9 seconds
+Info: Imported 1 files in 0.9 seconds
+TAIL reload_crouch_idle swing=0.447
+
+DMX IMPORTER: now working on reload_crouch_idle_quick.dmx
+- Loading DMX...
+Importing DMX animation "reload_crouch_idle_quick"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL reload_crouch_idle_quick swing=0.437
+
+DMX IMPORTER: now working on reload_crouch_run_quick.dmx
+- Loading DMX...
+Importing DMX animation "reload_crouch_run_quick"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL reload_crouch_run_quick swing=0.437
+
+DMX IMPORTER: now working on reload_idle.dmx
+- Loading DMX...
+Importing DMX animation "reload_idle"
+- Imported 51 frames of animation
+Imported 1 files in 0.9 seconds
+Info: Imported 1 files in 0.9 seconds
+TAIL reload_idle swing=0.000
+
+DMX IMPORTER: now working on reload_idle_quick.dmx
+- Loading DMX...
+Importing DMX animation "reload_idle_quick"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL reload_idle_quick swing=0.437
+
+DMX IMPORTER: now working on reload_in_air_quick.dmx
+- Loading DMX...
+Importing DMX animation "reload_in_air_quick"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL reload_in_air_quick swing=0.437
+
+DMX IMPORTER: now working on reload_run.dmx
+- Loading DMX...
+Importing DMX animation "reload_run"
+- Imported 51 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+TAIL reload_run swing=0.447
+
+DMX IMPORTER: now working on reload_run_quick.dmx
+- Loading DMX...
+Importing DMX animation "reload_run_quick"
+- Imported 17 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL reload_run_quick swing=0.437
+
+DMX IMPORTER: now working on reload_slide_quick.dmx
+- Loading DMX...
+Importing DMX animation "reload_slide_quick"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL reload_slide_quick swing=0.437
+
+DMX IMPORTER: now working on rope_climb_down.dmx
+- Loading DMX...
+Importing DMX animation "rope_climb_down"
+- Imported 11 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL rope_climb_down swing=0.050
+
+DMX IMPORTER: now working on rope_climb_idle.dmx
+- Loading DMX...
+Importing DMX animation "rope_climb_idle"
+- Imported 5 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL rope_climb_idle swing=0.000
+
+DMX IMPORTER: now working on rope_climb_up.dmx
+- Loading DMX...
+Importing DMX animation "rope_climb_up"
+- Imported 16 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL rope_climb_up swing=0.753
+
+DMX IMPORTER: now working on run_to_stop_crouch.dmx
+- Loading DMX...
+Importing DMX animation "run_to_stop_crouch"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL run_to_stop_crouch swing=0.000
+
+DMX IMPORTER: now working on run_to_stop_stand.dmx
+- Loading DMX...
+Importing DMX animation "run_to_stop_stand"
+- Imported 26 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL run_to_stop_stand swing=0.078
+
+DMX IMPORTER: now working on shiv_dagger.dmx
+- Loading DMX...
+Importing DMX animation "shiv_dagger"
+- Imported 28 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL shiv_dagger swing=0.000
+
+DMX IMPORTER: now working on shoot_alt_idle.dmx
+- Loading DMX...
+Importing DMX animation "shoot_alt_idle"
+- Imported 46 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL shoot_alt_idle swing=0.000
+
+DMX IMPORTER: now working on shoot_idle.dmx
+- Loading DMX...
+Importing DMX animation "shoot_idle"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL shoot_idle swing=0.257
+
+DMX IMPORTER: now working on shopping_idle.dmx
+- Loading DMX...
+Importing DMX animation "shopping_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.6 seconds
+Info: Imported 1 files in 1.6 seconds
+TAIL shopping_idle swing=0.000
+
+DMX IMPORTER: now working on sleep_idle.dmx
+- Loading DMX...
+Importing DMX animation "sleep_idle"
+- Imported 81 frames of animation
+Imported 1 files in 1.2 seconds
+Info: Imported 1 files in 1.2 seconds
+TAIL sleep_idle swing=0.152
+
+DMX IMPORTER: now working on slide_getup.dmx
+- Loading DMX...
+Importing DMX animation "slide_getup"
+- Imported 13 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL slide_getup swing=5.802
+
+DMX IMPORTER: now working on slide_loop.dmx
+- Loading DMX...
+Importing DMX animation "slide_loop"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL slide_loop swing=0.000
+
+DMX IMPORTER: now working on slide_start.dmx
+- Loading DMX...
+Importing DMX animation "slide_start"
+- Imported 18 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL slide_start swing=0.765
+
+DMX IMPORTER: now working on throw.dmx
+- Loading DMX...
+Importing DMX animation "throw"
+- Imported 20 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL throw swing=0.000
+
+DMX IMPORTER: now working on turn_crouch_left.dmx
+- Loading DMX...
+Importing DMX animation "turn_crouch_left"
+- Imported 18 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL turn_crouch_left swing=0.000
+
+DMX IMPORTER: now working on turn_crouch_right.dmx
+- Loading DMX...
+Importing DMX animation "turn_crouch_right"
+- Imported 18 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL turn_crouch_right swing=0.000
+
+DMX IMPORTER: now working on turn_left.dmx
+- Loading DMX...
+Importing DMX animation "turn_left"
+- Imported 18 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL turn_left swing=0.000
+
+DMX IMPORTER: now working on turn_right.dmx
+- Loading DMX...
+Importing DMX animation "turn_right"
+- Imported 18 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL turn_right swing=0.000
+
+DMX IMPORTER: now working on wall_attach_forward.dmx
+- Loading DMX...
+Importing DMX animation "wall_attach_forward"
+- Imported 11 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL wall_attach_forward swing=0.000
+
+DMX IMPORTER: now working on wall_attach_left.dmx
+- Loading DMX...
+Importing DMX animation "wall_attach_left"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL wall_attach_left swing=0.000
+
+DMX IMPORTER: now working on wall_attach_right.dmx
+- Loading DMX...
+Importing DMX animation "wall_attach_right"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+TAIL wall_attach_right swing=0.000
+
+DMX IMPORTER: now working on weapon_crouch_idle.dmx
+- Loading DMX...
+Importing DMX animation "weapon_crouch_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.7 seconds
+Info: Imported 1 files in 1.7 seconds
+TAIL weapon_crouch_idle swing=0.275
+
+DMX IMPORTER: now working on weapon_crouch_run_center.dmx
+- Loading DMX...
+Importing DMX animation "weapon_crouch_run_center"
+- Imported 35 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+TAIL weapon_crouch_run_center swing=0.000
+
+DMX IMPORTER: now working on weapon_crouch_run_e.dmx
+- Loading DMX...
+Importing DMX animation "weapon_crouch_run_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL weapon_crouch_run_e swing=0.000
+
+DMX IMPORTER: now working on weapon_crouch_run_n.dmx
+- Loading DMX...
+Importing DMX animation "weapon_crouch_run_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL weapon_crouch_run_n swing=0.000
+
+DMX IMPORTER: now working on weapon_crouch_run_ne.dmx
+- Loading DMX...
+Importing DMX animation "weapon_crouch_run_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+TAIL weapon_crouch_run_ne swing=0.000
+
+DMX IMPORTER: now working on weapon_crouch_run_nw.dmx
+- Loading DMX...
+Importing DMX animation "weapon_crouch_run_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL weapon_crouch_run_nw swing=0.000
+
+DMX IMPORTER: now working on weapon_crouch_run_s.dmx
+- Loading DMX...
+Importing DMX animation "weapon_crouch_run_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL weapon_crouch_run_s swing=0.000
+
+DMX IMPORTER: now working on weapon_crouch_run_se.dmx
+- Loading DMX...
+Importing DMX animation "weapon_crouch_run_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL weapon_crouch_run_se swing=0.000
+
+DMX IMPORTER: now working on weapon_crouch_run_sw.dmx
+- Loading DMX...
+Importing DMX animation "weapon_crouch_run_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL weapon_crouch_run_sw swing=0.000
+
+DMX IMPORTER: now working on weapon_crouch_run_w.dmx
+- Loading DMX...
+Importing DMX animation "weapon_crouch_run_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL weapon_crouch_run_w swing=0.000
+
+DMX IMPORTER: now working on weapon_run_center.dmx
+- Loading DMX...
+Importing DMX animation "weapon_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL weapon_run_center swing=0.826
+
+DMX IMPORTER: now working on weapon_run_e.dmx
+- Loading DMX...
+Importing DMX animation "weapon_run_e"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL weapon_run_e swing=1.173
+
+DMX IMPORTER: now working on weapon_run_n.dmx
+- Loading DMX...
+Importing DMX animation "weapon_run_n"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL weapon_run_n swing=1.124
+
+DMX IMPORTER: now working on weapon_run_ne.dmx
+- Loading DMX...
+Importing DMX animation "weapon_run_ne"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL weapon_run_ne swing=1.164
+
+DMX IMPORTER: now working on weapon_run_nw.dmx
+- Loading DMX...
+Importing DMX animation "weapon_run_nw"
+- Imported 21 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL weapon_run_nw swing=1.369
+
+DMX IMPORTER: now working on weapon_run_s.dmx
+- Loading DMX...
+Importing DMX animation "weapon_run_s"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL weapon_run_s swing=1.050
+
+DMX IMPORTER: now working on weapon_run_se.dmx
+- Loading DMX...
+Importing DMX animation "weapon_run_se"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL weapon_run_se swing=1.388
+
+DMX IMPORTER: now working on weapon_run_sw.dmx
+- Loading DMX...
+Importing DMX animation "weapon_run_sw"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+TAIL weapon_run_sw swing=0.719
+
+DMX IMPORTER: now working on weapon_run_w.dmx
+- Loading DMX...
+Importing DMX animation "weapon_run_w"
+- Imported 21 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL weapon_run_w swing=0.723
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+Importing DMX animation "weapon_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.6 seconds
+Info: Imported 1 files in 1.6 seconds
+TAIL weapon_stand_idle swing=0.447
+
+DMX IMPORTER: now working on zipline_attached_loop.dmx
+- Loading DMX...
+Importing DMX animation "zipline_attached_loop"
+- Imported 46 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL zipline_attached_loop swing=0.000
+
+DMX IMPORTER: now working on zipline_attached_start.dmx
+- Loading DMX...
+Importing DMX animation "zipline_attached_start"
+- Imported 25 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+TAIL zipline_attached_start swing=0.000
+
+DMX IMPORTER: now working on zipline_awaiting_tether.dmx
+- Loading DMX...
+Importing DMX animation "zipline_awaiting_tether"
+- Imported 61 frames of animation
+Imported 1 files in 1.0 seconds
+Info: Imported 1 files in 1.0 seconds
+TAIL zipline_awaiting_tether swing=0.000
+
+DMX IMPORTER: now working on zipline_tethered_reeling_loop.dmx
+- Loading DMX...
+Importing DMX animation "zipline_tethered_reeling_loop"
+- Imported 89 frames of animation
+Imported 1 files in 1.3 seconds
+Info: Imported 1 files in 1.3 seconds
+TAIL zipline_tethered_reeling_loop swing=0.000
+
+DMX IMPORTER: now working on zoomed_crouch_run_e.dmx
+- Loading DMX...
+Importing DMX animation "zoomed_crouch_run_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL zoomed_crouch_run_e swing=0.447
+
+DMX IMPORTER: now working on zoomed_crouch_run_n.dmx
+- Loading DMX...
+Importing DMX animation "zoomed_crouch_run_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL zoomed_crouch_run_n swing=0.447
+
+DMX IMPORTER: now working on zoomed_crouch_run_ne.dmx
+- Loading DMX...
+Importing DMX animation "zoomed_crouch_run_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL zoomed_crouch_run_ne swing=0.447
+
+DMX IMPORTER: now working on zoomed_crouch_run_nw.dmx
+- Loading DMX...
+Importing DMX animation "zoomed_crouch_run_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL zoomed_crouch_run_nw swing=0.447
+
+DMX IMPORTER: now working on zoomed_crouch_run_s.dmx
+- Loading DMX...
+Importing DMX animation "zoomed_crouch_run_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+TAIL zoomed_crouch_run_s swing=0.447
+
+DMX IMPORTER: now working on zoomed_crouch_run_se.dmx
+- Loading DMX...
+Importing DMX animation "zoomed_crouch_run_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+TAIL zoomed_crouch_run_se swing=0.447
+
+DMX IMPORTER: now working on zoomed_crouch_run_sw.dmx
+- Loading DMX...
+Importing DMX animation "zoomed_crouch_run_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL zoomed_crouch_run_sw swing=0.447
+
+DMX IMPORTER: now working on zoomed_crouch_run_w.dmx
+- Loading DMX...
+Importing DMX animation "zoomed_crouch_run_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+TAIL zoomed_crouch_run_w swing=0.447
+TAIL done 181 clips, 89 with a moving tail, 0 failed
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+[Blender Buddy] unregister: Server not running.
+INFO: Ucupaint 2.4.9 is unregistered!
+[36m[FNPORTING] [0mShutdown Server

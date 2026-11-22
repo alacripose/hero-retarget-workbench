@@ -1,0 +1,2 @@
+GATE REFUSE skeleton-tail-chain-flat: haze_model_tail.dmx does not parent the tail as a chain: [('tail_1', 'pelvis', 'tail_0'), ('tail_2', 'pelvis', 'tail_1'), ('tail_3', 'pelvis', 'tail_2'), ('tail_4', 'pelvis', 'tail_3')]; a flat chain has no joint to swing and the tail lies on the ground
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

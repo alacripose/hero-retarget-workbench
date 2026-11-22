@@ -1,0 +1,1 @@
+{"at":"2026-11-20T18:19:55.958Z","before":"- **A live compile can actually be stopped.**","after":"A live compile can actually be stopped: the job sets a cancel event and ends as CANCELLED.","grade":"annotated","gaps":["bold-lead-only"],"source":"notation-ide"}

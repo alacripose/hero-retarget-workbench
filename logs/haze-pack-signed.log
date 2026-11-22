@@ -1,0 +1,4 @@
+GATE ADMIT haze_tail: model 144 joints, skeleton 131, tail 9
+PROOF (no verdict) proof-needs-skeleton: the addon has no .vnmskel or .vmdl to bind
+
+refused proof-not-verified: the pak cannot be signed against the gated bytes; see <home>\Documents\deadlock-model-forge\artifacts\proofs\haze_tail_signed.proof.json

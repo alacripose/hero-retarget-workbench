@@ -1,0 +1,36 @@
+
+DMX IMPORTER: now working on haze_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+
+DMX IMPORTER: now working on haze_model_tail.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "haze_body"
+- New material: haze_backpack.vmat
+- New material: hazev2_head.vmat
+- New material: hazev2.vmat
+- New material: hazev2_headsmoke.vmat
+Imported 1 files in 1.7 seconds
+Info: Imported 1 files in 1.7 seconds
+REST shared=98 only_authored=0 only_model=33
+REST weaponHand_L             turn  172.409 deg  head 0.0001
+REST weaponHand_R             turn   47.807 deg  head 0.0002
+REST ankle_L                  turn    0.000 deg  head 0.0001
+REST ankle_R                  turn    0.000 deg  head 0.0001
+REST arm_L_IKTARGET           turn    0.000 deg  head 0.0000
+REST arm_R_IKTARGET           turn    0.000 deg  head 0.0000
+REST arm_lower_L              turn    0.000 deg  head 0.0004
+REST arm_lower_R              turn    0.000 deg  head 0.0004
+REST arm_upper_L              turn    0.000 deg  head 0.0003
+REST arm_upper_R              turn    0.000 deg  head 0.0004
+REST attachWorld              turn    0.000 deg  head 0.0000
+REST ball_L                   turn    0.000 deg  head 0.0001
+REST ball_R                   turn    0.000 deg  head 0.0001
+REST clavicle_L               turn    0.000 deg  head 0.0002
+REST clavicle_R               turn    0.000 deg  head 0.0002
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

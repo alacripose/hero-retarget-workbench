@@ -28,11 +28,75 @@ keeps Blender's own controls.
 | `tickets/` | Work contracts and acceptance evidence |
 | `ledger/` | Append-only command/evidence rows and gate state |
 | `STATUS.md` | Generated capability and gate state; never hand-edited |
+| `tools/vpk_tracker.py` | Snapshot and compare every `*_dir.vpk`; historical baselines come from depot manifests |
+
+## VPK version tracker
+
+The tracker reads every directory VPK in `game/citadel` through Source 2
+Viewer. A snapshot keeps each entry's path, CRC, stored size, archive chunk and
+offset, plus the chunk files' sizes and hashes, so a diff can show both file
+changes and VPK repacking. It does not parse, rebuild or write a VPK.
+
+### Launch it
+
+Double-click **`Launch-VPK-Tracker.cmd`** on Windows. It finds Python, starts the
+server if it is not already running, reuses a healthy one, and opens
+`http://127.0.0.1:8765/`. The page's **Launcher** has three actions: snapshot the
+installed game, fetch a historical build, or sign in to Steam.
+
+The server watches the installed build while it is open. It waits for the VPKs
+and `steam.inf` to settle, rechecks them before writing, and starts a new
+snapshot only when the previous local snapshot no longer matches. A patch that
+arrives during another job waits for that job; a change during S2V reading
+aborts the snapshot instead of recording a half-updated build. The footer chip
+shows the state and the change table follows the new snapshot automatically.
+
+**History** lists captured snapshots as versions with per-version added /
+removed / changed counts, and lists upstream Deadlock builds from the public
+`SteamTracking/GameTracking-Deadlock` commit history. The public build list is
+read-only; fetching one uses its manifest ID from that commit and needs the
+saved Steam login. The GameTracking link opens the same compare surface the
+list is derived from.
+
+A local snapshot is a comparison point, not the historical baseline:
+
+```bash
+python tools/vpk_tracker.py snapshot --wait-stable
+python tools/vpk_tracker.py list
+python tools/vpk_tracker.py serve --port 8765
+```
+
+`--wait-stable` waits for two matching file signatures and aborts without
+writing if a VPK or `steam.inf` changes while S2V reads. `serve --no-watch`
+turns the live watcher off for a one-off inspection.
+
+For a build the game is not installed at, address its depot manifest. The
+fetch is one SteamFileDownloader run for every target; only `*_dir.vpk` and
+`steam.inf` are downloaded, never the archive chunks:
+
+```bash
+python tools/vpk_tracker.py login
+python tools/vpk_tracker.py snapshot --manifest 1422456:322100466064667547
+python tools/vpk_tracker.py snapshot --manifest 1422456:322100466064667547 --manifest 1422456:2884704357985063041
+```
+
+The login is a one-time QR scan with the Steam mobile app; the tracker never
+asks for or stores a password. SteamFileDownloader is built locally at
+`artifacts/tools/sfd/SteamFileDownloader.exe`; pass `--sfd` to use another
+copy. Manifests are cached under `artifacts/vpk-tracker/depots/<depot>/<manifest>`
+and are reused. Steam may refuse a very old manifest even to an owning account;
+the tracker reports `steam-no-access` rather than falling back to the local
+install.
+
+The UI labels a downloaded snapshot as **Steam** and a local capture as
+**Local**. Compare any two snapshots from the timeline or the History panel; a
+snapshot with no predecessor is the starting inventory, not a list of newly
+added files.
 
 ## Requirements
 
-- Deadlock installed through Steam (currently observed build **6861**, version
-  date **Nov 09 2026**).
+- Deadlock installed through Steam (currently observed build **6863**, version
+  date **Nov 18 2026**; upstream build **6864** is listed in History).
 - Source 2 Viewer CLI, selected in the addon's **Setup** panel.
 - Blender 5.4 with **PulseSrcOps** enabled (DMX import/export) and SourceIO
   available (Source 2 assets). Observed: PulseSrcOps 2.1.2, SourceIO 5.5.2.

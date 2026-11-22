@@ -1,0 +1,594 @@
+00:00.094  reports          | WARNING File written by newer Blender binary (504.6), expect loss of data!
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -79051.404798
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=editor error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 0.45 ms!
+register_class(...):
+Info: Registering operator class: 'SelectVertexColorMap', bl_idname 'smd.vertex_map_select_valvesource_vertex_paint' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexColorMap', bl_idname 'smd.vertex_map_create_valvesource_vertex_paint' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexColorMap', bl_idname 'smd.vertex_map_remove_valvesource_vertex_paint' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexColorMap', bl_idname 'smd.vertex_map_select_valvesource_vertex_blend' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexColorMap', bl_idname 'smd.vertex_map_create_valvesource_vertex_blend' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexColorMap', bl_idname 'smd.vertex_map_remove_valvesource_vertex_blend' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexColorMap', bl_idname 'smd.vertex_map_select_valvesource_vertex_blend1' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexColorMap', bl_idname 'smd.vertex_map_create_valvesource_vertex_blend1' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexColorMap', bl_idname 'smd.vertex_map_remove_valvesource_vertex_blend1' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_enable' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_enable' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_enable' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_animation_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_animation_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_animation_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_animation_force_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_animation_force_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_animation_force_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_goal_strength' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_goal_strength' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_goal_strength' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_goal_strength_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_goal_strength_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_goal_strength_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_goal_damping' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_goal_damping' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_goal_damping' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_drag' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_drag' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_drag' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_drag_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_drag_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_drag_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_mass' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_mass' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_mass' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_gravity' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_gravity' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_gravity' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_gravity_z' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_gravity_z' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_gravity_z' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_collision_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_collision_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_collision_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_ground_collision' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_ground_collision' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_ground_collision' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_ground_friction' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_ground_friction' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_ground_friction' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_use_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_use_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_use_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_make_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_make_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_make_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_anchor_free_rotate' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_anchor_free_rotate' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_anchor_free_rotate' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_volumetric' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_volumetric' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_volumetric' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_suspenders' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_suspenders' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_suspenders' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_bend_stiffness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_bend_stiffness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_bend_stiffness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_stray_radius_inv' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_stray_radius_inv' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_stray_radius_inv' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_stray_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_stray_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_stray_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_stray_radius_stretchiness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_stray_radius_stretchiness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_stray_radius_stretchiness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_antishrink' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_antishrink' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_antishrink' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_shear_resistance' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_shear_resistance' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_shear_resistance' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_stretch' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_stretch' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_stretch' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_friction' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_friction' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_friction' has been registered before, unregistering previous
+APPEND ability_bullet_flurry.dmx 214397b joints=106 tail_channels=24 encoding=binary/9
+BATCH ability_bullet_flurry 214397b joints=106
+APPEND ability_bullet_flurry_intro.dmx 131211b joints=106 tail_channels=24 encoding=binary/9
+BATCH ability_bullet_flurry_intro 131211b joints=106
+APPEND ability_sleep_dagger.dmx 216475b joints=106 tail_channels=24 encoding=binary/9
+BATCH ability_sleep_dagger 216475b joints=106
+APPEND aim_hideout_idle_crouch_down.dmx 317707b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_hideout_idle_crouch_down 317707b joints=106
+APPEND aim_hideout_idle_crouch_mid.dmx 317707b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_hideout_idle_crouch_mid 317707b joints=106
+APPEND aim_hideout_idle_crouch_up.dmx 317707b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_hideout_idle_crouch_up 317707b joints=106
+APPEND aim_hideout_idle_down.dmx 317707b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_hideout_idle_down 317707b joints=106
+APPEND aim_hideout_idle_mid.dmx 317707b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_hideout_idle_mid 317707b joints=106
+APPEND aim_hideout_idle_up.dmx 317707b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_hideout_idle_up 317707b joints=106
+APPEND aim_invis_idle.dmx 321523b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_invis_idle 321523b joints=106
+APPEND aim_invis_idle_down.dmx 321523b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_invis_idle_down 321523b joints=106
+APPEND aim_invis_idle_up.dmx 321523b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_invis_idle_up 321523b joints=106
+APPEND aim_weapon_idle.dmx 317707b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_weapon_idle 317707b joints=106
+APPEND aim_weapon_idle_down.dmx 317707b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_weapon_idle_down 317707b joints=106
+APPEND aim_weapon_idle_up.dmx 317707b joints=106 tail_channels=24 encoding=binary/9
+BATCH aim_weapon_idle_up 317707b joints=106
+APPEND cast_channeling_end.dmx 127555b joints=106 tail_channels=24 encoding=binary/9
+BATCH cast_channeling_end 127555b joints=106
+APPEND cast_channeling_loop.dmx 278907b joints=106 tail_channels=24 encoding=binary/9
+BATCH cast_channeling_loop 278907b joints=106
+APPEND cast_channeling_start.dmx 112035b joints=106 tail_channels=24 encoding=binary/9
+BATCH cast_channeling_start 112035b joints=106
+APPEND cast_end.dmx 181875b joints=106 tail_channels=24 encoding=binary/9
+BATCH cast_end 181875b joints=106
+APPEND cast_loop.dmx 84971b joints=106 tail_channels=24 encoding=binary/9
+BATCH cast_loop 84971b joints=106
+APPEND cast_start.dmx 108187b joints=106 tail_channels=24 encoding=binary/9
+BATCH cast_start 108187b joints=106
+APPEND corner_lean_crouch.dmx 123771b joints=106 tail_channels=24 encoding=binary/9
+BATCH corner_lean_crouch 123771b joints=106
+APPEND corner_lean_crouch_run.dmx 123771b joints=106 tail_channels=24 encoding=binary/9
+BATCH corner_lean_crouch_run 123771b joints=106
+APPEND corner_lean_run.dmx 123771b joints=106 tail_channels=24 encoding=binary/9
+BATCH corner_lean_run 123771b joints=106
+APPEND corner_lean_stand.dmx 123771b joints=106 tail_channels=24 encoding=binary/9
+BATCH corner_lean_stand 123771b joints=106
+APPEND dash_air_back.dmx 189411b joints=106 tail_channels=24 encoding=binary/9
+BATCH dash_air_back 189411b joints=106
+APPEND dash_air_forward.dmx 189347b joints=106 tail_channels=24 encoding=binary/9
+BATCH dash_air_forward 189347b joints=106
+APPEND dash_air_left.dmx 189475b joints=106 tail_channels=24 encoding=binary/9
+BATCH dash_air_left 189475b joints=106
+APPEND dash_air_right.dmx 189539b joints=106 tail_channels=24 encoding=binary/9
+BATCH dash_air_right 189539b joints=106
+APPEND dash_ground.dmx 229965b joints=106 tail_channels=24 encoding=binary/9
+BATCH dash_ground 229965b joints=106
+APPEND flinch_back.dmx 143043b joints=106 tail_channels=24 encoding=binary/9
+BATCH flinch_back 143043b joints=106
+APPEND flinch_left.dmx 143043b joints=106 tail_channels=24 encoding=binary/9
+BATCH flinch_left 143043b joints=106
+APPEND flinch_right.dmx 143043b joints=106 tail_channels=24 encoding=binary/9
+BATCH flinch_right 143043b joints=106
+APPEND hideout_crouch_walk_center.dmx 158499b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_crouch_walk_center 158499b joints=106
+APPEND hideout_crouch_walk_e.dmx 158499b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_crouch_walk_e 158499b joints=106
+APPEND hideout_crouch_walk_n.dmx 158499b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_crouch_walk_n 158499b joints=106
+APPEND hideout_crouch_walk_ne.dmx 158499b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_crouch_walk_ne 158499b joints=106
+APPEND hideout_crouch_walk_nw.dmx 158499b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_crouch_walk_nw 158499b joints=106
+APPEND hideout_crouch_walk_s.dmx 158499b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_crouch_walk_s 158499b joints=106
+APPEND hideout_crouch_walk_se.dmx 158499b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_crouch_walk_se 158499b joints=106
+APPEND hideout_crouch_walk_sw.dmx 158499b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_crouch_walk_sw 158499b joints=106
+APPEND hideout_crouch_walk_w.dmx 158499b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_crouch_walk_w 158499b joints=106
+APPEND hideout_run_center.dmx 146859b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_run_center 146859b joints=106
+APPEND hideout_run_e.dmx 146795b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_run_e 146795b joints=106
+APPEND hideout_run_n.dmx 146795b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_run_n 146795b joints=106
+APPEND hideout_run_ne.dmx 146795b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_run_ne 146795b joints=106
+APPEND hideout_run_nw.dmx 146731b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_run_nw 146731b joints=106
+APPEND hideout_run_s.dmx 146859b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_run_s 146859b joints=106
+APPEND hideout_run_se.dmx 146859b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_run_se 146859b joints=106
+APPEND hideout_run_sw.dmx 146859b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_run_sw 146859b joints=106
+APPEND hideout_run_w.dmx 146795b joints=106 tail_channels=24 encoding=binary/9
+BATCH hideout_run_w 146795b joints=106
+APPEND holster_both_guns.dmx 189667b joints=106 tail_channels=24 encoding=binary/9
+BATCH holster_both_guns 189667b joints=106
+APPEND idle_hideout.dmx 298275b joints=106 tail_channels=24 encoding=binary/9
+BATCH idle_hideout 298275b joints=106
+APPEND idle_hideout_crouch.dmx 298275b joints=106 tail_channels=24 encoding=binary/9
+BATCH idle_hideout_crouch 298275b joints=106
+APPEND in_air_loop_down.dmx 461203b joints=106 tail_channels=24 encoding=binary/9
+BATCH in_air_loop_down 461203b joints=106
+APPEND invis_crouch_idle.dmx 216731b joints=106 tail_channels=24 encoding=binary/9
+BATCH invis_crouch_idle 216731b joints=106
+APPEND invis_run_center.dmx 146795b joints=106 tail_channels=24 encoding=binary/9
+BATCH invis_run_center 146795b joints=106
+APPEND invis_run_e.dmx 147985b joints=106 tail_channels=24 encoding=binary/9
+BATCH invis_run_e 147985b joints=106
+APPEND invis_run_n.dmx 147953b joints=106 tail_channels=24 encoding=binary/9
+BATCH invis_run_n 147953b joints=106
+APPEND invis_run_ne.dmx 147953b joints=106 tail_channels=24 encoding=binary/9
+BATCH invis_run_ne 147953b joints=106
+APPEND invis_run_nw.dmx 147953b joints=106 tail_channels=24 encoding=binary/9
+BATCH invis_run_nw 147953b joints=106
+APPEND invis_run_s.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH invis_run_s 148017b joints=106
+APPEND invis_run_se.dmx 147889b joints=106 tail_channels=24 encoding=binary/9
+BATCH invis_run_se 147889b joints=106
+APPEND invis_run_sw.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH invis_run_sw 148017b joints=106
+APPEND invis_run_w.dmx 147985b joints=106 tail_channels=24 encoding=binary/9
+BATCH invis_run_w 147985b joints=106
+APPEND invis_stand_idle.dmx 216731b joints=106 tail_channels=24 encoding=binary/9
+BATCH invis_stand_idle 216731b joints=106
+APPEND item_crouch_idle.dmx 84971b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_crouch_idle 84971b joints=106
+APPEND item_crouch_run_center.dmx 224427b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_crouch_run_center 224427b joints=106
+APPEND item_crouch_run_e.dmx 226305b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_crouch_run_e 226305b joints=106
+APPEND item_crouch_run_n.dmx 226305b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_crouch_run_n 226305b joints=106
+APPEND item_crouch_run_ne.dmx 226305b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_crouch_run_ne 226305b joints=106
+APPEND item_crouch_run_nw.dmx 226305b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_crouch_run_nw 226305b joints=106
+APPEND item_crouch_run_s.dmx 226305b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_crouch_run_s 226305b joints=106
+APPEND item_crouch_run_se.dmx 226305b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_crouch_run_se 226305b joints=106
+APPEND item_crouch_run_sw.dmx 226305b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_crouch_run_sw 226305b joints=106
+APPEND item_crouch_run_w.dmx 226305b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_crouch_run_w 226305b joints=106
+APPEND item_run_center.dmx 158371b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_run_center 158371b joints=106
+APPEND item_run_e.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_run_e 148017b joints=106
+APPEND item_run_n.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_run_n 148017b joints=106
+APPEND item_run_ne.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_run_ne 148017b joints=106
+APPEND item_run_nw.dmx 147953b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_run_nw 147953b joints=106
+APPEND item_run_s.dmx 147953b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_run_s 147953b joints=106
+APPEND item_run_se.dmx 147889b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_run_se 147889b joints=106
+APPEND item_run_sw.dmx 147953b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_run_sw 147953b joints=106
+APPEND item_run_w.dmx 146795b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_run_w 146795b joints=106
+APPEND item_stand_idle.dmx 158691b joints=106 tail_channels=24 encoding=binary/9
+BATCH item_stand_idle 158691b joints=106
+APPEND jump_ground.dmx 181491b joints=106 tail_channels=24 encoding=binary/9
+BATCH jump_ground 181491b joints=106
+APPEND jump_hideout_in_air_loop.dmx 465309b joints=106 tail_channels=24 encoding=binary/9
+BATCH jump_hideout_in_air_loop 465309b joints=106
+APPEND jump_hideout_start.dmx 181491b joints=106 tail_channels=24 encoding=binary/9
+BATCH jump_hideout_start 181491b joints=106
+APPEND jump_invis_in_air_loop.dmx 465309b joints=106 tail_channels=24 encoding=binary/9
+BATCH jump_invis_in_air_loop 465309b joints=106
+APPEND jump_invis_start.dmx 181587b joints=106 tail_channels=24 encoding=binary/9
+BATCH jump_invis_start 181587b joints=106
+APPEND jump_zipline.dmx 228211b joints=106 tail_channels=24 encoding=binary/9
+BATCH jump_zipline 228211b joints=106
+APPEND knockdown_in_air_loop.dmx 195137b joints=106 tail_channels=24 encoding=binary/9
+BATCH knockdown_in_air_loop 195137b joints=106
+APPEND knockdown_in_air_start.dmx 238213b joints=106 tail_channels=24 encoding=binary/9
+BATCH knockdown_in_air_start 238213b joints=106
+APPEND knockdown_large_getup.dmx 245949b joints=106 tail_channels=24 encoding=binary/9
+BATCH knockdown_large_getup 245949b joints=106
+APPEND knockdown_large_loop.dmx 261613b joints=106 tail_channels=24 encoding=binary/9
+BATCH knockdown_large_loop 261613b joints=106
+APPEND knockdown_large_start.dmx 159765b joints=106 tail_channels=24 encoding=binary/9
+BATCH knockdown_large_start 159765b joints=106
+APPEND knockdown_medium_loop.dmx 551525b joints=106 tail_channels=24 encoding=binary/9
+BATCH knockdown_medium_loop 551525b joints=106
+APPEND knockdown_medium_start.dmx 152029b joints=106 tail_channels=24 encoding=binary/9
+BATCH knockdown_medium_start 152029b joints=106
+APPEND knockdown_small.dmx 202969b joints=106 tail_channels=24 encoding=binary/9
+BATCH knockdown_small 202969b joints=106
+APPEND landing_impact_idle.dmx 135283b joints=106 tail_channels=24 encoding=binary/9
+BATCH landing_impact_idle 135283b joints=106
+APPEND lift_loop.dmx 555345b joints=106 tail_channels=24 encoding=binary/9
+BATCH lift_loop 555345b joints=106
+APPEND loco_lean_back.dmx 193515b joints=106 tail_channels=24 encoding=binary/9
+BATCH loco_lean_back 193515b joints=106
+APPEND loco_lean_center.dmx 193611b joints=106 tail_channels=24 encoding=binary/9
+BATCH loco_lean_center 193611b joints=106
+APPEND loco_lean_forward.dmx 193387b joints=106 tail_channels=24 encoding=binary/9
+BATCH loco_lean_forward 193387b joints=106
+APPEND loco_lean_left.dmx 193515b joints=106 tail_channels=24 encoding=binary/9
+BATCH loco_lean_left 193515b joints=106
+APPEND loco_lean_right.dmx 193451b joints=106 tail_channels=24 encoding=binary/9
+BATCH loco_lean_right 193451b joints=106
+APPEND mantle_128.dmx 210609b joints=106 tail_channels=24 encoding=binary/9
+BATCH mantle_128 210609b joints=106
+APPEND mantle_32.dmx 179345b joints=106 tail_channels=24 encoding=binary/9
+BATCH mantle_32 179345b joints=106
+APPEND mantle_64.dmx 179185b joints=106 tail_channels=24 encoding=binary/9
+BATCH mantle_64 179185b joints=106
+APPEND mantle_96.dmx 202617b joints=106 tail_channels=24 encoding=binary/9
+BATCH mantle_96 202617b joints=106
+APPEND melee_dash.dmx 112773b joints=106 tail_channels=24 encoding=binary/9
+BATCH melee_dash 112773b joints=106
+APPEND melee_hit.dmx 167597b joints=106 tail_channels=24 encoding=binary/9
+BATCH melee_hit 167597b joints=106
+APPEND melee_in_air_dash.dmx 112805b joints=106 tail_channels=24 encoding=binary/9
+BATCH melee_in_air_dash 112805b joints=106
+APPEND melee_in_air_hit.dmx 167629b joints=106 tail_channels=24 encoding=binary/9
+BATCH melee_in_air_hit 167629b joints=106
+APPEND melee_in_air_start.dmx 144133b joints=106 tail_channels=24 encoding=binary/9
+BATCH melee_in_air_start 144133b joints=106
+APPEND melee_quick_1.dmx 162443b joints=106 tail_channels=24 encoding=binary/9
+BATCH melee_quick_1 162443b joints=106
+APPEND melee_start.dmx 142979b joints=106 tail_channels=24 encoding=binary/9
+BATCH melee_start 142979b joints=106
+APPEND out_of_combat_crouch_run_center.dmx 158499b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_crouch_run_center 158499b joints=106
+APPEND out_of_combat_crouch_run_e.dmx 159701b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_crouch_run_e 159701b joints=106
+APPEND out_of_combat_crouch_run_n.dmx 159765b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_crouch_run_n 159765b joints=106
+APPEND out_of_combat_crouch_run_ne.dmx 159765b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_crouch_run_ne 159765b joints=106
+APPEND out_of_combat_crouch_run_nw.dmx 159765b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_crouch_run_nw 159765b joints=106
+APPEND out_of_combat_crouch_run_s.dmx 159765b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_crouch_run_s 159765b joints=106
+APPEND out_of_combat_crouch_run_se.dmx 159701b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_crouch_run_se 159701b joints=106
+APPEND out_of_combat_crouch_run_sw.dmx 159765b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_crouch_run_sw 159765b joints=106
+APPEND out_of_combat_crouch_run_w.dmx 159701b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_crouch_run_w 159701b joints=106
+APPEND out_of_combat_run_center.dmx 146859b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_run_center 146859b joints=106
+APPEND out_of_combat_run_e.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_run_e 148017b joints=106
+APPEND out_of_combat_run_n.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_run_n 148017b joints=106
+APPEND out_of_combat_run_ne.dmx 147953b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_run_ne 147953b joints=106
+APPEND out_of_combat_run_nw.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_run_nw 148017b joints=106
+APPEND out_of_combat_run_s.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_run_s 148017b joints=106
+APPEND out_of_combat_run_se.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_run_se 148017b joints=106
+APPEND out_of_combat_run_sw.dmx 147953b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_run_sw 147953b joints=106
+APPEND out_of_combat_run_w.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH out_of_combat_run_w 148017b joints=106
+APPEND parry.dmx 216635b joints=106 tail_channels=24 encoding=binary/9
+BATCH parry 216635b joints=106
+APPEND parry_success.dmx 208875b joints=106 tail_channels=24 encoding=binary/9
+BATCH parry_success 208875b joints=106
+APPEND reload_idle.dmx 290323b joints=106 tail_channels=24 encoding=binary/9
+BATCH reload_idle 290323b joints=106
+APPEND rope_climb_down.dmx 123771b joints=106 tail_channels=24 encoding=binary/9
+BATCH rope_climb_down 123771b joints=106
+APPEND rope_climb_idle.dmx 131531b joints=106 tail_channels=24 encoding=binary/9
+BATCH rope_climb_idle 131531b joints=106
+APPEND rope_climb_settle.dmx 162411b joints=106 tail_channels=24 encoding=binary/9
+BATCH rope_climb_settle 162411b joints=106
+APPEND rope_climb_up.dmx 142915b joints=106 tail_channels=24 encoding=binary/9
+BATCH rope_climb_up 142915b joints=106
+APPEND run_to_stop_crouch.dmx 166419b joints=106 tail_channels=24 encoding=binary/9
+BATCH run_to_stop_crouch 166419b joints=106
+APPEND run_to_stop_stand.dmx 166323b joints=106 tail_channels=24 encoding=binary/9
+BATCH run_to_stop_stand 166323b joints=106
+APPEND shoot_idle_l.dmx 127619b joints=106 tail_channels=24 encoding=binary/9
+BATCH shoot_idle_l 127619b joints=106
+APPEND shoot_idle_r.dmx 127619b joints=106 tail_channels=24 encoding=binary/9
+BATCH shoot_idle_r 127619b joints=106
+APPEND shoot_run_l.dmx 127619b joints=106 tail_channels=24 encoding=binary/9
+BATCH shoot_run_l 127619b joints=106
+APPEND shoot_run_r.dmx 127619b joints=106 tail_channels=24 encoding=binary/9
+BATCH shoot_run_r 127619b joints=106
+APPEND shopping_idle.dmx 523283b joints=106 tail_channels=24 encoding=binary/9
+BATCH shopping_idle 523283b joints=106
+APPEND sleep_idle.dmx 395307b joints=106 tail_channels=24 encoding=binary/9
+BATCH sleep_idle 395307b joints=106
+APPEND slide_getup.dmx 154619b joints=106 tail_channels=24 encoding=binary/9
+BATCH slide_getup 154619b joints=106
+APPEND slide_loop.dmx 247771b joints=106 tail_channels=24 encoding=binary/9
+BATCH slide_loop 247771b joints=106
+APPEND slide_start.dmx 177931b joints=106 tail_channels=24 encoding=binary/9
+BATCH slide_start 177931b joints=106
+APPEND throw.dmx 177963b joints=106 tail_channels=24 encoding=binary/9
+BATCH throw 177963b joints=106
+APPEND turn_crouch_left.dmx 187177b joints=106 tail_channels=24 encoding=binary/9
+BATCH turn_crouch_left 187177b joints=106
+APPEND turn_crouch_right.dmx 187209b joints=106 tail_channels=24 encoding=binary/9
+BATCH turn_crouch_right 187209b joints=106
+APPEND turn_hideout_crouch_l.dmx 171545b joints=106 tail_channels=24 encoding=binary/9
+BATCH turn_hideout_crouch_l 171545b joints=106
+APPEND turn_hideout_crouch_r.dmx 171577b joints=106 tail_channels=24 encoding=binary/9
+BATCH turn_hideout_crouch_r 171577b joints=106
+APPEND turn_hideout_l.dmx 171577b joints=106 tail_channels=24 encoding=binary/9
+BATCH turn_hideout_l 171577b joints=106
+APPEND turn_hideout_r.dmx 171577b joints=106 tail_channels=24 encoding=binary/9
+BATCH turn_hideout_r 171577b joints=106
+APPEND turn_left.dmx 187241b joints=106 tail_channels=24 encoding=binary/9
+BATCH turn_left 187241b joints=106
+APPEND turn_right.dmx 187241b joints=106 tail_channels=24 encoding=binary/9
+BATCH turn_right 187241b joints=106
+APPEND ui_hero_emote_01.dmx 682203b joints=106 tail_channels=24 encoding=binary/9
+BATCH ui_hero_emote_01 682203b joints=106
+APPEND ui_hero_info.dmx 298275b joints=106 tail_channels=24 encoding=binary/9
+BATCH ui_hero_info 298275b joints=106
+APPEND ui_hero_select.dmx 123771b joints=106 tail_channels=24 encoding=binary/9
+BATCH ui_hero_select 123771b joints=106
+APPEND ui_main_menu.dmx 123771b joints=106 tail_channels=24 encoding=binary/9
+BATCH ui_main_menu 123771b joints=106
+APPEND ui_matchmaking.dmx 123771b joints=106 tail_channels=24 encoding=binary/9
+BATCH ui_matchmaking 123771b joints=106
+APPEND ui_shop.dmx 298275b joints=106 tail_channels=24 encoding=binary/9
+BATCH ui_shop 298275b joints=106
+APPEND unholster_both_guns.dmx 119827b joints=106 tail_channels=24 encoding=binary/9
+BATCH unholster_both_guns 119827b joints=106
+APPEND wall_attach_forward.dmx 123771b joints=106 tail_channels=24 encoding=binary/9
+BATCH wall_attach_forward 123771b joints=106
+APPEND wall_attach_left.dmx 123771b joints=106 tail_channels=24 encoding=binary/9
+BATCH wall_attach_left 123771b joints=106
+APPEND wall_attach_right.dmx 123675b joints=106 tail_channels=24 encoding=binary/9
+BATCH wall_attach_right 123675b joints=106
+APPEND weapon_crouch_idle.dmx 84971b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_crouch_idle 84971b joints=106
+APPEND weapon_crouch_run_center.dmx 158499b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_crouch_run_center 158499b joints=106
+APPEND weapon_crouch_run_e.dmx 159701b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_crouch_run_e 159701b joints=106
+APPEND weapon_crouch_run_n.dmx 159765b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_crouch_run_n 159765b joints=106
+APPEND weapon_crouch_run_ne.dmx 159765b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_crouch_run_ne 159765b joints=106
+APPEND weapon_crouch_run_nw.dmx 159701b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_crouch_run_nw 159701b joints=106
+APPEND weapon_crouch_run_s.dmx 159765b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_crouch_run_s 159765b joints=106
+APPEND weapon_crouch_run_se.dmx 159701b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_crouch_run_se 159701b joints=106
+APPEND weapon_crouch_run_sw.dmx 159765b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_crouch_run_sw 159765b joints=106
+APPEND weapon_crouch_run_w.dmx 159765b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_crouch_run_w 159765b joints=106
+APPEND weapon_run_center.dmx 146859b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_run_center 146859b joints=106
+APPEND weapon_run_e.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_run_e 148017b joints=106
+APPEND weapon_run_n.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_run_n 148017b joints=106
+APPEND weapon_run_ne.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_run_ne 148017b joints=106
+APPEND weapon_run_nw.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_run_nw 148017b joints=106
+APPEND weapon_run_s.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_run_s 148017b joints=106
+APPEND weapon_run_se.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_run_se 148017b joints=106
+APPEND weapon_run_sw.dmx 148017b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_run_sw 148017b joints=106
+APPEND weapon_run_w.dmx 147953b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_run_w 147953b joints=106
+APPEND weapon_stand_idle.dmx 298275b joints=106 tail_channels=24 encoding=binary/9
+BATCH weapon_stand_idle 298275b joints=106
+APPEND zipline_attached_loop.dmx 550379b joints=106 tail_channels=24 encoding=binary/9
+BATCH zipline_attached_loop 550379b joints=106
+APPEND zipline_attached_start.dmx 266979b joints=106 tail_channels=24 encoding=binary/9
+BATCH zipline_attached_start 266979b joints=106
+APPEND zipline_awaiting_tether.dmx 317611b joints=106 tail_channels=24 encoding=binary/9
+BATCH zipline_awaiting_tether 317611b joints=106
+APPEND zipline_tethered_reeling_loop.dmx 430131b joints=106 tail_channels=24 encoding=binary/9
+BATCH zipline_tethered_reeling_loop 430131b joints=106
+BATCH done 197 appended, 0 failed
+[Blender Buddy] unregister: Server not running.
+INFO: Ucupaint 2.4.9 is unregistered!
+[36m[FNPORTING] [0mShutdown Server

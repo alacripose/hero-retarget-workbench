@@ -1,0 +1,12 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_tailbones_tailend.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+BONES 147 TAIL_IDX [132, 133, 134, 135, 136, 137, 138] TAIL ['tail_0', 'tail_1', 'tail_2', 'tail_3', 'tail_4', 'tail_5', 'tail_end'] LAST ['tail_3', 'tail_4', 'tail_5', 'tail_end', 'arm_L_IKTARGET', 'weaponHand_L', 'arm_R_IKTARGET', 'weaponHand_R', 'leg_L_OFFSET', 'leg_L_IKTARGET', 'leg_R_OFFSET', 'leg_R_IKTARGET']
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+
+Blender quit

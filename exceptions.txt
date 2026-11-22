@@ -1,0 +1,45 @@
+---------------
+File: <home>\Documents\deadlock-model-forge\artifacts\oldviper\pak99_dir.vpk
+Exception: ValveResourceFormat.Utils.UnexpectedMagicException: Unexpected header. You likely tried to read a file that is not actually a resource (usually ends in '_c'). for variable 'HeaderVersion': 20 (0x14)
+   at ValveResourceFormat.Resource.Read(Stream input, Boolean leaveOpen, ReadMode mode) in /_/ValveResourceFormat/Resource/Resource.cs:line 235
+   at CLI.Decompiler.ProcessResource(String path, Stream stream, String originalPath, IFileLoader fileLoader, Package package) in /_/CLI/Decompiler.cs:line 1086
+
+---------------
+File: <home>\Documents\Documents\Reduced_CSDK_12\game\citadel\shaders_pc_000.vpk
+Exception: ValveResourceFormat.CompiledShader.ShaderParserException: File name convention unknown or not supported <home>\Documents\Documents\Reduced_CSDK_12\game\citadel\shaders_pc_000.vpk
+   at ValveResourceFormat.CompiledShader.ShaderUtilHelpers.ComputeVCSFileName(String filenamepath) in /_/ValveResourceFormat/CompiledShader/ShaderUtilHelpers.cs:line 49
+   at ValveResourceFormat.CompiledShader.VfxProgramData.SetFileNameDerivedProperties(String fileName) in /_/ValveResourceFormat/CompiledShader/VfxProgramData.cs:line 554
+   at ValveResourceFormat.CompiledShader.VfxProgramData.VfxCreateFromVcs() in /_/ValveResourceFormat/CompiledShader/VfxProgramData.cs:line 263
+   at ValveResourceFormat.CompiledShader.VfxProgramData.Read(String filenamepath, Stream input) in /_/ValveResourceFormat/CompiledShader/VfxProgramData.cs:line 224
+   at CLI.Decompiler.ParseVCS(String path, Stream stream, String originalPath, Package package) in /_/CLI/Decompiler.cs:line 1285
+
+---------------
+File: <home>\Documents\Documents\Reduced_CSDK_12\game\citadel\shaders_vulkan_000.vpk
+Exception: ValveResourceFormat.CompiledShader.ShaderParserException: File name convention unknown or not supported <home>\Documents\Documents\Reduced_CSDK_12\game\citadel\shaders_vulkan_000.vpk
+   at ValveResourceFormat.CompiledShader.ShaderUtilHelpers.ComputeVCSFileName(String filenamepath) in /_/ValveResourceFormat/CompiledShader/ShaderUtilHelpers.cs:line 49
+   at ValveResourceFormat.CompiledShader.VfxProgramData.SetFileNameDerivedProperties(String fileName) in /_/ValveResourceFormat/CompiledShader/VfxProgramData.cs:line 554
+   at ValveResourceFormat.CompiledShader.VfxProgramData.VfxCreateFromVcs() in /_/ValveResourceFormat/CompiledShader/VfxProgramData.cs:line 263
+   at ValveResourceFormat.CompiledShader.VfxProgramData.Read(String filenamepath, Stream input) in /_/ValveResourceFormat/CompiledShader/VfxProgramData.cs:line 224
+   at CLI.Decompiler.ParseVCS(String path, Stream stream, String originalPath, Package package) in /_/CLI/Decompiler.cs:line 1285
+
+---------------
+File: <home>\Documents\Documents\Reduced_CSDK_12\game\citadel\shaders_vulkan_001.vpk
+Exception: ValveResourceFormat.CompiledShader.ShaderParserException: File name convention unknown or not supported <home>\Documents\Documents\Reduced_CSDK_12\game\citadel\shaders_vulkan_001.vpk
+   at ValveResourceFormat.CompiledShader.ShaderUtilHelpers.ComputeVCSFileName(String filenamepath) in /_/ValveResourceFormat/CompiledShader/ShaderUtilHelpers.cs:line 49
+   at ValveResourceFormat.CompiledShader.VfxProgramData.SetFileNameDerivedProperties(String fileName) in /_/ValveResourceFormat/CompiledShader/VfxProgramData.cs:line 554
+   at ValveResourceFormat.CompiledShader.VfxProgramData.VfxCreateFromVcs() in /_/ValveResourceFormat/CompiledShader/VfxProgramData.cs:line 263
+   at ValveResourceFormat.CompiledShader.VfxProgramData.Read(String filenamepath, Stream input) in /_/ValveResourceFormat/CompiledShader/VfxProgramData.cs:line 224
+   at CLI.Decompiler.ParseVCS(String path, Stream stream, String originalPath, Package package) in /_/CLI/Decompiler.cs:line 1285
+
+---------------
+File: <home>\Documents\deadlock-model-forge\artifacts\probes\rebuild-check\models\heroes_staging\shiv\shiv.vnmskel
+Exception: ValveResourceFormat.Utils.UnexpectedMagicException: Unexpected header. You likely tried to read a file that is not actually a resource (usually ends in '_c'). for variable 'HeaderVersion': 27424 (0x6B20)
+   at ValveResourceFormat.Resource.Read(Stream input, Boolean leaveOpen, ReadMode mode) in /_/ValveResourceFormat/Resource/Resource.cs:line 235
+   at CLI.Decompiler.ProcessResource(String path, Stream stream, String originalPath, IFileLoader fileLoader, Package package) in /_/CLI/Decompiler.cs:line 1086
+
+---------------
+File: <home>\Downloads\Reduced_CSDK_13\content\citadel_addons\haze_tail\models\heroes_staging\haze\haze_model_tail.dmx
+Exception: ValveResourceFormat.Utils.UnexpectedMagicException: Unexpected header. You likely tried to read a file that is not actually a resource (usually ends in '_c'). for variable 'HeaderVersion': 25632 (0x6420)
+   at ValveResourceFormat.Resource.Read(Stream input, Boolean leaveOpen, ReadMode mode) in /_/ValveResourceFormat/Resource/Resource.cs:line 235
+   at CLI.Decompiler.ProcessResource(String path, Stream stream, String originalPath, IFileLoader fileLoader, Package package) in /_/CLI/Decompiler.cs:line 1086
+

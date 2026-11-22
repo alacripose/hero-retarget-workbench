@@ -1,0 +1,12 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+DMX 168 ['root_motion', 'arm_L_IKTARGET', 'arm_R_IKTARGET', 'leg_L_OFFSET', 'leg_L_IKTARGET', 'leg_R_OFFSET', 'leg_R_IKTARGET', 'pelvis', 'spine_0', 'spine_1', 'spine_2', 'spine_3'] ['jet_wing_outer_0_R', 'reliquary_base', 'reliquary_0', 'reliquary_1', 'reliquary_end', 'tail_0', 'tail_1', 'tail_2', 'tail_3', 'tail_4', 'tail_5', 'tail_end']
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

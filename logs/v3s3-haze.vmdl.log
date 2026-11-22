@@ -1,0 +1,279 @@
+Creating render device for graphics adapter 0 'NVIDIA GeForce RTX 2070 SUPER' [VendorId 0x10DE / DeviceId 0x1E84]: 32.0.16.1742
+- citadel_addons\haze_tail\models\heroes_staging\haze\haze.vmdl
+RESOURCE COMPILE WARNING: RenderMeshFile: body : Duplicate Bone: tail_1, Duplicates Renamed: tail_1_duplicate
+RESOURCE COMPILE WARNING: RenderMeshFile: body : Duplicate Bone: tail_2, Duplicates Renamed: tail_2_duplicate, tail_2_duplicate1
+RESOURCE COMPILE WARNING: RenderMeshFile: body : Duplicate Bone: tail_3, Duplicates Renamed: tail_3_duplicate, tail_3_duplicate1, tail_3_duplicate2
+RESOURCE COMPILE WARNING: RenderMeshFile: body : Duplicate Bone: tail_4, Duplicates Renamed: tail_4_duplicate, tail_4_duplicate1, tail_4_duplicate2, tail_4_duplicate3
+RESOURCE COMPILE WARNING: RenderMeshFile: body : Duplicate Bone: tail_5, Duplicates Renamed: tail_5_duplicate, tail_5_duplicate1, tail_5_duplicate2, tail_5_duplicate3, tail_5_duplicate4
+RESOURCE COMPILE WARNING: RenderMeshFile: body : Duplicate Bone: tail_6, Duplicates Renamed: tail_6_duplicate, tail_6_duplicate1, tail_6_duplicate2, tail_6_duplicate3, tail_6_duplicate4, tail_6_duplicate5
+RESOURCE COMPILE WARNING: RenderMeshFile: body : Duplicate Bone: tail_7, Duplicates Renamed: tail_7_duplicate, tail_7_duplicate1, tail_7_duplicate2, tail_7_duplicate3, tail_7_duplicate4, tail_7_duplicate5, tail_7_duplicate6
+- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_headsmoke.vmat
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_headsmoke_vmat_g_tnormalroughness_53b47c48_png_a4f4cee6.vtex
+       Read 2 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 34ms
+  +- citadel_addons\haze_tail\materials\default\default_color_tga_756019c2.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_black_mask_tga_e7be3cc.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 2ms
+       Encoding 16x16x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\npc\ghosts_passive\materials\gradient_trans_png_7ad12a5b.vtex
+Unable to read file <home>\downloads\reduced_csdk_13\content\citadel_addons\haze_tail\models\npc\ghosts_passive\materials\gradient_trans.png
+CTextureObject::ReadFromFile(2699): Error calling LoadFromFile() for texture "<home>\downloads\reduced_csdk_13\content\citadel_addons\haze_tail\models\npc\ghosts_passive\materials\gradient_trans.png"!
+CResourceCompilerTexture::ReadInputTextures(397): Error reading texture "models/npc/ghosts_passive/materials/gradient_trans.png" for "TextureJitterMask" when compiling file "<home>/downloads/reduced_csdk_13/content/citadel_addons/haze_tail/models/npc/ghosts_passive/materials/gradient_trans_png_7ad12a5b.vtex"!
+                                                                      [FAIL]
+ProcessTexture(851): Error calling CompileImmediately( <home>\Downloads\Reduced_CSDK_13\content\citadel_addons\haze_tail\models\npc\ghosts_passive\materials\gradient_trans_png_7ad12a5b.vtex ) for <home>/downloads/reduced_csdk_13/content/citadel_addons/haze_tail/models/heroes_staging/haze/materials/hazev2_headsmoke.vmat!
+CResourceCompilerMaterial::CompileResourceInternal(2015): Error processing texture g_tJitterMask
+                                                                      [FAIL]
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/haze/materials/hazev2_headsmoke.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body' referencing missing material 'models/heroes_staging/haze/materials/hazev2_headsmoke.vmat'
+
+- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_headsmoke_invis.vmat
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_headsmoke_invis_vmat_g_tnormalroughness_53b47c48_png_f3655b42.vtex
+       Read 2 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_color_tga_756019c2.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_black_mask_tga_e7be3cc.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 3ms
+       Encoding 16x16x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_625be5d1.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_headsmoke_invis_vmat_g_tambientocclusion_9782fd5c.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_headsmoke_opacity_png_8de31f38.vtex
+       Read 3 Input(s): 8ms
+       Generated Mips and Output: 27ms
+       Encoding 256x512x1 texture to BC7 (Q=3): 27ms
+  +- citadel_addons\haze_tail\materials\default\default_metal_tga_9e174e3d.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_headsmoke_invis_vmat_g_ttintmaskrimlightmask_4ea53fc4_png_bc964444.vtex
+       Read 2 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2.vmat
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_vmat_g_tnormalroughness_53b47c48_png_f72e057.vtex
+       Read 2 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\haze_v2_color_png_777a8ec8.vtex
+       Read 2 Input(s): 136ms
+       Generated Mips and Output: 66ms
+       Encoding 2048x2048x1 texture to BC7 (Q=3): 591ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_vmat_g_tnprtransmissivecolor_3b93caea.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\haze_v2_color_png_cf8554e6.vtex
+       Read 2 Input(s): 106ms
+       Generated Mips and Output: 50ms
+       Encoding 2048x2048x1 texture to BC7 (Q=3): 458ms
+  +- citadel_addons\haze_tail\materials\default\default_ao_tga_559f1ac6.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_2aa88af4.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_head.vmat
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_head_vmat_g_tnormalroughness_53b47c48_png_d10c1619.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_color_tga_756019c2.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_black_mask_tga_e7be3cc.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 2ms
+       Encoding 16x16x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_head_color_png_47d895cf.vtex
+       Read 2 Input(s): 57ms
+       Generated Mips and Output: 37ms
+       Encoding 2048x1024x1 texture to BC7 (Q=3): 124ms
+  +- citadel_addons\haze_tail\materials\default\default_ao_tga_559f1ac6.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_head_vmat_g_ttintmaskrimlightmask_4ea53fc4_png_43cb3858.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_head_invis.vmat
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_head_invis_vmat_g_tnormalroughness_53b47c48_png_f3a522d0.vtex
+       Read 2 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_color_tga_756019c2.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_black_mask_tga_e7be3cc.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 2ms
+       Encoding 16x16x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_head_color_png_47d895cf.vtex
+       Read 2 Input(s): 54ms
+       Generated Mips and Output: 33ms
+       Encoding 2048x1024x1 texture to BC7 (Q=3): 123ms
+  +- citadel_addons\haze_tail\materials\default\default_ao_tga_559f1ac6.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\hazev2_head_invis_vmat_g_ttintmaskrimlightmask_4ea53fc4_png_d529dfda.vtex
+       Read 2 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+- citadel_addons\haze_tail\models\heroes_staging\haze\materials\haze_backpack.vmat
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\haze_backpack_vmat_g_tnormalroughness_9ab1d602.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_color_tga_756019c2.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_black_mask_tga_e7be3cc.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 2ms
+       Encoding 16x16x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\haze_backpack_vmat_g_tcolor_91a727cd.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\haze_backpack_vmat_g_tambientocclusion_9782fd5c.vtex
+       Read 1 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze\materials\haze_backpack_vmat_g_ttintmaskrimlightmask_d2f00059_png_6944e80e.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+- citadel_addons\haze_tail\models\heroes_staging\haze_v2\materials\haze_v2_gun.vmat
+  +- citadel_addons\haze_tail\models\heroes_staging\haze_v2\materials\haze_v2_gun_vmat_g_tnormalroughness_9ab1d602.vtex
+       Read 2 Input(s): 0ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_color_tga_756019c2.vtex
+       Read 2 Input(s): 2ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_black_mask_tga_e7be3cc.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 2ms
+       Encoding 16x16x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze_v2\materials\haze_v2_gun_vmat_g_tcolor_cc1c4812_png_f11dc54a.vtex
+       Read 2 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to BC7 (Q=3): 0ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze_v2\materials\haze_v2_gun_ao_png_b9f219f3.vtex
+       Read 1 Input(s): 20ms
+       Generated Mips and Output: 5ms
+       Encoding 1024x1024x1 texture to ATI1N (Q=3): 47ms
+  +- citadel_addons\haze_tail\models\heroes_staging\haze_v2\materials\haze_v2_gun_vmat_g_ttintmaskrimlightmask_8babd4c8_png_32db2d07.vtex
+       Read 2 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI2N (Q=3): 0ms
+  +- citadel_addons\haze_tail\materials\default\default_mask_tga_344101f8.vtex
+       Read 1 Input(s): 1ms
+       Generated Mips and Output: 0ms
+       Encoding 4x4x1 texture to ATI1N (Q=3): 0ms
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/haze/materials/hazev2_headsmoke.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod1' referencing missing material 'models/heroes_staging/haze/materials/hazev2_headsmoke.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/haze/materials/hazev2_headsmoke.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod2' referencing missing material 'models/heroes_staging/haze/materials/hazev2_headsmoke.vmat'
+
+CAssociateResourceBlockLoader::BlockingLoadResourceFileData: Trying to load an illegal resource name models/heroes_staging/haze/materials/hazev2_headsmoke.vmat!
+RESOURCE COMPILE WARNING: Mesh 'body_lod3' referencing missing material 'models/heroes_staging/haze/materials/hazev2_headsmoke.vmat'
+
+     0/   1 (elapsed  6.879):  <home>\Downloads\Reduced_CSDK_13\content\citadel_addons\haze_tail\models\heroes_staging\haze\haze.vmdl
+Compile of 1 file(s) matching nonrecursive specification "<home>/Downloads/Reduced_CSDK_13/content/citadel_addons/haze_tail/models/heroes_staging/haze/haze.vmdl" took 6.879 seconds
+
+---------------------------------------------------------------------
+ 11 Compile WARNINGS
+ These may represent problems, but will not cause the compile to fail.
+ Look for "RESOURCE COMPILE WARNING:" in the log above.
+---------------------------------------------------------------------
+  Duplicate Bone: tail_1, Duplicates Renamed: tail_1_duplicate
+  Duplicate Bone: tail_2, Duplicates Renamed: tail_2_duplicate, tail_2_duplicate1
+  Duplicate Bone: tail_3, Duplicates Renamed: tail_3_duplicate, tail_3_duplicate1, tail_3_duplicate2
+  Duplicate Bone: tail_4, Duplicates Renamed: tail_4_duplicate, tail_4_duplicate1, tail_4_duplicate2, tail_4_duplicate3
+  Duplicate Bone: tail_5, Duplicates Renamed: tail_5_duplicate, tail_5_duplicate1, tail_5_duplicate2, tail_5_duplicate3, tail_5_duplicate4
+  Duplicate Bone: tail_6, Duplicates Renamed: tail_6_duplicate, tail_6_duplicate1, tail_6_duplicate2, tail_6_duplicate3, tail_6_duplicate4, tail_6_duplicate5
+  Duplicate Bone: tail_7, Duplicates Renamed: tail_7_duplicate, tail_7_duplicate1, tail_7_duplicate2, tail_7_duplicate3, tail_7_duplicate4, tail_7_duplicate5, tail_7_duplicate6
+  Mesh 'body' referencing missing material 'models/heroes_staging/haze/materials/hazev2_headsmoke.vmat'
+
+  Mesh 'body_lod1' referencing missing material 'models/heroes_staging/haze/materials/hazev2_headsmoke.vmat'
+
+  Mesh 'body_lod2' referencing missing material 'models/heroes_staging/haze/materials/hazev2_headsmoke.vmat'
+
+  Mesh 'body_lod3' referencing missing material 'models/heroes_staging/haze/materials/hazev2_headsmoke.vmat'
+
+
+-----------------------------------------------------------------
+ WARNING: 1 compiled, 0 failed, 0 skipped, 0m:07s
+-----------------------------------------------------------------

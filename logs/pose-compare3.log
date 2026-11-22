@@ -1,0 +1,141 @@
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -32210.862759
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 0.58 ms!
+POSE-COMPARE importing artifacts/tail-animgraph/shiv/models/heroes_staging/shiv/dmx/mesh/shiv_tailbones.dmx
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Importing mesh "werewolf_werewolf_model.001"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 8.3 seconds
+Info: Imported 1 files in 8.3 seconds
+POSE-COMPARE imported left: 3 objects
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.1 seconds
+Info: Imported 1 files in 9.1 seconds
+POSE-COMPARE imported right: 3 objects
+
+DMX IMPORTER: now working on primary_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_idle.
+Importing DMX animation "primary_idle"
+- Imported 121 frames of animation
+0 Errors and 1 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_idle.
+Imported 1 files in 1.0 seconds with 0 Errors and 1 Warnings
+Info: Imported 1 files in 1.0 seconds with 0 Errors and 1 Warnings
+
+DMX IMPORTER: now working on primary_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_idle.
+Importing DMX animation "primary_idle"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: primary_idle contains 2 bones not present in shiv_body.002. Check the console for a list.
+- Imported 121 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in primary_idle.
+Warning: primary_idle contains 2 bones not present in shiv_body.002. Check the console for a list.
+Imported 1 files in 0.9 seconds with 0 Errors and 2 Warnings
+00:28.328  render           | Saved: 'C:\artifacts\visual\shiv-compare\idle.png'
+Info: Imported 1 files in 0.9 seconds with 0 Errors and 2 Warnings
+POSE-COMPARE FAIL idle: [WinError 2] The system cannot find the file specified: 'artifacts\\visual\\shiv-compare\\idle.png'
+
+DMX IMPORTER: now working on slide_getup.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in slide_getup.
+Importing DMX animation "slide_getup"
+- Imported 13 frames of animation
+0 Errors and 1 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in slide_getup.
+Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
+
+DMX IMPORTER: now working on slide_getup.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in slide_getup.
+Importing DMX animation "slide_getup"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: slide_getup contains 2 bones not present in shiv_body.002. Check the console for a list.
+- Imported 13 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in slide_getup.
+Warning: slide_getup contains 2 bones not present in shiv_body.002. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+00:29.172  render           | Saved: 'C:\artifacts\visual\shiv-compare\tail.png'
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+POSE-COMPARE FAIL tail: [WinError 2] The system cannot find the file specified: 'artifacts\\visual\\shiv-compare\\tail.png'
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Importing DMX animation "item_run_center"
+- Imported 21 frames of animation
+0 Errors and 1 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Importing DMX animation "item_run_center"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: item_run_center contains 2 bones not present in shiv_body.002. Check the console for a list.
+- Imported 21 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in item_run_center.
+Warning: item_run_center contains 2 bones not present in shiv_body.002. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+00:29.969  render           | Saved: 'C:\artifacts\visual\shiv-compare\lift.png'
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+POSE-COMPARE FAIL lift: [WinError 2] The system cannot find the file specified: 'artifacts\\visual\\shiv-compare\\lift.png'
+POSE-COMPARE done 3 renders, 3 failed
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+[Blender Buddy] unregister: Server not running.
+INFO: Ucupaint 2.4.9 is unregistered!
+[36m[FNPORTING] [0mShutdown Server

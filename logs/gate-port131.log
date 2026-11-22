@@ -1,0 +1,2 @@
+GATE REFUSE clip-rest-differs: item_stand_idle.dmx declares a different rest for 130 joints than haze_model_tail.dmx (e.g. [('leg_L_OFFSET', 0.0, 0.5), ('leg_L_IKTARGET', 7.4987, 0.396445), ('leg_R_OFFSET', 0.0, 0.5)]); every bone whose rest disagrees is read through the wrong frame, which is bone orientations wrong in game
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

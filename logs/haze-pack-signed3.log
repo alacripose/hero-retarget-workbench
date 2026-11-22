@@ -1,0 +1,3 @@
+GATE ADMIT haze_tail: model 144 joints, skeleton 131, tail 9
+PROOF PASS artifacts/haze-tail/haze_tail_signed.vpk digest blake3:f928ca6e314c5438f08f20eec
+PACK haze_tail_signed.vpk 54007789b files=624 models=1 skeletons=1 clips=228 materials=0 sha256=fcd09b33b8eadf6c

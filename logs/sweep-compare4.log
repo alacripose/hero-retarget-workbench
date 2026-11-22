@@ -1,0 +1,3071 @@
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -33510.698026
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 0.59 ms!
+
+DMX IMPORTER: now working on ability_shiv_dash_start.dmx
+- Loading DMX...
+Importing DMX animation "ability_shiv_dash_start"
+- Imported 11 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on ability_shiv_dash_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "ability_shiv_dash_start"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP ability_dash_start pos_max=0.037 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on ability_shiv_dash.dmx
+- Loading DMX...
+Importing DMX animation "ability_shiv_dash"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on ability_shiv_dash.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "ability_shiv_dash"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP ability_shiv_dash pos_max=0.044 rot_max=0.005 over=0
+
+DMX IMPORTER: now working on ability_slash_attack.dmx
+- Loading DMX...
+Importing DMX animation "ability_slash_attack"
+- Imported 36 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on ability_slash_attack.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "ability_slash_attack"
+- Imported 36 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP ability_shiv_killingblow_idle pos_max=0.184 rot_max=0.011 over=3
+
+DMX IMPORTER: now working on ability_slash_leap.dmx
+- Loading DMX...
+Importing DMX animation "ability_slash_leap"
+- Imported 43 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on ability_slash_leap.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "ability_slash_leap"
+- Imported 43 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP ability_shiv_killingblow_leap pos_max=0.065 rot_max=0.003 over=1
+
+DMX IMPORTER: now working on ability_slash_attack.dmx
+- Loading DMX...
+Importing DMX animation "ability_slash_attack"
+- Imported 30 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on ability_slash_attack.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "ability_slash_attack"
+- Imported 30 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP ability_shiv_killingblow_slash pos_max=0.022 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on shiv_weapon_crouch_aim_sweep.dmx
+- Loading DMX...
+Importing DMX animation "shiv_weapon_crouch_aim_sweep"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on shiv_weapon_crouch_aim_sweep.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "shiv_weapon_crouch_aim_sweep"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP aim_weapon_crouch pos_max=0.011 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on shiv_weapon_crouch_aim_sweep.dmx
+- Loading DMX...
+Importing DMX animation "shiv_weapon_crouch_aim_sweep"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on shiv_weapon_crouch_aim_sweep.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "shiv_weapon_crouch_aim_sweep"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP aim_weapon_crouch_down pos_max=0.010 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_crouch_aim.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_aim"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on primary_crouch_aim.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_aim"
+- Imported 10 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP aim_weapon_crouch_run pos_max=0.137 rot_max=0.050 over=3
+
+DMX IMPORTER: now working on shiv_weapon_crouch_aim_sweep.dmx
+- Loading DMX...
+Importing DMX animation "shiv_weapon_crouch_aim_sweep"
+- Imported 26 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on shiv_weapon_crouch_aim_sweep.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "shiv_weapon_crouch_aim_sweep"
+- Imported 26 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP aim_weapon_crouch_up pos_max=0.002 rot_max=3.142 over=0
+
+DMX IMPORTER: now working on shiv_weapon_stand_aim_sweep.dmx
+- Loading DMX...
+Importing DMX animation "shiv_weapon_stand_aim_sweep"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on shiv_weapon_stand_aim_sweep.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "shiv_weapon_stand_aim_sweep"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP aim_weapon_idle pos_max=0.010 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on shiv_weapon_stand_aim_sweep.dmx
+- Loading DMX...
+Importing DMX animation "shiv_weapon_stand_aim_sweep"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on shiv_weapon_stand_aim_sweep.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "shiv_weapon_stand_aim_sweep"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP aim_weapon_idle_down pos_max=0.010 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on shiv_weapon_stand_aim_sweep.dmx
+- Loading DMX...
+Importing DMX animation "shiv_weapon_stand_aim_sweep"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on shiv_weapon_stand_aim_sweep.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "shiv_weapon_stand_aim_sweep"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP aim_weapon_idle_up pos_max=0.010 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on in_air_aim.dmx
+- Loading DMX...
+Importing DMX animation "in_air_aim"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on in_air_aim.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "in_air_aim"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP aim_weapon_in_air pos_max=0.173 rot_max=0.012 over=4
+
+DMX IMPORTER: now working on primary_stand_aim.dmx
+- Loading DMX...
+Importing DMX animation "primary_stand_aim"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on primary_stand_aim.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_stand_aim"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP aim_weapon_run pos_max=0.153 rot_max=0.018 over=3
+
+DMX IMPORTER: now working on forward_slide_aim.dmx
+- Loading DMX...
+Importing DMX animation "forward_slide_aim"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on forward_slide_aim.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "forward_slide_aim"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP aim_weapon_slide pos_max=0.273 rot_max=0.011 over=3
+
+DMX IMPORTER: now working on generic_cast_channeling_end.dmx
+- Loading DMX...
+Importing DMX animation "generic_cast_channeling_end"
+- Imported 8 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on generic_cast_channeling_end.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "generic_cast_channeling_end"
+- Imported 8 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+SWEEP cast_channeling_end pos_max=0.047 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on generic_cast_channeling_loop.dmx
+- Loading DMX...
+Importing DMX animation "generic_cast_channeling_loop"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on generic_cast_channeling_loop.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "generic_cast_channeling_loop"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP cast_channeling_loop pos_max=0.003 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on generic_cast_channeling_start.dmx
+- Loading DMX...
+Importing DMX animation "generic_cast_channeling_start"
+- Imported 6 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on generic_cast_channeling_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "generic_cast_channeling_start"
+- Imported 6 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+SWEEP cast_channeling_start pos_max=0.062 rot_max=0.003 over=2
+
+DMX IMPORTER: now working on generic_cast_end.dmx
+- Loading DMX...
+Importing DMX animation "generic_cast_end"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on generic_cast_end.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "generic_cast_end"
+- Imported 19 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP cast_end pos_max=0.048 rot_max=0.005 over=0
+
+DMX IMPORTER: now working on item_cast_loop.dmx
+- Loading DMX...
+Importing DMX animation "item_cast_loop"
+- Imported 51 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on item_cast_loop.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_cast_loop"
+- Imported 51 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+SWEEP cast_loop pos_max=0.027 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on generic_cast_start.dmx
+- Loading DMX...
+Importing DMX animation "generic_cast_start"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on generic_cast_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "generic_cast_start"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP cast_start pos_max=0.013 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on corner_lean_crouch.dmx
+- Loading DMX...
+Importing DMX animation "corner_lean_crouch"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on corner_lean_crouch.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "corner_lean_crouch"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP corner_lean_crouch pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on corner_lean_crouch.dmx
+- Loading DMX...
+Importing DMX animation "corner_lean_crouch"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on corner_lean_crouch.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "corner_lean_crouch"
+- Imported 11 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP corner_lean_crouch_run pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on corner_lean_stand.dmx
+- Loading DMX...
+Importing DMX animation "corner_lean_stand"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on corner_lean_stand.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "corner_lean_stand"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP corner_lean_run pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on corner_lean_stand.dmx
+- Loading DMX...
+Importing DMX animation "corner_lean_stand"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on corner_lean_stand.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "corner_lean_stand"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP corner_lean_stand pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on primary_airdash_bkward.dmx
+- Loading DMX...
+Importing DMX animation "primary_airdash_bkward"
+- Imported 46 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on primary_airdash_bkward.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_airdash_bkward"
+- Imported 46 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP dash_air_back pos_max=0.040 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_airdash.dmx
+- Loading DMX...
+Importing DMX animation "primary_airdash"
+- Imported 51 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_airdash.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_airdash"
+- Imported 51 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+SWEEP dash_air_forward pos_max=0.054 rot_max=0.005 over=2
+
+DMX IMPORTER: now working on primary_airdash_left.dmx
+- Loading DMX...
+Importing DMX animation "primary_airdash_left"
+- Imported 51 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_airdash_left.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_airdash_left"
+- Imported 51 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP dash_air_left pos_max=0.071 rot_max=0.005 over=1
+
+DMX IMPORTER: now working on primary_airdash_right.dmx
+- Loading DMX...
+Importing DMX animation "primary_airdash_right"
+- Imported 51 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+DMX IMPORTER: now working on primary_airdash_right.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_airdash_right"
+- Imported 51 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+SWEEP dash_air_right pos_max=0.068 rot_max=0.020 over=2
+
+DMX IMPORTER: now working on leap_forward.dmx
+- Loading DMX...
+Importing DMX animation "leap_forward"
+- Imported 53 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on leap_forward.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "leap_forward"
+- Imported 53 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+SWEEP dash_ground pos_max=0.191 rot_max=0.016 over=6
+
+DMX IMPORTER: now working on flinch_melee_mid_add.dmx
+- Loading DMX...
+Importing DMX animation "flinch_melee_mid_add"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on flinch_melee_mid_add.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "flinch_melee_mid_add"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP flinch_back pos_max=0.006 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on flinch_melee_left_add.dmx
+- Loading DMX...
+Importing DMX animation "flinch_melee_left_add"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on flinch_melee_left_add.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "flinch_melee_left_add"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP flinch_left pos_max=0.003 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on flinch_melee_right_add.dmx
+- Loading DMX...
+Importing DMX animation "flinch_melee_right_add"
+- Imported 16 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on flinch_melee_right_add.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "flinch_melee_right_add"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP flinch_right pos_max=0.011 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on in_air_apex.dmx
+- Loading DMX...
+Importing DMX animation "in_air_apex"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on in_air_apex.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "in_air_apex"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP in_air_loop_apex pos_max=0.004 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on in_air_downward.dmx
+- Loading DMX...
+Importing DMX animation "in_air_downward"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on in_air_downward.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "in_air_downward"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP in_air_loop_down pos_max=0.004 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on item_crouch_idle.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.1 seconds
+Info: Imported 1 files in 1.1 seconds
+
+DMX IMPORTER: now working on item_crouch_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_crouch_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.2 seconds
+Info: Imported 1 files in 1.2 seconds
+SWEEP item_crouch_idle pos_max=0.002 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on item_crouch_walk_center.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_walk_center"
+- Imported 35 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on item_crouch_walk_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_crouch_walk_center"
+- Imported 35 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+SWEEP item_crouch_run_center pos_max=0.012 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on item_crouch_walk_e.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_walk_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on item_crouch_walk_e.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_crouch_walk_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP item_crouch_run_e pos_max=0.040 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on item_crouch_walk_n.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_walk_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on item_crouch_walk_n.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_crouch_walk_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP item_crouch_run_n pos_max=0.040 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on item_crouch_walk_ne.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_walk_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on item_crouch_walk_ne.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_crouch_walk_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP item_crouch_run_ne pos_max=0.034 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on item_crouch_walk_nw.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_walk_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on item_crouch_walk_nw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_crouch_walk_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP item_crouch_run_nw pos_max=0.034 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on item_crouch_walk_s.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_walk_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on item_crouch_walk_s.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_crouch_walk_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP item_crouch_run_s pos_max=0.039 rot_max=0.005 over=0
+
+DMX IMPORTER: now working on item_crouch_walk_se.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_walk_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on item_crouch_walk_se.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_crouch_walk_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP item_crouch_run_se pos_max=0.032 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on item_crouch_walk_sw.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_walk_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on item_crouch_walk_sw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_crouch_walk_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP item_crouch_run_sw pos_max=0.032 rot_max=0.005 over=0
+
+DMX IMPORTER: now working on item_crouch_walk_w.dmx
+- Loading DMX...
+Importing DMX animation "item_crouch_walk_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on item_crouch_walk_w.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_crouch_walk_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP item_crouch_run_w pos_max=0.037 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+Importing DMX animation "item_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP item_run_center pos_max=0.022 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on item_run_e.dmx
+- Loading DMX...
+Importing DMX animation "item_run_e"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on item_run_e.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_run_e"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP item_run_e pos_max=0.048 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on item_run_n.dmx
+- Loading DMX...
+Importing DMX animation "item_run_n"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on item_run_n.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_run_n"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP item_run_n pos_max=0.048 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on item_run_ne.dmx
+- Loading DMX...
+Importing DMX animation "item_run_ne"
+- Imported 21 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on item_run_ne.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_run_ne"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP item_run_ne pos_max=0.035 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on item_run_nw.dmx
+- Loading DMX...
+Importing DMX animation "item_run_nw"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on item_run_nw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_run_nw"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP item_run_nw pos_max=0.035 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on item_run_s.dmx
+- Loading DMX...
+Importing DMX animation "item_run_s"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on item_run_s.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_run_s"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP item_run_s pos_max=0.069 rot_max=0.003 over=2
+
+DMX IMPORTER: now working on item_run_se.dmx
+- Loading DMX...
+Importing DMX animation "item_run_se"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on item_run_se.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_run_se"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP item_run_se pos_max=0.034 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on item_run_sw.dmx
+- Loading DMX...
+Importing DMX animation "item_run_sw"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on item_run_sw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_run_sw"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP item_run_sw pos_max=0.035 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on item_run_w.dmx
+- Loading DMX...
+Importing DMX animation "item_run_w"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on item_run_w.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_run_w"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP item_run_w pos_max=0.056 rot_max=0.003 over=1
+
+DMX IMPORTER: now working on item_stand_idle.dmx
+- Loading DMX...
+Importing DMX animation "item_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.4 seconds
+Info: Imported 1 files in 1.4 seconds
+
+DMX IMPORTER: now working on item_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.0 seconds
+Info: Imported 1 files in 1.0 seconds
+SWEEP item_stand_idle pos_max=0.001 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on jump_start.dmx
+- Loading DMX...
+Importing DMX animation "jump_start"
+- Imported 27 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on jump_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "jump_start"
+- Imported 27 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+SWEEP jump_forced pos_max=0.054 rot_max=0.003 over=2
+
+DMX IMPORTER: now working on jump_ground.dmx
+- Loading DMX...
+Importing DMX animation "jump_ground"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on jump_ground.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "jump_ground"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP jump_ground pos_max=0.031 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on zipline_detach.dmx
+- Loading DMX...
+Importing DMX animation "zipline_detach"
+- Imported 45 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on zipline_detach.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "zipline_detach"
+- Imported 45 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP jump_zipline pos_max=0.071 rot_max=0.009 over=4
+
+DMX IMPORTER: now working on in_air_stun_loop.dmx
+- Loading DMX...
+Importing DMX animation "in_air_stun_loop"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on in_air_stun_loop.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "in_air_stun_loop"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP knockdown_in_air_loop pos_max=0.053 rot_max=0.006 over=1
+
+DMX IMPORTER: now working on in_air_stun_intro.dmx
+- Loading DMX...
+Importing DMX animation "in_air_stun_intro"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on in_air_stun_intro.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "in_air_stun_intro"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP knockdown_in_air_start pos_max=0.051 rot_max=0.007 over=1
+
+DMX IMPORTER: now working on knockdown_large_get_up.dmx
+- Loading DMX...
+Importing DMX animation "knockdown_large_get_up"
+- Imported 51 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on knockdown_large_get_up.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "knockdown_large_get_up"
+- Imported 51 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP knockdown_large_getup pos_max=0.127 rot_max=0.018 over=5
+
+DMX IMPORTER: now working on knockdown_large_loop_on_ground.dmx
+- Loading DMX...
+Importing DMX animation "knockdown_large_loop_on_ground"
+- Imported 11 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on knockdown_large_loop_on_ground.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "knockdown_large_loop_on_ground"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP knockdown_large_loop pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on knockdown_large.dmx
+- Loading DMX...
+Importing DMX animation "knockdown_large"
+- Imported 50 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on knockdown_large.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "knockdown_large"
+- Imported 50 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP knockdown_large_start pos_max=0.055 rot_max=3.140 over=1
+
+DMX IMPORTER: now working on crouching_stunned.dmx
+- Loading DMX...
+Importing DMX animation "crouching_stunned"
+- Imported 27 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on crouching_stunned.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "crouching_stunned"
+- Imported 27 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP knockdown_medium_loop pos_max=0.002 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on stun_medium_forward.dmx
+- Loading DMX...
+Importing DMX animation "stun_medium_forward"
+- Imported 20 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on stun_medium_forward.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "stun_medium_forward"
+- Imported 20 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP knockdown_medium_start pos_max=0.063 rot_max=0.004 over=1
+
+DMX IMPORTER: now working on stagger_n.dmx
+- Loading DMX...
+Importing DMX animation "stagger_n"
+- Imported 30 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on stagger_n.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "stagger_n"
+- Imported 30 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+SWEEP knockdown_small pos_max=0.049 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on jump_landing_crouch.dmx
+- Loading DMX...
+Importing DMX animation "jump_landing_crouch"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on jump_landing_crouch.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "jump_landing_crouch"
+- Imported 19 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP landing_impact_crouch pos_max=0.024 rot_max=0.031 over=0
+
+DMX IMPORTER: now working on jump_landing.dmx
+- Loading DMX...
+Importing DMX animation "jump_landing"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on jump_landing.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "jump_landing"
+- Imported 19 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP landing_impact_idle pos_max=0.014 rot_max=0.038 over=0
+
+DMX IMPORTER: now working on lift.dmx
+- Loading DMX...
+Importing DMX animation "lift"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on lift.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "lift"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+SWEEP lift_loop pos_max=0.053 rot_max=0.002 over=1
+
+DMX IMPORTER: now working on loco_sprint_lean_s.dmx
+- Loading DMX...
+Importing DMX animation "loco_sprint_lean_s"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on loco_sprint_lean_s.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "loco_sprint_lean_s"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP loco_lean_back pos_max=0.014 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on loco_sprint_lean_center.dmx
+- Loading DMX...
+Importing DMX animation "loco_sprint_lean_center"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on loco_sprint_lean_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "loco_sprint_lean_center"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP loco_lean_center pos_max=0.007 rot_max=1.571 over=0
+
+DMX IMPORTER: now working on loco_sprint_lean_n.dmx
+- Loading DMX...
+Importing DMX animation "loco_sprint_lean_n"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on loco_sprint_lean_n.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "loco_sprint_lean_n"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP loco_lean_forward pos_max=0.021 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on loco_sprint_lean_w.dmx
+- Loading DMX...
+Importing DMX animation "loco_sprint_lean_w"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on loco_sprint_lean_w.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "loco_sprint_lean_w"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP loco_lean_left pos_max=0.013 rot_max=1.571 over=0
+
+DMX IMPORTER: now working on loco_sprint_lean_e.dmx
+- Loading DMX...
+Importing DMX animation "loco_sprint_lean_e"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on loco_sprint_lean_e.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "loco_sprint_lean_e"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP loco_lean_right pos_max=0.013 rot_max=1.571 over=0
+
+DMX IMPORTER: now working on primary_mantle_128.dmx
+- Loading DMX...
+Importing DMX animation "primary_mantle_128"
+- Imported 41 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on primary_mantle_128.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_mantle_128"
+- Imported 41 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP mantle_128 pos_max=0.067 rot_max=0.005 over=5
+
+DMX IMPORTER: now working on primary_mantle_32.dmx
+- Loading DMX...
+Importing DMX animation "primary_mantle_32"
+- Imported 24 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on primary_mantle_32.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_mantle_32"
+- Imported 24 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP mantle_32 pos_max=0.045 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_mantle_64.dmx
+- Loading DMX...
+Importing DMX animation "primary_mantle_64"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on primary_mantle_64.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_mantle_64"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP mantle_64 pos_max=0.055 rot_max=0.014 over=1
+
+DMX IMPORTER: now working on primary_mantle_96.dmx
+- Loading DMX...
+Importing DMX animation "primary_mantle_96"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on primary_mantle_96.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_mantle_96"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP mantle_96 pos_max=0.066 rot_max=0.005 over=3
+
+DMX IMPORTER: now working on melee_dash.dmx
+- Loading DMX...
+Importing DMX animation "melee_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on melee_dash.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+SWEEP melee_dash pos_max=0.041 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on melee_dwn_dash.dmx
+- Loading DMX...
+Importing DMX animation "melee_dwn_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on melee_dwn_dash.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "melee_dwn_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+SWEEP melee_dash_down pos_max=0.039 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on melee_up_dash.dmx
+- Loading DMX...
+Importing DMX animation "melee_up_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on melee_up_dash.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "melee_up_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+SWEEP melee_dash_up pos_max=0.039 rot_max=0.009 over=0
+
+DMX IMPORTER: now working on melee_hit.dmx
+- Loading DMX...
+Importing DMX animation "melee_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on melee_hit.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_hit pos_max=0.025 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on melee_dwn_hit.dmx
+- Loading DMX...
+Importing DMX animation "melee_dwn_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on melee_dwn_hit.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "melee_dwn_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_hit_down pos_max=0.035 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on melee_up_hit.dmx
+- Loading DMX...
+Importing DMX animation "melee_up_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on melee_up_hit.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_up_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP melee_hit_up pos_max=0.035 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on melee_in_air_dash.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on melee_in_air_dash.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_in_air_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_in_air_dash pos_max=0.021 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on melee_dwn_in_air_dash.dmx
+- Loading DMX...
+Importing DMX animation "melee_dwn_in_air_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on melee_dwn_in_air_dash.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_dwn_in_air_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_in_air_dash_down pos_max=0.020 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on melee_up_in_air_dash.dmx
+- Loading DMX...
+Importing DMX animation "melee_up_in_air_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on melee_up_in_air_dash.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_up_in_air_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_in_air_dash_up pos_max=0.020 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on melee_in_air_hit.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on melee_in_air_hit.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_in_air_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_in_air_hit pos_max=0.016 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on melee_dwn_in_air_hit.dmx
+- Loading DMX...
+Importing DMX animation "melee_dwn_in_air_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on melee_dwn_in_air_hit.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_dwn_in_air_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_in_air_hit_down pos_max=0.020 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on melee_up_in_air_hit.dmx
+- Loading DMX...
+Importing DMX animation "melee_up_in_air_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on melee_up_in_air_hit.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_up_in_air_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_in_air_hit_up pos_max=0.023 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on melee_in_air_start.dmx
+- Loading DMX...
+Importing DMX animation "melee_in_air_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on melee_in_air_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_in_air_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_in_air_start pos_max=0.034 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on melee_dwn_in_air_start.dmx
+- Loading DMX...
+Importing DMX animation "melee_dwn_in_air_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on melee_dwn_in_air_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_dwn_in_air_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_in_air_start_down pos_max=0.036 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on melee_up_in_air_start.dmx
+- Loading DMX...
+Importing DMX animation "melee_up_in_air_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on melee_up_in_air_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_up_in_air_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_in_air_start_up pos_max=0.027 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on melee_combo_hit_one.dmx
+- Loading DMX...
+Importing DMX animation "melee_combo_hit_one"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on melee_combo_hit_one.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_combo_hit_one"
+- Imported 19 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_quick_1 pos_max=0.173 rot_max=0.012 over=6
+
+DMX IMPORTER: now working on melee_combo_hit_one.dmx
+- Loading DMX...
+Importing DMX animation "melee_combo_hit_one"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on melee_combo_hit_one.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_combo_hit_one"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP melee_quick_1_down pos_max=0.173 rot_max=0.012 over=6
+
+DMX IMPORTER: now working on melee_combo_hit_one.dmx
+- Loading DMX...
+Importing DMX animation "melee_combo_hit_one"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on melee_combo_hit_one.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_combo_hit_one"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP melee_quick_1_up pos_max=0.173 rot_max=0.012 over=6
+
+DMX IMPORTER: now working on melee_combo_hit_two.dmx
+- Loading DMX...
+Importing DMX animation "melee_combo_hit_two"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on melee_combo_hit_two.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_combo_hit_two"
+- Imported 17 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_quick_2 pos_max=0.209 rot_max=0.012 over=5
+
+DMX IMPORTER: now working on melee_up_start.dmx
+- Loading DMX...
+Importing DMX animation "melee_up_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on melee_up_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_up_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_start pos_max=0.047 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on melee_dwn_start.dmx
+- Loading DMX...
+Importing DMX animation "melee_dwn_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on melee_dwn_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_dwn_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP melee_start_down pos_max=0.047 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on melee_up_start.dmx
+- Loading DMX...
+Importing DMX animation "melee_up_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on melee_up_start.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "melee_up_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP melee_start_up pos_max=0.047 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_e.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_e.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP out_of_combat_crouch_run_e pos_max=0.040 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_n.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_n.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+SWEEP out_of_combat_crouch_run_n pos_max=0.040 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_ne.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_ne.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP out_of_combat_crouch_run_ne pos_max=0.034 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_w.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_w.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+SWEEP out_of_combat_crouch_run_nw pos_max=0.037 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_s.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_s.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP out_of_combat_crouch_run_s pos_max=0.039 rot_max=0.005 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_se.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_se.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP out_of_combat_crouch_run_se pos_max=0.032 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_sw.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_sw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP out_of_combat_crouch_run_sw pos_max=0.032 rot_max=0.005 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_nw.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_nw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP out_of_combat_crouch_run_w pos_max=0.034 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on out_of_combat_run_center.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_center"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "out_of_combat_run_center"
+- Imported 19 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP out_of_combat_run_center pos_max=0.098 rot_max=0.022 over=3
+
+DMX IMPORTER: now working on out_of_combat_run_e.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_e"
+- Imported 19 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_e.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "out_of_combat_run_e"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP out_of_combat_run_e pos_max=0.085 rot_max=0.051 over=4
+
+DMX IMPORTER: now working on out_of_combat_run_n.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_n"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_n.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "out_of_combat_run_n"
+- Imported 19 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP out_of_combat_run_n pos_max=0.058 rot_max=0.010 over=3
+
+DMX IMPORTER: now working on out_of_combat_run_ne.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_ne"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_ne.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "out_of_combat_run_ne"
+- Imported 19 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP out_of_combat_run_ne pos_max=0.073 rot_max=0.012 over=2
+
+DMX IMPORTER: now working on out_of_combat_run_nw.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_nw"
+- Imported 19 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_nw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "out_of_combat_run_nw"
+- Imported 19 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP out_of_combat_run_nw pos_max=0.079 rot_max=0.013 over=2
+
+DMX IMPORTER: now working on out_of_combat_run_s.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_s"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_s.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "out_of_combat_run_s"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP out_of_combat_run_s pos_max=0.071 rot_max=0.006 over=3
+
+DMX IMPORTER: now working on out_of_combat_run_se.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_se"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_se.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "out_of_combat_run_se"
+- Imported 19 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+SWEEP out_of_combat_run_se pos_max=0.064 rot_max=0.006 over=2
+
+DMX IMPORTER: now working on out_of_combat_run_sw.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_sw"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_sw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "out_of_combat_run_sw"
+- Imported 19 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+SWEEP out_of_combat_run_sw pos_max=0.079 rot_max=0.006 over=3
+
+DMX IMPORTER: now working on out_of_combat_run_w.dmx
+- Loading DMX...
+Importing DMX animation "out_of_combat_run_w"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_w.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "out_of_combat_run_w"
+- Imported 19 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP out_of_combat_run_w pos_max=0.059 rot_max=0.007 over=2
+
+DMX IMPORTER: now working on parry_shiv.dmx
+- Loading DMX...
+Importing DMX animation "parry_shiv"
+- Imported 35 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on parry_shiv.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "parry_shiv"
+- Imported 35 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP parry pos_max=0.008 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on parry_shiv.dmx
+- Loading DMX...
+Importing DMX animation "parry_shiv"
+- Imported 33 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on parry_shiv.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "parry_shiv"
+- Imported 33 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+SWEEP parry_success pos_max=0.005 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on primary_crouch_reload.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_reload"
+- Imported 51 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_crouch_reload.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_reload"
+- Imported 51 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP reload_crouch_idle pos_max=0.027 rot_max=0.007 over=0
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP reload_crouch_idle_quick pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP reload_crouch_run_quick pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+Importing DMX animation "primary_reload"
+- Imported 51 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_reload"
+- Imported 51 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+SWEEP reload_idle pos_max=0.029 rot_max=0.009 over=0
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP reload_idle_quick pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP reload_in_air_quick pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on primary_run_reload.dmx
+- Loading DMX...
+Importing DMX animation "primary_run_reload"
+- Imported 51 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+
+DMX IMPORTER: now working on primary_run_reload.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_run_reload"
+- Imported 51 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+SWEEP reload_run pos_max=0.039 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP reload_run_quick pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on primary_reload.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_reload"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP reload_slide_quick pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on rope_climb_down.dmx
+- Loading DMX...
+Importing DMX animation "rope_climb_down"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on rope_climb_down.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "rope_climb_down"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP rope_climb_down pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on rope_climb_idle.dmx
+- Loading DMX...
+Importing DMX animation "rope_climb_idle"
+- Imported 5 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on rope_climb_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "rope_climb_idle"
+- Imported 5 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+SWEEP rope_climb_idle pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on rope_climb_loop.dmx
+- Loading DMX...
+Importing DMX animation "rope_climb_loop"
+- Imported 16 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on rope_climb_loop.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "rope_climb_loop"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP rope_climb_up pos_max=0.109 rot_max=0.006 over=3
+
+DMX IMPORTER: now working on primary_crouch_walk_to_stop.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_to_stop"
+- Imported 31 frames of animation
+Imported 1 files in 1.3 seconds
+Info: Imported 1 files in 1.3 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_to_stop.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "primary_crouch_walk_to_stop"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP run_to_stop_crouch pos_max=0.002 rot_max=0.125 over=0
+
+DMX IMPORTER: now working on primary_run_to_stop.dmx
+- Loading DMX...
+Importing DMX animation "primary_run_to_stop"
+- Imported 26 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on primary_run_to_stop.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "primary_run_to_stop"
+- Imported 26 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+SWEEP run_to_stop_stand pos_max=0.019 rot_max=0.031 over=0
+
+DMX IMPORTER: now working on ability_shiv_dagger_throw_v4.dmx
+- Loading DMX...
+Importing DMX animation "ability_shiv_dagger_throw_v4"
+- Imported 28 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on ability_shiv_dagger_throw_v4.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "ability_shiv_dagger_throw_v4"
+- Imported 28 frames of animation
+Imported 1 files in 1.8 seconds
+Info: Imported 1 files in 1.8 seconds
+SWEEP shiv_dagger pos_max=0.135 rot_max=0.008 over=4
+
+DMX IMPORTER: now working on primary_alt_fire.dmx
+- Loading DMX...
+Importing DMX animation "primary_alt_fire"
+- Imported 46 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+
+DMX IMPORTER: now working on primary_alt_fire.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "primary_alt_fire"
+- Imported 46 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+SWEEP shoot_alt_idle pos_max=0.041 rot_max=1.571 over=0
+
+DMX IMPORTER: now working on primary_hip_fire.dmx
+- Loading DMX...
+Importing DMX animation "primary_hip_fire"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on primary_hip_fire.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "primary_hip_fire"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP shoot_idle pos_max=0.010 rot_max=0.014 over=0
+
+DMX IMPORTER: now working on shopping.dmx
+- Loading DMX...
+Importing DMX animation "shopping"
+- Imported 121 frames of animation
+Imported 1 files in 1.3 seconds
+Info: Imported 1 files in 1.3 seconds
+
+DMX IMPORTER: now working on shopping.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "shopping"
+- Imported 121 frames of animation
+Imported 1 files in 1.2 seconds
+Info: Imported 1 files in 1.2 seconds
+SWEEP shopping_idle pos_max=0.003 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on self_sleep.dmx
+- Loading DMX...
+Importing DMX animation "self_sleep"
+- Imported 81 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+DMX IMPORTER: now working on self_sleep.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "self_sleep"
+- Imported 81 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+SWEEP sleep_idle pos_max=0.001 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on slide_getup.dmx
+- Loading DMX...
+Importing DMX animation "slide_getup"
+- Imported 13 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on slide_getup.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "slide_getup"
+- Imported 13 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP slide_getup pos_max=0.080 rot_max=0.008 over=1
+
+DMX IMPORTER: now working on slide_forward.dmx
+- Loading DMX...
+Importing DMX animation "slide_forward"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on slide_forward.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+Importing DMX animation "slide_forward"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP slide_loop pos_max=0.002 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on slide_intro.dmx
+- Loading DMX...
+Importing DMX animation "slide_intro"
+- Imported 18 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on slide_intro.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "slide_intro"
+- Imported 18 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP slide_start pos_max=0.046 rot_max=0.008 over=0
+
+DMX IMPORTER: now working on throw_crouch.dmx
+- Loading DMX...
+Importing DMX animation "throw_crouch"
+- Imported 20 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on throw_crouch.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "throw_crouch"
+- Imported 20 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP throw pos_max=0.078 rot_max=0.006 over=2
+
+DMX IMPORTER: now working on turn_crouch_90_l.dmx
+- Loading DMX...
+Importing DMX animation "turn_crouch_90_l"
+- Imported 18 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on turn_crouch_90_l.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "turn_crouch_90_l"
+- Imported 18 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP turn_crouch_left pos_max=0.042 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on turn_crouch_90_r.dmx
+- Loading DMX...
+Importing DMX animation "turn_crouch_90_r"
+- Imported 18 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on turn_crouch_90_r.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "turn_crouch_90_r"
+- Imported 18 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP turn_crouch_right pos_max=0.039 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on turn_90_l.dmx
+- Loading DMX...
+Importing DMX animation "turn_90_l"
+- Imported 18 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on turn_90_l.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "turn_90_l"
+- Imported 18 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP turn_left pos_max=0.042 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on turn_90_r.dmx
+- Loading DMX...
+Importing DMX animation "turn_90_r"
+- Imported 18 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on turn_90_r.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "turn_90_r"
+- Imported 18 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP turn_right pos_max=0.039 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on wall_attach_forward.dmx
+- Loading DMX...
+Importing DMX animation "wall_attach_forward"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+DMX IMPORTER: now working on wall_attach_forward.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "wall_attach_forward"
+- Imported 11 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP wall_attach_forward pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on wall_attach_left.dmx
+- Loading DMX...
+Importing DMX animation "wall_attach_left"
+- Imported 11 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on wall_attach_left.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "wall_attach_left"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP wall_attach_left pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on wall_attach_right.dmx
+- Loading DMX...
+Importing DMX animation "wall_attach_right"
+- Imported 11 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on wall_attach_right.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "wall_attach_right"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP wall_attach_right pos_max=0.000 rot_max=0.000 over=0
+
+DMX IMPORTER: now working on primary_crouch_idle.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.2 seconds
+Info: Imported 1 files in 1.2 seconds
+
+DMX IMPORTER: now working on primary_crouch_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.0 seconds
+Info: Imported 1 files in 1.0 seconds
+SWEEP weapon_crouch_idle pos_max=0.002 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_center.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_center"
+- Imported 35 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_center"
+- Imported 35 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+SWEEP weapon_crouch_run_center pos_max=0.012 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_e.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_e.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP weapon_crouch_run_e pos_max=0.040 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_n.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_n.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+SWEEP weapon_crouch_run_n pos_max=0.040 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_ne.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_ne.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP weapon_crouch_run_ne pos_max=0.034 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_nw.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_nw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP weapon_crouch_run_nw pos_max=0.034 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_s.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_s.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP weapon_crouch_run_s pos_max=0.039 rot_max=0.005 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_se.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_se.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP weapon_crouch_run_se pos_max=0.032 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_sw.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_sw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP weapon_crouch_run_sw pos_max=0.032 rot_max=0.005 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_w.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_w.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP weapon_crouch_run_w pos_max=0.037 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_run_center.dmx
+- Loading DMX...
+Importing DMX animation "primary_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on primary_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP weapon_run_center pos_max=0.024 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on primary_run_e.dmx
+- Loading DMX...
+Importing DMX animation "primary_run_e"
+- Imported 21 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_run_e.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_run_e"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP weapon_run_e pos_max=0.048 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_run_n.dmx
+- Loading DMX...
+Importing DMX animation "primary_run_n"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on primary_run_n.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_run_n"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP weapon_run_n pos_max=0.048 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on primary_run_ne.dmx
+- Loading DMX...
+Importing DMX animation "primary_run_ne"
+- Imported 21 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_run_ne.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_run_ne"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP weapon_run_ne pos_max=0.035 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_run_nw.dmx
+- Loading DMX...
+Importing DMX animation "primary_run_nw"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on primary_run_nw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_run_nw"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP weapon_run_nw pos_max=0.035 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on primary_run_s.dmx
+- Loading DMX...
+Importing DMX animation "primary_run_s"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on primary_run_s.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_run_s"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP weapon_run_s pos_max=0.069 rot_max=0.003 over=2
+
+DMX IMPORTER: now working on primary_run_se.dmx
+- Loading DMX...
+Importing DMX animation "primary_run_se"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on primary_run_se.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_run_se"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP weapon_run_se pos_max=0.034 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_run_sw.dmx
+- Loading DMX...
+Importing DMX animation "primary_run_sw"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on primary_run_sw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_run_sw"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP weapon_run_sw pos_max=0.035 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_run_w.dmx
+- Loading DMX...
+Importing DMX animation "primary_run_w"
+- Imported 21 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_run_w.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_run_w"
+- Imported 21 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+SWEEP weapon_run_w pos_max=0.056 rot_max=0.003 over=1
+
+DMX IMPORTER: now working on primary_idle.dmx
+- Loading DMX...
+Importing DMX animation "primary_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.2 seconds
+Info: Imported 1 files in 1.2 seconds
+
+DMX IMPORTER: now working on primary_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.0 seconds
+Info: Imported 1 files in 1.0 seconds
+SWEEP weapon_stand_idle pos_max=0.001 rot_max=0.001 over=0
+
+DMX IMPORTER: now working on zipline_loop.dmx
+- Loading DMX...
+Importing DMX animation "zipline_loop"
+- Imported 46 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on zipline_loop.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "zipline_loop"
+- Imported 46 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+SWEEP zipline_attached_loop pos_max=0.005 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on zipline_grab.dmx
+- Loading DMX...
+Importing DMX animation "zipline_grab"
+- Imported 25 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+DMX IMPORTER: now working on zipline_grab.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "zipline_grab"
+- Imported 25 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+SWEEP zipline_attached_start pos_max=0.045 rot_max=0.008 over=0
+
+DMX IMPORTER: now working on zipline_awaiting_tether.dmx
+- Loading DMX...
+Importing DMX animation "zipline_awaiting_tether"
+- Imported 61 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+
+DMX IMPORTER: now working on zipline_awaiting_tether.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "zipline_awaiting_tether"
+- Imported 61 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+SWEEP zipline_awaiting_tether pos_max=0.047 rot_max=0.008 over=0
+
+DMX IMPORTER: now working on zipline_attached_and_reeling.dmx
+- Loading DMX...
+Importing DMX animation "zipline_attached_and_reeling"
+- Imported 89 frames of animation
+Imported 1 files in 1.1 seconds
+Info: Imported 1 files in 1.1 seconds
+
+DMX IMPORTER: now working on zipline_attached_and_reeling.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "zipline_attached_and_reeling"
+- Imported 89 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+SWEEP zipline_tethered_reeling_loop pos_max=0.073 rot_max=0.006 over=3
+
+DMX IMPORTER: now working on primary_crouch_walk_e.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_e.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+SWEEP zoomed_crouch_run_e pos_max=0.040 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_n.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_n.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP zoomed_crouch_run_n pos_max=0.040 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_ne.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_ne.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+SWEEP zoomed_crouch_run_ne pos_max=0.034 rot_max=0.002 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_w.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.9 seconds
+Info: Imported 1 files in 0.9 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_w.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_w"
+- Imported 37 frames of animation
+Imported 1 files in 9.7 seconds
+Info: Imported 1 files in 9.7 seconds
+SWEEP zoomed_crouch_run_nw pos_max=0.037 rot_max=0.003 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_s.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_s.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP zoomed_crouch_run_s pos_max=0.039 rot_max=0.005 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_se.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_se.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP zoomed_crouch_run_se pos_max=0.032 rot_max=0.004 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_sw.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_sw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+SWEEP zoomed_crouch_run_sw pos_max=0.032 rot_max=0.005 over=0
+
+DMX IMPORTER: now working on primary_crouch_walk_nw.dmx
+- Loading DMX...
+Importing DMX animation "primary_crouch_walk_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+DMX IMPORTER: now working on primary_crouch_walk_nw.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "primary_crouch_walk_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+SWEEP zoomed_crouch_run_w pos_max=0.034 rot_max=0.003 over=0
+SWEEP done 181 clips, 44 with a body bone over 0.05, 0 failed
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+[Blender Buddy] unregister: Server not running.
+INFO: Ucupaint 2.4.9 is unregistered!
+[36m[FNPORTING] [0mShutdown Server

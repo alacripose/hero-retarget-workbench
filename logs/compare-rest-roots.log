@@ -1,0 +1,45 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+skel140 FILE shiv_skel.dmx BONES 140 OBJ (1.0, 0.0, 0.0, 0.0)
+skel140 ROOT_LOCAL (1.0, -0.0, -0.0, -0.0) HEAD (0.0, 0.0, 0.0) TAIL (0.0, 0.31, -0.0) PARENT None
+skel140 POSE root_motion (1.0, -0.0, -0.0, -0.0)
+skel140 POSE pelvis (0.5, -0.5, -0.5, -0.5)
+
+DMX IMPORTER: now working on shiv_body.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "shiv_body"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 1.9 seconds
+Info: Imported 1 files in 1.9 seconds
+body168 FILE shiv_body.dmx BONES 161 OBJ (1.0, 0.0, 0.0, 0.0)
+body168 ROOT_LOCAL (1.0, -0.0, -0.0, -0.0) HEAD (0.0, 0.0, 0.0) TAIL (0.0, 0.312, -0.0) PARENT None
+body168 POSE root_motion (1.0, -0.0, -0.0, -0.0)
+body168 POSE pelvis (0.5, -0.5, -0.5, -0.5)
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+tail147 FILE shiv_tailbones.dmx BONES 147 OBJ (1.0, 0.0, 0.0, 0.0)
+tail147 ROOT_LOCAL (1.0, 0.0, -0.0, -0.0) HEAD (0.0, 0.0, 0.0) TAIL (0.0, 0.344, 0.0) PARENT None
+tail147 POSE root_motion (1.0, 0.0, -0.0, -0.0)
+tail147 POSE pelvis (0.5, -0.5, -0.5, -0.5)
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+
+Blender quit

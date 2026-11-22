@@ -1,0 +1,8 @@
+[PASS] unit tests
+[PASS] python compileall
+[PASS] no KV3 parser in source
+[PASS] no vmdl writes in forge
+[PASS] blake3 dependency
+[PASS] tail vnmclip gate
+[SKIP] probe lane
+disabled with --no-probes

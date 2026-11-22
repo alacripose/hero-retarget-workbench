@@ -1,0 +1,200 @@
+00:00.078  reports          | WARNING File written by newer Blender binary (504.6), expect loss of data!
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -78389.977404
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=editor error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 0.73 ms!
+register_class(...):
+Info: Registering operator class: 'SelectVertexColorMap', bl_idname 'smd.vertex_map_select_valvesource_vertex_paint' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexColorMap', bl_idname 'smd.vertex_map_create_valvesource_vertex_paint' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexColorMap', bl_idname 'smd.vertex_map_remove_valvesource_vertex_paint' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexColorMap', bl_idname 'smd.vertex_map_select_valvesource_vertex_blend' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexColorMap', bl_idname 'smd.vertex_map_create_valvesource_vertex_blend' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexColorMap', bl_idname 'smd.vertex_map_remove_valvesource_vertex_blend' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexColorMap', bl_idname 'smd.vertex_map_select_valvesource_vertex_blend1' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexColorMap', bl_idname 'smd.vertex_map_create_valvesource_vertex_blend1' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexColorMap', bl_idname 'smd.vertex_map_remove_valvesource_vertex_blend1' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_enable' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_enable' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_enable' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_animation_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_animation_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_animation_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_animation_force_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_animation_force_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_animation_force_attract' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_goal_strength' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_goal_strength' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_goal_strength' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_goal_strength_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_goal_strength_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_goal_strength_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_goal_damping' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_goal_damping' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_goal_damping' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_drag' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_drag' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_drag' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_drag_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_drag_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_drag_v2' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_mass' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_mass' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_mass' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_gravity' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_gravity' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_gravity' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_gravity_z' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_gravity_z' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_gravity_z' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_collision_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_collision_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_collision_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_ground_collision' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_ground_collision' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_ground_collision' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_ground_friction' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_ground_friction' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_ground_friction' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_use_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_use_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_use_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_make_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_make_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_make_rods' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_anchor_free_rotate' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_anchor_free_rotate' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_anchor_free_rotate' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_volumetric' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_volumetric' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_volumetric' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_suspenders' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_suspenders' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_suspenders' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_bend_stiffness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_bend_stiffness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_bend_stiffness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_stray_radius_inv' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_stray_radius_inv' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_stray_radius_inv' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_stray_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_stray_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_stray_radius' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_stray_radius_stretchiness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_stray_radius_stretchiness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_stray_radius_stretchiness' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_antishrink' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_antishrink' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_antishrink' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_shear_resistance' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_shear_resistance' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_shear_resistance' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_stretch' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_stretch' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_stretch' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'SelectVertexFloatMap', bl_idname 'smd.vertex_float_map_select_cloth_friction' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'CreateVertexFloatMap', bl_idname 'smd.vertex_float_map_create_cloth_friction' has been registered before, unregistering previous
+register_class(...):
+Info: Registering operator class: 'RemoveVertexFloatMap', bl_idname 'smd.vertex_float_map_remove_cloth_friction' has been registered before, unregistering previous
+GATE ADMIT haze_tail: model 144 joints, skeleton 132, tail 9
+[Blender Buddy] unregister: Server not running.
+INFO: Ucupaint 2.4.9 is unregistered!
+[36m[FNPORTING] [0mShutdown Server

@@ -1,0 +1,2 @@
+GATE REFUSE clip-rest-differs: ability_bullet_flurry.dmx declares a different rest for 11 joints than haze_model_tail.dmx (e.g. [('pelvis', 54.3914, 0.5), ('finger_middle_2_L', 0.0005, 0.000102), ('finger_middle_2_R', 0.0002, 0.000102)]); every bone whose rest disagrees is read through the wrong frame, which is bone orientations wrong in game
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

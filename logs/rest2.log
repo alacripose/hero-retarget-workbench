@@ -1,0 +1,33 @@
+
+DMX IMPORTER: now working on haze_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+
+DMX IMPORTER: now working on item_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+Importing DMX animation "item_stand_idle"
+- Imported 20 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+REST shared=98 only_authored=0 only_model=0
+REST holster_R                turn  175.148 deg  head 13.9099
+REST ball_R                   turn  172.168 deg  head 77.7196
+REST finger_thumb_0_R         turn  171.492 deg  head 20.9353
+REST holster_L                turn  170.615 deg  head 16.9599
+REST cocking_handle_L         turn  164.834 deg  head 52.8039
+REST magazine_L               turn  164.834 deg  head 55.2327
+REST magazine_R               turn  164.834 deg  head 30.2351
+REST muzzle_fx                turn  164.834 deg  head 47.0828
+REST muzzle_fx_L              turn  164.834 deg  head 58.0901
+REST weapon_hand_L            turn  164.834 deg  head 55.6373
+REST weapon_hand_R            turn  164.834 deg  head 20.9488
+REST cocking_handle_R         turn  164.833 deg  head 31.7184
+REST arm_R_IKTARGET           turn  155.963 deg  head 16.7647
+REST weaponHand_R             turn  155.963 deg  head 16.7647
+REST hand_R                   turn  155.962 deg  head 20.5910
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

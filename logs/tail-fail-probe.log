@@ -1,0 +1,409 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_body.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "shiv_body"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 1.6 seconds
+Info: Imported 1 files in 1.6 seconds
+
+DMX IMPORTER: now working on werewolf_werewolf_model.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "werewolf_werewolf_model"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 3.8 seconds
+Info: Imported 1 files in 3.8 seconds
+
+DMX IMPORTER: now working on turn_left.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in turn_left.
+Importing DMX animation "turn_left"
+- Animation refers to unrecognised bone ""
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: turn_left contains 3 bones not present in shiv_body. Check the console for a list.
+- Imported 18 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in turn_left.
+Warning: turn_left contains 3 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on turn_left.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in turn_left.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in turn_left.
+Importing DMX animation "turn_left"
+- Animation refers to unrecognised bone ""
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: turn_left contains 3 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 27 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in turn_left.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in turn_left.
+Warning: turn_left contains 3 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.3 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.3 seconds with 0 Errors and 3 Warnings
+
+DMX IMPORTER: now working on turn_right.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in turn_right.
+Importing DMX animation "turn_right"
+- Animation refers to unrecognised bone ""
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: turn_right contains 3 bones not present in shiv_body. Check the console for a list.
+- Imported 18 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in turn_right.
+Warning: turn_right contains 3 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on turn_right.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in turn_right.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in turn_right.
+Importing DMX animation "turn_right"
+- Animation refers to unrecognised bone ""
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: turn_right contains 3 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 27 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in turn_right.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in turn_right.
+Warning: turn_right contains 3 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+
+DMX IMPORTER: now working on ui_hero_select.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in ui_hero_select.
+Importing DMX animation "ui_hero_select"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: ui_hero_select contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 1 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in ui_hero_select.
+Warning: ui_hero_select contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.1 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.1 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on ui_hero_select.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in ui_hero_select.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in ui_hero_select.
+Importing DMX animation "ui_hero_select"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: ui_hero_select contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 11 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in ui_hero_select.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in ui_hero_select.
+Warning: ui_hero_select contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.3 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.3 seconds with 0 Errors and 3 Warnings
+FAILNOTE ui_hero_select: tail-target-empty-range: ui_hero_select has no frame range
+
+DMX IMPORTER: now working on wall_attach_forward.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in wall_attach_forward.
+Importing DMX animation "wall_attach_forward"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: wall_attach_forward contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 11 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in wall_attach_forward.
+Warning: wall_attach_forward contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.1 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.1 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on wall_attach_forward.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in wall_attach_forward.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in wall_attach_forward.
+Importing DMX animation "wall_attach_forward"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: wall_attach_forward contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 11 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in wall_attach_forward.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in wall_attach_forward.
+Warning: wall_attach_forward contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+FAILNOTE wall_attach_forward: 11 frames on 7 tail bones; 6 left
+
+DMX IMPORTER: now working on wall_attach_left.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in wall_attach_left.
+Importing DMX animation "wall_attach_left"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: wall_attach_left contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 11 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in wall_attach_left.
+Warning: wall_attach_left contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.1 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.1 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on wall_attach_left.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in wall_attach_left.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in wall_attach_left.
+Importing DMX animation "wall_attach_left"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: wall_attach_left contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 11 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in wall_attach_left.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in wall_attach_left.
+Warning: wall_attach_left contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.1 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.1 seconds with 0 Errors and 3 Warnings
+FAILNOTE wall_attach_left: 11 frames on 7 tail bones; 5 left
+
+DMX IMPORTER: now working on wall_attach_right.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in wall_attach_right.
+Importing DMX animation "wall_attach_right"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: wall_attach_right contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 11 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in wall_attach_right.
+Warning: wall_attach_right contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.1 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.1 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on wall_attach_right.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in wall_attach_right.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in wall_attach_right.
+Importing DMX animation "wall_attach_right"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: wall_attach_right contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 11 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in wall_attach_right.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in wall_attach_right.
+Warning: wall_attach_right contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+FAILNOTE wall_attach_right: 11 frames on 7 tail bones; 4 left
+
+DMX IMPORTER: now working on weapon_crouch_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_crouch_idle.
+Importing DMX animation "weapon_crouch_idle"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: weapon_crouch_idle contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 121 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_crouch_idle.
+Warning: weapon_crouch_idle contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.7 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.7 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on weapon_crouch_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_crouch_idle.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_crouch_idle.
+Importing DMX animation "weapon_crouch_idle"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: weapon_crouch_idle contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 57 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_crouch_idle.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_crouch_idle.
+Warning: weapon_crouch_idle contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.4 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.4 seconds with 0 Errors and 3 Warnings
+FAILNOTE weapon_crouch_idle: 121 frames on 7 tail bones; 3 left
+
+DMX IMPORTER: now working on weapon_crouch_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_crouch_run_center.
+Importing DMX animation "weapon_crouch_run_center"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: weapon_crouch_run_center contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 35 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_crouch_run_center.
+Warning: weapon_crouch_run_center contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.3 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.3 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on weapon_crouch_run_center.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_crouch_run_center.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_crouch_run_center.
+Importing DMX animation "weapon_crouch_run_center"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: weapon_crouch_run_center contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 21 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_crouch_run_center.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_crouch_run_center.
+Warning: weapon_crouch_run_center contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+FAILNOTE weapon_crouch_run_center: 35 frames on 7 tail bones; 2 left
+
+DMX IMPORTER: now working on weapon_crouch_run_e.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_crouch_run_e.
+Importing DMX animation "weapon_crouch_run_e"
+- Animation refers to unrecognised bone ""
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: weapon_crouch_run_e contains 3 bones not present in shiv_body. Check the console for a list.
+- Imported 37 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_crouch_run_e.
+Warning: weapon_crouch_run_e contains 3 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.3 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.3 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on weapon_crouch_run_e.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_crouch_run_e.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_crouch_run_e.
+Importing DMX animation "weapon_crouch_run_e"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: weapon_crouch_run_e contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 21 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_crouch_run_e.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_crouch_run_e.
+Warning: weapon_crouch_run_e contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+FAILNOTE weapon_crouch_run_e: 37 frames on 7 tail bones; 1 left
+
+DMX IMPORTER: now working on weapon_crouch_run_n.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_crouch_run_n.
+Importing DMX animation "weapon_crouch_run_n"
+- Animation refers to unrecognised bone ""
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: weapon_crouch_run_n contains 3 bones not present in shiv_body. Check the console for a list.
+- Imported 37 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_crouch_run_n.
+Warning: weapon_crouch_run_n contains 3 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.3 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.3 seconds with 0 Errors and 2 Warnings
+
+DMX IMPORTER: now working on weapon_crouch_run_n.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_crouch_run_n.
+ WARNING: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_crouch_run_n.
+Importing DMX animation "weapon_crouch_run_n"
+- Animation refers to unrecognised bone "ear_0_L"
+- Animation refers to unrecognised bone "ear_0_R"
+ WARNING: weapon_crouch_run_n contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+- Imported 21 frames of animation
+0 Errors and 3 Warnings
+Warning: Parent mismatch for bone "ear_1_l": "ear_0_l" in Blender, "ear_0_L" in weapon_crouch_run_n.
+Warning: Parent mismatch for bone "ear_1_r": "ear_0_r" in Blender, "ear_0_R" in weapon_crouch_run_n.
+Warning: weapon_crouch_run_n contains 2 bones not present in werewolf_werewolf_model. Check the console for a list.
+Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+Info: Imported 1 files in 0.2 seconds with 0 Errors and 3 Warnings
+FAILNOTE werewolf_werewolf_model: added tail to 9 clips, 1 failed
+RESULT 9 0 1
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

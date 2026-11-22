@@ -1,0 +1,4 @@
+$ <home>\Documents\deadlock-model-forge\artifacts\csdk13-wrapper\game\bin\win64\resourcecompiler.exe -nop4 -f -game <home>\Documents\deadlock-model-forge\artifacts\csdk13-wrapper\game\citadel -i citadel_addons\dmf_build_mayu_updated_w2047p1t\models\heroes_wip\doorman_v2\doorman.vmdl
+
+Creating render device for graphics adapter 0 'NVIDIA GeForce RTX 2070 SUPER' [VendorId 0x10DE / DeviceId 0x1E84]: 32.0.16.1742
+FATAL ERROR: CAppSystemDict:Unable to load module modeldoc_utils (Dependency of ResourceCompilerSystem001), error 126

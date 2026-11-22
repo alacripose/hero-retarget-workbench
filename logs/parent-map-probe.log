@@ -1,0 +1,68 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_body.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "shiv_body"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 1.7 seconds
+Info: Imported 1 files in 1.7 seconds
+BODY168 BONES 168 OBJ shiv_body
+BODY168 root_motion parent None head (0.0, 0.0, 0.0)
+BODY168 pelvis parent None head (0.0, 0.0, 61.52)
+BODY168 spine_0 parent pelvis head (0.26, 0.0, 62.57)
+BODY168 tail_0 parent pelvis head (-6.36, 0.0, 61.24)
+
+DMX IMPORTER: now working on shiv_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+STOCK140 BONES 140 OBJ shiv_skel
+STOCK140 root_motion parent None head (0.0, 0.0, 0.0)
+STOCK140 pelvis parent root_motion head (-0.0, 0.0, 61.52)
+STOCK140 spine_0 parent pelvis head (0.26, 0.0, 62.57)
+STOCK140 tail_0 parent None head None
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+CLIP147 BONES 147 OBJ shiv_tailbones
+CLIP147 root_motion parent None head (0.0, 0.0, 0.0)
+CLIP147 pelvis parent root_motion head (-0.0, -0.0, 61.52)
+CLIP147 spine_0 parent pelvis head (0.26, -0.0, 62.57)
+CLIP147 tail_0 parent pelvis head (-6.36, -0.0, 61.24)
+
+DMX IMPORTER: now working on shiv_body_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Imported 1 files in 2.7 seconds
+Info: Imported 1 files in 2.7 seconds
+PREVIEW168 BONES 168 OBJ shiv_body.002
+PREVIEW168 root_motion parent None head (0.0, 0.0, 0.0)
+PREVIEW168 pelvis parent None head (0.0, 0.0, 61.52)
+PREVIEW168 spine_0 parent pelvis head (0.26, 0.0, 62.57)
+PREVIEW168 tail_0 parent pelvis head (-6.36, 0.0, 61.24)
+DIFF STOCK140 BODY168 onlyA ['weaponHand_L', 'weaponHand_R'] onlyB ['blade_a_hinge_end_R', 'blade_b_hinge_end_L', 'blade_b_hinge_end_R', 'cig_end', 'coat_end', 'collar_back_end', 'collar_end_L', 'collar_end_R', 'hair_end', 'hand_end_L', 'hand_end_R', 'head_end', 'jet_wing_inner_end_L', 'jet_wing_inner_end_R', 'knifearm_hand_end_L', 'knifearm_hand_end_R', 'piston_bot_end_R', 'piston_top_end_L', 'piston_top_end_R', 'reliquary_end', 'shoebar_end_L', 'shoebar_end_R', 'sleeve_end_R', 'tail_0', 'tail_1', 'tail_2', 'tail_3', 'tail_4', 'tail_5', 'tail_end']
+PARENT_MISMATCH STOCK140 BODY168 1 [('pelvis', 'root_motion', None)]
+DIFF CLIP147 BODY168 onlyA ['weaponHand_L', 'weaponHand_R'] onlyB ['blade_a_hinge_end_R', 'blade_b_hinge_end_L', 'blade_b_hinge_end_R', 'cig_end', 'coat_end', 'collar_back_end', 'collar_end_L', 'collar_end_R', 'hair_end', 'hand_end_L', 'hand_end_R', 'head_end', 'jet_wing_inner_end_L', 'jet_wing_inner_end_R', 'knifearm_hand_end_L', 'knifearm_hand_end_R', 'piston_bot_end_R', 'piston_top_end_L', 'piston_top_end_R', 'reliquary_end', 'shoebar_end_L', 'shoebar_end_R', 'sleeve_end_R']
+PARENT_MISMATCH CLIP147 BODY168 1 [('pelvis', 'root_motion', None)]
+DIFF STOCK140 CLIP147 onlyA [] onlyB ['tail_0', 'tail_1', 'tail_2', 'tail_3', 'tail_4', 'tail_5', 'tail_end']
+PARENT_MISMATCH STOCK140 CLIP147 0 []
+DIFF PREVIEW168 BODY168 onlyA [] onlyB []
+PARENT_MISMATCH PREVIEW168 BODY168 0 []
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+
+Blender quit

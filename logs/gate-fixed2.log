@@ -1,0 +1,2 @@
+GATE REFUSE joint-order-diverges: 2 model joints appear in a different order in haze_model_tail.dmx: ['weaponHand_L', 'weaponHand_R']
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

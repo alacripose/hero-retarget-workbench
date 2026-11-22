@@ -1,0 +1,19 @@
+[package]
+name = "notation-core"
+version = "0.1.0"
+edition = "2021"
+description = "Crudity classifier for the notation IDE: what a shorthand rewrite took out of a line"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.test]
+opt-level = 2

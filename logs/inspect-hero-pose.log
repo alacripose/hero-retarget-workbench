@@ -1,0 +1,42 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_body.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "shiv_body"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 1.6 seconds
+Info: Imported 1 files in 1.6 seconds
+HERO shiv_body ROT (0.0, 0.0, 0.0) MW (0.0, -0.0, 0.0)
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Removed ValveResourceFormat's root_motion axis fixup from this animation
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+ WARNING: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_stand_idle.
+Importing DMX animation "weapon_stand_idle"
+- Animation refers to unrecognised bone "weaponHand_L"
+- Animation refers to unrecognised bone "weaponHand_R"
+ WARNING: weapon_stand_idle contains 2 bones not present in shiv_body. Check the console for a list.
+- Imported 121 frames of animation
+0 Errors and 2 Warnings
+Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" in weapon_stand_idle.
+Warning: weapon_stand_idle contains 2 bones not present in shiv_body. Check the console for a list.
+Imported 1 files in 0.9 seconds with 0 Errors and 2 Warnings
+Info: Imported 1 files in 0.9 seconds with 0 Errors and 2 Warnings
+AFTER_IMPORT root_motion (0.0, 0.0, 0.0) (0.5, 0.5, 0.5, 0.5)
+AFTER_IMPORT pelvis (0.977, -2.04, 58.747) (0.1222, -0.5572, -0.4353, -0.6965)
+AFTER_IMPORT spine_0 (0.978, -2.047, 59.827) (0.1597, -0.6439, -0.3149, -0.6788)
+ACTION weapon_stand_idle
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

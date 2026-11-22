@@ -1,0 +1,2 @@
+{"at":"2026-11-12T21:50:00+00:00","schema":"goose.authority/1","source":"user","authority":"user","unit":"user-owned-tool-paths","text":"it seriously can't be dependant on my personal drives and directoruies, what if someone has something newer? the paths should not be set by a python script someone runs it should be something the user sets up and can save to their default blend file"}
+{"at":"2026-11-12T22:20:00+00:00","schema":"goose.authority/1","source":"user","authority":"user","unit":"user-owned-tool-paths","text":"why did you not commit and use ci"}

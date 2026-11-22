@@ -1,0 +1,4 @@
+DEDUPE haze_model_tail.dmx: 167 -> 131 elements, 8 duplicates removed
+DEDUPE FAIL <home>\Downloads\Reduced_CSDK_13\content\citadel_addons\haze_tail\models\heroes_staging\haze\haze_body_tail.dmx: FileNotFoundError: [Errno 2] No such file or directory: '<home>\\Downloads\\Reduced_CSDK_13\\content\\citadel_addons\\haze_tail\\models\\heroes_staging\\haze\\haze_body_tail.dmx'
+DEDUPE FAIL <home>\Downloads\Reduced_CSDK_13\content\citadel_addons\haze_tail\models\heroes_staging\haze\haze_anim_tail.dmx: FileNotFoundError: [Errno 2] No such file or directory: '<home>\\Downloads\\Reduced_CSDK_13\\content\\citadel_addons\\haze_tail\\models\\heroes_staging\\haze\\haze_anim_tail.dmx'
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

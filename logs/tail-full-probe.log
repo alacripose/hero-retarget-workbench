@@ -1,0 +1,43 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_body.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "shiv_body"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Imported 1 files in 2.2 seconds
+Info: Imported 1 files in 2.2 seconds
+
+DMX IMPORTER: now working on werewolf_werewolf_model.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Importing mesh "werewolf_werewolf_model"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 4.1 seconds
+Traceback (most recent call last):
+  File "<home>\Documents\deadlock-model-forge\artifacts\probes\tail_full_probe.py", line 52, in <module>
+    queued = tailops.start_auto(settings, schedule=False, publish=True)
+  File "<home>\Documents\deadlock-model-forge\blender\hero_retarget_workbench\tailops.py", line 477, in start_auto
+    raise RuntimeError("tail-auto-no-clips: import this hero's clips first")
+RuntimeError: tail-auto-no-clips: import this hero's clips first
+Info: Imported 1 files in 4.1 seconds
+
+Error: script failed, file: 'artifacts/probes/tail_full_probe.py', exiting.
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

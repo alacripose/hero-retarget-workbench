@@ -1,0 +1,30 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Imported 1 files in 0.0 seconds
+Info: Imported 1 files in 0.0 seconds
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+BONES 147 ACTION shiv_tailbones
+TAIL_CURVES 0
+TF 0 tail_0 (55.507, -3.092, 1.63) (55.567, -3.349, 1.851)
+TF 0 tail_3 (35.059, 1.78, 0.124) (34.992, 1.544, 0.365)
+TF 0 tail_end (20.663, 0.518, 10.697) (20.984, 0.396, 10.711)
+TF 30 tail_0 (55.387, -3.144, 2.108) (55.449, -3.414, 2.311)
+TF 30 tail_3 (34.897, -0.369, -1.905) (34.811, -0.635, -1.705)
+TF 30 tail_end (18.289, -5.133, 3.492) (18.605, -5.2, 3.611)
+TF 60 tail_0 (55.268, -3.456, 1.707) (55.349, -3.707, 1.928)
+TF 60 tail_3 (34.537, -2.335, -1.975) (34.476, -2.591, -1.753)
+TF 60 tail_end (17.85, -10.964, 0.418) (18.143, -11.033, 0.584)
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

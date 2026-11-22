@@ -1,0 +1,32 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on shiv_skel.dmx
+- Loading DMX...
+- Removed ValveResourceFormat's broken root_motion axis fixup from this skeleton
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+STOCK BONES 140 OBJ (0.0, 0.0, 0.0) (0.0, -0.0, 0.0)
+STOCK root_motion head (0.0, 0.0, 0.0) tail (0.0, 0.31, -0.0) quat (1.0, -0.0, -0.0, -0.0)
+STOCK pelvis head (-0.0, 0.0, 61.52) tail (0.31, 0.0, 61.52) quat (0.5, -0.5, -0.5, -0.5)
+STOCK spine_0 head (0.262, 0.0, 62.567) tail (0.569, 0.0, 62.604) quat (0.4692, -0.4692, -0.529, -0.529)
+STOCK head head (1.534, 0.0, 89.307) tail (1.844, 0.0, 89.3) quat (0.5054, -0.5054, -0.4946, -0.4946)
+STOCK leg_upper_L head (-0.363, 4.428, 57.833) tail (-0.655, 4.325, 57.815) quat (0.4632, -0.5269, 0.3461, 0.623)
+STOCK leg_lower_L head (-0.768, 9.899, 32.663) tail (-1.055, 9.787, 32.697) quat (0.4082, -0.4954, 0.3899, 0.6603)
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+TAIL147 BONES 147 OBJ (0.0, 0.0, 0.0) (0.0, -0.0, 0.0)
+TAIL147 root_motion head (0.0, 0.0, 0.0) tail (0.0, 0.344, 0.0) quat (1.0, 0.0, -0.0, -0.0)
+TAIL147 pelvis head (-0.0, -0.0, 61.52) tail (0.344, -0.0, 61.52) quat (0.5, -0.5, -0.5, -0.5)
+TAIL147 spine_0 head (0.262, -0.0, 62.567) tail (0.603, -0.0, 62.609) quat (0.4692, -0.4692, -0.529, -0.529)
+TAIL147 head head (1.534, -0.0, 89.307) tail (1.878, -0.0, 89.3) quat (0.5054, -0.5054, -0.4946, -0.4946)
+TAIL147 leg_upper_L head (-0.363, 4.428, 57.833) tail (-0.687, 4.314, 57.813) quat (0.4632, -0.5269, 0.3461, 0.623)
+TAIL147 leg_lower_L head (-0.768, 9.899, 32.663) tail (-1.086, 9.774, 32.701) quat (0.4082, -0.4954, 0.3899, 0.6603)
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+
+Blender quit

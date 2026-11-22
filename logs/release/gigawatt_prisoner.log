@@ -1,0 +1,35 @@
+$ <home>\Downloads\Reduced_CSDK_13\game\bin\win64\resourcecompiler.exe -nop4 -f -game <home>\Downloads\Reduced_CSDK_13\game\citadel -i <home>\Downloads\Reduced_CSDK_13\content\citadel_addons\seven_tail\models\heroes_staging\gigawatt_prisoner\gigawatt_prisoner.vmdl
+
+Creating render device for graphics adapter 0 'NVIDIA GeForce RTX 2070 SUPER' [VendorId 0x10DE / DeviceId 0x1E84]: 32.0.16.1742
+- citadel_addons\seven_tail\models\heroes_staging\gigawatt_prisoner\gigawatt_prisoner.vmdl
+RESOURCE COMPILE ERROR: Load error: Failed to load document kv3 data: Line 11939: Expected ',' or ']' (before "-0.027506")
+Line 11939: Invalid data for member 'origin'
+Line 11939: Expected value or ']' (before "-0.027506")
+Line 9784: Invalid data for member 'children'
+Line 11939: Expected value or ']' (before "-0.027506")
+Line 9711: Invalid data for member 'children'
+Line 11939: Expected value or ']' (before "-0.027506")
+Line 6: Invalid data for member 'children'
+Line 3: Invalid data for member 'rootNode'
+
+                                                                      [FAIL]
+
+---------------------------------------------------------------------
+ 1 Compile ERRORS
+ These errors will cause the compile to fail.
+ Look for "RESOURCE COMPILE ERROR:" in the log above.
+---------------------------------------------------------------------
+  Load error: Failed to load document kv3 data: Line 11939: Expected ',' or ']' (before "-0.027506")
+Line 11939: Invalid data for member 'origin'
+Line 11939: Expected value or ']' (before "-0.027506")
+Line 9784: Invalid data for member 'children'
+Line 11939: Expected value or ']' (before "-0.027506")
+Line 9711: Invalid data for member 'children'
+Line 11939: Expected value or ']' (before "-0.027506")
+Line 6: Invalid data for member 'children'
+Line 3: Invalid data for member 'rootNode'
+
+
+-----------------------------------------------------------------
+ ERROR: 0 compiled, 1 failed, 0 skipped, 0m:01s
+-----------------------------------------------------------------

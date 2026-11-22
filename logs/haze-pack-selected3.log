@@ -1,0 +1,2 @@
+GATE ADMIT haze_tail: model 144 joints, skeleton 131, tail 9
+PACK haze_tail_selected.vpk 53937480b files=593 models=1 skeletons=1 clips=197 materials=0 sha256=24af3a1162503e43

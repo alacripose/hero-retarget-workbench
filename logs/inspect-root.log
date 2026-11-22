@@ -1,0 +1,33 @@
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+Importing DMX animation "weapon_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 2.2 seconds
+Info: Imported 1 files in 2.2 seconds
+CLIP models/heroes_staging/shiv/clips/weapon_stand_idle.dmx ACTION shiv_body RANGE (0.0, 120.0)
+ROOT 0 [-0.0, -0.0, -0.0, -0.0] [-0.0, -0.0]
+ROOT 1 [-0.0, -0.0, -0.0, -0.0] [-0.0, -0.0]
+ROOT 2 [-0.0, -0.0, -0.0, -0.0] [-0.0, -0.0]
+LOC 0 [0.0, 0.0, 0.0, 0.0] [0.0, 0.0]
+LOC 1 [0.0, 0.0, 0.0, 0.0] [0.0, 0.0]
+LOC 2 [0.0, 0.0, 0.0, 0.0] [0.0, 0.0]
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+Importing DMX animation "item_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+CLIP models/heroes_staging/shiv/clips/item_run_center.dmx ACTION shiv_body.001 RANGE (0.0, 19.99920082092285)
+ROOT 0 [-0.0, -0.0, -0.0, -0.0] [-0.0, -0.0]
+ROOT 1 [-0.0, -0.0, -0.0, -0.0] [-0.0, -0.0]
+ROOT 2 [-0.0, -0.0, -0.0, -0.0] [-0.0, -0.0]
+LOC 0 [0.0, 0.0, 0.0, 0.0] [0.0, 0.0]
+LOC 1 [0.0, 0.0, 0.0, 0.0] [0.0, 0.0]
+LOC 2 [0.0, 0.0, 0.0, 0.0] [0.0, 0.0]
+Blender 5.4.0 Alpha (hash 2e131281d777 built 2026-11-13 01:39:22)
+
+Blender quit

@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deadlock VPK Tracker</title>
+<meta name="description" content="BLAKE3 snapshots of Deadlock's VPKs, read through Source 2 Viewer, with an added/removed/modified ledger.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar slab">
+    <div class="brand">
+      <span class="wordmark">DEADLOCK</span><span class="wordmark sub">VPK TRACKER</span>
+      <span class="build mono" id="build-chip">build —</span>
+    </div>
+    <div class="top-right">
+      <label class="snap-select mono"><span>BASE</span><select id="from-select" aria-label="Compare from snapshot"></select></label>
+      <label class="snap-select mono"><span>HEAD</span><select id="to-select" aria-label="Compare to snapshot"></select></label>
+      <button class="chip action" id="history-toggle" type="button" aria-expanded="false" aria-controls="history-panel">History</button>
+      <button class="chip action" id="launcher-toggle" type="button" aria-expanded="false" aria-controls="launcher-panel">Launcher</button>
+      <button class="chip action" id="refresh" type="button">Refresh</button>
+    </div>
+  </header>
+
+  <div class="launcher-backdrop" id="launcher-backdrop" hidden></div>
+  <section class="launcher-panel slab" id="launcher-panel" aria-label="Launcher" hidden>
+    <div class="launcher-head">
+      <div class="slab-title">Launcher</div>
+      <button class="chip action" id="launcher-close" type="button">Close</button>
+    </div>
+    <div class="launcher-body">
+      <div class="launcher-status" id="launcher-status"></div>
+
+      <section class="launcher-section">
+        <div class="launcher-kicker">Installed game</div>
+        <button class="pill launch" id="launcher-snapshot" type="button">Snapshot installed game</button>
+      </section>
+
+      <section class="launcher-section">
+        <label class="launcher-kicker" for="launcher-manifest">Historical build</label>
+        <div class="launcher-row">
+          <input class="launcher-input" id="launcher-manifest" type="text" placeholder="Build number" autocomplete="off" spellcheck="false">
+          <button class="pill launch" id="launcher-fetch" type="button">Fetch</button>
+        </div>
+      </section>
+
+      <section class="launcher-section">
+        <div class="launcher-kicker">Steam</div>
+        <p class="launcher-note" id="launcher-login-note">Sign in once to fetch old builds.</p>
+        <button class="pill ghost" id="launcher-login" type="button">Sign in to Steam</button>
+      </section>
+
+      <div class="launcher-error" id="launcher-error" hidden></div>
+
+      <section class="launcher-job" id="launcher-job" hidden aria-live="polite">
+        <div class="launcher-job-top">
+          <div class="launcher-job-line" id="launcher-job-label">Working…</div>
+          <button class="launcher-log-toggle" id="launcher-log-toggle" type="button">Details</button>
+        </div>
+        <pre class="launcher-log" id="launcher-log" hidden></pre>
+      </section>
+
+      <div class="launcher-foot mono" id="launcher-foot">Checking…</div>
+    </div>
+  </section>
+
+  <div class="history-backdrop" id="history-backdrop" hidden></div>
+  <section class="history-panel slab" id="history-panel" aria-label="History" hidden>
+    <div class="history-head">
+      <div class="slab-title">History</div>
+      <div class="history-head-actions">
+        <a class="chip action" id="history-link" href="https://github.com/SteamTracking/GameTracking-Deadlock/compare/" target="_blank" rel="noreferrer">GameTracking ↗</a>
+        <button class="chip action" id="history-close" type="button">Close</button>
+      </div>
+    </div>
+    <div class="history-body">
+      <section class="history-column">
+        <div class="history-column-head"><span class="launcher-kicker">Snapshots</span><span class="mono" id="history-snapshot-count">—</span></div>
+        <div class="history-list" id="history-snapshots"></div>
+      </section>
+      <section class="history-column">
+        <div class="history-column-head"><span class="launcher-kicker">Steam builds</span><span class="mono" id="history-build-status">—</span><button class="history-mini" id="history-signin" type="button" hidden>Sign in</button></div>
+        <div class="history-list" id="history-builds"></div>
+      </section>
+    </div>
+    <div class="history-foot">
+      <div class="history-compare" id="history-compare">Select two versions.</div>
+      <div class="history-foot-actions">
+        <button class="pill ghost" id="history-clear" type="button">Latest</button>
+        <button class="pill launch" id="history-show" type="button">Show diff</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="body">
+
+    <nav class="rail slab" aria-label="VPK inventory">
+      <div class="rail-head">
+        <span class="slab-sub">VPKs</span>
+      </div>
+      <div class="rail-list" id="vpk-list"></div>
+      <div class="rail-foot mono" id="rail-foot">—</div>
+    </nav>
+
+    <main class="stage">
+      <div class="stage-bar">
+        <div class="stage-heading">
+          <div class="slab-title" id="stage-title">Changes</div>
+          <div class="slab-sub" id="stage-sub">Loading…</div>
+        </div>
+        <div class="segmented" id="kind-seg" role="group" aria-label="Change kind">
+          <button type="button" data-kind="all" aria-pressed="true">All</button>
+          <button type="button" data-kind="added" aria-pressed="false">Added</button>
+          <button type="button" data-kind="modified" aria-pressed="false">Modified</button>
+          <button type="button" data-kind="removed" aria-pressed="false">Removed</button>
+        </div>
+        <label class="search">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="search" type="search" placeholder="Filter files…" autocomplete="off" spellcheck="false" aria-label="Filter files">
+        </label>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="table-wrap">
+        <table class="changes">
+          <thead>
+            <tr>
+              <th class="w-kind">Change</th>
+              <th>Path</th>
+              <th class="w-vpk">VPK</th>
+              <th class="w-size">Old</th>
+              <th class="w-size">New</th>
+              <th class="w-delta">Δ</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="empty" id="empty" hidden>
+          <div class="empty-mark">∅</div>
+          <div class="empty-title" id="empty-title">No changes</div>
+          <div class="empty-body" id="empty-body">No differences.</div>
+        </div>
+      </div>
+
+      <div class="pager">
+        <button class="pill ghost" id="prev" type="button">◀ Prev</button>
+        <span class="mono muted" id="page-label">—</span>
+        <button class="pill ghost" id="next" type="button">Next ▶</button>
+        <span class="spacer"></span>
+        <label class="mono muted">Rows
+          <select id="limit">
+            <option value="100">100</option>
+            <option value="200" selected>200</option>
+            <option value="400">400</option>
+          </select>
+        </label>
+      </div>
+    </main>
+
+    <aside class="inspector slab">
+      <div class="slab-head">
+        <div>
+          <div class="slab-title">File</div>
+          <div class="slab-sub" id="insp-sub">Select a row</div>
+        </div>
+      </div>
+      <div class="insp-body" id="entry-detail"></div>
+      <div class="chunk-block">
+        <div class="slab-sub">Chunks</div>
+        <div class="chunk-list" id="chunk-list"></div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="timeline slab">
+    <div class="tl-head">
+      <span class="slab-title tl-title">Snapshots</span>
+      <span class="scene-chip live mono" id="live-chip" data-state="starting"><span class="dot"></span><span id="live-label">checking game…</span></span>
+      <span class="chip mono digest" id="digest-chip">Digest —</span>
+      <span class="spacer"></span>
+      <span class="mono muted" id="tl-meta">—</span>
+    </div>
+    <div class="timeline-track" id="timeline"></div>
+    <div class="tl-foot mono muted">Click = compare · Shift = base</div>
+  </footer>
+
+</div>
+
+<div class="live-toast" id="live-toast" hidden>
+  <span id="live-toast-text"></span>
+  <button id="live-toast-close" type="button" aria-label="Dismiss">×</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

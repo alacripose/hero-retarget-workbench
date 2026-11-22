@@ -1,0 +1,2 @@
+GATE REFUSE clip-joint-list-differs: clips carry [106] tracks against a 132-joint skeleton (e.g. ability_bullet_flurry.dmx); the client binds a clip by index, so the pose is wrong and the tail drops
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

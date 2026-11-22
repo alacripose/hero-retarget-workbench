@@ -1,0 +1,13 @@
+$ <home>\Downloads\Reduced_CSDK_13\game\bin\win64\resourcecompiler.exe -nop4 -f -game <home>\Downloads\Reduced_CSDK_13\game\citadel -i <home>\Downloads\Reduced_CSDK_13\content\citadel_addons\shiv_tail_full168_baked\models\heroes_staging\shiv\clips\zipline_attached_loop.vnmclip
+
+Creating render device for graphics adapter 0 'NVIDIA GeForce RTX 2070 SUPER' [VendorId 0x10DE / DeviceId 0x1E84]: 32.0.16.1742
+- citadel_addons\shiv_tail_full168_baked\models\heroes_staging\shiv\clips\zipline_attached_loop.vnmclip
+- citadel_addons\shiv_tail_full168_baked\models\heroes_staging\shiv\shiv.vnmskel
+Creating Bone Masks for Skeleton: Couldn't find bone (weaponHand_L) in skeleton(models/heroes_staging/shiv/shiv.vnmskel) while serializing bone mask (melee_UpperBody)
+Creating Bone Masks for Skeleton: Couldn't find bone (weaponHand_R) in skeleton(models/heroes_staging/shiv/shiv.vnmskel) while serializing bone mask (melee_UpperBody)
+Creating Bone Masks for Skeleton: Couldn't find bone (weaponHand_L) in skeleton(models/heroes_staging/shiv/shiv.vnmskel) while serializing bone mask (Parry_UpperBody)
+Creating Bone Masks for Skeleton: Couldn't find bone (weaponHand_R) in skeleton(models/heroes_staging/shiv/shiv.vnmskel) while serializing bone mask (Parry_UpperBody)
+
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:01s
+-----------------------------------------------------------------

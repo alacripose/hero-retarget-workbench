@@ -1,0 +1,5466 @@
+[36m[FNPORTING] [0mRunning FP V4 Server at 127.0.0.1:40000
+[Blender Buddy] icons registered — static: yes  animations: ['1', '2', '3', '4', '5']
+[Blender Buddy] register() — version (9, 13, 1) — mtime 1776941603
+[]
+ucupaint addon: Verbose is enabled
+ucupaint addon: Read in JSON settings from file
+Determined it's not yet time to check for updates -25190.034029
+Aborting check for updated, check interval not reached
+tag-link https://github.com/ucupumar/ucupaint/releases/download/3.0.1/ucupaint-3.0.1.zip
+INFO: Ucupaint 2.4.9 is registered!
+Registered nodes
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+INFO: Ucupaint update routine is done in 0.59 ms!
+DMF surface=sidebar error=-
+DMF surface report: <home>\AppData\Roaming\Blender Foundation\Blender\5.4\config\dmf\surface.json
+REPARENT 181 clips
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+- New material: shiv_mods.vmat
+- New material: shiv_head.vmat
+- New material: shiv_body.vmat
+- New material: shiv_skin.vmat
+- New material: shiv_legs.vmat
+- New material: shiv_reliquary.vmat
+- New material: shiv_reliquary_gem.vmat
+Importing mesh "werewolf_werewolf_model.001"
+- New material: werewolf_lower.vmat
+- New material: werewolf_bola.vmat
+- New material: werewolf_upper.vmat
+- New material: werewolf_head.vmat
+- New material: werewolf_eye.vmat
+- New material: werewolf_hair.vmat
+- New material: werewolf_teeth.vmat
+Imported 1 files in 8.3 seconds
+Info: Imported 1 files in 8.3 seconds
+
+DMX IMPORTER: now working on ability_dash_start.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "ability_dash_start"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5198
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0341
+    DMX Animation setup:0.0429
+Frames: ..........
+- Writing DMX...
+    DMX write:0.2076
+ _run_dmx_writer:0.2850
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT ability_dash_start -> 216978 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on ability_shiv_dash.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "ability_shiv_dash"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.4967
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0307
+    DMX Animation setup:0.0518
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.4167
+ _run_dmx_writer:0.4996
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT ability_shiv_dash -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.7 seconds
+Info: Imported 1 files in 8.7 seconds
+
+DMX IMPORTER: now working on ability_shiv_killingblow_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "ability_shiv_killingblow_idle"
+- Imported 36 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.4799
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0305
+    DMX Animation setup:0.0555
+Frames: ...................................
+- Writing DMX...
+    DMX write:0.4154
+ _run_dmx_writer:0.5018
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT ability_shiv_killingblow_idle -> 401778 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.4 seconds
+Info: Imported 1 files in 8.4 seconds
+
+DMX IMPORTER: now working on ability_shiv_killingblow_leap.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "ability_shiv_killingblow_leap"
+- Imported 43 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4974
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0305
+    DMX Animation setup:0.0647
+Frames: ..........................................
+- Writing DMX...
+    DMX write:0.4858
+ _run_dmx_writer:0.5813
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT ability_shiv_killingblow_leap -> 453522 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on ability_shiv_killingblow_slash.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "ability_shiv_killingblow_slash"
+- Imported 30 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.5010
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0484
+    DMX Animation setup:0.0681
+Frames: .............................
+- Writing DMX...
+    DMX write:0.3419
+ _run_dmx_writer:0.4587
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT ability_shiv_killingblow_slash -> 357426 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.6 seconds
+Info: Imported 1 files in 8.6 seconds
+
+DMX IMPORTER: now working on aim_weapon_crouch.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "aim_weapon_crouch"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.4834
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0312
+    DMX Animation setup:0.0532
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.3420
+ _run_dmx_writer:0.4267
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT aim_weapon_crouch -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.6 seconds
+Info: Imported 1 files in 8.6 seconds
+
+DMX IMPORTER: now working on aim_weapon_crouch_down.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "aim_weapon_crouch_down"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.5251
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0326
+    DMX Animation setup:0.0545
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.3631
+ _run_dmx_writer:0.4505
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT aim_weapon_crouch_down -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on aim_weapon_crouch_run.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "aim_weapon_crouch_run"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5215
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0373
+    DMX Animation setup:0.0409
+Frames: .........
+- Writing DMX...
+    DMX write:0.1887
+ _run_dmx_writer:0.2672
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT aim_weapon_crouch_run -> 209586 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on aim_weapon_crouch_up.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "aim_weapon_crouch_up"
+- Imported 26 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4624
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0337
+    DMX Animation setup:0.0479
+Frames: .........................
+- Writing DMX...
+    DMX write:0.3290
+ _run_dmx_writer:0.4110
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT aim_weapon_crouch_up -> 327858 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.5 seconds
+Info: Imported 1 files in 8.5 seconds
+
+DMX IMPORTER: now working on aim_weapon_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "aim_weapon_idle"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4910
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0302
+    DMX Animation setup:0.0737
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.4001
+ _run_dmx_writer:0.5042
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT aim_weapon_idle -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on aim_weapon_idle_down.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "aim_weapon_idle_down"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4637
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0311
+    DMX Animation setup:0.0537
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.3773
+ _run_dmx_writer:0.4623
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT aim_weapon_idle_down -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on aim_weapon_idle_up.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "aim_weapon_idle_up"
+- Imported 31 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.4797
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0294
+    DMX Animation setup:0.0543
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.3823
+ _run_dmx_writer:0.4664
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT aim_weapon_idle_up -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.7 seconds
+Info: Imported 1 files in 8.7 seconds
+
+DMX IMPORTER: now working on aim_weapon_in_air.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "aim_weapon_in_air"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4712
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0284
+    DMX Animation setup:0.0343
+Frames: .........
+- Writing DMX...
+    DMX write:0.1842
+ _run_dmx_writer:0.2473
+1 files exported in 0.7 seconds
+Info: 1 files exported in 0.7 seconds
+REPARENT aim_weapon_in_air -> 209586 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.0 seconds
+Info: Imported 1 files in 9.0 seconds
+
+DMX IMPORTER: now working on aim_weapon_run.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "aim_weapon_run"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5483
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0384
+    DMX Animation setup:0.0361
+Frames: .........
+- Writing DMX...
+    DMX write:0.2025
+ _run_dmx_writer:0.2773
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT aim_weapon_run -> 209586 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.7 seconds
+Info: Imported 1 files in 8.7 seconds
+
+DMX IMPORTER: now working on aim_weapon_slide.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "aim_weapon_slide"
+- Imported 10 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.5131
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0401
+    DMX Animation setup:0.0385
+Frames: .........
+- Writing DMX...
+    DMX write:0.1923
+ _run_dmx_writer:0.2715
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT aim_weapon_slide -> 209586 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.0 seconds
+Info: Imported 1 files in 9.0 seconds
+
+DMX IMPORTER: now working on cast_channeling_end.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "cast_channeling_end"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.4597
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0326
+    DMX Animation setup:0.0358
+Frames: .......
+- Writing DMX...
+    DMX write:0.1795
+ _run_dmx_writer:0.2482
+1 files exported in 0.7 seconds
+Info: 1 files exported in 0.7 seconds
+REPARENT cast_channeling_end -> 194802 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.9 seconds
+Info: Imported 1 files in 8.9 seconds
+
+DMX IMPORTER: now working on cast_channeling_loop.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "cast_channeling_loop"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.5125
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0318
+    DMX Animation setup:0.0515
+Frames: ....................
+- Writing DMX...
+    DMX write:0.2900
+ _run_dmx_writer:0.3736
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT cast_channeling_loop -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on cast_channeling_start.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "cast_channeling_start"
+- Imported 6 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.4557
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0300
+    DMX Animation setup:0.0338
+Frames: .....
+- Writing DMX...
+    DMX write:0.1805
+ _run_dmx_writer:0.2446
+1 files exported in 0.7 seconds
+Info: 1 files exported in 0.7 seconds
+REPARENT cast_channeling_start -> 180018 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on cast_end.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "cast_end"
+- Imported 19 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5352
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0302
+    DMX Animation setup:0.0450
+Frames: ..................
+- Writing DMX...
+    DMX write:0.2727
+ _run_dmx_writer:0.3482
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT cast_end -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on cast_loop.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "cast_loop"
+- Imported 51 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.5153
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0309
+    DMX Animation setup:0.0661
+Frames: ..................................................
+- Writing DMX...
+    DMX write:0.4841
+ _run_dmx_writer:0.5815
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT cast_loop -> 512658 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.7 seconds
+Info: Imported 1 files in 8.7 seconds
+
+DMX IMPORTER: now working on cast_start.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "cast_start"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5409
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0351
+    DMX Animation setup:0.0465
+Frames: ....................
+- Writing DMX...
+    DMX write:0.2774
+ _run_dmx_writer:0.3593
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT cast_start -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.7 seconds
+Info: Imported 1 files in 8.7 seconds
+
+DMX IMPORTER: now working on corner_lean_crouch.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "corner_lean_crouch"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4940
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0626
+    DMX Animation setup:0.0452
+Frames: ..........
+- Writing DMX...
+    DMX write:0.2127
+ _run_dmx_writer:0.3208
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT corner_lean_crouch -> 216978 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on corner_lean_crouch_run.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "corner_lean_crouch_run"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.5008
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0325
+    DMX Animation setup:0.0404
+Frames: ..........
+- Writing DMX...
+    DMX write:0.2128
+ _run_dmx_writer:0.2859
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT corner_lean_crouch_run -> 216978 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.0 seconds
+Info: Imported 1 files in 9.0 seconds
+
+DMX IMPORTER: now working on corner_lean_run.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "corner_lean_run"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4621
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0323
+    DMX Animation setup:0.0367
+Frames: ..........
+- Writing DMX...
+    DMX write:0.2036
+ _run_dmx_writer:0.2729
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT corner_lean_run -> 216978 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.7 seconds
+Info: Imported 1 files in 8.7 seconds
+
+DMX IMPORTER: now working on corner_lean_stand.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "corner_lean_stand"
+- Imported 11 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:1.1048
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0679
+    DMX Animation setup:0.0635
+Frames: ..........
+- Writing DMX...
+    DMX write:0.2738
+ _run_dmx_writer:0.4056
+1 files exported in 1.5 seconds
+Info: 1 files exported in 1.5 seconds
+REPARENT corner_lean_stand -> 216978 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.9 seconds
+Info: Imported 1 files in 8.9 seconds
+
+DMX IMPORTER: now working on dash_air_back.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "dash_air_back"
+- Imported 46 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0003
+ Post Bake:0.5786
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0329
+    DMX Animation setup:0.0730
+Frames: .............................................
+- Writing DMX...
+    DMX write:0.4838
+ _run_dmx_writer:0.5900
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT dash_air_back -> 475698 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.9 seconds
+Info: Imported 1 files in 8.9 seconds
+
+DMX IMPORTER: now working on dash_air_forward.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "dash_air_forward"
+- Imported 51 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.4743
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0323
+    DMX Animation setup:0.0742
+Frames: ..................................................
+- Writing DMX...
+    DMX write:0.5253
+ _run_dmx_writer:0.6321
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT dash_air_forward -> 512658 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on dash_air_left.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "dash_air_left"
+- Imported 51 frames of animation
+Imported 1 files in 1.2 seconds
+Info: Imported 1 files in 1.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.4950
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0331
+    DMX Animation setup:0.0733
+Frames: ..................................................
+- Writing DMX...
+    DMX write:0.5125
+ _run_dmx_writer:0.6192
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT dash_air_left -> 512658 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.1 seconds
+Info: Imported 1 files in 8.1 seconds
+
+DMX IMPORTER: now working on dash_air_right.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "dash_air_right"
+- Imported 51 frames of animation
+Imported 1 files in 1.2 seconds
+Info: Imported 1 files in 1.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4586
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0309
+    DMX Animation setup:0.0763
+Frames: ..................................................
+- Writing DMX...
+    DMX write:0.5402
+ _run_dmx_writer:0.6478
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT dash_air_right -> 512658 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.8 seconds
+Info: Imported 1 files in 9.8 seconds
+
+DMX IMPORTER: now working on dash_ground.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "dash_ground"
+- Imported 53 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.5239
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0369
+    DMX Animation setup:0.0803
+Frames: ....................................................
+- Writing DMX...
+    DMX write:0.7450
+ _run_dmx_writer:0.8628
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT dash_ground -> 527442 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.5 seconds
+Info: Imported 1 files in 9.5 seconds
+
+DMX IMPORTER: now working on flinch_back.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "flinch_back"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6307
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0400
+    DMX Animation setup:0.0567
+Frames: ...............
+- Writing DMX...
+    DMX write:0.5366
+ _run_dmx_writer:0.6338
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT flinch_back -> 253938 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on flinch_left.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "flinch_left"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0007
+ Post Bake:0.5767
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0351
+    DMX Animation setup:0.0455
+Frames: ...............
+- Writing DMX...
+    DMX write:0.2709
+ _run_dmx_writer:0.3518
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT flinch_left -> 253938 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.6 seconds
+Info: Imported 1 files in 10.6 seconds
+
+DMX IMPORTER: now working on flinch_right.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "flinch_right"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6451
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0492
+    DMX Animation setup:0.0631
+Frames: ...............
+- Writing DMX...
+    DMX write:0.3161
+ _run_dmx_writer:0.4288
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT flinch_right -> 253938 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 12.2 seconds
+Info: Imported 1 files in 12.2 seconds
+
+DMX IMPORTER: now working on in_air_loop_apex.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "in_air_loop_apex"
+- Imported 31 frames of animation
+Imported 1 files in 0.9 seconds
+Info: Imported 1 files in 0.9 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.7137
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0331
+    DMX Animation setup:0.0500
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.3732
+ _run_dmx_writer:0.4566
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT in_air_loop_apex -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 12.5 seconds
+Info: Imported 1 files in 12.5 seconds
+
+DMX IMPORTER: now working on in_air_loop_down.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "in_air_loop_down"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0003
+ Post Bake:0.5379
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0379
+    DMX Animation setup:0.0528
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.3703
+ _run_dmx_writer:0.4614
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT in_air_loop_down -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.2 seconds
+Info: Imported 1 files in 9.2 seconds
+
+DMX IMPORTER: now working on item_crouch_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_crouch_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.4 seconds
+Info: Imported 1 files in 1.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5163
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0363
+    DMX Animation setup:0.1402
+Frames: ........................................................................................................................
+- Writing DMX...
+    DMX write:1.0460
+ _run_dmx_writer:1.2228
+1 files exported in 1.8 seconds
+Info: 1 files exported in 1.8 seconds
+REPARENT item_crouch_idle -> 1030098 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.6 seconds
+Info: Imported 1 files in 9.6 seconds
+
+DMX IMPORTER: now working on item_crouch_run_center.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_crouch_run_center"
+- Imported 35 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0007
+ Post Bake:0.6386
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0408
+    DMX Animation setup:0.0564
+Frames: ..................................
+- Writing DMX...
+    DMX write:0.4195
+ _run_dmx_writer:0.5171
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT item_crouch_run_center -> 394386 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.2 seconds
+Info: Imported 1 files in 9.2 seconds
+
+DMX IMPORTER: now working on item_crouch_run_e.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_crouch_run_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0008
+ Post Bake:0.5209
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0291
+    DMX Animation setup:0.0526
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.3946
+ _run_dmx_writer:0.4766
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT item_crouch_run_e -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.9 seconds
+Info: Imported 1 files in 8.9 seconds
+
+DMX IMPORTER: now working on item_crouch_run_n.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_crouch_run_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6514
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0411
+    DMX Animation setup:0.0771
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4805
+ _run_dmx_writer:0.5991
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT item_crouch_run_n -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 11.1 seconds
+Info: Imported 1 files in 11.1 seconds
+
+DMX IMPORTER: now working on item_crouch_run_ne.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_crouch_run_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0008
+ Post Bake:0.6377
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0387
+    DMX Animation setup:0.0738
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5086
+ _run_dmx_writer:0.6215
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT item_crouch_run_ne -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on item_crouch_run_nw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_crouch_run_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6192
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0429
+    DMX Animation setup:0.0760
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4953
+ _run_dmx_writer:0.6145
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT item_crouch_run_nw -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.1 seconds
+Info: Imported 1 files in 9.1 seconds
+
+DMX IMPORTER: now working on item_crouch_run_s.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_crouch_run_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.4910
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0318
+    DMX Animation setup:0.0650
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4022
+ _run_dmx_writer:0.4993
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT item_crouch_run_s -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.6 seconds
+Info: Imported 1 files in 8.6 seconds
+
+DMX IMPORTER: now working on item_crouch_run_se.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_crouch_run_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0007
+ Post Bake:0.5316
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0355
+    DMX Animation setup:0.0622
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4525
+ _run_dmx_writer:0.5505
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT item_crouch_run_se -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.6 seconds
+Info: Imported 1 files in 10.6 seconds
+
+DMX IMPORTER: now working on item_crouch_run_sw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_crouch_run_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6368
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0409
+    DMX Animation setup:0.0763
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4805
+ _run_dmx_writer:0.5981
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT item_crouch_run_sw -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 14.2 seconds
+Info: Imported 1 files in 14.2 seconds
+
+DMX IMPORTER: now working on item_crouch_run_w.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_crouch_run_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5293
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0383
+    DMX Animation setup:0.0596
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4347
+ _run_dmx_writer:0.5331
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT item_crouch_run_w -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.1 seconds
+Info: Imported 1 files in 9.1 seconds
+
+DMX IMPORTER: now working on item_run_center.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.5096
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0333
+    DMX Animation setup:0.0545
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3226
+ _run_dmx_writer:0.4107
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT item_run_center -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.0 seconds
+Info: Imported 1 files in 9.0 seconds
+
+DMX IMPORTER: now working on item_run_e.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_run_e"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5350
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0527
+    DMX Animation setup:0.0890
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3575
+ _run_dmx_writer:0.4996
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT item_run_e -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.5 seconds
+Info: Imported 1 files in 10.5 seconds
+
+DMX IMPORTER: now working on item_run_n.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_run_n"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6620
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0399
+    DMX Animation setup:0.0564
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3347
+ _run_dmx_writer:0.4314
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT item_run_n -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on item_run_ne.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_run_ne"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5981
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0378
+    DMX Animation setup:0.0549
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3455
+ _run_dmx_writer:0.4387
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT item_run_ne -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on item_run_nw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_run_nw"
+- Imported 21 frames of animation
+Imported 1 files in 1.0 seconds
+Info: Imported 1 files in 1.0 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6152
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0417
+    DMX Animation setup:0.0559
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3406
+ _run_dmx_writer:0.4385
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT item_run_nw -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.8 seconds
+Info: Imported 1 files in 9.8 seconds
+
+DMX IMPORTER: now working on item_run_s.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_run_s"
+- Imported 21 frames of animation
+Imported 1 files in 1.0 seconds
+Info: Imported 1 files in 1.0 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6264
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0360
+    DMX Animation setup:0.0586
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3599
+ _run_dmx_writer:0.4548
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT item_run_s -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.7 seconds
+Info: Imported 1 files in 9.7 seconds
+
+DMX IMPORTER: now working on item_run_se.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_run_se"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6288
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0382
+    DMX Animation setup:0.0570
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3367
+ _run_dmx_writer:0.4322
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT item_run_se -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.5 seconds
+Info: Imported 1 files in 10.5 seconds
+
+DMX IMPORTER: now working on item_run_sw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_run_sw"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6207
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0425
+    DMX Animation setup:0.0571
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3524
+ _run_dmx_writer:0.4523
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT item_run_sw -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on item_run_w.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_run_w"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.5964
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0357
+    DMX Animation setup:0.0628
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3390
+ _run_dmx_writer:0.4378
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT item_run_w -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on item_stand_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "item_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 2.3 seconds
+Info: Imported 1 files in 2.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6039
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0365
+    DMX Animation setup:0.1639
+Frames: ........................................................................................................................
+- Writing DMX...
+    DMX write:1.2349
+ _run_dmx_writer:1.4356
+1 files exported in 2.1 seconds
+Info: 1 files exported in 2.1 seconds
+REPARENT item_stand_idle -> 1030098 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.0 seconds
+Info: Imported 1 files in 10.0 seconds
+
+DMX IMPORTER: now working on jump_forced.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "jump_forced"
+- Imported 27 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6067
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0356
+    DMX Animation setup:0.0646
+Frames: ..........................
+- Writing DMX...
+    DMX write:0.4081
+ _run_dmx_writer:0.5087
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT jump_forced -> 335250 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on jump_ground.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "jump_ground"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5885
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0375
+    DMX Animation setup:0.0647
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.4476
+ _run_dmx_writer:0.5502
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT jump_ground -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on jump_zipline.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "jump_zipline"
+- Imported 45 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0007
+ Post Bake:0.6180
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0367
+    DMX Animation setup:0.0870
+Frames: ............................................
+- Writing DMX...
+    DMX write:0.5612
+ _run_dmx_writer:0.6853
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT jump_zipline -> 468306 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on knockdown_in_air_loop.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "knockdown_in_air_loop"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5963
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0361
+    DMX Animation setup:0.0658
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.4528
+ _run_dmx_writer:0.5550
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT knockdown_in_air_loop -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on knockdown_in_air_start.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "knockdown_in_air_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6439
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0419
+    DMX Animation setup:0.0533
+Frames: ...............
+- Writing DMX...
+    DMX write:0.3079
+ _run_dmx_writer:0.4036
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT knockdown_in_air_start -> 253938 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on knockdown_large_getup.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "knockdown_large_getup"
+- Imported 51 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6087
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0374
+    DMX Animation setup:0.0903
+Frames: ..................................................
+- Writing DMX...
+    DMX write:0.6180
+ _run_dmx_writer:0.7460
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT knockdown_large_getup -> 512658 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on knockdown_large_loop.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "knockdown_large_loop"
+- Imported 11 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5825
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0349
+    DMX Animation setup:0.6702
+Frames: ..........
+- Writing DMX...
+    DMX write:0.2579
+ _run_dmx_writer:0.9633
+1 files exported in 1.6 seconds
+Info: 1 files exported in 1.6 seconds
+REPARENT knockdown_large_loop -> 216978 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.8 seconds
+Info: Imported 1 files in 9.8 seconds
+
+DMX IMPORTER: now working on knockdown_large_start.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "knockdown_large_start"
+- Imported 50 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6374
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0371
+    DMX Animation setup:0.0852
+Frames: 
+- Writing DMX...
+    DMX write:0.5865
+ _run_dmx_writer:0.7092
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT knockdown_large_start -> 505266 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on knockdown_medium_loop.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "knockdown_medium_loop"
+- Imported 27 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6265
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0370
+    DMX Animation setup:0.0632
+Frames: ..........................
+- Writing DMX...
+    DMX write:0.4018
+ _run_dmx_writer:0.5024
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT knockdown_medium_loop -> 335250 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on knockdown_medium_start.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "knockdown_medium_start"
+- Imported 20 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0003
+ Post Bake:0.6838
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0428
+    DMX Animation setup:0.0618
+Frames: ...................
+- Writing DMX...
+    DMX write:0.3643
+ _run_dmx_writer:0.4692
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT knockdown_medium_start -> 283506 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on knockdown_small.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "knockdown_small"
+- Imported 30 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6104
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0425
+    DMX Animation setup:0.0708
+Frames: .............................
+- Writing DMX...
+    DMX write:0.4195
+ _run_dmx_writer:0.5331
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT knockdown_small -> 357426 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.8 seconds
+Info: Imported 1 files in 10.8 seconds
+
+DMX IMPORTER: now working on landing_impact_crouch.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "landing_impact_crouch"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6020
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0423
+    DMX Animation setup:0.0592
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3081
+ _run_dmx_writer:0.4099
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT landing_impact_crouch -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on landing_impact_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "landing_impact_idle"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5951
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0388
+    DMX Animation setup:0.0542
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3203
+ _run_dmx_writer:0.4135
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT landing_impact_idle -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on lift_loop.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "lift_loop"
+- Imported 31 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0003
+ Post Bake:0.6573
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0353
+    DMX Animation setup:0.0740
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.4522
+ _run_dmx_writer:0.5620
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT lift_loop -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.5 seconds
+Info: Imported 1 files in 10.5 seconds
+
+DMX IMPORTER: now working on loco_lean_back.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "loco_lean_back"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0007
+ Post Bake:0.5921
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0379
+    DMX Animation setup:0.0699
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.4478
+ _run_dmx_writer:0.5560
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT loco_lean_back -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 11.2 seconds
+Info: Imported 1 files in 11.2 seconds
+
+DMX IMPORTER: now working on loco_lean_center.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "loco_lean_center"
+- Imported 31 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.7338
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0445
+    DMX Animation setup:0.0796
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.4746
+ _run_dmx_writer:0.5992
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT loco_lean_center -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on loco_lean_forward.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "loco_lean_forward"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6868
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0471
+    DMX Animation setup:0.0632
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3644
+ _run_dmx_writer:0.4752
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT loco_lean_forward -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on loco_lean_left.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "loco_lean_left"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6084
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0405
+    DMX Animation setup:0.0575
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.4268
+ _run_dmx_writer:0.5251
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT loco_lean_left -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on loco_lean_right.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "loco_lean_right"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6020
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0407
+    DMX Animation setup:0.0642
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.4368
+ _run_dmx_writer:0.5420
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT loco_lean_right -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.9 seconds
+Info: Imported 1 files in 9.9 seconds
+
+DMX IMPORTER: now working on mantle_128.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "mantle_128"
+- Imported 41 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6170
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0396
+    DMX Animation setup:0.0766
+Frames: ........................................
+- Writing DMX...
+    DMX write:1.1476
+ _run_dmx_writer:1.2642
+1 files exported in 1.9 seconds
+Info: 1 files exported in 1.9 seconds
+REPARENT mantle_128 -> 438738 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.8 seconds
+Info: Imported 1 files in 9.8 seconds
+
+DMX IMPORTER: now working on mantle_32.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "mantle_32"
+- Imported 24 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6064
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0354
+    DMX Animation setup:0.0628
+Frames: .......................
+- Writing DMX...
+    DMX write:0.3701
+ _run_dmx_writer:0.4685
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT mantle_32 -> 313074 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on mantle_64.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "mantle_64"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6091
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0418
+    DMX Animation setup:0.0727
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.4241
+ _run_dmx_writer:0.5390
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT mantle_64 -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on mantle_96.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "mantle_96"
+- Imported 31 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6224
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0388
+    DMX Animation setup:0.0681
+Frames: ..............................
+- Writing DMX...
+    DMX write:1.0285
+ _run_dmx_writer:1.1358
+1 files exported in 1.8 seconds
+Info: 1 files exported in 1.8 seconds
+REPARENT mantle_96 -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.8 seconds
+Info: Imported 1 files in 9.8 seconds
+
+DMX IMPORTER: now working on melee_dash.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6129
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0420
+    DMX Animation setup:0.0429
+Frames: .......
+- Writing DMX...
+    DMX write:0.2346
+ _run_dmx_writer:0.3200
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT melee_dash -> 194802 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on melee_dash_down.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_dash_down"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6235
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0372
+    DMX Animation setup:0.0452
+Frames: .......
+- Writing DMX...
+    DMX write:0.2530
+ _run_dmx_writer:0.3358
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT melee_dash_down -> 194802 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on melee_dash_up.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_dash_up"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6013
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0386
+    DMX Animation setup:0.0454
+Frames: .......
+- Writing DMX...
+    DMX write:0.2230
+ _run_dmx_writer:0.3073
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT melee_dash_up -> 194802 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on melee_hit.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0003
+ Post Bake:0.5953
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0422
+    DMX Animation setup:0.0639
+Frames: .....................
+- Writing DMX...
+    DMX write:0.3682
+ _run_dmx_writer:0.4746
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_hit -> 298290 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 11.1 seconds
+Info: Imported 1 files in 11.1 seconds
+
+DMX IMPORTER: now working on melee_hit_down.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_hit_down"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6144
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0362
+    DMX Animation setup:0.0536
+Frames: .....................
+- Writing DMX...
+    DMX write:0.3687
+ _run_dmx_writer:0.4588
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_hit_down -> 298290 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on melee_hit_up.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_hit_up"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6036
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0401
+    DMX Animation setup:0.0535
+Frames: .....................
+- Writing DMX...
+    DMX write:0.3339
+ _run_dmx_writer:0.4279
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_hit_up -> 298290 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.6 seconds
+Info: Imported 1 files in 10.6 seconds
+
+DMX IMPORTER: now working on melee_in_air_dash.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_in_air_dash"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6068
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0401
+    DMX Animation setup:0.0485
+Frames: .......
+- Writing DMX...
+    DMX write:0.1965
+ _run_dmx_writer:0.2855
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT melee_in_air_dash -> 194802 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on melee_in_air_dash_down.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_in_air_dash_down"
+- Imported 8 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.5970
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0380
+    DMX Animation setup:0.0411
+Frames: .......
+- Writing DMX...
+    DMX write:0.2391
+ _run_dmx_writer:0.3186
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT melee_in_air_dash_down -> 194802 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on melee_in_air_dash_up.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_in_air_dash_up"
+- Imported 8 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6159
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0380
+    DMX Animation setup:0.0453
+Frames: .......
+- Writing DMX...
+    DMX write:0.2218
+ _run_dmx_writer:0.3055
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT melee_in_air_dash_up -> 194802 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.6 seconds
+Info: Imported 1 files in 10.6 seconds
+
+DMX IMPORTER: now working on melee_in_air_hit.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_in_air_hit"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6531
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0422
+    DMX Animation setup:0.0598
+Frames: .....................
+- Writing DMX...
+    DMX write:0.3546
+ _run_dmx_writer:0.4570
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT melee_in_air_hit -> 298290 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on melee_in_air_hit_down.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_in_air_hit_down"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6279
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0452
+    DMX Animation setup:0.0637
+Frames: .....................
+- Writing DMX...
+    DMX write:0.3440
+ _run_dmx_writer:0.4533
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_in_air_hit_down -> 298290 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on melee_in_air_hit_up.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_in_air_hit_up"
+- Imported 22 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6341
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0414
+    DMX Animation setup:0.0496
+Frames: .....................
+- Writing DMX...
+    DMX write:0.3582
+ _run_dmx_writer:0.4496
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_in_air_hit_up -> 298290 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.9 seconds
+Info: Imported 1 files in 9.9 seconds
+
+DMX IMPORTER: now working on melee_in_air_start.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_in_air_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.7234
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0432
+    DMX Animation setup:0.0551
+Frames: ...............
+- Writing DMX...
+    DMX write:0.3038
+ _run_dmx_writer:0.4024
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT melee_in_air_start -> 253938 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.5 seconds
+Info: Imported 1 files in 10.5 seconds
+
+DMX IMPORTER: now working on melee_in_air_start_down.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_in_air_start_down"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6190
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0372
+    DMX Animation setup:0.0572
+Frames: ...............
+- Writing DMX...
+    DMX write:0.3265
+ _run_dmx_writer:0.4213
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_in_air_start_down -> 253938 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.6 seconds
+Info: Imported 1 files in 10.6 seconds
+
+DMX IMPORTER: now working on melee_in_air_start_up.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_in_air_start_up"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6350
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0394
+    DMX Animation setup:0.0562
+Frames: ...............
+- Writing DMX...
+    DMX write:0.3080
+ _run_dmx_writer:0.4040
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_in_air_start_up -> 253938 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.5 seconds
+Info: Imported 1 files in 10.5 seconds
+
+DMX IMPORTER: now working on melee_quick_1.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_quick_1"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6372
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0400
+    DMX Animation setup:0.0524
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3246
+ _run_dmx_writer:0.4174
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_quick_1 -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on melee_quick_1_down.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_quick_1_down"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6201
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0359
+    DMX Animation setup:0.0618
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3094
+ _run_dmx_writer:0.4075
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_quick_1_down -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on melee_quick_1_up.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_quick_1_up"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6050
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0383
+    DMX Animation setup:0.0573
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3252
+ _run_dmx_writer:0.4213
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_quick_1_up -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on melee_quick_2.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_quick_2"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.7025
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0461
+    DMX Animation setup:0.0608
+Frames: ................
+- Writing DMX...
+    DMX write:0.3398
+ _run_dmx_writer:0.4470
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT melee_quick_2 -> 261330 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.6 seconds
+Info: Imported 1 files in 10.6 seconds
+
+DMX IMPORTER: now working on melee_start.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_start"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6136
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0395
+    DMX Animation setup:0.0525
+Frames: ...............
+- Writing DMX...
+    DMX write:0.2948
+ _run_dmx_writer:0.3872
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT melee_start -> 253938 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on melee_start_down.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_start_down"
+- Imported 16 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6174
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0409
+    DMX Animation setup:0.0490
+Frames: ...............
+- Writing DMX...
+    DMX write:0.3016
+ _run_dmx_writer:0.3919
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_start_down -> 253938 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on melee_start_up.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "melee_start_up"
+- Imported 16 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6316
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0403
+    DMX Animation setup:0.0533
+Frames: ...............
+- Writing DMX...
+    DMX write:0.3014
+ _run_dmx_writer:0.3953
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT melee_start_up -> 253938 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.5 seconds
+Info: Imported 1 files in 10.5 seconds
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_e.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_crouch_run_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6241
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0384
+    DMX Animation setup:0.0695
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5089
+ _run_dmx_writer:0.6171
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT out_of_combat_crouch_run_e -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_n.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_crouch_run_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6229
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0396
+    DMX Animation setup:0.0741
+Frames: ....................................
+- Writing DMX...
+    DMX write:1.0855
+ _run_dmx_writer:1.1996
+1 files exported in 1.9 seconds
+Info: 1 files exported in 1.9 seconds
+REPARENT out_of_combat_crouch_run_n -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_ne.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_crouch_run_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0007
+ Post Bake:0.6159
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0359
+    DMX Animation setup:0.0811
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5547
+ _run_dmx_writer:0.6720
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT out_of_combat_crouch_run_ne -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_nw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_crouch_run_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6189
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0387
+    DMX Animation setup:0.1046
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5210
+ _run_dmx_writer:0.6647
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT out_of_combat_crouch_run_nw -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_s.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_crouch_run_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6043
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0483
+    DMX Animation setup:0.0771
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5557
+ _run_dmx_writer:0.6815
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT out_of_combat_crouch_run_s -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 11.2 seconds
+Info: Imported 1 files in 11.2 seconds
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_se.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_crouch_run_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6984
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0413
+    DMX Animation setup:0.0810
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5377
+ _run_dmx_writer:0.6604
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT out_of_combat_crouch_run_se -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 11.2 seconds
+Info: Imported 1 files in 11.2 seconds
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_sw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_crouch_run_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0007
+ Post Bake:0.7495
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0437
+    DMX Animation setup:0.0822
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5025
+ _run_dmx_writer:0.6288
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT out_of_combat_crouch_run_sw -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.6 seconds
+Info: Imported 1 files in 10.6 seconds
+
+DMX IMPORTER: now working on out_of_combat_crouch_run_w.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_crouch_run_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6490
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0417
+    DMX Animation setup:0.0774
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5134
+ _run_dmx_writer:0.6329
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT out_of_combat_crouch_run_w -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_center.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_run_center"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6545
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0390
+    DMX Animation setup:0.0601
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3266
+ _run_dmx_writer:0.4263
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT out_of_combat_run_center -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_e.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_run_e"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0008
+ Post Bake:0.6944
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0361
+    DMX Animation setup:0.0513
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3182
+ _run_dmx_writer:0.4060
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT out_of_combat_run_e -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_n.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_run_n"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0003
+ Post Bake:0.6261
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0365
+    DMX Animation setup:0.0576
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3228
+ _run_dmx_writer:0.4173
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT out_of_combat_run_n -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_ne.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_run_ne"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6229
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0402
+    DMX Animation setup:0.0829
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3416
+ _run_dmx_writer:0.4651
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT out_of_combat_run_ne -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_nw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_run_nw"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6125
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0375
+    DMX Animation setup:0.0618
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3303
+ _run_dmx_writer:0.4299
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT out_of_combat_run_nw -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.8 seconds
+Info: Imported 1 files in 10.8 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_s.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_run_s"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0011
+ Post Bake:0.6025
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0447
+    DMX Animation setup:0.0577
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3376
+ _run_dmx_writer:0.4404
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT out_of_combat_run_s -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_se.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_run_se"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6384
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0436
+    DMX Animation setup:0.0561
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3312
+ _run_dmx_writer:0.4312
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT out_of_combat_run_se -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_sw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_run_sw"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0003
+ Post Bake:0.6352
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0415
+    DMX Animation setup:0.0578
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3303
+ _run_dmx_writer:0.4299
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT out_of_combat_run_sw -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on out_of_combat_run_w.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "out_of_combat_run_w"
+- Imported 19 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6862
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0438
+    DMX Animation setup:0.0529
+Frames: ..................
+- Writing DMX...
+    DMX write:0.3132
+ _run_dmx_writer:0.4102
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT out_of_combat_run_w -> 276114 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.6 seconds
+Info: Imported 1 files in 10.6 seconds
+
+DMX IMPORTER: now working on parry.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "parry"
+- Imported 35 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6077
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0366
+    DMX Animation setup:0.0730
+Frames: ..................................
+- Writing DMX...
+    DMX write:0.4594
+ _run_dmx_writer:0.5694
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT parry -> 394386 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on parry_success.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "parry_success"
+- Imported 33 frames of animation
+Imported 1 files in 1.2 seconds
+Info: Imported 1 files in 1.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6497
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0440
+    DMX Animation setup:0.0757
+Frames: ................................
+- Writing DMX...
+    DMX write:0.4398
+ _run_dmx_writer:0.5600
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT parry_success -> 379602 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.9 seconds
+Info: Imported 1 files in 9.9 seconds
+
+DMX IMPORTER: now working on reload_crouch_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "reload_crouch_idle"
+- Imported 51 frames of animation
+Imported 1 files in 1.4 seconds
+Info: Imported 1 files in 1.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6137
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0423
+    DMX Animation setup:0.0958
+Frames: ..................................................
+- Writing DMX...
+    DMX write:0.6184
+ _run_dmx_writer:0.7568
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT reload_crouch_idle -> 512658 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on reload_crouch_idle_quick.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "reload_crouch_idle_quick"
+- Imported 17 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6762
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0425
+    DMX Animation setup:0.0472
+Frames: ................
+- Writing DMX...
+    DMX write:0.3272
+ _run_dmx_writer:0.4173
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT reload_crouch_idle_quick -> 261330 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 11.0 seconds
+Info: Imported 1 files in 11.0 seconds
+
+DMX IMPORTER: now working on reload_crouch_run_quick.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "reload_crouch_run_quick"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6556
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0431
+    DMX Animation setup:0.0516
+Frames: ................
+- Writing DMX...
+    DMX write:0.3144
+ _run_dmx_writer:0.4095
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT reload_crouch_run_quick -> 261330 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on reload_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "reload_idle"
+- Imported 51 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6539
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0425
+    DMX Animation setup:0.1196
+Frames: ..................................................
+- Writing DMX...
+    DMX write:0.6237
+ _run_dmx_writer:0.7862
+1 files exported in 1.5 seconds
+Info: 1 files exported in 1.5 seconds
+REPARENT reload_idle -> 512658 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.8 seconds
+Info: Imported 1 files in 10.8 seconds
+
+DMX IMPORTER: now working on reload_idle_quick.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "reload_idle_quick"
+- Imported 17 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6417
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0404
+    DMX Animation setup:0.0565
+Frames: ................
+- Writing DMX...
+    DMX write:0.3009
+ _run_dmx_writer:0.3983
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT reload_idle_quick -> 261330 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on reload_in_air_quick.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "reload_in_air_quick"
+- Imported 17 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6296
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0415
+    DMX Animation setup:0.0594
+Frames: ................
+- Writing DMX...
+    DMX write:0.3216
+ _run_dmx_writer:0.4229
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT reload_in_air_quick -> 261330 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.5 seconds
+Info: Imported 1 files in 10.5 seconds
+
+DMX IMPORTER: now working on reload_run.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "reload_run"
+- Imported 51 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6603
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0376
+    DMX Animation setup:0.0895
+Frames: ..................................................
+- Writing DMX...
+    DMX write:0.6293
+ _run_dmx_writer:0.7568
+1 files exported in 1.5 seconds
+Info: 1 files exported in 1.5 seconds
+REPARENT reload_run -> 512658 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.6 seconds
+Info: Imported 1 files in 10.6 seconds
+
+DMX IMPORTER: now working on reload_run_quick.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "reload_run_quick"
+- Imported 17 frames of animation
+Imported 1 files in 1.0 seconds
+Info: Imported 1 files in 1.0 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6144
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0412
+    DMX Animation setup:0.0573
+Frames: ................
+- Writing DMX...
+    DMX write:0.3067
+ _run_dmx_writer:0.4055
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT reload_run_quick -> 261330 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on reload_slide_quick.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "reload_slide_quick"
+- Imported 17 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6354
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0400
+    DMX Animation setup:0.0558
+Frames: ................
+- Writing DMX...
+    DMX write:0.2965
+ _run_dmx_writer:0.3926
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT reload_slide_quick -> 261330 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.9 seconds
+Info: Imported 1 files in 10.9 seconds
+
+DMX IMPORTER: now working on rope_climb_down.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "rope_climb_down"
+- Imported 11 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.5384
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0350
+    DMX Animation setup:0.0373
+Frames: ..........
+- Writing DMX...
+    DMX write:0.2135
+ _run_dmx_writer:0.2863
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT rope_climb_down -> 216978 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.5 seconds
+Info: Imported 1 files in 8.5 seconds
+
+DMX IMPORTER: now working on rope_climb_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "rope_climb_idle"
+- Imported 5 frames of animation
+Imported 1 files in 0.1 seconds
+Info: Imported 1 files in 0.1 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4038
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0278
+    DMX Animation setup:0.0279
+Frames: ....
+- Writing DMX...
+    DMX write:0.1368
+ _run_dmx_writer:0.1928
+1 files exported in 0.6 seconds
+Info: 1 files exported in 0.6 seconds
+REPARENT rope_climb_idle -> 172626 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.1 seconds
+Info: Imported 1 files in 8.1 seconds
+
+DMX IMPORTER: now working on rope_climb_up.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "rope_climb_up"
+- Imported 16 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4280
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0301
+    DMX Animation setup:0.0476
+Frames: ...............
+- Writing DMX...
+    DMX write:0.2250
+ _run_dmx_writer:0.3029
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT rope_climb_up -> 253938 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 7.6 seconds
+Info: Imported 1 files in 7.6 seconds
+
+DMX IMPORTER: now working on run_to_stop_crouch.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "run_to_stop_crouch"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.3898
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0295
+    DMX Animation setup:0.0648
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.3680
+ _run_dmx_writer:0.4626
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT run_to_stop_crouch -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 7.9 seconds
+Info: Imported 1 files in 7.9 seconds
+
+DMX IMPORTER: now working on run_to_stop_stand.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "run_to_stop_stand"
+- Imported 26 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4066
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0265
+    DMX Animation setup:0.0419
+Frames: .........................
+- Writing DMX...
+    DMX write:0.3115
+ _run_dmx_writer:0.3801
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT run_to_stop_stand -> 327858 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.0 seconds
+Info: Imported 1 files in 8.0 seconds
+
+DMX IMPORTER: now working on shiv_dagger.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "shiv_dagger"
+- Imported 28 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.3956
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0290
+    DMX Animation setup:0.0423
+Frames: ...........................
+- Writing DMX...
+    DMX write:0.3038
+ _run_dmx_writer:0.3755
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT shiv_dagger -> 342642 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 7.5 seconds
+Info: Imported 1 files in 7.5 seconds
+
+DMX IMPORTER: now working on shoot_alt_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "shoot_alt_idle"
+- Imported 46 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.4092
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0258
+    DMX Animation setup:0.0552
+Frames: .............................................
+- Writing DMX...
+    DMX write:0.4317
+ _run_dmx_writer:0.5130
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT shoot_alt_idle -> 475698 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.0 seconds
+Info: Imported 1 files in 8.0 seconds
+
+DMX IMPORTER: now working on shoot_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "shoot_idle"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4003
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0287
+    DMX Animation setup:0.0397
+Frames: ....................
+- Writing DMX...
+    DMX write:0.2424
+ _run_dmx_writer:0.3110
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT shoot_idle -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.1 seconds
+Info: Imported 1 files in 8.1 seconds
+
+DMX IMPORTER: now working on shopping_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "shopping_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.2 seconds
+Info: Imported 1 files in 1.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.3910
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0263
+    DMX Animation setup:0.1078
+Frames: ........................................................................................................................
+- Writing DMX...
+    DMX write:0.8850
+ _run_dmx_writer:1.0194
+1 files exported in 1.5 seconds
+Info: 1 files exported in 1.5 seconds
+REPARENT shopping_idle -> 1030098 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 7.6 seconds
+Info: Imported 1 files in 7.6 seconds
+
+DMX IMPORTER: now working on sleep_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "sleep_idle"
+- Imported 81 frames of animation
+Imported 1 files in 0.8 seconds
+Info: Imported 1 files in 0.8 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.3932
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0279
+    DMX Animation setup:0.0845
+Frames: ................................................................................
+- Writing DMX...
+    DMX write:0.6315
+ _run_dmx_writer:0.7441
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT sleep_idle -> 734418 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.0 seconds
+Info: Imported 1 files in 8.0 seconds
+
+DMX IMPORTER: now working on slide_getup.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "slide_getup"
+- Imported 13 frames of animation
+Imported 1 files in 0.2 seconds
+Info: Imported 1 files in 0.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.3861
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0255
+    DMX Animation setup:0.0317
+Frames: ............
+- Writing DMX...
+    DMX write:0.1904
+ _run_dmx_writer:0.2478
+1 files exported in 0.7 seconds
+Info: 1 files exported in 0.7 seconds
+REPARENT slide_getup -> 231762 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 7.4 seconds
+Info: Imported 1 files in 7.4 seconds
+
+DMX IMPORTER: now working on slide_loop.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "slide_loop"
+- Imported 31 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.3924
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0272
+    DMX Animation setup:0.0486
+Frames: ..............................
+- Writing DMX...
+    DMX write:0.3851
+ _run_dmx_writer:0.4612
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT slide_loop -> 364818 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.7 seconds
+Info: Imported 1 files in 8.7 seconds
+
+DMX IMPORTER: now working on slide_start.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "slide_start"
+- Imported 18 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.4002
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0260
+    DMX Animation setup:0.0355
+Frames: .................
+- Writing DMX...
+    DMX write:0.2805
+ _run_dmx_writer:0.3422
+1 files exported in 0.8 seconds
+Info: 1 files exported in 0.8 seconds
+REPARENT slide_start -> 268722 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 7.9 seconds
+Info: Imported 1 files in 7.9 seconds
+
+DMX IMPORTER: now working on throw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "throw"
+- Imported 20 frames of animation
+Imported 1 files in 0.9 seconds
+Info: Imported 1 files in 0.9 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5177
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0397
+    DMX Animation setup:0.0696
+Frames: ...................
+- Writing DMX...
+    DMX write:0.3737
+ _run_dmx_writer:0.4833
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT throw -> 283506 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.2 seconds
+Info: Imported 1 files in 8.2 seconds
+
+DMX IMPORTER: now working on turn_crouch_left.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "turn_crouch_left"
+- Imported 18 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4674
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0348
+    DMX Animation setup:0.0404
+Frames: .................
+- Writing DMX...
+    DMX write:0.2675
+ _run_dmx_writer:0.3431
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT turn_crouch_left -> 268722 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.5 seconds
+Info: Imported 1 files in 9.5 seconds
+
+DMX IMPORTER: now working on turn_crouch_right.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "turn_crouch_right"
+- Imported 18 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6768
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0463
+    DMX Animation setup:0.0606
+Frames: .................
+- Writing DMX...
+    DMX write:0.3291
+ _run_dmx_writer:0.4365
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT turn_crouch_right -> 268722 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on turn_left.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "turn_left"
+- Imported 18 frames of animation
+Imported 1 files in 1.1 seconds
+Info: Imported 1 files in 1.1 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0009
+ Post Bake:0.6560
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0671
+    DMX Animation setup:0.0591
+Frames: .................
+- Writing DMX...
+    DMX write:0.3290
+ _run_dmx_writer:0.4556
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT turn_left -> 268722 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.4 seconds
+Info: Imported 1 files in 10.4 seconds
+
+DMX IMPORTER: now working on turn_right.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "turn_right"
+- Imported 18 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6316
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0351
+    DMX Animation setup:0.0546
+Frames: .................
+- Writing DMX...
+    DMX write:0.3277
+ _run_dmx_writer:0.4178
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT turn_right -> 268722 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on wall_attach_forward.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "wall_attach_forward"
+- Imported 11 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6460
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0442
+    DMX Animation setup:0.0476
+Frames: ..........
+- Writing DMX...
+    DMX write:0.2679
+ _run_dmx_writer:0.3601
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT wall_attach_forward -> 216978 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.5 seconds
+Info: Imported 1 files in 10.5 seconds
+
+DMX IMPORTER: now working on wall_attach_left.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "wall_attach_left"
+- Imported 11 frames of animation
+Imported 1 files in 0.9 seconds
+Info: Imported 1 files in 0.9 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6341
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0425
+    DMX Animation setup:0.0485
+Frames: ..........
+- Writing DMX...
+    DMX write:0.2362
+ _run_dmx_writer:0.3275
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT wall_attach_left -> 216978 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on wall_attach_right.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "wall_attach_right"
+- Imported 11 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.7107
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0467
+    DMX Animation setup:0.0575
+Frames: ..........
+- Writing DMX...
+    DMX write:0.2974
+ _run_dmx_writer:0.4020
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT wall_attach_right -> 216978 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.9 seconds
+Info: Imported 1 files in 10.9 seconds
+
+DMX IMPORTER: now working on weapon_crouch_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_crouch_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.8 seconds
+Info: Imported 1 files in 1.8 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6277
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0286
+    DMX Animation setup:0.1257
+Frames: ........................................................................................................................
+- Writing DMX...
+    DMX write:1.2448
+ _run_dmx_writer:1.3994
+1 files exported in 2.1 seconds
+Info: 1 files exported in 2.1 seconds
+REPARENT weapon_crouch_idle -> 1030098 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.5 seconds
+Info: Imported 1 files in 9.5 seconds
+
+DMX IMPORTER: now working on weapon_crouch_run_center.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_crouch_run_center"
+- Imported 35 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6307
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0421
+    DMX Animation setup:0.0732
+Frames: ..................................
+- Writing DMX...
+    DMX write:0.4915
+ _run_dmx_writer:0.6073
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT weapon_crouch_run_center -> 394386 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.3 seconds
+Info: Imported 1 files in 10.3 seconds
+
+DMX IMPORTER: now working on weapon_crouch_run_e.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_crouch_run_e"
+- Imported 37 frames of animation
+Imported 1 files in 1.3 seconds
+Info: Imported 1 files in 1.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0009
+ Post Bake:0.6109
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0429
+    DMX Animation setup:0.0757
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5286
+ _run_dmx_writer:0.6477
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT weapon_crouch_run_e -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on weapon_crouch_run_n.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_crouch_run_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6441
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0464
+    DMX Animation setup:0.0754
+Frames: ....................................
+- Writing DMX...
+    DMX write:1.0579
+ _run_dmx_writer:1.1801
+1 files exported in 1.9 seconds
+Info: 1 files exported in 1.9 seconds
+REPARENT weapon_crouch_run_n -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on weapon_crouch_run_ne.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_crouch_run_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6679
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0374
+    DMX Animation setup:0.0689
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4915
+ _run_dmx_writer:0.5982
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT weapon_crouch_run_ne -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.0 seconds
+Info: Imported 1 files in 10.0 seconds
+
+DMX IMPORTER: now working on weapon_crouch_run_nw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_crouch_run_nw"
+- Imported 37 frames of animation
+Imported 1 files in 1.1 seconds
+Info: Imported 1 files in 1.1 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5049
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0347
+    DMX Animation setup:0.0613
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4079
+ _run_dmx_writer:0.5042
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT weapon_crouch_run_nw -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.7 seconds
+Info: Imported 1 files in 8.7 seconds
+
+DMX IMPORTER: now working on weapon_crouch_run_s.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_crouch_run_s"
+- Imported 37 frames of animation
+Imported 1 files in 1.2 seconds
+Info: Imported 1 files in 1.2 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.5224
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0322
+    DMX Animation setup:0.0594
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4202
+ _run_dmx_writer:0.5122
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT weapon_crouch_run_s -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.7 seconds
+Info: Imported 1 files in 8.7 seconds
+
+DMX IMPORTER: now working on weapon_crouch_run_se.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_crouch_run_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0007
+ Post Bake:0.5415
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0348
+    DMX Animation setup:0.0575
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.9642
+ _run_dmx_writer:1.0569
+1 files exported in 1.7 seconds
+Info: 1 files exported in 1.7 seconds
+REPARENT weapon_crouch_run_se -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.6 seconds
+Info: Imported 1 files in 8.6 seconds
+
+DMX IMPORTER: now working on weapon_crouch_run_sw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_crouch_run_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.5218
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0357
+    DMX Animation setup:0.0602
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4197
+ _run_dmx_writer:0.5161
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT weapon_crouch_run_sw -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.8 seconds
+Info: Imported 1 files in 8.8 seconds
+
+DMX IMPORTER: now working on weapon_crouch_run_w.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_crouch_run_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.5080
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0352
+    DMX Animation setup:0.0619
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4091
+ _run_dmx_writer:0.5065
+1 files exported in 1.1 seconds
+Info: 1 files exported in 1.1 seconds
+REPARENT weapon_crouch_run_w -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 9.0 seconds
+Info: Imported 1 files in 9.0 seconds
+
+DMX IMPORTER: now working on weapon_run_center.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_run_center"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.4836
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0335
+    DMX Animation setup:0.0465
+Frames: ....................
+- Writing DMX...
+    DMX write:0.2915
+ _run_dmx_writer:0.3719
+1 files exported in 0.9 seconds
+Info: 1 files exported in 0.9 seconds
+REPARENT weapon_run_center -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 8.9 seconds
+Info: Imported 1 files in 8.9 seconds
+
+DMX IMPORTER: now working on weapon_run_e.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_run_e"
+- Imported 21 frames of animation
+Imported 1 files in 0.3 seconds
+Info: Imported 1 files in 0.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0008
+ Post Bake:0.5395
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0331
+    DMX Animation setup:0.0411
+Frames: ....................
+- Writing DMX...
+    DMX write:0.2792
+ _run_dmx_writer:0.3538
+1 files exported in 1.0 seconds
+Info: 1 files exported in 1.0 seconds
+REPARENT weapon_run_e -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.5 seconds
+Info: Imported 1 files in 10.5 seconds
+
+DMX IMPORTER: now working on weapon_run_n.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_run_n"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6553
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0497
+    DMX Animation setup:0.0552
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3611
+ _run_dmx_writer:0.4664
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT weapon_run_n -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.9 seconds
+Info: Imported 1 files in 10.9 seconds
+
+DMX IMPORTER: now working on weapon_run_ne.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_run_ne"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6741
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0380
+    DMX Animation setup:0.0572
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3370
+ _run_dmx_writer:0.4325
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT weapon_run_ne -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on weapon_run_nw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_run_nw"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6494
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0400
+    DMX Animation setup:0.0601
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3511
+ _run_dmx_writer:0.4516
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT weapon_run_nw -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.5 seconds
+Info: Imported 1 files in 10.5 seconds
+
+DMX IMPORTER: now working on weapon_run_s.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_run_s"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6478
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0383
+    DMX Animation setup:0.0585
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3422
+ _run_dmx_writer:0.4393
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT weapon_run_s -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on weapon_run_se.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_run_se"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6346
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0416
+    DMX Animation setup:0.0626
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3559
+ _run_dmx_writer:0.4605
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT weapon_run_se -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 11.1 seconds
+Info: Imported 1 files in 11.1 seconds
+
+DMX IMPORTER: now working on weapon_run_sw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_run_sw"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6523
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0422
+    DMX Animation setup:0.0588
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3528
+ _run_dmx_writer:0.4542
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT weapon_run_sw -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on weapon_run_w.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_run_w"
+- Imported 21 frames of animation
+Imported 1 files in 0.4 seconds
+Info: Imported 1 files in 0.4 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6308
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0418
+    DMX Animation setup:0.0589
+Frames: ....................
+- Writing DMX...
+    DMX write:0.3604
+ _run_dmx_writer:0.4615
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT weapon_run_w -> 290898 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on weapon_stand_idle.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "weapon_stand_idle"
+- Imported 121 frames of animation
+Imported 1 files in 1.7 seconds
+Info: Imported 1 files in 1.7 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6195
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0410
+    DMX Animation setup:0.1614
+Frames: ........................................................................................................................
+- Writing DMX...
+    DMX write:1.9921
+ _run_dmx_writer:2.1949
+1 files exported in 2.9 seconds
+Info: 1 files exported in 2.9 seconds
+REPARENT weapon_stand_idle -> 1030098 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.1 seconds
+Info: Imported 1 files in 10.1 seconds
+
+DMX IMPORTER: now working on zipline_attached_loop.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zipline_attached_loop"
+- Imported 46 frames of animation
+Imported 1 files in 0.7 seconds
+Info: Imported 1 files in 0.7 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0003
+ Post Bake:0.6373
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0454
+    DMX Animation setup:0.1243
+Frames: .............................................
+- Writing DMX...
+    DMX write:0.6068
+ _run_dmx_writer:0.7769
+1 files exported in 1.5 seconds
+Info: 1 files exported in 1.5 seconds
+REPARENT zipline_attached_loop -> 475698 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.8 seconds
+Info: Imported 1 files in 10.8 seconds
+
+DMX IMPORTER: now working on zipline_attached_start.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zipline_attached_start"
+- Imported 25 frames of animation
+Imported 1 files in 0.5 seconds
+Info: Imported 1 files in 0.5 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6329
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0444
+    DMX Animation setup:0.0638
+Frames: 
+- Writing DMX...
+    DMX write:0.3843
+ _run_dmx_writer:0.4929
+1 files exported in 1.2 seconds
+Info: 1 files exported in 1.2 seconds
+REPARENT zipline_attached_start -> 320466 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on zipline_awaiting_tether.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zipline_awaiting_tether"
+- Imported 61 frames of animation
+Imported 1 files in 0.9 seconds
+Info: Imported 1 files in 0.9 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6527
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0452
+    DMX Animation setup:0.1002
+Frames: ............................................................
+- Writing DMX...
+    DMX write:0.7552
+ _run_dmx_writer:0.9009
+1 files exported in 1.7 seconds
+Info: 1 files exported in 1.7 seconds
+REPARENT zipline_awaiting_tether -> 586578 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.8 seconds
+Info: Imported 1 files in 10.8 seconds
+
+DMX IMPORTER: now working on zipline_tethered_reeling_loop.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zipline_tethered_reeling_loop"
+- Imported 89 frames of animation
+Imported 1 files in 1.3 seconds
+Info: Imported 1 files in 1.3 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6813
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0475
+    DMX Animation setup:0.1423
+Frames: ........................................................................................
+- Writing DMX...
+    DMX write:1.1087
+ _run_dmx_writer:1.2989
+1 files exported in 2.1 seconds
+Info: 1 files exported in 2.1 seconds
+REPARENT zipline_tethered_reeling_loop -> 793554 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.9 seconds
+Info: Imported 1 files in 10.9 seconds
+
+DMX IMPORTER: now working on zoomed_crouch_run_e.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zoomed_crouch_run_e"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.5944
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0483
+    DMX Animation setup:0.0819
+Frames: ....................................
+- Writing DMX...
+    DMX write:1.1006
+ _run_dmx_writer:1.2311
+1 files exported in 1.9 seconds
+Info: 1 files exported in 1.9 seconds
+REPARENT zoomed_crouch_run_e -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.2 seconds
+Info: Imported 1 files in 10.2 seconds
+
+DMX IMPORTER: now working on zoomed_crouch_run_n.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zoomed_crouch_run_n"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6519
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0404
+    DMX Animation setup:0.0798
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4905
+ _run_dmx_writer:0.6110
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT zoomed_crouch_run_n -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on zoomed_crouch_run_ne.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zoomed_crouch_run_ne"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0004
+ Post Bake:0.6525
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0434
+    DMX Animation setup:0.0744
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5040
+ _run_dmx_writer:0.6221
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT zoomed_crouch_run_ne -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.8 seconds
+Info: Imported 1 files in 10.8 seconds
+
+DMX IMPORTER: now working on zoomed_crouch_run_nw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zoomed_crouch_run_nw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6105
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0396
+    DMX Animation setup:0.0700
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5155
+ _run_dmx_writer:0.6255
+1 files exported in 1.3 seconds
+Info: 1 files exported in 1.3 seconds
+REPARENT zoomed_crouch_run_nw -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.7 seconds
+Info: Imported 1 files in 10.7 seconds
+
+DMX IMPORTER: now working on zoomed_crouch_run_s.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zoomed_crouch_run_s"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6224
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0542
+    DMX Animation setup:0.0712
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5046
+ _run_dmx_writer:0.6305
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT zoomed_crouch_run_s -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.8 seconds
+Info: Imported 1 files in 10.8 seconds
+
+DMX IMPORTER: now working on zoomed_crouch_run_se.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zoomed_crouch_run_se"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0006
+ Post Bake:0.6497
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0402
+    DMX Animation setup:0.0718
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5180
+ _run_dmx_writer:0.6305
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT zoomed_crouch_run_se -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.6 seconds
+Info: Imported 1 files in 10.6 seconds
+
+DMX IMPORTER: now working on zoomed_crouch_run_sw.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zoomed_crouch_run_sw"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0005
+ Post Bake:0.6323
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0417
+    DMX Animation setup:0.0801
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.4957
+ _run_dmx_writer:0.6178
+1 files exported in 1.4 seconds
+Info: 1 files exported in 1.4 seconds
+REPARENT zoomed_crouch_run_sw -> 409170 b link None->root_motion
+
+DMX IMPORTER: now working on shiv_tailbones.dmx
+- Loading DMX...
+- Imported 1 frames of animation
+Importing mesh "shiv_body.001"
+Importing mesh "werewolf_werewolf_model.001"
+Imported 1 files in 10.8 seconds
+Info: Imported 1 files in 10.8 seconds
+
+DMX IMPORTER: now working on zoomed_crouch_run_w.dmx
+- Loading DMX...
+- Appending bones from animations is destructive; switching Bone Append Mode to "Validate"
+Importing DMX animation "zoomed_crouch_run_w"
+- Imported 37 frames of animation
+Imported 1 files in 0.6 seconds
+Info: Imported 1 files in 0.6 seconds
+
+PulseSrcOps exporting shiv_body
+ planning:0.0009
+ Post Bake:0.7826
+- <home>\Documents\deadlock-model-forge\artifacts\shiv-reparented\shiv_body.dmx
+    DMX Bones:0.0539
+    DMX Animation setup:0.0799
+Frames: ....................................
+- Writing DMX...
+    DMX write:0.5224
+ _run_dmx_writer:0.6671
+1 files exported in 1.6 seconds
+Info: 1 files exported in 1.6 seconds
+REPARENT zoomed_crouch_run_w -> 409170 b link None->root_motion
+REPARENT done 181 ok, 0 failed
+Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)
+[Blender Buddy] unregister: Server not running.
+INFO: Ucupaint 2.4.9 is unregistered!
+[36m[FNPORTING] [0mShutdown Server

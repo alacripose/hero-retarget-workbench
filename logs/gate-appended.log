@@ -1,0 +1,2 @@
+GATE REFUSE clip-joint-list-differs: ability_bullet_flurry.dmx declares 106 joints against the 131-joint skeleton (missing ['back_waist_pack_end', 'back_waist_pack_root', 'back_waist_pack_top', 'ball_end_L'], extra []); the client binds a clip by index, so the pose is wrong and the tail drops
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

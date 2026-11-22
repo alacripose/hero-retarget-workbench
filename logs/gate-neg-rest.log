@@ -1,0 +1,2 @@
+GATE REFUSE model-rest-differs-from-game-model: 1 joints bind the mesh away from haze_body.dmx (e.g. [('pelvis', 54.3914)]); a rest in a mesh document is where the mesh was skinned, so the body deforms
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

@@ -1,0 +1,2 @@
+GATE REFUSE clip-rest-moved-without-rebake: ability_bullet_flurry.dmx declares a rest moved for 1 joints (['pelvis']) but carries ability_bullet_flurry.dmx's own channel values; the samples are then read in a frame they were not authored in and the body folds over
+Blender 5.4.0 Alpha (hash ca9a25cceea7 built 2026-10-21 16:37:51)

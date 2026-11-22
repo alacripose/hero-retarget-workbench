@@ -820,3 +820,54 @@ surfaces with 41 `.contour-frame` paths, 0 failed requests, and the prose record
 prose tool refuses the page's own long sentences rather than the page being shortened to fit.
 
 Published by the repository's own `pages.yml` on `landing/**`; pushed `b4e740a`, `ls-remote` matches.
+
+## Pass 15 — 2026-11-22: the host's two voices, the contour record, and the axis that serves both
+
+**The voices the owner named exist online, and they are hosted models, not a TikTok endpoint.**
+TikTok's own speech API (`api16-normal-v6.tiktokv.com/media/api/text/speech/invoke/`) carries no
+Wukong and no Pigsy id; its catalogue is Disney and `en_xx` presets. Fish Audio hosts both at stable
+model addresses — Wukong `96664a5214884cbabe8e3a3ba7b1f9c6`, Pigsy
+`684bdfc2180f4b4e8f837ca25109e256` — with a documented `POST https://api.fish.audio/v1/tts`
+(Bearer key, `model: s2.1-pro-free`, `reference_id`). Those two ids are what the host now pins.
+
+**The voice is a component, not an `apt-get install`.** `secure_shell_v2` carries `host-voice@1`:
+`packages/voice/voice.meta.json` (schema `secure-shell.voice/1`, entry point
+`impl/packages/voice.py`), `packages/voice/voices.json` (engine, model, both reference ids, and the
+channel map **wish → wukong, response → pigsy**), `impl/packages/voice.py` and
+`tests/packages/run_cases_voice.py`. A kind the table does not name is refused (`voice-kind-unnamed`)
+rather than spoken in a guessed voice; an empty or over-long line is refused by name; a host with no
+key records `speech_unavailable` and writes no artifact; a spoken line writes its waveform and a
+receipt carrying its BLAKE3; and every line, produced or not, yields exactly one ledger row naming
+the engine, the values read and whether sound was produced. Measured: **11 cases, 0 failed**.
+
+**The contour is a record read from the three files that own it.**
+`secure_shell_v2/tools/contour_record.py` reads `pins/contour-pin.json` here,
+`openlock/clientaddon/panorama/scripts/openlock_contour.js` and `popit-shell/ui/contour.js`, and
+writes `packages/contour/{contour.json,contour.meta.json}` — the plate, card and application numbers,
+both implementations with their digests, and the pin's own digest. `--check` refuses a record that is
+not those files (`contour-record-stale`) and refuses to write at all when an owner is absent
+(`contour-owner-absent`). Measured: pin `6fb21ef1f94e`, openlock `13ff4f88be9c`, popit
+`395d41fe2be5`.
+
+**The Debian axis serves both, so the machine knows the pinned contour by name.**
+`secure-shell/server/axis-server.mjs` gained `/api/axis/contour` and `/api/axis/voice` over
+`packages/contour/contour.json` and `packages/voice/voices.json`, reading them as they stand on disk
+and answering a missing file with `contour-record-absent` / `voice-record-absent` instead of an empty
+shape. `server/test/family-records.test.mjs` boots the axis on an ephemeral port and asserts the
+numbers, both digests, the engine, the model and both channels: **3 cases, 0 failed**, inside
+`node --test server/test/*.test.mjs` → **136 pass, 0 fail**; `node --test tests/*.test.mjs` → **60
+pass, 0 fail**.
+
+**What was committed, and the one measured exclusion.** `secure-shell` `67a5781` (the axis HTTP edge,
+the CUA client, `civilian-life`/`civilians`, the openlock shell port with its rounds script and test,
+the governance sections and their archive, and the two family records) and `secure_shell_v2`
+`ced51e3` (the voice component, the contour record, the round doc, the agents axis). Both match
+`origin/main` on `ls-remote`. `tools/game-adapter/target/` stayed local: 279 cargo-build files, 69 of
+them embedding absolute `<home>` paths, which is the owner's own personal-information rule and
+not a judgement about the work. The crate itself — `shploingus-world-adapter`, 193 lines, `GET
+/state`, `POST /act`, `GET /version` over `shploingus-voxel-world` — is committed.
+
+**Not checked:** no key was placed on this machine, so no line has been spoken through the engine;
+the component's produced path is proven against an injected transport, not against Fish Audio. The
+Debian host itself was not reached this pass (the axis binds loopback and this box holds no key), so
+"the axis serves the record" is measured on this machine's axis build, not on the Debian unit.
