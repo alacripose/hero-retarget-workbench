@@ -43,7 +43,9 @@ What parity means here, and what it deliberately does not:
 
 A dimension with no input is reported as `unchecked`, never as a pass.
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import hashlib
@@ -58,7 +60,7 @@ if str(REPO) not in sys.path:
 if str(REPO / "tools") not in sys.path:
     sys.path.insert(0, str(REPO / "tools"))
 
-S2V = Path("<home>/Downloads/cli-windows-x64/Source2Viewer-CLI.exe")
+S2V = Path(os.path.expanduser("~/Downloads/cli-windows-x64/Source2Viewer-CLI.exe"))
 SHIV_PIN = REPO / "ledger" / "pins" / "shiv.json"
 DEFAULT_REFERENCE = REPO / "artifacts" / "oldviper" / "shiv_tail_all.vpk"
 DEFAULT_REPORT = REPO / "artifacts" / "receipts" / "vpk-parity.json"

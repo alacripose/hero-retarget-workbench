@@ -14,7 +14,9 @@ so a port that has no history behind it can be compared with Shiv.
         --tail werewolf --clips aim_weapon_idle,item_run_center,item_stand_idle \
         --out artifacts/haze-tail/clips --report artifacts/receipts/tail-port-haze.json
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import addon_utils
@@ -283,7 +285,7 @@ def stage_compile(report, args, settings, tailops, hero, extraction, out, import
 
     core = sys.modules[f"{PACKAGE}.core"]
     checks = report["checks"]
-    cdk = Path("<home>/Downloads/Reduced_CSDK_13")
+    cdk = Path(os.path.expanduser("~/Downloads/Reduced_CSDK_13"))
     content_addon = cdk / "content" / "citadel_addons" / args.compile_addon
     rows = [row for row in settings.clips if row.label in imported and row.path]
     if not rows:

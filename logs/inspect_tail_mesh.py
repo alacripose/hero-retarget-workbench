@@ -1,6 +1,7 @@
+import os
 import importlib.util, sys, bpy
 from pathlib import Path
-ROOT=Path(r'<home>\Documents\deadlock-model-forge')
+ROOT=Path(ros.path.expanduser("~\Documents\deadlock-model-forge"))
 P=ROOT/'blender'/'hero_retarget_workbench'
 spec=importlib.util.spec_from_file_location('dmf_tmp',P/'__init__.py',submodule_search_locations=[str(P)])
 m=importlib.util.module_from_spec(spec); sys.modules['dmf_tmp']=m; spec.loader.exec_module(m)
@@ -8,7 +9,7 @@ import addon_utils
 addon_utils.enable('bl_ext.user_default.pulse_src_ops', default_set=False)
 m.register()
 s2=sys.modules['dmf_tmp.source2']
-root=Path(r'<home>\AppData\Roaming\Blender Foundation\Blender\5.4\datafiles\hero_retarget_workbench\artifacts\extractions')
+root=Path(ros.path.expanduser("~\AppData\Roaming\Blender Foundation\Blender\5.4\datafiles\hero_retarget_workbench\artifacts\extractions"))
 for hero, rel in [('werewolf','werewolf/models/heroes_wip/werewolf/werewolf_werewolf_model.dmx'),('shiv','shiv/models/heroes_staging/shiv/shiv_body.dmx')]:
     before={o.name for o in bpy.context.scene.objects}
     s2.import_dmx(root/rel, append='NEW_ARMATURE')

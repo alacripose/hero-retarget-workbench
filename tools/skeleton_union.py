@@ -15,14 +15,16 @@ the only placement that cannot move a slot the meshes already bind by index.
   blender -b --factory-startup --python tools/skeleton_union.py -- \\
       --model <haze_model_tail.dmx> --meshes <a.dmx> --meshes <b.dmx> ... --out <union.dmx>
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 _MAKE_ARRAY = None
 _ELEMENT_TYPE = None

@@ -32,7 +32,9 @@ one.
 
   python tools/shiv_merge_gate.py [--report artifacts/receipts/shiv-merge-gate.json]
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import hashlib
@@ -120,16 +122,14 @@ APPEND_VPK_SHA = "01efc18ec8d156e9ff3846f17c5b9da06955ae25772031d3e0284c9c130be7
 GOLDEN_BASE = ROOT / "artifacts" / "shiv-168-full-baked3.vpk"
 GOLDEN_BASE_SHA = "ebeadce2993831e67930611cff3b33c36b24c00103571b17d5777036e5ed752a"
 MERGE_SKELETON = Path(
-    r"<home>\Downloads\Reduced_CSDK_13\content\citadel_addons\shiv_tail_0647_check"
-    r"\models\heroes_staging\shiv\dmx\mesh\shiv_tailbones.dmx"
+    os.path.expanduser(r"~\Downloads\Reduced_CSDK_13\content\citadel_addons\shiv_tail_0647_check\models\heroes_staging\shiv\dmx\mesh\shiv_tailbones.dmx")
 )
 MERGE_SKELETON_MD5 = "ae3d181321cce008d3d5fa2293efe6d7"
 MERGE_SKELETON_BYTES = 31_950_782
 REJECTED_SKELETON = ROOT / "artifacts" / "golden" / "tail-vnmclip-gate" / "dmx" / "mesh" / "shiv_tailbones.dmx"
 REJECTED_SKELETON_MD5 = "0c837723126ec8cc5c88ae383b94f912"
 ANIM_SKELETON = Path(
-    r"<home>\Downloads\Reduced_CSDK_13\content\citadel_addons\shiv_tail_0647_check"
-    r"\models\heroes_staging\shiv\shiv.vnmskel"
+    os.path.expanduser(r"~\Downloads\Reduced_CSDK_13\content\citadel_addons\shiv_tail_0647_check\models\heroes_staging\shiv\shiv.vnmskel")
 )
 ANIM_SKELETON_MD5 = "62d2639fddd81799818662d47a4d4b51"
 TRACK_DIFF = ROOT / "artifacts" / "receipts" / "item-run-center-trackdiff.json"

@@ -24,7 +24,9 @@ a compiled resource.
       --tree artifacts/ab/release-tree --base-tree artifacts/ab/golden-skel \
       --report artifacts/receipts/tail-audit.json
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import hashlib
@@ -33,7 +35,7 @@ import math
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 TAIL = ("tail_0", "tail_1", "tail_2", "tail_3", "tail_4", "tail_5", "tail_end")
 VARIANCE_EPSILON = 1e-4
 

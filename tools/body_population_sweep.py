@@ -18,7 +18,9 @@ This walks every clip in both trees and reports:
       --old artifacts/shiv-tailed --new artifacts/shiv-tailed4 \
       --report artifacts/receipts/population-sweep.json [--tolerance-angle 0.5 --tolerance-position 0.05]
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import hashlib
@@ -27,7 +29,7 @@ import math
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 TAIL_PREFIX = "tail"
 
 

@@ -9,14 +9,16 @@ game's does" has a numeric answer in degrees.
 
   blender -b --python tools/dmx_pose_delta.py -- --a <ours.dmx> --b <game.dmx>
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import math
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 
 def _arguments() -> argparse.Namespace:

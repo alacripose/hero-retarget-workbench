@@ -20,7 +20,9 @@ This tool refuses rather than guesses:
         --report artifacts/receipts/x.json
 """
 
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -33,7 +35,7 @@ for entry in (str(ROOT), str(ROOT / "tools")):
         sys.path.insert(0, entry)
 
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 
 def datamodel():

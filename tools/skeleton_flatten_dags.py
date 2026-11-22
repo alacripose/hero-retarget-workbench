@@ -22,14 +22,16 @@ joint is renamed, moved in the list, or re-parented across a joint.
         --skeleton <in.dmx> --out <out.dmx> --report artifacts/receipts/<name>.json
 """
 
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 
 def datamodel():

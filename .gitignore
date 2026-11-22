@@ -7,3 +7,5 @@ artifacts/
 dist/
 # logs/ is the family record, not machine output: the authority rows, the collision journals and the
 # moved agents text are committed like any other file.
+# Cargo build output: it embeds the absolute build path, so it is regenerated rather than committed.
+**/target/

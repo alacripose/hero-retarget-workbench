@@ -16,7 +16,9 @@ Body channels are never touched, so the 181-clip body sweep keeps its result.
       --source <authored tail clip.dmx> --clips artifacts/shiv-appended2 \
       --out artifacts/shiv-tailed [--only clip1,clip2]
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -24,7 +26,7 @@ import math
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 TAIL = ("tail_0", "tail_1", "tail_2", "tail_3", "tail_4", "tail_5", "tail_end")
 
 

@@ -19,7 +19,9 @@ translations is a second change with its own failure modes.
   blender -b --factory-startup --python tools/clip_retarget_frames.py -- \\
       --target <haze_tailbones.dmx> --bodies <dir> --tails <dir> --clips <dir> --out-dir <dir>
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -27,7 +29,7 @@ import math
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 
 def _datamodel():

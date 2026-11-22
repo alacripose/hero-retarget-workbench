@@ -9,7 +9,9 @@ it: if the stock clip also comes back rotated, the pipeline does it.
   python tools/clip_compile_ab.py --csdk <csdk> --addon dmf_ab \
       --clip item_run_center --dmx <source.dmx> --out <decompiled dir> [--skeleton <vnmskel_c>]
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import shutil
@@ -17,7 +19,7 @@ import subprocess
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-S2V = Path("<home>/Downloads/cli-windows-x64/Source2Viewer-CLI.exe")
+S2V = Path(os.path.expanduser("~/Downloads/cli-windows-x64/Source2Viewer-CLI.exe"))
 LIVE_PAK = Path("D:/SteamLibrary/steamapps/common/Deadlock/game/citadel/pak01_dir.vpk")
 SOURCE = "models/heroes_staging/shiv/dmx/animation"
 

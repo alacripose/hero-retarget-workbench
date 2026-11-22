@@ -12,7 +12,9 @@ Blender is only the DMX reader (PulseSrcOps); the vmdl write goes through `forge
 and the file is replaced by `forge.migrate`, the one module allowed to write a vmdl.
 """
 
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -25,7 +27,7 @@ for entry in (str(ROOT), str(ROOT / "tools")):
         sys.path.insert(0, entry)
 
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 
 def datamodel():

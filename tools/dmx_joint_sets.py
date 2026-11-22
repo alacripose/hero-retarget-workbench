@@ -15,7 +15,9 @@ comparison cannot drift from the check being calibrated.
       --pair artifacts/.../dmx/animation/item_stand_idle.dmx=artifacts/.../shiv_tailbones.dmx \
       --report artifacts/receipts/joint-sets.json
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -23,7 +25,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 sys.path.insert(0, str(REPO / "tools"))
 for _path in (PULSE_DIR, REPO / "tools"):
     if str(_path) not in sys.path:

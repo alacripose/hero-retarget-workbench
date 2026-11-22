@@ -3533,8 +3533,8 @@
 11/14 23:47:49 Multiple definitions for criteria 'IsTargetArtist'
 11/14 23:47:49 response rule AGResp_unnamed_1089 has no CONCEPT!
 11/14 23:47:49 response rule deadpack_Air_Dash has no CONCEPT!
-11/14 23:47:49 [SteamNetSockets] [Relay sgp#79 (103.10.124.117:27047) only] L4S detection: unusual.  up_ecn1=pass_ecn1  down_dscp45=unusual(ECN0,DSCPOther).
-11/14 23:47:49 [SteamNetSockets] [Relay sgp#79 (103.10.124.117:27047) only] We will send ECN=0 (ECN config value -1)
+11/14 23:47:49 [SteamNetSockets] [Relay sgp#79 (103.<host>:27047) only] L4S detection: unusual.  up_ecn1=pass_ecn1  down_dscp45=unusual(ECN0,DSCPOther).
+11/14 23:47:49 [SteamNetSockets] [Relay sgp#79 (103.<host>:27047) only] We will send ECN=0 (ECN config value -1)
 11/14 23:47:49 Multiple definitions for criteria 'IsTargetInferno'
 11/14 23:47:49 Multiple definitions for criteria 'IsTargetGigawatt'
 11/14 23:47:49 Multiple definitions for criteria 'IsTargetHornet'

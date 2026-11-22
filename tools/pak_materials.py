@@ -8,13 +8,15 @@ question for the packer: is this material path already the game's?
 The listing is cached in `artifacts/receipts/pak01-material-paths.txt` so a
 release does not read the pak twice.
 """
+
 from __future__ import annotations
+import os
 
 import subprocess
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-S2V = Path("<home>/Downloads/cli-windows-x64/Source2Viewer-CLI.exe")
+S2V = Path(os.path.expanduser("~/Downloads/cli-windows-x64/Source2Viewer-CLI.exe"))
 PAK01 = Path("D:/SteamLibrary/steamapps/common/Deadlock/game/citadel/pak01_dir.vpk")
 CACHE = REPO / "artifacts" / "receipts" / "pak01-material-paths.txt"
 

@@ -15,7 +15,9 @@ Refuses when the two documents disagree about which bones the game ships: a mode
 of the game's bones cannot bind it, and guessing which side is right is not this tool's job.
 """
 
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -30,7 +32,7 @@ for entry in (str(ROOT), str(ROOT / "tools")):
     if entry not in sys.path:
         sys.path.insert(0, entry)
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 
 def datamodel():

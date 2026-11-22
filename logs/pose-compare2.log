@@ -57,9 +57,11 @@ Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" i
 Imported 1 files in 0.9 seconds with 0 Errors and 1 Warnings
 Info: Imported 1 files in 0.9 seconds with 0 Errors and 1 Warnings
 Imported 0 files in 0.0 seconds
-Error: Format of primary_idle.dmx not recognised
+Error: Format of primary_idle.dmx
+ not recognised
 Info: Imported 0 files in 0.0 seconds
-POSE-COMPARE FAIL idle: Error: Format of primary_idle.dmx not recognised
+POSE-COMPARE FAIL idle: Error: Format of primary_idle.dmx
+ not recognised
 
 
 DMX IMPORTER: now working on slide_getup.dmx
@@ -73,9 +75,11 @@ Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" i
 Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
 Info: Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
 Imported 0 files in 0.0 seconds
-Error: Format of slide_getup.dmx not recognised
+Error: Format of slide_getup.dmx
+ not recognised
 Info: Imported 0 files in 0.0 seconds
-POSE-COMPARE FAIL tail: Error: Format of slide_getup.dmx not recognised
+POSE-COMPARE FAIL tail: Error: Format of slide_getup.dmx
+ not recognised
 
 
 DMX IMPORTER: now working on item_run_center.dmx
@@ -89,9 +93,11 @@ Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" i
 Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
 Info: Imported 1 files in 0.2 seconds with 0 Errors and 1 Warnings
 Imported 0 files in 0.0 seconds
-Error: Format of item_run_center.dmx not recognised
+Error: Format of item_run_center.dmx
+ not recognised
 Info: Imported 0 files in 0.0 seconds
-POSE-COMPARE FAIL lift: Error: Format of item_run_center.dmx not recognised
+POSE-COMPARE FAIL lift: Error: Format of item_run_center.dmx
+ not recognised
 
 POSE-COMPARE done 0 renders, 3 failed
 Blender 5.4.0 Alpha (hash 049750f9fa83 built 2026-11-14 02:01:58)

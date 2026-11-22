@@ -7,7 +7,9 @@ export use) and prints the joints in file order.
 
   blender -b --python tools/dmx_joint_names.py -- --dmx <file> [--dmx <file> ...] [--report <json>]
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -15,7 +17,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 
 def _datamodel():

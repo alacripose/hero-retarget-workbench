@@ -12,7 +12,9 @@ divergence moves, and the client binds clips by index.
 The stock skeleton's bone masks are kept as they are; a mask that names a joint the
 rig does not carry is reported, not silently rewritten.
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -21,7 +23,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "tools"))
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 
 def _arguments() -> argparse.Namespace:

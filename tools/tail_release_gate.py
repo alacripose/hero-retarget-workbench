@@ -21,7 +21,9 @@ exists so the code path that produced those paks cannot be run again.
 
 Exit 0 admits the port.  Exit 2 refuses it and names the check that refused.
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -29,7 +31,7 @@ import re
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 
 class Refused(RuntimeError):

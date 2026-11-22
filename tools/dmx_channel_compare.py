@@ -6,13 +6,15 @@ use it either: this reads both files with the datamodel and compares each
 
   blender -b --python tools/dmx_channel_compare.py -- --a <clip.dmx> --b <clip.dmx> [--expect-extra tail_0,tail_1]
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 
 def _arguments() -> argparse.Namespace:

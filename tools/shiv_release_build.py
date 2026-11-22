@@ -17,7 +17,9 @@ owner's verdict on them is that the tail is right and the body plays correctly.
       --out artifacts/oldviper/shiv_root0647.vpk \
       --receipt artifacts/receipts/release-clips-only.json
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import hashlib
@@ -28,7 +30,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-S2V = Path(r"<home>\Downloads\cli-windows-x64\Source2Viewer-CLI.exe")
+S2V = Path(os.path.expanduser(r"~\Downloads\cli-windows-x64\Source2Viewer-CLI.exe"))
 BLENDER = Path(r"C:\Program Files (x86)\Steam\steamapps\common\Blender\blender.exe")
 ADDON = "shiv_release_skel"
 SKELETON_RELATIVE = Path("models/heroes_staging/shiv/shiv.vnmskel_c")

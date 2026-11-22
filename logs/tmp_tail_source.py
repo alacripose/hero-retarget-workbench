@@ -1,6 +1,7 @@
+import os
 import importlib.util, sys, bpy
 from pathlib import Path
-ROOT=Path(r'<home>\Documents\deadlock-model-forge')
+ROOT=Path(ros.path.expanduser("~\Documents\deadlock-model-forge"))
 P=ROOT/'blender'/'hero_retarget_workbench'
 spec=importlib.util.spec_from_file_location('dmf_tmp',P/'__init__.py',submodule_search_locations=[str(P)])
 m=importlib.util.module_from_spec(spec); sys.modules['dmf_tmp']=m; spec.loader.exec_module(m)
@@ -8,8 +9,8 @@ import addon_utils
 addon_utils.enable('bl_ext.user_default.pulse_src_ops', default_set=False)
 m.register()
 s2=sys.modules['dmf_tmp.source2']
-body=Path(r'<home>\AppData\Roaming\Blender Foundation\Blender\5.4\datafiles\hero_retarget_workbench\artifacts\extractions\werewolf\models\heroes_wip\werewolf\werewolf_werewolf_model.dmx')
-clip=Path(r'<home>\AppData\Roaming\Blender Foundation\Blender\5.4\datafiles\hero_retarget_workbench\artifacts\extractions\werewolf\models\heroes_wip\werewolf\clips\aim_weapon_idle.dmx')
+body=Path(ros.path.expanduser("~\AppData\Roaming\Blender Foundation\Blender\5.4\datafiles\hero_retarget_workbench\artifacts\extractions\werewolf\models\heroes_wip\werewolf\werewolf_werewolf_model.dmx"))
+clip=Path(ros.path.expanduser("~\AppData\Roaming\Blender Foundation\Blender\5.4\datafiles\hero_retarget_workbench\artifacts\extractions\werewolf\models\heroes_wip\werewolf\clips\aim_weapon_idle.dmx"))
 before={o.name for o in bpy.context.scene.objects}
 s2.import_dmx(body, append='NEW_ARMATURE')
 rig=max([o for o in bpy.context.scene.objects if o.name not in before and o.type=='ARMATURE'], key=lambda x:len(x.data.bones))

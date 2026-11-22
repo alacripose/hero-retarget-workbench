@@ -20,14 +20,16 @@ untouched; this moves no bone, it only changes which slot each bone occupies.
 Exit 0 when the written file's order and parents equal the model's, 2 when they cannot (a joint in one
 tree and not the other is refused rather than dropped).
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 TOOLS = Path(__file__).resolve().parent
 
 

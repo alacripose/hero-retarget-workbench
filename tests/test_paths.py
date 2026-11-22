@@ -195,7 +195,7 @@ class PathConfigurationTests(unittest.TestCase):
         source = Path(paths.__file__).read_text(encoding="utf-8")
         self.assertNotIn("openlock_modern", source)
         self.assertNotIn("Reduced_CSDK_13", source)
-        self.assertNotIn("<home>", source)
+        self.assertNotIn(os.path.expanduser("~"), source)
 
 
 if __name__ == "__main__":

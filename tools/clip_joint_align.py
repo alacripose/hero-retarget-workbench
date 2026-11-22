@@ -18,14 +18,16 @@ from the reference document.
   blender -b --factory-startup --python tools/clip_joint_align.py -- \\
       --reference <mesh+skeleton dmx> --clips <dir> --out-dir <dir>
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 _MAKE_ARRAY = None
 _ELEMENT_TYPE = None

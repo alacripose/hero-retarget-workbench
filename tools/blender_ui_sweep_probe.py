@@ -79,8 +79,8 @@ def _area():
 def _seed(dmf, settings) -> None:
     settings.build = "6861 Nov 09 2026"
     settings.deadlock_root = r"D:\SteamLibrary\steamapps\common\Deadlock"
-    settings.s2v_cli = r"<home>\Downloads\cli-windows-x64\Source2Viewer-CLI.exe"
-    settings.csdk_root = r"<home>\Downloads\Reduced_CSDK_13"
+    settings.s2v_cli = os.path.expanduser(r"~\Downloads\cli-windows-x64\Source2Viewer-CLI.exe")
+    settings.csdk_root = os.path.expanduser(r"~\Downloads\Reduced_CSDK_13")
     try:
         from types import SimpleNamespace
 

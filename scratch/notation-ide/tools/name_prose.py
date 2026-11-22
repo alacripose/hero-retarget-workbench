@@ -19,7 +19,9 @@ family already reads. That exemption is named here so it is not silent.
     python tools/name_prose.py --family --json artifacts/name-judge.json
 """
 
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -201,7 +203,7 @@ def selftest() -> int:
 
 
 def discover() -> list[Path]:
-    roots = [Path("<home>/Documents"), Path("F:/Documents")]
+    roots = [Path(os.path.expanduser("~/Documents")), Path("F:/Documents")]
     repos = []
     for root in roots:
         if not root.exists():

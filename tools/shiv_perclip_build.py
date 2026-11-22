@@ -18,7 +18,9 @@ clips, so no clip can be built from a sibling's animation.
   python tools/shiv_perclip_build.py compile --csdk <csdk> --addon <addon> \
       --merged <merged dir> --extraction <live clips dir> --skeleton-source <tree with vnmskel_c>
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -30,7 +32,7 @@ import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-S2V = Path("<home>/Downloads/cli-windows-x64/Source2Viewer-CLI.exe")
+S2V = Path(os.path.expanduser("~/Downloads/cli-windows-x64/Source2Viewer-CLI.exe"))
 LIVE_PAK = Path("D:/SteamLibrary/steamapps/common/Deadlock/game/citadel/pak01_dir.vpk")
 
 

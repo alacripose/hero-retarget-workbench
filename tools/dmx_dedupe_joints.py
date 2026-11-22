@@ -12,14 +12,16 @@ are moved under the kept joint, so nothing is lost and nothing is invented.
   blender -b --factory-startup --python tools/dmx_dedupe_joints.py -- \\
       --dmx <file> [<file> ...] [--report <json>]
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
 import sys
 from pathlib import Path
 
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 _MAKE_ARRAY = None
 _ELEMENT_TYPE = None

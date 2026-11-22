@@ -57,9 +57,11 @@ Warning: Parent mismatch for bone "pelvis": "<None>" in Blender, "root_motion" i
 Imported 1 files in 1.1 seconds with 0 Errors and 1 Warnings
 Info: Imported 1 files in 1.1 seconds with 0 Errors and 1 Warnings
 Imported 0 files in 0.0 seconds
-Error: Format of primary_idle.dmx not recognised
+Error: Format of primary_idle.dmx
+ not recognised
 Info: Imported 0 files in 0.0 seconds
-POSE-COMPARE FAIL idle: Error: Format of primary_idle.dmx not recognised
+POSE-COMPARE FAIL idle: Error: Format of primary_idle.dmx
+ not recognised
 
 
 DMX IMPORTER: now working on slide_getup.dmx

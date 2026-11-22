@@ -1,5 +1,6 @@
+import os
 import sys
-sys.path.insert(0, "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+sys.path.insert(0, os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 sys.path.insert(0, "tools")
 from pulse_src_ops import datamodel
 from tail_release_audit import _joint_table

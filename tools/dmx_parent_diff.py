@@ -8,7 +8,9 @@ parent does.
 
   blender -b --python tools/dmx_parent_diff.py -- --a <stock.dmx> --b <grafted.dmx> --report <json>
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -16,7 +18,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 for candidate in (PULSE_DIR, REPO / "tools"):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))

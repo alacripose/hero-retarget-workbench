@@ -19,7 +19,9 @@ convention can drift.
 The tail joints are attached under the same parent they have in the tail clip
 (`pelvis`), with that clip's rest transforms, so the tail's own basis is kept.
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -28,7 +30,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 # A tail chain is whatever the authored clip declares: Shiv carries tail_0..tail_5
 # plus tail_end, Tengu tail_0..tail_7 plus tail_end.  The set is read from the
 # tail clip, never assumed, so a port is not limited to one source's chain.

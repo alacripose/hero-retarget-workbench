@@ -1,7 +1,7 @@
 """Headless probe for the cloth suite and the properties-editor page surface.
 
   blender -b --python tools/blender_cloth_probe.py -- \
-    --extraction "<home>/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv" \
+    --extraction os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/datafiles/hero_retarget_workbench/artifacts/extractions/shiv") \
     --report artifacts/receipts/cloth.json
 
 The probe imports a real hero extraction through the addon's own
@@ -17,7 +17,9 @@ installed copy disabled and ``forge`` unshadowed.
 Without an extraction it reports SKIP and exits 0: CI has no game install, and a
 probe that fails there would only teach us that the game is missing.
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import importlib.util

@@ -13,7 +13,9 @@ with the same name.  Channel logs and times are untouched.
       --skeleton <haze_model_tail.dmx> --clips artifacts/haze-tail/merged2 \
       --out-dir artifacts/haze-tail/merged3 [--report <json>]
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import json
@@ -22,7 +24,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "tools"))
-PULSE_DIR = Path("<home>/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default")
+PULSE_DIR = Path(os.path.expanduser("~/AppData/Roaming/Blender Foundation/Blender/5.4/extensions/user_default"))
 
 
 def _arguments() -> argparse.Namespace:

@@ -14,7 +14,9 @@ bigger and can shadow a working game material with a half-compiled copy.
 never packed.  `--include-materials` adds the compiled `*.vmat_c`/`*.vtex_c`
 for the case where a port introduces a material the game does not have.
 """
+
 from __future__ import annotations
+import os
 
 import argparse
 import hashlib
@@ -25,10 +27,9 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-S2V = Path("<home>/Downloads/cli-windows-x64/Source2Viewer-CLI.exe")
+S2V = Path(os.path.expanduser("~/Downloads/cli-windows-x64/Source2Viewer-CLI.exe"))
 BLENDER = Path(
-    "<home>/Downloads/blender-PR165087/"
-    "blender-5.4.0-alpha+main-PR165087.ca9a25cceea7-windows.amd64-release/blender.exe"
+    os.path.expanduser("~/Downloads/blender-PR165087/blender-5.4.0-alpha+main-PR165087.ca9a25cceea7-windows.amd64-release/blender.exe")
 )
 GATE = REPO / "tools" / "tail_release_gate.py"
 if str(REPO / "tools") not in sys.path:
