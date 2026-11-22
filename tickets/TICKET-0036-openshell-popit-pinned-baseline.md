@@ -389,3 +389,44 @@ host's padding removed it measures 93 again, as the reference's 92.8 lays out.
 
 **Gates, all exit 0:** contour 10/0 · options 9/0 · options selftest 7/0 · archive on the installed
 VPK 9/0 · landing `--check` ok · chrome 99 · contour-test 63/0 · boot-carrier 12/0.
+
+## 2026-11-22 (eighth pass) — clip padding, interaction fills and rows: two of the three closed
+
+The pin's three deltas were worked in order, against the pinned reference in `pins/` and the shape
+authority in `docs/`.
+
+**One shared padding implementation.** `openlock_contour.js` now derives every surface from
+`OpenlockContour.pads()`, which reads `clip_pad` 0.5, `frame_pad` 1.5 and `stroke_width` 1 straight from
+`docs/family-look.json`. The profile is cut at the frame pad, the ink is one stroke wide, and the fill
+starts at `2 * stroke` inside the box. A cell, a row and a window crown all come through that one call;
+none carries its own numbers. The test proves it (`pads()` equals the pin's constants, and the fill's
+first row starts at the stroke), and the gate's `outline-not-clipped` now reads the padded call.
+
+**Delta 1, hover and activated cells — closed, measured.** The flood was a rectangle: `.Taskbar
+.ShellTab.Active { background-color: #b08d5729 }` painted a slab across the crown, and the fill colour
+was a brass that carried over it. Both are gone. The fills are the reference's two paints composited
+over the bar's ink — paper 6 per cent (#1c1d1e) and brass 16 per cent (#29251e) — and hover moves only
+the ink, as `bar.css` does. Measured: `contour 85x36 / 82x36 / 188x36 / 218x36 band=11 slices=48`, cells
+read paper-on-ink in all three states, no brass over a crown.
+
+**Delta 3, rows inside a window — closed for the surfaces, measured.** `actionRow` and `rowXd` build a
+`ViewRowBox` ground that takes the contour, with the Label inside keeping the text, the pointer and the
+handler (`check_shell_clicks` still reads a Label, `row.text` and the activation event), and
+`addControl` contours `ViewAction` surfaces. Measured: `contour 130x22 band=7 slices=28`,
+`99x22 band=7`, `96x22 band=7` — a 22 px row cuts a 7 px crown from the same profile, and the rows show
+the chamfer and the 1 px ink in the captures.
+
+**Delta 2, the window crown after a drag — not closed, and the attempt is shown.** The drag now ends by
+dropping the frame's size cache and drawing twice (`contourChip` immediately and again at 0.12 s), so
+the frame is re-cut at the box the drag ended on and the log shows the window's own line. What does not
+follow is the *visible* crown: the frame's plates (`WindowTitle`, `WindowMeta`, `WindowBody`) are
+rectangles, this client has no clip for a child, and a plate inset by 2 px still squares the corner the
+contour cut. The capture after the drag shows the contoured rows and the ink body with a square outer
+corner. Recorded as open in the pin (`states.resized`) rather than claimed.
+
+**Start stays at 93 px** (`bar metrics: start=93 tab0=85 gap=5.6`), the two non-reference cells are
+untouched, and `docs/family-look.json`'s surface list is unchanged.
+
+**Gates, all exit 0:** contour 11/0 (a new `contour-on-rows-and-crowns` check) · options 9/0 · options
+selftest 7/0 · archive on the installed VPK (`26BA67D90DD7E7199D13C6FABD2A4346AA364BCAD04AC553A888F8C3482A07F9`) 9/0 ·
+landing `--check` ok · chrome 99 · contour-test 74/0 · boot-carrier 12/0.

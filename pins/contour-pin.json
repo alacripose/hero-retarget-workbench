@@ -1,7 +1,7 @@
 {
-  "schema": "openlock.contour-pin/1",
-  "at": "2026-11-22T09:22:49+00:00",
-  "what": "the contour the openshell bar buttons carried at this build, before the clip padding and interaction work",
+  "schema": "openlock.contour-pin/2",
+  "at": "2026-11-22T02:44:00+00:00",
+  "what": "the contour after the clip padding, the interaction fills and the contoured rows were ported; the window crown after a drag is still open",
   "authority": {
     "docs/contour.json": "6810368a4a85fafb5c5e951883e85a1669080b5206a1adec2561b375575e07a3",
     "docs/family-look.json": "778ccb695225275da0b0e13e62453dcd023764e97593d3d2803247b49bf1fea3",
@@ -20,53 +20,64 @@
       ".ShellTab",
       ".WindowsButton",
       ".Clock"
-    ]
+    ],
+    "runtime_pads": "OpenlockContour.pads() returns clip 0.5, frame 1.5, stroke 1, read from docs/family-look.json"
   },
   "rendered": {
-    "band_px": 11,
-    "slices_per_surface": 48,
+    "band_px": {
+      "cell": 11,
+      "row": 7
+    },
+    "slices_per_surface": {
+      "cell": 48,
+      "row": 28
+    },
     "ink": "two crowns plus a 1px side rail each side (outline, never a slab)",
-    "fill": "one surface, inset 1px, #1b1a16 under the bar's paper",
+    "fill": "one surface, inset by the pin's stroke, paper 6% over ink #1c1d1e; active brass 16% over ink #29251e",
     "ink_colours": {
       "cell": "#b08d5773",
       "hover": "#d9b779d9",
       "active": "#d9b779",
       "window": "#b08d576b",
-      "clock": "#b08d574d"
+      "clock": "#b08d574d",
+      "row": "#b08d576b"
     },
     "bar_metrics": "bar=1920x48 start=93 tab0=85 gap=5.6 windows=90 clock=109 tabs=3 startx=18 tab0x=117 gapExact=5.6",
     "contour_log": [
-      "contour 87x36 band=11 slices=48 drawn",
+      "contour 130x22 band=7 slices=28 drawn",
+      "contour 99x22 band=7 slices=28 drawn",
+      "contour 96x22 band=7 slices=28 drawn",
+      "contour 85x36 band=11 slices=48 drawn",
       "contour 82x36 band=11 slices=48 drawn",
       "contour 188x36 band=11 slices=48 drawn",
       "contour 218x36 band=11 slices=48 drawn",
       "contour 300x66 band=11 slices=48 drawn",
-      "contour 640x520 band=11 slices=39 drawn"
+      "contour 640x520 band=11 slices=48 drawn"
     ]
   },
-  "installed_vpk": "1b8f849addc27b228891b606df248cb5064f507b709da58d8d85d6a15f26d8a4",
+  "installed_vpk": "26ba67d90dd7e7199d13c6fabd2a4346aa364bcad04ac553a888f8c3482a07f9",
   "images": {
-    "idle": "e5c2133b644a46e430e3dd6b4f95bda84d144568e197f861e9100dcdac20aa13",
-    "hover": "a6929dc7a2e0f886f66c2b57db8ed3fa9ed8721f5c45a57e248920988e84ce5e",
-    "activated": "99b33e57c0f604714405e5b3eaf26942ac0b6a3d23503ab0ed910b70be193477",
-    "resized": "16f93f2462289e808cf3f0abb9da3e9b71f9c08656c75962b4c8853922e8d4f5",
-    "pin": "3bb4ea6bb68a9dbeb09759762a000711b8f27e046d27fa5db7721fba5981a0af"
+    "idle": "bf4d90c59a544a7628c6296852313e735bd1cccd770ae2fc2f31fe9cc9137a50",
+    "hover": "a64f2eb70a0c89aa955bd954ed1eb0ea3097a608a507e6aa7b0d89c4f23cc5d5",
+    "activated": "b1a0e2acd453fa9e2dbc2bd084a7a2aea226ca2f0a6cf4211d0a53b4339ccac5",
+    "resized": "5ad6fa91a114581e8ffff57960737729162c7ee05bdf0feee4f9434b0037402d",
+    "pin": "33d1dfc32410632c6961d8027a277af0a9cc3db58136a0f3f7047496013c1aff"
   },
   "states": {
-    "idle": "each cell is the profile with a 1px brass ink and an ink fill; labels read paper on ink",
-    "hover": "the hovered cell fills brass over the crown; the outline is still there, the fill is not yet the reference's 6 per cent paper",
-    "activated": "the active cell fills brass as well; this is the interaction look the next step replaces",
-    "resized": "the window keeps its body and rows; its crown is not repainted after the drag"
+    "idle": "closed: each cell is the profile with a 1px brass ink and the paper fill; labels paper on ink",
+    "hover": "closed: the fill stays the paper (6 per cent over ink) and only the ink lights; no brass flood",
+    "activated": "closed: the active cell's fill is the reference's 16 per cent brass over ink, still inside the closed outline",
+    "resized": "open: the rows are contoured and the body is the reference's ink, but the frame's crown does not show after the drag because the plates inside the frame are rectangles and this client has no clip for a child"
   },
-  "next": "clip padding (0.5 outside, 1.5 inside), the hover/active fill from bar.css, and the application/taskbar look",
+  "next": "the window crown needs either a child clip or a frame whose plates are cut to the profile; the reference's radial washes are still flat here",
   "gates": {
-    "contour": "10/0",
+    "contour": "11/0",
     "options": "9/0",
     "options-selftest": "7/0",
     "archive": "9/0",
     "landing-check": "ok",
     "chrome": "99",
-    "contour-test": "63/0",
+    "contour-test": "74/0",
     "boot-carrier": "12/0"
   }
 }
