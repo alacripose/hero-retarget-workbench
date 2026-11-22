@@ -345,3 +345,47 @@ hash) remain, as recorded last pass.
 
 contour 10/0 · options 9/0 · options selftest 7/0 · archive on the installed VPK 9/0 · landing
 `--check` ok · chrome 99 · contour-test 63/0 · boot-carrier 12/0.
+
+## 2026-11-22 (seventh pass) — the current button contour is pinned before the clip padding work
+
+The owner asked for the contour the buttons carry today to be screenshotted and pinned, because the
+next step is the clip padding, the interaction logic and the look from the pinned popit application and
+taskbar. The pin is `pins/contour-pin.json` with `pins/contour-pin.png` and the four state captures it
+is composed from (`contour-idle`, `-hover`, `-activated`, `-resized`).
+
+**What the pin records, measured on the installed archive `1B8F849ADDC27B228891B606DF248CB5064F507B709DA58D8D85D6A15F26D8A4`.**
+A normal launch into the hideout with PrintWindow, then the pointer driven to the first cell, clicked,
+and the window's corner dragged:
+
+```
+bar=1920x48 start=93 tab0=85 gap=5.6 windows=90 clock=109 tabs=3 startx=18 tab0x=117 gapExact=5.6
+contour 87x36  band=11 slices=48 drawn
+contour 82x36  band=11 slices=48 drawn
+contour 188x36 band=11 slices=48 drawn
+contour 218x36 band=11 slices=48 drawn
+contour 300x66 band=11 slices=48 drawn
+contour 640x520 band=11 slices=39 drawn
+```
+
+The authority is unchanged and is what the runtime renders: `docs/contour.json` and
+`docs/family-look.json` (corner 7.67 by 11.00 px, clip pad 0.5, frame pad 1.5, stroke 1 px, surfaces
+`.WindowFrame`, `.ShellTab`, `.WindowsButton`, `.Clock`), digested into the pin beside the images. The
+landing page still checks: `python tools/landing.py --check` → ok.
+
+**One drift was found and closed in the same pass.** The Start cell had grown to 102 px because the
+`.BarStart` rule still carried `padding: 3px 16px` while its label carries the inset too; with the
+host's padding removed it measures 93 again, as the reference's 92.8 lays out.
+
+**What the pin deliberately shows as not yet the reference.**
+
+* The **hover and activated** cells fill brass over the crown (`.ShellTab:hover` and `.Active` paint a
+  rectangle and the fill colour is not the reference's six per cent paper). The outline is still there;
+  the fill is the next step's work.
+* The **window after a resize** keeps its body and rows but does not repaint its crown — the frame's
+  contour is taken on the geometry write, and a drag that ends without a further write leaves the
+  previous crown. This is the clip padding step's first job.
+* The rows inside a window (`Dashboard`, the HUD panel list) are still plain 1 px bordered rows; the
+  contour on them is the step after this pin.
+
+**Gates, all exit 0:** contour 10/0 · options 9/0 · options selftest 7/0 · archive on the installed
+VPK 9/0 · landing `--check` ok · chrome 99 · contour-test 63/0 · boot-carrier 12/0.
