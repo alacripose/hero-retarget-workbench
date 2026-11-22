@@ -272,3 +272,76 @@ contour 10/0 · options 9/0 · options selftest 7/0 · archive on the installed 
 `--check` ok · chrome 99 · contour-test 53/0 · boot-carrier 12/0. The archive installed for this pass
 is `bf7cf983da49c9d33cec90f97e1a9cb9b6329a9a90fc7e01b8e3a62ec0782a3a`, built after the layout order change and the metrics probe. Live chain:
 `Taskbar:1920x48 < OpenlockStandaloneHost:1920x1080 < CitadelHudRoot:1920x1080`.
+
+## 2026-11-22 (sixth pass) — the contour was on no cell, and where it was, it was a slab
+
+The owner asked why the contour on the shell's items is not the contour in the popit shell, whose
+docs and landing page already draw it. The answer was not a value: it was the accessor and the shape
+of the paint.
+
+**What was actually wrong, in the order it was found.**
+
+1. `openlock_contour.js` cleared its own slices with `layer.Children()`. Panorama has no `Children()`;
+   the call returned nothing, so a repaint left the previous slices in place and stacked a second set
+   under the first. The same defect was in the bar's cell count last pass.
+2. `layerFor` moved the slice layer under the surface's content with `host.GetFirstChild()`, which is
+   also not this client's accessor. The throw was caught, the layer stayed last, and its fill painted
+   over every bar cell's label — the text was there, under the paint. `GetChild(0)` after
+   `GetChildCount()` is the accessor that works.
+3. The stroke was drawn as a **slab**: one full-width, full-height panel between the crowns. A fill of
+   six per cent paper cannot hide a 45 per cent brass slab, so every cell rendered solid brass. The
+   ink is now an outline — the two crowns, one 1 px line down each side, and nothing between them —
+   and the fill is the one surface inside it, inset by 1 px.
+4. The bar cell's own padding (3 by 16) was inherited by the slice layer, so the contour started
+   16 px into a 36 px cell and its crown was cut off. The inset moved to the label; the shape gets the
+   whole box. Measured after: the cells read `Minimap`, `Abilities`, `inventory` in paper on ink,
+   with a 1 px brass ink and the profile's crown.
+5. Every frame is contoured where its geometry is written (`setRect`), not never: a 640x520 window
+   now reports `contour 640x520 band=11 drawn`. A tracked game panel 1900 px wide was being contoured
+   every frame as it animated; surfaces over 1200 by 900 are named as not shell surfaces and skipped.
+
+**The profile is the reference's, unchanged.** `docs/contour.json` (the page 9 loop, 445.05..526.95 by
+514.348..635.652) and `docs/family-look.json` (corner 7.67 by 11.00 px, clip pad 0.5, frame pad 1.5)
+are byte-identical to `F:/Documents/popit-shell` at `e507d355`; the generated slice data carries the
+same digest. The gate proves it: `contour-authority`, `contour-pinned`, `contour-data-current`,
+`corner-is-the-button`, `nothing-stretched`, `outline-not-clipped`, `contour-slices-tested`,
+`contour-wired`, `options-pinned` — 10 checks, 0 refusals.
+
+**The test and the gate were widened, not weakened.** The slice test now asserts the ink is *two*
+1 px side rails rather than one full-width rail, and that the fill is one inset surface; the gate's
+`outline-not-clipped` reads the new call. The independent reading of the profile (a flattened polygon
+sampled per row) is unchanged and still agrees with every crown row.
+
+**The landing page already draws this contour** — `landing/index.html` with `landing/contour.js` and
+`landing/family-look.json`, which embeds the same profile and the gate's own check count. It was
+stale against this pass's check count (63 shape checks, not 10); `python tools/landing.py --check`
+now reports the records are current.
+
+**Measured in the client after the fixes** (installed
+`BDEE7EBFF6D033289F5AB944450E19C47D634D3FA8E922281FD6A3AAAF1AC80C`, normal launch, hideout,
+PrintWindow):
+
+```
+[openlock] contour 82x36 band=11 slices=48 drawn
+[openlock] contour 188x36 band=11 slices=48 drawn
+[openlock] contour 640x520 band=11 slices=39 drawn
+[Openlock] bar metrics: bar=1920x48 start=93 tab0=85 gap=5.6 windows=90 clock=109 tabs=3
+                        startx=18 tab0x=117 gapExact=5.6
+```
+
+**The gap is 5.6, and it is the measurement, not the sheet.** The cell margin is 5.76. The Start cell's
+min-width is 92.8 and the client lays it out at 93; `gapExact` subtracts the laid-out width from the
+next cell's position, so an 0.2 px width rounding comes out of the gap and 5.76 - 0.2 reads 5.6. The
+two facts together pin it: the sheet and the reference agree at 5.76, and this client's layout grid
+truncates a fractional width to a whole pixel before it positions the next cell. The remeasurement is
+`gapExact`, unrounded, so a future build that stops truncating will read 5.76 without a code change.
+
+**Still different, measured.** The window's body is opaque ink and its frame is contoured, but the
+rows inside it (`Dashboard`, the HUD panel list) are plain 1 px bordered rows, not contoured cells;
+the reference draws each card with its own contour. The bar's own two extra cells (Windows, build
+hash) remain, as recorded last pass.
+
+### Gates, all exit 0
+
+contour 10/0 · options 9/0 · options selftest 7/0 · archive on the installed VPK 9/0 · landing
+`--check` ok · chrome 99 · contour-test 63/0 · boot-carrier 12/0.
