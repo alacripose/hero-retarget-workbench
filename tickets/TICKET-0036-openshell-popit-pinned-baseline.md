@@ -726,3 +726,50 @@ its profile and its ±1 tolerance unchanged.
 `https://alacripose.github.io/popit-shell/` now reports 8 surfaces carrying `--clip`, 8
 `.contour-frame` paths drawn and 0 failed requests — the live landing page draws the contour. The
 earlier reading was 0 clips, 0 frames and a failed `https://alacripose.github.io/contour.json`.
+
+## Thirteenth pass — 2026-11-22: the delivery was the defect, not the drawing
+
+The live page drew its contour in a fresh profile and not for the user. Measured, in this order:
+
+1. **The deployed bytes were the committed bytes.** `sha256` of
+   `https://alacripose.github.io/popit-shell/contour.js` equals `git show e1d1975:docs/contour.js`
+   exactly, and the page likewise. Pages was not serving an older commit, `docs/` was not out of
+   step with `ui/`, and there was no service worker from an earlier deploy.
+2. **Pages serves every file with `Cache-Control: max-age=600` and no revalidation window** (measured
+   on `/`, `/index.html`, `/contour.js`, `/contour.json`: all `max-age=600`, `Age: 0`, ETag present).
+   A visitor who opened the page before the fix keeps that page *and* that module for ten minutes,
+   and the pre-fix module asks for `/contour.json` at the domain root, which does not exist. That is
+   the page the user was still seeing.
+
+**The fix is in the build, so it cannot recur.** The page now names its assets by the hash of their
+bytes — `contour.js?v=9196ebb15e`, `loadContour("./contour.json?v=b6d678b1c3")` — so a fresh page
+can never be paired with a module an earlier visit cached. The page also registers `docs/sw.js`,
+which is network-first for the document and the contour files (`cache: "no-store"`), caches only the
+image, deletes every other cache on activate, calls `skipWaiting` and `clients.claim`, and is
+registered with `updateViaCache: "none"`. Both assets and the page carry one build name,
+`openlock-build` `0d5cf347bb`, derived from their content.
+
+`docs/` is now reproducible from the sources alone: `python tools/landing.py --rebuild` renders the
+page and the worker from the stored Debian copy and the pins (no machine needed), and `--check` now
+also refuses a published `contour.js`/`contour.json` that is not byte-identical to `ui/contour.js`/
+`contour.json`, a worker of another build, or an unversioned asset URL in the page.
+
+**Evidence, on the public URL and on both path shapes.**
+
+- cold incognito profile, `https://alacripose.github.io/popit-shell/`: build `0d5cf347bb`, 8 surfaces,
+  8 with `path()` in `--clip`, 8 `.contour-frame` paths, 0 failed requests, worker controlling.
+- returning profile that had loaded the pre-fix page: same URL, plain navigation, same result.
+- the cache hole itself reproduced and closed at a server that sends exactly Pages' header: the
+  pre-fix docs (`e507d35`) served at `/popit-shell/` with `max-age=600` gave 0 clipped surfaces, 0
+  frames and a failed `/contour.json` — the user's page; replacing those files with the build and
+  taking a *plain reload* (no cache clear, no hard refresh) in the same profile gave build
+  `0d5cf347bb`, 8 clipped, 8 frames, 0 failed requests, worker controlling.
+- root versus subpath, same build served at `/` and at `/popit-shell/`: 8 clipped and 8 frames in
+  both, 0 failed requests. Nothing in the page is root-relative.
+
+**Gates, all exit 0, nothing disabled or widened:** contour 11/0 · options 9/0 · contour-test 76/0 ·
+chrome 107/0 · dashboard 61/0 · `check_shell_clicks` ok · openlock landing `--check` ok ·
+`browser-minimal-shell` HELD · popit-shell landing `--check` ok. The pinned contour numbers and the
+brass-meridian/openlock package formats were not touched.
+
+Pushed `popit-shell` `39f046c`; `ls-remote` matches.
