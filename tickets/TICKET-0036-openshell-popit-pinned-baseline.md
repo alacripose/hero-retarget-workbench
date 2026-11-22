@@ -201,3 +201,74 @@ landing `--check` ok · chrome 98 · contour-test 53/0 · boot-carrier 12/0.
 slice), the bar's cell spacing is the shell's own 6 px rather than the Popit shell's 5.76 px, and the
 `Windows` cell is wider than the Popit's `max-width` of seven cap units. Those are look refinements,
 not blockers; the surface and the inks are the new Popit shell's.
+
+## 2026-11-22 (fifth pass) — the bar is the popit-shell's bar, value by value
+
+**Authority first.** `F:/Documents/popit-shell` is the project the owner links: `origin` is
+`https://github.com/alacripose/popit-shell.git`, `HEAD` is `e507d355153c8b7c9e5c6ea312555c1323a2588d`
+and `git ls-remote origin` reports the same `e507d35…` for `refs/heads/main`, with a clean working
+tree. No fetch was needed and no divergence exists; every number below is from that checkout at that
+commit, read from `tools/bar_pin.json`, `tools/family_look.json`, `ui/bar.css`, `ui/bar.html`,
+`ui/bar.js`, `ui/index.html`, `ui/style.css` and `ui/app.js`.
+
+### The spec, and what our shell emits
+
+| # | fact | popit-shell (source) | openshell (file) | measured in the live client |
+|---|---|---|---|---|
+| 1 | bar height | 48 (`bar_pin.BAR_HEIGHT`, `family_look.bar_height`) | `.Taskbar height: 48px` | `bar=1920x48` |
+| 2 | bar padding | 5.12 down, 17.6 across (cap 32 × 0.16 / 0.55) | `padding: 5.12px 17.6px` | `startx=18` |
+| 3 | cell gap | 5.76 (cap × 0.18) | cells `margin-right: 5.76px` | `gap=6` (the client's grid rounds 5.76 up) |
+| 4 | cell inset | 3 by 16 (`--ink-y`, `--ink-x`) | `padding: 3px 16px` | `tab0=88` wide |
+| 5 | cell width band | min 64, max 224 (cap × 2, × 7) | `min-width: 64px; max-width: 224px` | `tab0=88`, `windows=90`, both inside |
+| 6 | cell text | 13.44 (cap × 0.42) paper | `font-size: 13.44px; color: #e6dbc2` | source-level |
+| 7 | Start cell | 92.8 min, centred, 0.96 tracking, brass-lit | `.BarStart min-width: 92.8px; letter-spacing: 0.96px; #d9b779` | `start=93` |
+| 8 | clock cell | 108.8 min, centred, dim | `.Clock min-width: 108.8px; #8b8778` | `clock=109` |
+| 9 | cell fill | paper 6 % gradient, active brass 16 % | `#e6dbc20f`, active `#b08d5729` | pixel `#171615` |
+| 10 | cell outline | brass 42 %, hover brass-lit 85 %, active brass-lit | `.ContourInk #b08d576b`, hover `#d9b779d9`, focus `#d9b779` | contour chip per cell |
+| 11 | cell order | Start, one cell per open window, clock | Start, `TabStrip` cells, then the shell's own Windows/version/clock | `startx=18 tab0x=117 tabs=5` |
+| 12 | plate padding | 3.78 top, 36 sides, 8.64 bottom (u 5.4) | `.WindowTitle padding: 3.78px 36px 8.64px` | source-level |
+| 13 | title | 19.44 (u × 3.6), tracking 5.94 (u × 1.1), brass-lit, uppercase | same in `.WindowTitleLabel` | reference render: `h1 19.44px / 5.94px / rgb(217,183,121)` |
+| 14 | keyline | brass 32 % under the plate | `border-bottom: 1px solid #b08d5752` | source-level |
+| 15 | body | opaque ink `#0f1113` (two washes over it) | `.ShellRoot .ContourFill #0f1113`, `.WindowBody #0f1113` | pixel `#0F1114` inside the window |
+
+### What had to change structurally
+
+* **The strip was empty.** `renderBar()` set the version label and nothing else, so the bar drew Start
+  and the readouts with a hole between them. It now builds one cell per open window through the
+  shell's own `addTab`, keyed by a signature of the open set. Measured: `tabs=5`.
+* **`Children()` does not exist in Panorama.** The cell count and the contour chips both asked for it.
+  They use `GetChildCount`/`GetChild` now (the same defect the boot had last pass).
+* **Start was in the right-hand cluster**, so the cells ran to its left and the clock sat beside it —
+  a different bar. It leads the strip now: `startx=18`, first cell at `117` (18 + 93 + 6).
+* **The body was a translucent contour slice**; it is solid ink at the shell root's specificity.
+
+### The comparison
+
+`popit-shell` was rendered from its own files (a local server over `F:/Documents/popit-shell/ui`,
+`bar.html` with sample cells injected through its own render path, `index.html` for the window), and
+captured beside a fresh capture of the running client. Reference bar: Start, `windows` (active),
+`inventory`, `settings`, clock. Client bar: Start, five window cells, the shell's own Windows cell,
+the build cell, clock. Reference window: brass-lit `POPIT` plate over an ink body with brass cards.
+Client window: brass-lit `OPENSHELL` plate over an ink body with brass rows. Images:
+`popit-compare.png` (full) and `popit-compare-small.png` in the model-forge root. The Freebuff chip
+over the reference's Start cell is this app's preview overlay, not the page.
+
+### Still different, measured, not hidden
+
+1. **Two extra cells.** The bar carries the shell's `Windows` cell (90 px) and a build-hash cell,
+   which the reference does not have; both are inside the 224 px limit and neither is a window cell.
+2. **Gap is 6 px on screen, 5.76 in the sheet.** Panorama's layout grid rounds 5.76 up to 6; the
+   stylesheet value and the reference agree, the pixel grid does not have thirds.
+3. **Body washes.** The reference paints two radial washes over the ink; Panorama here has no radial
+   gradient, so the body is flat `#0f1113` (measured `#0F1114`).
+4. **Cell labels** are the game's own window titles (`gameplay_hud`, `windows`, …) where the reference
+   shows application titles, because the cells are the game's windows.
+5. **Cell clip.** The reference clips each cell to its contour with an SVG stroke; the shell uses its
+   pinned nine-slice contour chip.
+
+### Gates
+
+contour 10/0 · options 9/0 · options selftest 7/0 · archive on the installed VPK 9/0 · landing
+`--check` ok · chrome 99 · contour-test 53/0 · boot-carrier 12/0. The archive installed for this pass
+is `bf7cf983da49c9d33cec90f97e1a9cb9b6329a9a90fc7e01b8e3a62ec0782a3a`, built after the layout order change and the metrics probe. Live chain:
+`Taskbar:1920x48 < OpenlockStandaloneHost:1920x1080 < CitadelHudRoot:1920x1080`.
