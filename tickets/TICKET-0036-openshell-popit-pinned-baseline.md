@@ -112,3 +112,40 @@ instead of layering on it.
   `openlock_boot.js`, and no option form setting the taskbar height in the generated sheet.
 - The install tree was not touched: `citadel/addons/mods/pak01_dir.vpk` kept md5 `d0706b3e…`
   before and after the build, and no `-Live` install was attempted.
+
+## 2026-11-21 (third pass) — roles by name, installed, and the mount measured in game
+
+**The gate now covers ink roles.** `O9 roles-named` reads the pinned scheme's eleven roles and
+refuses three things in any theme: a role the pinned scheme does not name (a new surface with no
+pinned value behind it), a pinned role left unpainted, and a role value that is not a colour or a
+token (`#…` or `@define`). The rule lives in `role_problems()` so the gate and its selftest read the
+same code. The selftest grew `role-invented`, `role-dropped` and `role-shape` — 7 checks, 0 failures —
+and the real tree was provoked: appending `corner-radius 7.67px` to `brass.theme` gave
+`[FAIL] roles-named: role not named by the pinned scheme: brass:corner-radius` with exit 1, and
+restoring the file returned 9 checks, 0 refusals.
+
+**Installed.** Deadlock was closed (the owner's instruction for this pass), the installer packed and
+installed with its own archive gate inline: **2,690,213 bytes**, sha256
+`6dd70b7147de87a0a00ba82673e4a9282a25a56e9c2fe01ab211ddd6643f201a`, state `CURRENT`. The installed
+archive passes all nine `--archive` facts (popit default, popit default form, popit order[0], brass
+option, 48px bar, four grips, contour runtime, carrier rule, folded forms).
+
+**What the client said.** The bar chain is still
+`Taskbar:0x0 < OpenlockStandaloneHost:0x0 < CitadelHudRoot:0x0`, and the boot's own walk now counts
+what it looked at: `carrier walk: visited=400 widest=0x0 carrier=CitadelHudRoot`. Four hundred panels
+under the component root, and not one of them is laid out. That is not a sizing retry any more: this
+`CitadelHud` instance is detached, so nothing mounted inside it can draw, and mounting the shell
+there can never produce a bar.
+
+**Two real defects were still removed on the way.** `Panorama` panels have no `Children()` — the
+engine's accessors are `GetChildCount()`/`GetChild(i)` — so the first carrier walk was looking at
+nothing; that is fixed and the walk now reports its own numbers. And the boot no longer trusts the
+shipped anchor just because it exists: an anchor is used only when a panel above it has a box, and
+otherwise the shell is mounted beside it on a laid-out carrier (new case in `boot-carrier-test`, which
+is now 12 checks, 0 failures).
+
+**Open.** The shell mounts and cannot draw, because the standalone host is not in the drawn HUD. The
+two remaining paths are named: mount through the Deadworks UI channel (`openlock_shell_server.xml`,
+`openlock_ui open`) so the shell is loaded into the live HUD, or put the anchor into the layout the
+match actually draws. Both need a decision the owner holds: whether the client should run with the
+Deadworks host, or whether a match-HUD layout override is acceptable.
