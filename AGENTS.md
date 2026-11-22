@@ -50,3 +50,30 @@ https://github.com/hardikpandya/stop-slop
 <home>\.agents\skills\ has a ton of skills for agents to use and yet they never use them for some reason. You need to be using these skills and updating/managing them ccording to family project convention.
 
 Do not delete patch probes.
+
+## 2026-11-22 — no heredoc, and the probe is the diff
+
+Owner, verbatim: *"Whatever decision you made to use a heredoc instead of following family convention needs to
+be recorded and fixed so it can never happen again"*, then *"continue the whole point of patch probes is so we can
+atually fucking see the things that happened per diff in each project?"*.
+
+- **The rule.** No heredoc for code, data or records in any project: not `<<'PY'`, not `<<EOF`, not
+  `python - <<`, not `cat > f <<`. A heredoc sends the payload through the shell, so one lost terminator loses the
+  whole command and writes nothing while looking like it ran. The family has this four times: `AGENTS-LOG.md`,
+  `logs/authority/2026-11-16-vpk-pack-and-adhoc-scripts.jsonl`,
+  `logs/authority/2026-11-20-shell-heredoc-and-guessed-blender-path.jsonl` (`heredoc-command-limit`), and
+  `ledger/ledger.jsonl` line 779.
+- **The permitted mechanism.** File edits go through the editor file tools, which accept the absolute path of a
+  sibling project's file (the Soul Lens checkout under this user's Documents wrote through them,
+  2026-11-22); records go through
+  `tools/record_row.py`; a probe is a **kept** file in that project (`data/probes/`, `logs/probes/`) that states what
+  was attempted and what was measured, so the diff shows what happened. Never delete one.
+- **The cause this session, and why the workaround was pointless.** The heredoc was chosen because the editor tools
+  were assumed to stop at the chat workspace while the mod is a sibling checkout. Measured,
+  they do not. The same probe write also replaced `soul-lens/logs/records.md`, an append target; `git checkout --`
+  restored it and `git status --short` showed no lost line.
+- **Enforcement.** `python tools/heredoc_audit.py` fails by name (`heredoc-invocation`) on a heredoc in a runnable
+  script, and the mod repository's tools/gate.py carries a `no-heredoc` leg over the same pattern. A command line is not
+  visible to either, so this section is the part a session is asked to read.
+- **The probe.** Soul Lens data/probes/2026-11-22-heredoc-code-authoring.md, with the record
+  line in that project's logs/records.md.
