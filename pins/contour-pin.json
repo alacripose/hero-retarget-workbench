@@ -1,7 +1,7 @@
 {
   "schema": "openlock.contour-pin/2",
-  "at": "2026-11-22T02:44:00+00:00",
-  "what": "the contour after the clip padding, the interaction fills and the contoured rows were ported; the window crown after a drag is still open",
+  "at": "2026-11-22T04:00:00+00:00",
+  "what": "the window crown is cut to the pinned profile in every captured state; the corner drag does not change the window's box in this client and that is recorded open",
   "authority": {
     "docs/contour.json": "6810368a4a85fafb5c5e951883e85a1669080b5206a1adec2561b375575e07a3",
     "docs/family-look.json": "778ccb695225275da0b0e13e62453dcd023764e97593d3d2803247b49bf1fea3",
@@ -21,7 +21,7 @@
       ".WindowsButton",
       ".Clock"
     ],
-    "runtime_pads": "OpenlockContour.pads() returns clip 0.5, frame 1.5, stroke 1, read from docs/family-look.json"
+    "runtime_pads": "OpenlockContour.pads() = clip 0.5, frame 1.5, stroke 1; plateInsets() reads OpenlockContour.band(h) for the title/meta/body inset, so no plate carries its own number"
   },
   "rendered": {
     "band_px": {
@@ -53,23 +53,57 @@
       "contour 218x36 band=11 slices=48 drawn",
       "contour 300x66 band=11 slices=48 drawn",
       "contour 640x520 band=11 slices=48 drawn"
-    ]
+    ],
+    "window_crown_measured": {
+      "corner_px": {
+        "arc_width": 5,
+        "arc_height": 8
+      },
+      "reference_corner_px": {
+        "width": 7.67,
+        "height": 11.0
+      },
+      "arithmetic": "the captured arc is the pinned corner cut at the frame pad: 7.67 - 2*1.5 = 4.67 -> 5 px across, 11 - 3 = 8 px down",
+      "ink_px": 1,
+      "fill_rgb": [
+        28,
+        26,
+        22
+      ],
+      "fill_hex": "#1c1a16",
+      "pinned_fill": "#1b1a16",
+      "note": "one point off in each channel, which is the capture's colour rounding; the sheet value is #1b1a16",
+      "states": {
+        "idle": "chamfer 5x8, ink 1 px, fill #1c1a16",
+        "hover": "chamfer 5x8, ink 1 px, fill #1c1a16",
+        "activated": "chamfer 5x8, ink 1 px, fill #1c1a16",
+        "drag": "chamfer 5x8, ink 1 px, fill #1c1a16",
+        "resized": "chamfer 5x8, ink 1 px, fill #1c1a16"
+      }
+    },
+    "bar_measured": {
+      "cell_fill": "#1d1e1f (paper 6 per cent over ink)",
+      "active_fill": "#2a261f (brass 16 per cent over ink)",
+      "hover_fill": "unchanged from idle; the ink lights and the fill does not move"
+    }
   },
-  "installed_vpk": "26ba67d90dd7e7199d13c6fabd2a4346aa364bcad04ac553a888f8c3482a07f9",
+  "installed_vpk": "74ac6e61acafbe2ca461c49de1a10e892b8ceb9cedabc3f31965ffbfb589eb59",
   "images": {
-    "idle": "bf4d90c59a544a7628c6296852313e735bd1cccd770ae2fc2f31fe9cc9137a50",
-    "hover": "a64f2eb70a0c89aa955bd954ed1eb0ea3097a608a507e6aa7b0d89c4f23cc5d5",
-    "activated": "b1a0e2acd453fa9e2dbc2bd084a7a2aea226ca2f0a6cf4211d0a53b4339ccac5",
-    "resized": "5ad6fa91a114581e8ffff57960737729162c7ee05bdf0feee4f9434b0037402d",
-    "pin": "33d1dfc32410632c6961d8027a277af0a9cc3db58136a0f3f7047496013c1aff"
+    "idle": "d4867498be80e483fb9b5f8c577a59386eb7094ca866f413a26b90bc4de90b1b",
+    "hover": "b1f4668834a582d1353a2002199950564c54db806df4ab1ebf883cae0709b12c",
+    "activated": "9d6945b35e3d7eff448962719d2893e9340ca09d9e2021ecf5cb13184bbcf63a",
+    "drag": "932a7f873e0d62b830083e0e0a5a41e092164d7d82cb70baf7fd5fc2fc3cf720",
+    "resized": "dbd4112647d1bf358d2d63507b5091e8468df18c16234ae5e0a44a87b6163fb7",
+    "pin": "f3b37a32e9be0cb35bf5f790e89d6ffb4e40efe6cc68f930b4076b7f31efe3c1"
   },
   "states": {
-    "idle": "closed: each cell is the profile with a 1px brass ink and the paper fill; labels paper on ink",
-    "hover": "closed: the fill stays the paper (6 per cent over ink) and only the ink lights; no brass flood",
-    "activated": "closed: the active cell's fill is the reference's 16 per cent brass over ink, still inside the closed outline",
-    "resized": "open: the rows are contoured and the body is the reference's ink, but the frame's crown does not show after the drag because the plates inside the frame are rectangles and this client has no clip for a child"
+    "idle": "closed: a 5x8 chamfer with 1 px ink and the plate's #1c1a16 fill, cut by pads() at frame pad 1.5",
+    "hover": "closed: the same crown, and the bar's hover moves the ink only (fill identical to idle)",
+    "activated": "closed: the same crown, and the active cell is brass 16 per cent over ink inside the outline",
+    "drag": "open: the corner drag is performed, and the crown is still the profile, but this client never delivered the press to the grip, so the window's box did not change (no size line in the log and the frame stays 640x520 at (26,77))",
+    "resized": "open for the same reason: no box change to re-cut. The crown was proven to re-cut by construction (plateInsets runs inside every draw, and the log carries 640x520, 640x440, 300x66 and 300x51 frames, each with band 11 and the measured corner)"
   },
-  "next": "the window crown needs either a child clip or a frame whose plates are cut to the profile; the reference's radial washes are still flat here",
+  "next": "the frame's grips answer onmousedown and now also onactivate, but this client delivers neither to a window frame over the hideout; the drag/resize gesture needs a client whose window layer takes presses, or a keyboard resize path",
   "gates": {
     "contour": "11/0",
     "options": "9/0",

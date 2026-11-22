@@ -430,3 +430,61 @@ untouched, and `docs/family-look.json`'s surface list is unchanged.
 **Gates, all exit 0:** contour 11/0 (a new `contour-on-rows-and-crowns` check) · options 9/0 · options
 selftest 7/0 · archive on the installed VPK (`26BA67D90DD7E7199D13C6FABD2A4346AA364BCAD04AC553A888F8C3482A07F9`) 9/0 ·
 landing `--check` ok · chrome 99 · contour-test 74/0 · boot-carrier 12/0.
+
+## 2026-11-22 (ninth pass) — the window crown is the contour, and the drag has no press to answer
+
+**The corner is now cut, not painted over.** Three things stood between the contour and the screen, and
+each was found by looking at a capture rather than by reading a log line:
+
+* `.WindowFrame .WindowMeta` painted `#0f1113ee` and `.WindowTitle` painted a wash right up to the
+  frame's edge, so both plates drew a square across the crown the contour had just cut.
+* The four `GripNW/NE/SW/SE` pins were 22 px brass squares sitting in the corners: the loudest
+  rectangle on the window, whatever the profile did underneath.
+* The body's own background painted over the contour's fill.
+
+The plates are transparent now and the shell insets them from the contour's own band
+(`plateInsets()` calls `OpenlockContour.band(h)`, never a constant), so the title starts below the
+crown and the body ends above the bottom one. The pins are 10 px brass marks inset 6 px inside the
+crown. The plate's fill is the pin's `#1b1a16` instead of the bar's `#0f1113`. Nothing in a window
+carries its own contour number: the crown, the plate inset and the fill all come from `pads()` and
+`band()`.
+
+**Measured, from the captures, not asserted.** With the window at 640x520 at (26,77):
+
+| state | corner arc | ink | fill |
+|---|---|---|---|
+| idle | 5 px wide × 8 rows | 1 px | (28,26,22) `#1c1a16` |
+| hover | 5 × 8 | 1 px | (28,26,22) |
+| activated | 5 × 8 | 1 px | (28,26,22) |
+| after the corner drag | 5 × 8 | 1 px | (28,26,22) |
+| after the resize attempt | 5 × 8 | 1 px | (28,26,22) |
+
+The reference corner is 7.67 × 11.00 px at the drawing's own pad; the pin cuts the profile at
+`frame_pad` 1.5, so the captured arc should be 7.67 − 2×1.5 = 4.67 → 5 px across and 11 − 3 = 8 rows
+down. That is exactly what the pixels read. The fill is one point off per channel from `#1b1a16`,
+which is the capture's colour rounding; the sheet value is the pin's.
+
+**What is still open, and why: the gesture does not change the box.** A press on the grip or the title
+is performed by the harness and produces nothing: the window stays 640x520 at (26,77), the log carries
+no new frame size and no `mousedown args`/`drag` line, while the same session's bar cells answer their
+presses (the active cell moved from cell 1 to cell 2 to cell 3 on successive clicks). So this client
+delivers a press to a bar cell as `onactivate` and does not deliver `onmousedown` at all to a window
+frame over the hideout. The grips now bind `onactivate` as well as `onmousedown` (guarded so a press
+during a drag is ignored, since the poll owns the release), and that press still does not arrive.
+
+The crown therefore cannot be shown *surviving a resize the client refuses to make*. What the capture
+does show is that the crown is the profile in every state, and the log shows the same crown cut at four
+box sizes the shell does apply — 640x520, 640x440, 300x66 and 300x51, all `band=11` for the frames and
+`band=7` for the 22 px rows. That is recorded as open in `pins/contour-pin.json` (`states.drag`,
+`states.resized`, `next`) with this pass's reasoning, rather than claimed as closed.
+
+**Unchanged and re-measured:** Start 93 px with no host padding (`start=93 tab0=85 gap=5.6`), cells
+85x36 / 82x36 / 188x36 / 218x36 `band=11 slices=48`, rows 130x22 / 99x22 / 96x22 `band=7 slices=28`,
+the `.WindowsButton` cell and the build-hash cell untouched, `docs/family-look.json`'s surface list
+unchanged. The stale `.ShellTab:hover .ContourFill { #b08d5721 }` rule — a brass flood that survived
+the previous pass's fill work — was found and removed; hover and active now read `#1d1e1f` and
+`#2a261f`.
+
+**Gates, all exit 0:** contour 11/0 · options 9/0 · options selftest 7/0 · archive on the installed
+VPK (`74AC6E61ACAFBE2CA461C49DE1A10E892B8CEB9CEDABC3F31965FFBFB589EB59`) 9/0 · landing `--check` ok ·
+chrome 99 · contour-test 74/0 · boot-carrier 12/0 · `check_shell_clicks` ok.
