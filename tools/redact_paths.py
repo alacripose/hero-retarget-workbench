@@ -155,9 +155,10 @@ def ensure_os_import(text: str) -> tuple[str, int]:
     return "".join(lines), 1
 
 
-def run(apply: bool, records: bool, code: bool) -> int:
+def run(apply: bool, records: bool, code: bool, all_files: bool = False) -> int:
     changed: list[tuple[str, int, str]] = []
-    for name in git("ls-files").splitlines():
+    listing = git("ls-files", "--cached", "--others", "--exclude-standard") if all_files else git("ls-files")
+    for name in dict.fromkeys(listing.splitlines()):
         path = ROOT / name
         if not path.is_file():
             continue
@@ -199,10 +200,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--apply", action="store_true", help="rewrite the tracked files")
     parser.add_argument("--records", action="store_true", help="records only")
     parser.add_argument("--code", action="store_true", help="Python only")
+    parser.add_argument("--all-files", action="store_true", help="include untracked files")
     arguments = parser.parse_args(argv)
     records = arguments.records or not arguments.code
     code = arguments.code or not arguments.records
-    return run(apply=arguments.apply, records=records, code=code)
+    return run(apply=arguments.apply, records=records, code=code, all_files=arguments.all_files)
 
 
 if __name__ == "__main__":
