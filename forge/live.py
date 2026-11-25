@@ -72,6 +72,46 @@ def _display_name(value: str) -> str:
 _VERSION_TOKEN = re.compile(r"^(?:v\d+|\d+)$")
 
 
+def _model_key(value: str) -> str:
+    """A model path without its compiled marker or extension, for comparison."""
+    text = str(value or "").replace("\\", "/").strip().lower()
+    if text.endswith("_c"):
+        text = text[:-2]
+    if text.endswith(".vmdl"):
+        text = text[:-5]
+    return text
+
+
+def _looks_like_model_path(value: str) -> bool:
+    text = str(value or "").replace("\\", "/").strip().lower()
+    return "/" in text or text.endswith((".vmdl", ".vmdl_c"))
+
+
+def _compiled_model_path(value: str) -> str:
+    text = str(value or "").replace("\\", "/").strip()
+    if text.lower().endswith(".vmdl"):
+        return text + "_c"
+    if text.lower().endswith("_c"):
+        return text
+    return text + ".vmdl_c"
+
+
+def _path_tokens(value: str) -> frozenset[str]:
+    """The hero identity tokens of a slug or a model path.
+
+    ``models/heroes_staging/nano/nano_v2/nano.vmdl_c`` reduces to ``{"nano"}``: the vmdl stem
+    carries the hero name and the parent folder carries its version, and neither the container
+    folders (``models``, ``heroes_staging``) nor a version suffix belongs to the identity.
+    """
+    parts = [part for part in str(value or "").replace("\\", "/").split("/") if part]
+    if not parts:
+        return frozenset()
+    tokens = set(_base_tokens(parts[-1].split(".")[0]))
+    if len(parts) > 1:
+        tokens |= _base_tokens(parts[-2])
+    return frozenset(tokens - {"models", "heroes", "staging", "wip", "vmdl", "c"})
+
+
 def _base_tokens(value: str) -> frozenset[str]:
     """The identity tokens of a slug or a model stem, without a version suffix.
 
@@ -110,17 +150,28 @@ def resolve_hero(
     exact = next((item for item in heroes if item.slug.lower() == wanted.lower()), None)
     if exact is not None:
         return exact, ""
-    wanted_base = _base_tokens(wanted)
+    by_model = next(
+        (item for item in heroes if _model_key(item.model_path) == _model_key(wanted)), None
+    )
+    if by_model is not None:
+        return by_model, f"roster-miss:{wanted}->{by_model.slug}:model-path"
+    wanted_tokens = _path_tokens(wanted)
     family = []
     for item in heroes:
-        hero_base = _base_tokens(item.slug) | _base_tokens(Path(item.model_path).parent.name)
-        if wanted_base and wanted_base <= hero_base:
-            family.append(item)
-        elif wanted_base and hero_base and wanted_base == hero_base:
+        hero_tokens = _base_tokens(item.slug) | _path_tokens(item.model_path)
+        if wanted_tokens and hero_tokens and (
+            wanted_tokens <= hero_tokens or wanted_tokens == hero_tokens
+        ):
             family.append(item)
     if family:
         best = sorted(family, key=lambda item: (len(item.model_path), item.slug.lower()))[0]
         return best, f"roster-miss:{wanted}->{best.slug}"
+    # The picker stores a model path, not the roster's enum value, and the build may still ship that
+    # very model (nano_v2 beside nano_v3). Use it as the live model rather than refusing.
+    if _looks_like_model_path(wanted):
+        model = _compiled_model_path(wanted)
+        name = model.rsplit("/", 1)[-1].split(".")[0]
+        return Hero(name, model, _display_name(name)), f"roster-miss:{wanted}:live-model"
     hint = (model_hint or "").replace("\\", "/").strip()
     if hint.lower().endswith(".vmdl"):
         hint = hint[:-len(".vmdl")] + ".vmdl_c"

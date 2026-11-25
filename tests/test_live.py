@@ -48,6 +48,30 @@ class HeroRosterTests(unittest.TestCase):
         self.assertIsNone(hero)
         self.assertEqual(note, "roster-miss:ghost:no-model")
 
+    def test_the_picker_stores_a_model_path_not_a_slug(self):
+        """`hero_slug` holds a model path, so a path must resolve; this is the real error text.
+
+        "Live hero models/heroes_staging/nano/nano_v2/nano.vmdl_c is no longer in the roster"
+        comes from this variable holding a path and the lookup comparing it to `hero.slug`.
+        """
+        heroes = [
+            Hero("nano", "models/heroes_staging/nano/nano_v3/nano.vmdl_c", "Nano"),
+            Hero("bebop", "models/heroes_staging/bebop/bebop.vmdl_c", "Bebop"),
+        ]
+        hero, note = resolve_hero(heroes, "models/heroes_staging/nano/nano_v2/nano.vmdl_c")
+        self.assertIs(hero, heroes[0])
+        self.assertTrue(note.endswith("->nano"), note)
+
+        hero, note = resolve_hero(heroes, "models\\heroes_staging\\bebop\\bebop.vmdl_c")
+        self.assertIs(hero, heroes[1])
+        self.assertIn("model-path", note)
+
+        # A model the table does not name at all is still a live model to extract.
+        hero, note = resolve_hero(heroes, "models/heroes_staging/calico/calico_v2/calico.vmdl_c")
+        self.assertIsNotNone(hero)
+        self.assertTrue(hero.model_path.endswith("calico.vmdl_c"))
+        self.assertEqual(note, "roster-miss:models/heroes_staging/calico/calico_v2/calico.vmdl_c:live-model")
+
     def test_reads_every_top_level_hero_and_keeps_wip_paths(self):
         text = """
 {
