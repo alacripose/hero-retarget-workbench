@@ -1,0 +1,5 @@
+-r requirements.txt
+
+# Test-only: three suite modules (test_scout.py, test_scout_graph.py, test_port_skeleton.py)
+# are pytest-style. The addon itself never imports pytest, so this file is not what Blender needs.
+pytest==9.1.1
