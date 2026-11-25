@@ -77,3 +77,64 @@ atually fucking see the things that happened per diff in each project?"*.
   visible to either, so this section is the part a session is asked to read.
 - **The probe.** Soul Lens data/probes/2026-11-22-heredoc-code-authoring.md, with the record
   line in that project's logs/records.md.
+
+## 2026-11-23 — every tool carries a Popit UI, and its probe reads that surface
+
+Owner instruction, verbatim: *"you will have to create popit uis for the tools that you make this is a new
+requiremnt for the probes that you use to work"*.
+
+- **The rule.** A tool here is not finished when its Python runs. It ships a **Popit** surface, and its
+  `probe` subcommand reads that surface over loopback HTTP: the page and the served report are checked
+  together. A probe that only prints a pass is refused, because a print can say pass while the surface the
+  owner would read shows nothing.
+- **The contract a probe enforces.** `tools/scout_update.py probe` starts the tool's own server, fetches `/`
+  and `/report.json`, and fails by name unless the page carries `data-popit="scout-update"`,
+  `id="port-state"`, `id="drift-table"`, `id="graph-clips"`, `id="sequence-coverage"`, and the report carries
+  its schema and named check rows. The receipt is `artifacts/receipts/scout-update-popit.json`.
+- **The register.** `tools/scout_ui/` uses the family web-dark tokens (ground `#0c0e11`, one gold attention
+  `#f0c454`, square data surfaces, Archivo + IBM Plex Mono, the square-in-square mark). Every colour that
+  carries a state sits beside the word for that state, and a refusal shows its code and the path searched.
+- **Why it is a rule and not a preference.** The first Scout report this session was correct in the terminal
+  and the tool had no surface at all; without a page the owner cannot see the reading, and a probe cannot
+  tell a rendered reading from a printed one. The current slice: report, Stage, bind, animgraph and probe
+  all read through the same surface; see `TICKET-0037` and `data/probes/2026-11-23-scout-port-popit.md`.
+- **A live hero graph is fused, and a file beside it compiles nothing.** The live build's
+  `animgraphs/animgraph2/hero/*.vnmgraph` decompile as one `CNmGraphDocument` holding every hero: each
+  animation-pose node carries `m_overrides` (one `{ m_variationID, m_pData { m_clip } }` per hero) and the
+  document keeps `m_variationHierarchy.m_variations`. A new hero is one override per pose node **plus** one
+  hierarchy entry; dropping `hero_aim.vnmgraph+<hero>.vnmgraph` in beside the base compiles the other 142
+  and silently omits the new one, and the compiler refuses a `+` file as input outright. See
+  `data/probes/2026-11-23-scout-port-bake.md`.
+- **Compile receipts must look where the compiler writes.** `resourcecompiler` writes compiled output under
+  `<game>/citadel_addons/…`, not beside the source; a receipt that checks only beside the source reports a
+  pass as a failure, and one that trusts the exit code alone misses the missing artifact.
+- **What it does not decide.** A Popit surface grants no claim about the mod: the Scout port's hero binding
+  and its 24 unbound graph sequences are refusals on that page (`hero-not-declared`,
+  `animgraph-sequence-unbound`), not values it filled in.
+
+## 2026-11-25 — the live roster is a picker, never an allowlist
+
+**Owner instruction, verbatim:** *"the mod updater should never prevent something from being worked on
+just because an agent handrolled a set list of things allowed to be worked on. nano is still in the live
+game but it doesn't matter because the workbench is not to restrict this stuff."*
+
+- **A roster miss was a refusal on three call sites.** `operators.DMF_OT_update_old_addon` raised
+  `Live hero {slug} is no longer in the roster` (this is the error the owner hit: an old package naming
+  `models/heroes_staging/nano/nano_v2/nano.vmdl_c` on Live 6868 / CSDK 6836), and `pipeline_ops`
+  raised `Hero {slug} is not in the live roster` for both Analyze and Update to latest. The roster is
+  `forge.live.list_heroes`, read from one build's `scripts/heroes.vdata`; it names what the picker shows,
+  not what the workbench may work on.
+- **`forge.live.resolve_hero(heroes, slug, model_hint=...)` resolves instead of refusing.** It returns
+  `(Hero | None, note)`: an exact slug, then the same hero family compared on identity tokens with
+  version suffixes removed (`nano_v2` and `nano_v3` reduce to `{"nano"}`; `nano` never matches
+  `nanobot`), then the model the package itself names, then `None`. `forge.migrate.update_from_package`
+  already accepts `hero=None` and keeps the package's own body, so the last rung is a working rung, not
+  a dead end. The three call sites show the note in job progress.
+- **Do not reintroduce a hand-written allowlist on this path.** A slug the live table does not name is a
+  note (`roster-miss:<slug>-><slug>`, `…:package-model`, `…:no-model`), and the test
+  `tests/test_live.py::HeroRosterTests::test_a_roster_miss_is_a_note_not_a_refusal` holds all four rungs.
+  Probe: `data/probes/2026-11-25-roster-is-not-an-allowlist.md`.
+- **Not checked by this pass:** the owner's GUI click through Import & update old addon in Blender; the
+  resolver, the call sites and migration's `hero=None` contract are what was measured. `pytest -q tests`
+  is 414 passed, 1 failed (`test_scout_port_app` live-image check, a different unit), and
+  `tools/project.py gate` still reports its existing 71 addon-boundary refusals.

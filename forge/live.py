@@ -69,6 +69,66 @@ def _display_name(value: str) -> str:
     return " ".join(word.capitalize() for word in words)
 
 
+_VERSION_TOKEN = re.compile(r"^(?:v\d+|\d+)$")
+
+
+def _base_tokens(value: str) -> frozenset[str]:
+    """The identity tokens of a slug or a model stem, without a version suffix.
+
+    ``nano_v2`` and ``nano_v3`` both reduce to ``{"nano"}`` so a build that re-versioned a
+    hero still resolves to that hero's live entry. A version token is ``v2``/``v3``/``4``;
+    the rest of the name is kept, so ``nano`` never matches ``nanobot``.
+    """
+    tokens = [token for token in re.split(r"[^a-z0-9]+", value.lower()) if token]
+    return frozenset(token for token in tokens if not _VERSION_TOKEN.match(token))
+
+
+def resolve_hero(
+    heroes: list[Hero],
+    slug: str,
+    *,
+    model_hint: str = "",
+) -> tuple[Hero | None, str]:
+    """The hero the work targets, with a roster miss recorded as a note, never a refusal.
+
+    The live roster read from ``scripts/heroes.vdata`` is the picker's list; it is not an
+    allowlist of what the workbench may work on. A build that renames or re-versioned a
+    hero (an old package naming ``models/heroes_staging/nano/nano_v2/nano.vmdl_c`` while
+    the table moved on) must still update, so a miss falls back in this order:
+
+    1. a roster entry for the same hero family (the slug is a token of the model path, or
+       the slug starts with the wanted name: ``nano`` finds ``nano_v3``);
+    2. the model the package itself names (``model_hint``), read as a live model path;
+    3. ``None`` — and ``migrate.update_from_package`` already accepts ``hero=None`` and
+       keeps the old body, so the work proceeds on the package's own model.
+
+    The returned note names the rung that was used, and is ``""`` for an exact match.
+    """
+    wanted = (slug or "").strip()
+    if not wanted:
+        return None, "roster-miss:blank-slug"
+    exact = next((item for item in heroes if item.slug.lower() == wanted.lower()), None)
+    if exact is not None:
+        return exact, ""
+    wanted_base = _base_tokens(wanted)
+    family = []
+    for item in heroes:
+        hero_base = _base_tokens(item.slug) | _base_tokens(Path(item.model_path).parent.name)
+        if wanted_base and wanted_base <= hero_base:
+            family.append(item)
+        elif wanted_base and hero_base and wanted_base == hero_base:
+            family.append(item)
+    if family:
+        best = sorted(family, key=lambda item: (len(item.model_path), item.slug.lower()))[0]
+        return best, f"roster-miss:{wanted}->{best.slug}"
+    hint = (model_hint or "").replace("\\", "/").strip()
+    if hint.lower().endswith(".vmdl"):
+        hint = hint[:-len(".vmdl")] + ".vmdl_c"
+    if hint.lower().endswith("_c"):
+        return Hero(wanted, hint, _display_name(wanted)), f"roster-miss:{wanted}:package-model"
+    return None, f"roster-miss:{wanted}:no-model"
+
+
 def parse_hero_roster(text: str) -> list[Hero]:
     """Read every top-level hero entry from Source 2 Viewer's decompiled roster.
 

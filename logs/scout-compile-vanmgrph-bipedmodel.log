@@ -1,0 +1,19 @@
+Bad KV3 data for resource: Unable to determine buffer encoding.
+WARNING: Failed to parse class 'AE_FOOTSTEP'.
+WARNING: Unable to load the FGD file 'models_gamedata.fgd'.
+Bad KV3 data for resource: Unable to determine buffer encoding.
+Couldn't load KV3 for resource: surfaceproperties/surfaceproperties.vsurfBad KV3 data for resource: Unable to determine buffer encoding.
+Bad KV3 data for resource: Unable to determine buffer encoding.
+Bad KV3 data for resource: Unable to determine buffer encoding.
+WARNING: Failed to parse class 'AE_FOOTSTEP'.
+WARNING: Unable to load the FGD file 'models_gamedata.fgd'.
+- citadel_addons\scout_animgraph\animgraphs\biped_standard.vanmgrph
+File "c:\users\ala\downloads\reduced_csdk_13\content\citadel_addons\scout_animgraph\models\biped_standard\biped_standard.vmdl" doesn't exist!
+LoadModelSyncNoExtrefs - Load & compile failed.
+ERROR: Failed to load Model models/biped_standard/biped_standard.vmdl, which is required by AnimGraph animgraphs/biped_standard.vanmgrph
+
+Warning! Above error(s) will cause failed resource compile!
+                                                                      [FAIL]
+-----------------------------------------------------------------
+ ERROR: 0 compiled, 1 failed, 0 skipped, 0m:00s
+-----------------------------------------------------------------

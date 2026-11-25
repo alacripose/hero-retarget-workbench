@@ -1,0 +1,4 @@
+$ artifacts\dota-tools\game\bin\win64\resourcecompiler.exe -nop4 -f -game D:\SteamLibrary\steamapps\common\Deadlock\game\citadel -i scout_loco.vanmgrph
+
+WARNING: Local content might be corrupt or missing files
+Failed to read 1437209140 bytes

@@ -19,7 +19,7 @@ if (_PACKAGE / "_vendor").is_dir() and str(_PACKAGE / "_vendor") not in sys.path
 bl_info = {
     "name": "Hero Retarget Workbench",
     "author": "ala",
-    "version": (0, 22, 9),
+    "version": (0, 22, 10),
     "blender": (5, 4, 0),
     "location": "Workbench editor or View3D > Sidebar > Deadlock",
     "description": "Fit a custom model to a live Deadlock hero, then ship it as a CSDK13 addon",

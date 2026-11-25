@@ -1,0 +1,19 @@
+Bad KV3 data for resource: Unable to determine buffer encoding.
+WARNING: Failed to parse class 'AE_FOOTSTEP'.
+WARNING: Unable to load the FGD file 'models_gamedata.fgd'.
+Bad KV3 data for resource: Unable to determine buffer encoding.
+Couldn't load KV3 for resource: surfaceproperties/surfaceproperties.vsurfBad KV3 data for resource: Unable to determine buffer encoding.
+Bad KV3 data for resource: Unable to determine buffer encoding.
+Bad KV3 data for resource: Unable to determine buffer encoding.
+WARNING: Failed to parse class 'AE_FOOTSTEP'.
+WARNING: Unable to load the FGD file 'models_gamedata.fgd'.
+- citadel_addons\scout_animgraph\animgraphs\biped_standard.vanmgrph
+- citadel_addons\scout_animgraph\models\biped_standard\biped_standard.vmdl
+Bad KV3 data for 'materials/dev/gray_50.vmat': Unable to determine buffer encoding.
+resourcecompiler: Could not find material data for "unnamed_1"!
+: Sequence: Cannot find sequence "crouch_runn"
+
+Sequence: Cannot find sequence "crouch_runn"
+-----------------------------------------------------------------
+ OK: 1 compiled, 0 failed, 0 skipped, 0m:01s
+-----------------------------------------------------------------

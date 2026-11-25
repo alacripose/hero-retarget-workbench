@@ -1,0 +1,45 @@
+{
+  "schema": "cua.corpus.ingest-profile/2",
+  "name": "family-prose-2026-11-24",
+  "roots": [
+    "/srv/ingest/family-prose"
+  ],
+  "root_project": "family-prose",
+  "include_suffixes": [
+    ".md",
+    ".txt",
+    ".json",
+    ".jsonl",
+    ".py",
+    ".rs",
+    ".js",
+    ".mjs",
+    ".ts",
+    ".tsx",
+    ".html",
+    ".css",
+    ".toml",
+    ".yaml",
+    ".yml"
+  ],
+  "skip_dirs": [
+    ".git",
+    "node_modules",
+    "target",
+    "build",
+    "dist",
+    "obj",
+    "bin",
+    "__pycache__",
+    ".cache",
+    ".venv",
+    "venv",
+    "coverage",
+    ".next",
+    "injest",
+    "store",
+    "session-archive"
+  ],
+  "max_body_bytes": 32000000,
+  "note": "Family prose and its generated prose-logic views. Claim rules and source quotes stay verbatim."
+}

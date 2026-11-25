@@ -1,0 +1,18 @@
+ILocalize::AddFile() failed to load file "resource/valve_english.txt".
+ILocalize::AddFile() failed to load file "resource/countries_english.txt".
+Error loading resource file "materials/error.vmat_c" (Error: ERROR_FILEOPEN: File not found)
+Unable to find fgd file models_gamedata.fgd!
+WARNING: Unable to load the FGD file 'models_gamedata.fgd'.
+WARNING: File might be corrupt or missing - 'soundstacks/sosstrings.txt'
+Error loading resource file "surfaceproperties/surfaceproperties.vsurf_c" (Error: ERROR_FILEOPEN: File not found)
+CompileScript failed, script not found: scripts/vscripts/animationsystem/animationsysteminit
+Failed to run initial animationsystem script
+CompileScript failed: Script not found: scripts/vscripts/modelprocessing/modelprocessinginit
+VSCRIPT: Failed to run initialization script: modelprocessing/modelprocessinginit
+Unable to find fgd file models_gamedata.fgd!
+WARNING: Unable to load the FGD file 'models_gamedata.fgd'.
+FS:  Tried to FileExists NULL filename!
+File "" doesn't exist!
+-----------------------------------------------------------------
+ ERROR: 0 compiled, 1 failed, 0 skipped, 0m:01s
+-----------------------------------------------------------------

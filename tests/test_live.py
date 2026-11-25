@@ -10,11 +10,44 @@ from forge.live import (
     looks_like_body,
     parse_hero_roster,
     parse_model_listing,
+    resolve_hero,
     roster_for_models,
 )
 
 
 class HeroRosterTests(unittest.TestCase):
+    def test_a_roster_miss_is_a_note_not_a_refusal(self):
+        """An old package naming a retired model still has a hero to work on.
+
+        The failure this covers: the updater refused with "Live hero\n        models/heroes_staging/nano/nano_v2/nano.vmdl_c is no longer in the roster"
+        and nothing could be updated. Nano is still in the live game; the table had
+        simply moved on from nano_v2, and the roster is a picker, not an allowlist.
+        """
+        heroes = [
+            Hero("nano", "models/heroes_staging/nano/nano_v3/nano.vmdl_c", "Nano"),
+            Hero("bebop", "models/heroes_staging/bebop/bebop.vmdl_c", "Bebop"),
+        ]
+        hero, note = resolve_hero(heroes, "bebop")
+        self.assertIs(hero, heroes[1])
+        self.assertEqual(note, "")
+
+        hero, note = resolve_hero(heroes, "nano_v2")
+        self.assertIs(hero, heroes[0])
+        self.assertEqual(note, "roster-miss:nano_v2->nano")
+
+        hero, note = resolve_hero(
+            heroes,
+            "calico",
+            model_hint="models/heroes_staging/calico/calico_v2/calico.vmdl_c",
+        )
+        self.assertIsNotNone(hero)
+        self.assertTrue(hero.model_path.endswith("calico.vmdl_c"))
+        self.assertEqual(note, "roster-miss:calico:package-model")
+
+        hero, note = resolve_hero(heroes, "ghost")
+        self.assertIsNone(hero)
+        self.assertEqual(note, "roster-miss:ghost:no-model")
+
     def test_reads_every_top_level_hero_and_keeps_wip_paths(self):
         text = """
 {

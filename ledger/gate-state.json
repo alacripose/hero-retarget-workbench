@@ -1,8 +1,8 @@
 {
   "unit tests": "pass",
   "python compileall": "pass",
-  "no KV3 parser in source": "pass",
-  "no vmdl writes in forge": "pass",
+  "no KV3 parser in source": "fail",
+  "no vmdl writes in forge": "fail",
   "blake3 dependency": "pass",
   "no effort caveats": "pass",
   "effort refusal selftest": "pass",

@@ -602,9 +602,10 @@ class DMF_OT_analyze_mod(Operator):
         def work(progress):
             progress(0.03, "reading the live hero roster")
             heroes = module["live"].list_heroes(env)
-            hero = next((item for item in heroes if item.slug.lower() == hero_slug.lower()), None)
-            if hero is None:
-                raise RuntimeError(f"Hero {hero_slug} is not in the live roster")
+            # A roster miss is a note, not a refusal (forge.live.resolve_hero).
+            hero, roster_note = module["live"].resolve_hero(heroes, hero_slug)
+            if roster_note:
+                progress(0.06, roster_note)
             progress(0.2, "resolving both models")
             return module["migrate"].analyze_package(
                 env,
@@ -706,9 +707,12 @@ class DMF_OT_port_mod(Operator):
         def work(progress):
             progress(0.05, "reading the live hero roster")
             heroes = module["live"].list_heroes(env)
-            hero = next((item for item in heroes if item.slug.lower() == hero_slug.lower()), None)
-            if hero is None:
-                raise RuntimeError(f"Hero {hero_slug} is not in the live roster")
+            # A roster miss is a note, not a refusal (forge.live.resolve_hero).
+            hero, roster_note = module["live"].resolve_hero(
+                heroes, hero_slug, model_hint=(old_vmdl or "")
+            )
+            if roster_note:
+                progress(0.06, roster_note)
             progress(0.2, "extracting and migrating")
             result = module["migrate"].update_from_package(
                 env,

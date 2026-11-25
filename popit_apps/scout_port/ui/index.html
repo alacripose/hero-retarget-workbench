@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" data-popit="scout-port">
+<head>
+  <meta charset="utf-8">
+  <title>Scout Port</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="plate">
+    <div class="mark"><span></span><span></span></div>
+    <div>
+      <h1>Scout Port</h1>
+      <p id="port-state" class="mono">reading the port…</p>
+    </div>
+    <button id="refresh" type="button">Read again</button>
+  </header>
+
+  <section class="facts" id="counts" aria-label="Counts"></section>
+
+  <section aria-label="Steps">
+    <h2>Build steps</h2>
+    <table id="step-table">
+      <thead>
+        <tr><th>Step</th><th>State</th><th>Reading</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section aria-label="Superseded">
+    <h2>Kept, not counted</h2>
+    <ul id="superseded"></ul>
+  </section>
+
+  <footer class="mono" id="foot">Popit-shell application · Deadlock Model Forge</footer>
+  <script src="app.js"></script>
+</body>
+</html>

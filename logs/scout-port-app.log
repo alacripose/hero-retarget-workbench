@@ -1,0 +1,14 @@
+scout-port serving http://127.0.0.1:8795/
+  workspace F:\Documents
+scout-port: "GET /api/state HTTP/1.1" 200 -
+scout-port: "GET / HTTP/1.1" 200 -
+scout-port: "GET / HTTP/1.1" 200 -
+scout-port: "GET / HTTP/1.1" 200 -
+scout-port: "GET /style.css HTTP/1.1" 200 -
+scout-port: "GET /app.js HTTP/1.1" 200 -
+scout-port: "GET /api/state HTTP/1.1" 200 -
+scout-port: "GET /api/state HTTP/1.1" 200 -
+scout-port: "GET / HTTP/1.1" 200 -
+scout-port: "GET /style.css HTTP/1.1" 200 -
+scout-port: "GET /app.js HTTP/1.1" 200 -
+scout-port: "GET /api/state HTTP/1.1" 200 -

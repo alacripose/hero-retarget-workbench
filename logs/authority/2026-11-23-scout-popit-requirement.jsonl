@@ -1,0 +1,1 @@
+{"at": "2026-11-24T00:04:33+00:00", "kind": "owner-instruction", "quote": "you will have to create popit uis for the tools that you make this is a new requiremnt for the probes that you use to work", "scope": "every tool added to this repository ships a Popit surface and its probe reads it", "ticket": "tickets/TICKET-0037-scout-port-live-update-and-popit-animgraph.md"}

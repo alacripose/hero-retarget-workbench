@@ -1,0 +1,10 @@
+[1795388375] rust-search: installed 
+[1795388379] rtaskmgr-win32: installed 
+[1795388386] topbar: installed 
+[1795388405] wiztree: installed restore point was not created: powershell -NoProfile -Command Checkpoint-Computer -Description 'Plugin Launcher' -RestorePointType MODIFY_SETTINGS: Checkpoint-Computer : This command cannot be run due to the following error: the service cannot be started because it 
+is disabled or does not have enabled devices associated with it.
+At line:1 char:1
++ Checkpoint-Computer -Description 'Plugin Launcher' -RestorePointType  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [Checkpoint-Computer], ArgumentException
+    + FullyQualifiedErrorId : ServiceDisabled,Microsoft.PowerShell.Commands.CheckpointComputerCommand

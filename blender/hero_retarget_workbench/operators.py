@@ -1646,9 +1646,16 @@ class DMF_OT_update_old_addon(Operator):
             def work(progress):
                 progress(0.05, "reading live hero roster")
                 heroes = module["live"].list_heroes(env)
-                hero = next((item for item in heroes if item.slug == hero_slug), None)
-                if hero is None:
-                    raise RuntimeError(f"Live hero {hero_slug} is no longer in the roster")
+                # The roster is the picker's list, not an allowlist of what may be worked on.
+                # An old package whose build named `nano_v2` still updates when the live table
+                # has moved on: a miss resolves to the same family, then to the package's own
+                # model, and `migrate.update_from_package` accepts `hero=None`. A roster miss is
+                # a note in the job progress, never a refusal.
+                hero, roster_note = module["live"].resolve_hero(
+                    heroes, hero_slug, model_hint=(settings.update_old_vmdl or "")
+                )
+                if roster_note:
+                    progress(0.06, roster_note)
                 progress(0.2, "extracting old addon and live hero")
                 result = module["migrate"].update_from_package(
                     env,

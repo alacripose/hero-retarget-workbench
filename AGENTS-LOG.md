@@ -3963,3 +3963,371 @@ checks catch the case where the heredoc is written into a file and committed.
 **Where the probe is.** `soul-lens/data/probes/2026-11-22-heredoc-code-authoring.md`, with the record line in
 `soul-lens/logs/records.md`. It is outside this repository on purpose: the failure happened in that project, and
 the probe is read next to that project's diff.
+
+## 2026-11-24 — 2026-11-23 — the Scout port reads both graph schemas, and every tool now carries a Popit surface
+
+# 2026-11-23 — the Scout port reads its own build, and its tool has a Popit surface
+
+## The requirement this obeys
+
+The owner's instruction, verbatim:
+
+> you will have to create popit uis for the tools that you make this is a new requiremnt for the probes that
+> you use to work
+
+So a tool is not finished when its Python runs. It is finished when the probe reads the tool's **Popit
+surface** and the surface carries the reading the same run produced. `tools/scout_update.py probe` starts
+the tool's own server, fetches `/` and `/report.json` over loopback HTTP, and refuses unless the page
+carries `data-popit="scout-update"`, `id="port-state"`, `id="drift-table"`, `id="graph-clips"` and the
+served report's own schema and check rows.
+
+## What the probe attempted
+
+| Step | Command | What it reads |
+|---|---|---|
+| Dota tools into the workspace | `python tools/scout_update.py extract-dota --zip "F:/Downloaded Files/dota-0423lite_ship.zip" --out artifacts/dota-tools` | only `content/dota_addons/animgraph/` and `game/bin/win64/resourcecompiler.exe` |
+| The port and its scripts | `python tools/scout_update.py report --workspace F:/Documents --game D:/SteamLibrary/steamapps/common/Deadlock --live-heroes <extracted> --dota-tools artifacts/dota-tools --graph <template>` | TF2 Scout sources, the port's `heroes.vdata`, the live roster, the Dota graph |
+| The graph retarget | `python tools/scout_update.py animgraph --template … --skeleton <port skeleton> --variation Scout --out artifacts/scout-update/animgraph/hero.vnmgraph+scout.vnmgraph` | replaces `m_variationID` and `m_skeleton` only; node and clip counts must not move |
+| The surface | `python tools/scout_update.py probe …` | the Popit page and its `/report.json` |
+
+## What is measured, and what is refused
+
+- The port workspace is `F:/Documents`: `scout.qc`, `scout.mdl`, `scout_ANIM.mdl` and the SMD animation
+  folders, plus its own `heroes.vdata` (a snapshot of the roster, not a parse of it).
+- The Dota 2 tools tree is `dota-0423lite_ship.zip` on `F:`: 13,876 entries, 1,019,266,484 bytes, with
+  `content/dota_addons/animgraph/animgraphs/biped_standard.vanmgrph` (328,344 bytes) and a
+  `resourcecompiler.exe` under `game/bin/win64`. The extraction keeps `content/dota_addons/animgraph/`,
+  `game/bin/` and `game/dota/gameinfo.gi`: **278 files, 588,314,380 bytes**. `game/bin` is not optional —
+  the compiler is a `binlaunch` wrapper and `game/bin/win64/tools/animgraph_editor.dll` is the editor.
+- The live roster is read from the installed build's own `scripts/heroes.vdata` through Source 2 Viewer,
+  and the drift is reported per hero: **6 added, 2 gone, 13 moved** against the port's 63-entry snapshot.
+- The Dota graph reads as `animgraph19`: **164 nodes, 24 sequence names**. **0 of 24** have a source
+  animation in the port (TF2's `@…_corrective_animation` names do not match `walkn`, `crouch_walkne`).
+- The reduced CSDK13 cannot compile a graph: its `animationsystem.dll` is disabled and every attempt ends
+  `FS: Tried to FileExists NULL filename`. The Dota toolchain compiled `biped_standard.vanmgrph` to a
+  **62,191-byte** `.vanmgrph_c` once the graph's model sat under the addon root (`OK: 1 compiled`).
+- The port's hero binding is **not** recorded in the workspace's hero table: no entry names a Scout model.
+  The tool therefore takes `--hero` and refuses `hero-not-declared` rather than picking one. That refusal is
+  the finding, not a gap in the probe.
+
+## Why the probe is a page and not a print
+
+A print can say `pass` while the surface the owner would look at shows nothing, and that is how a tool ships
+with an unreadable state. The probe reads the rendered page's contract and the served JSON together, so a
+surface that stops rendering the drift table fails the probe by name.
+
+## Not checked
+
+- The compiled `.vnmgraph_c` in the live game (the compiler run is recorded separately, with its own return
+  code, and a compile that does not produce `_c` is a `fail`, never a pass).
+- The port in game. No launch was performed for this probe.
+
+## 2026-11-24 — 2026-11-23 — the Scout port measured: staged verbatim, 0/24 on both sides, and the Dota compiler builds the graph
+
+# 2026-11-23 — what the second pass actually measured on the Scout port
+
+The first record established the tool and its Popit surface. This one is the readings the tool produced
+against the machine, and the two refusals that are the real state of the port.
+
+## Staged, verbatim
+
+`python tools/scout_update.py stage --workspace F:/Documents --hero frank --graph <dota graph> --out artifacts/scout-update/stage`
+copied the port's own `heroes.vdata` (2,242,348 bytes, 63 hero entries) with `verbatim: true` and its BLAKE3
+`bf6147c3328a84af…` checked against the source after the copy. The staged graph is the Dota
+`biped_standard.vanmgrph` (`animgraph19`, 164 nodes, 24 sequence names), digest `c74bc274b9d2abb8…`.
+
+The hero was **declared** (`--hero frank`), not inferred: `frank` is the only hero model in the port
+workspace, and the staged manifest records that the port carries `frank.vmdl_c` and no source `.vmdl`
+(`"source": false`). The tool refuses `hero-not-declared` without that flag.
+
+## The join the bake needs, measured on both sides
+
+| Graph sequences | Against the port's animation SMDs | Against the live Frank clips |
+|---|---|---|
+| 24 (`walkn`, `crouch_walkne`, `turn_left_90`, `idle`, …) | **0 bound** (1,414 SMD, named `@…_corrective_animation`) | **0 bound** (132 animation DMX, named `weapon_run_n`, `aim_crouch`, …) |
+
+So the Dota graph's sequence names are neither the TF2 port's names nor Deadlock's own clip names. The bake is
+first an **authoring** task: the graph must name the clips the model actually declares, or the model must be
+given sequences with those names. The tool reports both sides and refuses `animgraph-sequence-unbound` instead
+of inventing a synonym table.
+
+## The compile chain, end to end
+
+- Port graph → Dota toolchain: `biped_standard.vanmgrph` → `biped_standard.vanmgrph_c`, **62,191 bytes**,
+  `OK: 1 compiled, 0 failed`, with the graph's own `biped_standard.vmdl` under the addon root
+  (`models/biped_standard/`) — the addon root is the content root the compiler resolves against.
+- Reduced CSDK13: every graph fails with `FS: Tried to FileExists NULL filename`; its `game/bin/win64` carries
+  `-animationsystem.dll` **disabled**. The owner's direction holds: the animgraph editor and its compiler come
+  from the Dota tools tree, not the reduced CSDK.
+- `game/bin` is load-bearing. Extracting only `content/dota_addons/animgraph/` leaves the compiler a
+  `binlaunch` wrapper with no `game/bin` above it; the extraction now keeps `game/bin/`, `game/dota/gameinfo.gi`
+  and the animgraph content (278 files, 588,314,380 bytes).
+
+## Not checked
+
+- The retarget of a Deadlock *variation* document: no verified DMX skeleton for Frank sits in the extraction
+  (S2V's model dump emitted 150 clips and no skeleton), so `animgraph` was not run against an invented path.
+- In game. No launch.
+
+## 2026-11-24 — 2026-11-23 — the bake lands: a Scout variation in the live aim graph, compiled 143 graphs
+
+# 2026-11-23 — the bake: a Scout variation in the hero aim graph, compiled
+
+The third pass. The port's hero table is on main, and the animations are in a graph the toolchain
+builds. What is **not** done is the clip data itself, and this record says exactly where that line is.
+
+## What the live build's graphs are
+
+`Source2Viewer-CLI -d` on `animgraphs/animgraph2/hero/hero.vnmgraph+frank.vnmgraph_c` (7,252 bytes
+compiled) gives a **fused** `CNmGraphDocument` (210,346 bytes of text): not a variation file beside a
+base, but one document holding every hero. `hero_aim.vnmgraph_c` (20,234 bytes) decompiles to
+**932,528 bytes** of the same, naming **140** heroes.
+
+Three schemas now, and each is what it says it is:
+
+| Schema | Header | Where |
+|---|---|---|
+| `animgraph19` | `format:animgraph19` | the Dota 2 tools branch (`content/dota_addons/animgraph/…/biped_standard.vanmgrph`) |
+| variation | `m_variationID` + `m_skeleton` as a resource | the Kelvin document in the port workspace |
+| `CNmGraphDocument` | `format:generic`, `m_pRootGraph` | **what the live build ships**, fused |
+
+## Why a file beside the base compiles nothing
+
+`hero_aim.vnmgraph+scout.vnmgraph` placed next to the base compiled **142** graphs and no Scout: the
+base's variation list is `m_variationHierarchy.m_variations` (`m_ID`, `m_parentID`, `m_skeleton`), and
+`+<hero>` files are *outputs*, not inputs. Likewise the compiler refuses a `+` file as input:
+`Non-fused-child compiles cannot contain fused delimiter '+'`.
+
+Adding a hero to the fused document is two edits, both mechanical and both checked here:
+
+1. **One override per animation-pose node.** Every pose node carries `m_overrides`, an array of
+   `{ m_variationID, m_pData { m_clip } }` — one entry per hero. The document has **18 pose nodes**,
+   all 18 with overrides; Scout got 18 cloned entries with its clip path moved to
+   `models/heroes_wip/frank/clips/`.
+2. **One entry in the variation hierarchy**, or the overrides are data no variation selects.
+
+Result: `hero_aim_scout.vnmgraph` (965,957 bytes) → **143 compiled, 0 failed**, and
+`hero_aim_scout.vnmgraph+scout.vnmgraph_c` (**5,475 bytes**) exists. Compile receipt:
+`artifacts/receipts/scout-variation-Scout.json`.
+
+## The other graph, from the Dota branch proper
+
+`scout_loco.vanmgrph` is the Dota `biped_standard` template with its 24 sequence slots renamed to the
+port's own `$sequence` names (**379** declared by the port's QC), bound to
+`models/heroes_wip/frank/frank.vmdl`, and compiled: **28,482 bytes**, 1 compiled, 0 failed, with
+`StrideR: Failed to find foot with name "Foot_Left"` on the way — the template's rig is not the hero's.
+
+Two things this cost, both learned the hard way and now refusal codes:
+
+- The Dota compiler **cannot read the live game's content**: `-game …/Deadlock/game/citadel` fails on
+  every document with `Failed to read 1437209140 bytes`. Compiling goes through a Citadel content tree
+  the compiler can read (`Reduced_CSDK_13`), with the graph's model under the addon root.
+- The compiler writes compiled output under `game/citadel_addons/…`, not beside the source; a receipt
+  that looks only beside the source reports a pass as a failure.
+
+## The line that is not crossed
+
+The 18 Scout override clips point at `models/heroes_wip/frank/clips/<name>.vnmclip`, files that do not
+exist yet, and the compiler does not check clip existence — so this is a **compiled graph whose Scout
+clips are named but absent**. Producing them is the remaining work:
+
+- Scout's animation source is 1,414 SMDs of TF2 `@…_corrective_animation` additive layers, against a
+  Frank skeleton they were never built for.
+- Frank's live clip set is 132 DMX; the graph's six aim poses use `aim_weapon_idle*` / `aim_crouch*`,
+  which exist.
+- So each Scout clip is: SMD → DMX on `frank.vnmskel` (rebased to the shipped joint order), then a
+  `.vnmclip` doc with `m_sourceFilename` at that DMX. `tools/clip_rebase_to_skeleton.py` and the DMX
+  tail tooling do the rebase step; the SMD→DMX conversion does not exist here yet.
+
+## Evidence
+
+- `artifacts/scout-update/animgraph/`: `hero_aim_scout.vnmgraph`, `hero_aim_scout.vnmgraph_c`,
+  `hero_aim_scout.vnmgraph+scout.vnmgraph_c`, `scout_loco.vanmgrph`, `scout_loco.vanmgrph_c`
+- `logs/scout-variation-hero_aim_scout.log` (143 compiled), `logs/scout-graph-scout_loco.log`
+- `artifacts/scout-update/live-graphs/` — the decompiled live base and Frank variation
+- `artifacts/receipts/scout-variation-Scout.json`, `scout-graph-scout_loco.json`,
+  `scout-animgraph-hero_aim.vnmgraph+scout.json`, `scout-update-hero-table.json`
+
+## Not checked
+
+- In game: nothing was launched.
+- The compiled variation was not loaded by the live build (no addon VPK exists on this machine to load
+  it from).
+- Clip playback: the referenced clips are absent, by design, and named in the receipt.
+
+## 2026-11-24 — the Scout clips exist, compile, and mount
+
+**Owner instruction, verbatim:** *"using the deadlock model forge and family evidence, I' like you to update the scout mod for deadlock on my p, and then bake his animations into a custom animgraph made from the dota 2 tool branch"* — with the clip-bake and packaging clause: *"report how many clips exist, how many the graphs reference, and reconcile any shortfall instead of quietly dropping slots… prove the references resolve to generated files that contain real keyframe content"*.
+
+- **The clips are real, and there are 36 of them.** `forge/clipbake.py` parses the port's SMDs and QC `$sequence` blocks; `tools/scout_clip_bake.py plan` reads both graphs and finds **36 references** (24 locomotion slots + 12 aim clip paths), **36 distinct** names, from **24** Scout sequences — `missing 0`, so nothing was dropped. `bake` writes 36 animation DMX (7,368,484 B) and 36 `.vnmclip` documents; `verify` reads every DMX back through `dmxconvert` and counts **520 animated quaternion channels over 39,962 samples**.
+- **Joints are bound by name.** 54 of the 76 SMD nodes map to 54 Frank joints through an explicit `BONE_MAP`; the 22 unmapped TF2-only nodes (`weapon_bone_*`, `medal_bone`, `mvm`, `effect_hand_L/R`, dogtag, pack and prop chains) are listed in the receipt and never forced onto a joint. Rotations convert SMD Euler radians to quaternions; positions keep the template's values because the rigs differ in bone length.
+- **The compiler's silence was the trap.** `-i` with a relative path answers `ERROR: 0 compiled, 0 failed, 0 skipped` — a green word, no output. With an absolute path from the content root, and with the decompiled `frank.vnmskel` and its `frank_skel.dmx` installed beside the clips, the skeleton compiles (`OK: 1 compiled`, 9,203 B) and **36/36 clips compile**, 36 distinct md5s, each decompiling to a `CNmClipDocument` that names its own DMX and `models/heroes_wip/frank/frank.vnmskel`. Both graphs then rebuild: `hero_aim_scout.vnmgraph` → **143 compiled, 0 failed** (142 variation outputs), `scout_loco.vanmgrph` → 28,481 B.
+- **The pack mounts.** `pack` writes a VPK version 2 by hand (the repo only had a reader) with the compiled graph, the Scout variation, the compiled skeleton, 36 compiled clips and the 36 DMX they sample: 76 entries, 7,597,467 B. `forge.oldmods.read_vpk` reads back 76/76 with no missing and no extra; Source 2 Viewer lists the tree and extracts the variation, which decompiles to a `CNmGraphDocument` naming `Scout` and 12 clip sources.
+- **Tools mode launches, and nothing was seen move.** `deadlock.exe` with the tools flags starts and stays resident at 2.9 GB; it writes no further output, and the on-disk `citadel/console.log` is from 2026-11-18, showing tools mode failing to compile a previous WIP hero's clips (`ERROR_COMPILEFAIL: Tools mode - tried to (re)compile an asset but failed`). The process was stopped. No Scout motion was observed: that needs a map session with the model spawned.
+- **One link stays named, not claimed.** The locomotion graph is `format:animgraph19`, so its 24 slots carry names, not clip paths, and an AG1 graph binds sequences through the model's own sequence table. The 24 names equal 24 generated clips exactly, but the model that would declare them was not rebuilt here.
+- **Evidence.** `python -m pytest -q` **391 passed** (384 + 7 new in `tests/test_scout_clip_bake.py`); `tools/scout_update.py probe` Popit **7/7**; `tools/agents_audit.py --index` 7/7; `tools/heredoc_audit.py` pass; receipts `artifacts/receipts/scout-clip-bake.json`, `scout-clip-verify.json`, `scout-vpk.json`; probe `data/probes/2026-11-24-scout-clip-bake.md`.
+- **Not checked.** No in-game visual, no runtime mount inside the game process, and the 22 unmapped TF2 nodes stay unmapped by design.
+
+## 2026-11-24 — the port is Scout's, and it has a Popit-shell application
+
+**Owner correction, verbatim:** *"I never said it had anything to do with mapping onto frank I said it had to use the deadlock model forge and create popit-shell applications for working with it"*.
+
+- **The frank binding is withdrawn as the plan.** The previous slice baked Scout's clips onto `models/heroes_wip/frank/frank.vnmskel` and added a Scout entry to the live hero table on top of that rig. That was an inference of mine, not the owner's instruction. Scout is the port's own hero, with its own skeleton and its own animations, and the surface for the work is a Popit-shell application. Nothing was deleted: the frank-bound clips and VPK stay, and the new application names them as superseded instead of counting them.
+- **A Popit-shell application now exists for the port.** `popit_apps/scout_port/` follows the shell's own pattern — one loopback `ThreadingHTTPServer`, no framework, one JSON API, a view that reads it — served on `127.0.0.1:8795` with `/`, `/api/state` and `/api/sequences`. Its counts come from `forge.scout`, so the page reads the port rather than repeating a number typed into it.
+- **It is registered in the shell.** `popit-shell/server.py`'s `tools()` gained a **Scout Port** row (overridable with `SCOUT_PORT_APP`), and the shell's own gate still reports **21 checks, 0 refusals**; the launcher import returns `['Scout Port', 'Session archive', 'Reload applications', 'Close the shell']`.
+- **The probe reads the surface, not a print.** `python popit_apps/scout_port/probe.py` starts the app's server on an ephemeral port, fetches `/` and `/api/state` over loopback, and reports **PASS (8/8)**: page served, `data-popit="scout-port"`, the four required ids, the state schema, six shaped steps, the skeleton refusal by name, counts agreeing with those steps, and the port read from disk (`F:\Documents`, 379 `$sequence` names, 1,414 animation SMD). Receipt `artifacts/receipts/scout-port-app-probe.json`.
+- **What the page refuses is the reading.** Steps: `inventory pass`, then `skeleton blocked (skeleton-not-built)`, `clips`, `graph`, `pack` blocked behind it, and `hero blocked (hero-not-registered)`. The port ships a Source 1 model and SMDs; a Deadlock hero needs a `.vnmskel` built from that rig, so every later step says so instead of baking onto a rig Scout does not have.
+- **Still open, named.** No Scout skeleton yet; no clip bake onto Scout's own rig; no animgraph of the port's own (`scout_loco.vanmgrph` was authored on the frank rig and is superseded with the rest); no in-game observation. The previously installed `scout_animgraph_dir.vpk` and the `hero_scout` localization keys are still on the machine and are listed in the probe note so the next pass can decide about them rather than discover them.
+- **Evidence.** `data/probes/2026-11-24-scout-port-popit-app.md`, `artifacts/receipts/scout-port-app-probe.json`, `popit_apps/scout_port/`, `F:/Documents/popit-shell/server.py`.
+- **Not checked.** The application's own window was not opened in the Qt shell; the surface was read over loopback and shown in the preview panel, not driven by hand.
+
+## 2026-11-24 — the skeleton and the first clips are Scout's own
+
+**The two refused steps are built.** The Scout Port application refused `skeleton-not-built` and everything behind it; both the skeleton and the first clips on it now exist, on the port's own rig.
+
+- **The block was one missing file.** `F:/Documents/scout_anims/ref.smd` carries the port's rig as Source 1 data: a `nodes` table of 78 names and parents, then one local position and Euler rotation per bone. `forge.portskel` transcribes that into a `DmeModel` skeleton DMX — joint names, order and rest transforms untouched, axis system `3/1/0` like the live skeletons — and writes a `CNmSkeletonDocument` over it with every bone in LOD 0 plus `FullBody` and `UpperBody` masks. No retarget, no bone map.
+- **The composition was checked before it was trusted.** Composing the SMD's local transforms parent-to-child with `R = Rz·Ry·Rx` puts the pelvis at y≈47.3 and the head at y≈73.5 with hips below the pelvis. That is the port's anatomy, so the SMD block is local and the writer mirrors it.
+- **Skeleton, measured.** 78 joints, root `bip_pelvis`; 43,236 B DMX, 5,559 B `.vnmskel`; compiled `OK: 1 compiled, 0 failed` into 7,187 B; decompiled back and matched **78/78 bones** with `m_sourceFilename = models/heroes_wip/scout/dmx/mesh/scout_skel.dmx`.
+- **Clips, measured.** `tools/scout_own_clips.py` bakes port sequences onto that skeleton by identity (the SMD node names *are* the joint names): 4 clips, 76/76 nodes resolved, 207,960 B of DMX, then **5/5 documents compiled** (skeleton + 4 clips, 4,080–4,099 B each) and **4 × 78 channels** verified against the 78 joints. `AttackStand_PRIMARY` (21 frames, 22 moving channels) and `PRIMARY_reload_loop` (20 frames, 28 moving) carry the motion; the two 2-frame aim-matrix clips are poses and the receipt says so.
+- **A trap worth keeping.** `dmxconvert` rejects a trailing comma after the last element of an `element_array` and reports it one element type down the stack as `Expecting element type, didn't find it!`. `write_clip_template` writes commas *between* channels, and `tests/test_port_skeleton.py` fails if one comes back.
+- **The application reads the new state.** Its clips step now reads the bake/compile receipt instead of a generic `ready`: probe **9/9**, skeleton pass, clips pass (`4 clips baked, 5/5 documents compiled, 2 carry motion`), steps passing 3.
+- **Still refused, by name.** The animgraph (the existing graphs reference the frank-bound clips and the live build reads AnimGraph 2), the pack, the hero, the model (the port has no mesh SMD; `ref.smd` has no `triangles`), and in-game observation. The steps report `ready`/`blocked` for those rather than claiming them.
+- **Evidence.** `data/probes/2026-11-24-scout-own-skeleton-and-clips.md`, `artifacts/receipts/scout-skeleton.json`, `artifacts/receipts/scout-own-clips.json`, `artifacts/scout-port-skel/`, `artifacts/scout-own-clips/`.
+- **Not checked.** No client was launched. Nothing was observed in a match.
+
+## 2026-11-24 — Scout's animgraph is authored, compiled and verified
+
+**The graph exists and compiles.** `tools/scout_graph.py` authors a new `CNmGraphDocument` from the schema the live documents carry, over the port's skeleton and the four port clips — no frank path in the document, its clips or its skeleton — and the citadel `resourcecompiler` compiles it with **0 failures** (5/5 documents, graph `scout.vnmgraph_c` 2,512 B).
+
+- **The schema was dumped before a line was written.** `tools/scout_graph.py schema` inventories the live `hero_aim.vnmgraph` (24 classes, 2,532 clip refs, 142 skeleton refs) and `hero.vnmgraph` (38 classes), and `forge.scoutgraph` copies those shapes: `CNmGraphDocument`/`CNmGraphDocFlowGraph` keys, `CNmGraphDocAnimationPoseNode` with `m_pDefaultVariationData` and the four fields after its overrides, `CNmGraphDocStateNode` with `m_pChildGraph` + `m_pSecondaryGraph`, `CNmGraphDocStateMachineGraph` with `m_graphType = "StateMachine"` and `m_entryStateID`, and the two conduits a machine carries.
+- **Five traps, each one an access violation with no message.** The kept probe `artifacts/scout-graph/bisect.py` found them by narrowing: (1) the hierarchy's root variation must be `Default`, because a root named `Scout` sends the compiler looking for `+scout.vnmgraph` and crashing; (2) a machine needs the **global transition conduit**, not just states and the entry conduit; (3) a state's second graph slot carries its `CNmGraphDocStateLayerDataNode` and is not optional; (4) a pose node carries `m_defaultResourceName`, `m_inputTimeRemapRange`, `m_fixedTimeValue`, `m_useFramesAsInput` past its overrides; (5) a Pose pin takes one connection and unreachable pose nodes are **pruned**, so aim poses wired into the root's result vanished from the compiled graph until each lived in a state of its own.
+- **The graph as built.** 35,702 B, 31 nodes, 4 clip references, **0 frank references**: motion states `state_Scout_Attack` (21 frames of `AttackStand_PRIMARY`) and `state_Scout_Reload` (20 frames of `PRIMARY_reload_loop`), and aim states `aim_state_Scout_AimIdle`/`aim_state_Scout_AimRun` whose pose nodes `aim_Scout_AimIdle`/`aim_Scout_AimRun` are the 2-frame aim poses. The clip mapping was corrected to the bake's own readings — the aim-matrix clips are poses, not motion.
+- **Proved from the compiled artifact, not the source.** `verify` decompiles `scout.vnmgraph_c` back to a 30,255 B document and reads it: all four clips present at **78 channels** each, both motion states, both aim states with their pose nodes, skeleton `models/heroes_wip/scout/scout.vnmskel` named, **78 joints**, **78 bones** in the compiled skeleton, no `frank` in the decompiled text or the compiled bytes. `RESULT: PASS`.
+- **Toolchain, measured.** The Dota 2 tools branch's `dmxconvert.exe` converts the clip DMX for this slice; its `resourcecompiler.exe` cannot compile the graph — pointed at `game/dota` it fails on missing `materials/error.vmat_c` and `surfaceproperties/surfaceprops_c` and reports no result. The `.vnmgraph` compile runs on the AnimGraph 2 compiler against `game/citadel`, which is the one that produces a compiled graph.
+- **The app tells the truth.** Probe **11/11**: `inventory pass`, `skeleton pass`, `clips pass`, `graph pass` (`2,512 B compiled graph, 4/4 port clips, 2 motion states, 2 aim poses, 78 joints`), and refuses downstream by name — `pack-not-built`, `hero-not-registered`, `mesh-not-built`, `not-observed`.
+- **Evidence.** `data/probes/2026-11-24-scout-animgraph-authored.md`, `artifacts/receipts/scout-graph.json`,
+  `artifacts/scout-graph/` (source, bisect, verify dumps), `tests/test_scout_graph.py`.
+- **Not checked.** Nothing was launched in a client; the graph is compiled and verified, not observed playing.
+
+## 2026-11-24 — Scout's mesh exists; the refusal said otherwise
+
+**The mesh was never missing.** Owner, verbatim: *"the mesh for scouts model exists on disk"*. My `mesh-not-built` refusal was read from `scout_anims/ref.smd` having no `triangles` block — true of that reference SMD, false about the port.
+
+- **What is on disk, measured under `F:/Documents`.** `scout.mdl` 910,028 B; `scout.vvd` 529,152 B (`IDSV` version 4); `scout.dx90.vtx` 311,996 B and `scout.dx80.vtx` 316,585 B; `scout.obj` 1,055,705 B with **8,261 vertices and 7,814 faces** in named groups (`scout_red`, `scout_head_red`, `eyeball_l`, `eyeball_r`); `scout.phy` 19,162 B; `scout.qc` 124,513 B; **15** `.vtf` textures.
+- **What is genuinely absent.** No mesh DMX, no `.vmdl` naming one, and no `.vmt` for those 15 textures. So the work is the conversion, not the geometry: MDL/VVD/VTX or OBJ → mesh DMX → `RenderMeshFile` bound to `models/heroes_wip/scout/dmx/mesh/scout_skel.dmx`.
+- **The app reads the mesh files instead of one SMD.** `popit_apps/scout_port/server.py` gained `mesh_state(workspace)`, which reads `MESH_FILES` (`scout.mdl`, `scout.vvd`, `scout.dx90.vtx`, `scout.obj`, `scout.phy`, `scout.qc`), counts the `scout/*.vtf` textures, and counts the OBJ's vertices and faces. With sources present the step is `ready` with the refusal **`mesh-not-converted`** and the detail `scout.mdl 910,028 B, OBJ 8,261 verts / 7,814 faces, 15 VTF textures; Source 1 model present, mesh DMX not built`; with nothing present it still refuses as `mesh-not-built`.
+- **Probe grew a check, not a claim.** `mesh-sources` requires the refusal to be `mesh-not-converted` and the vertex and MDL byte counts non-zero: probe **12/12**. Steps read `inventory pass`, `skeleton pass`, `clips pass`, `graph pass` (2,512 B compiled graph, 4/4 port clips, 2 motion states, 2 aim poses, 78 joints), `pack ready`/`pack-not-built`, `mesh ready`/`mesh-not-converted`, `hero blocked`/`hero-not-registered`, `in_game blocked`/`not-observed`.
+- **Test.** `tests/test_scout_port_app.py` builds a synthetic port workspace: with `scout.mdl`, `scout.obj` (4 verts, 2 faces) and two `.vtf` files the state is `ready`/`mesh-not-converted` with those counts, and an empty workspace is `blocked`/`mesh-not-built`. A third test reads the live step list and requires the downstream refusals to stay named.
+- **Evidence.** `data/probes/2026-11-24-scout-mesh-present-on-disk.md`, `popit_apps/scout_port/server.py`, `tests/test_scout_port_app.py`.
+- **Not checked.** No mesh was converted in this pass and nothing was launched; the mesh DMX conversion and the material definitions remain open.
+
+## 2026-11-24 — Scout's mesh converted and parsed back
+
+**Scout's mesh is a Deadlock mesh now, and the file proves it.** The port had geometry (OBJ, `scout.mdl`) but no Deadlock mesh DMX, no model definition and no material definitions. This pass built all three and validated them by re-parse.
+
+- **Format taken from real files, not guessed.** `dmxconvert -oe keyvalues2` turned the shipped biped mesh (246,198 B) and frank's LOD36 mesh (1,959,924 B) into text, which gave the exact element shape: `DmeModel` → `DmeDag` → `shape DmeMesh` with `currentState`/`baseStates`/`faceSets`, and `DmeVertexData` with `vertexFormat`, `jointCount`, `position$0`/`normal$0`/`texcoord$0` plus `*Indices`. Frank's skinned bind state is the reference for `blendindices$0` (`int_array`) and `blendweights$0` (`float_array`) at `jointCount` 4.
+- **`forge/meshbuild.py` is the converter.** It reads the OBJ (8,261 vertices, 7,814 polygons, 4 groups) and the 78-joint skeleton DMX, composes world rest positions down the hierarchy, and gives each vertex the four nearest bone segments with inverse-square weights normalized to 1. Polygons stay polygons: `position$0Indices` holds 23,442 corners and `-1` ends each face.
+- **Written and parsed back.** `scout_body.dmx` 2,461,515 B parses to 8,261 positions, 7,814 faces in 4 face sets, 78 joints, `jointCount` 4, weight sums 1.0–1.0 over all 8,261 rows, `blend_index_max` 57. `dmxconvert` independently converts it to 916,004 B of binary and back to 8,261 positions / 23,442 corners / 7,814 faces / 33,044 weights.
+- **The model compiles.** `scout_body.vmdl` names `heroes_wip/scout/dmx/mesh/scout_body.dmx`; CSDK 13 compiled 16/16 documents (model + 15 `.vmat`) with 0 failures: `scout_body.vmdl_c` 107,209 B with `MVTX` 91,645 B, `MIDX` 8,932 B and 2 material refs, plus 15 `.vmat_c`.
+- **The path root was the warning.** `RenderMeshFile` and `mtlName` resolve from `models/`, so a leading `models/` doubled the path (`content/models/models/heroes_wip/...`). Dropping it removed the missing-material warnings; the compile is now `OK: 1 compiled, 0 failed`.
+- **One deliberate deviation.** `RenderMeshFile` points at `scout_body.dmx`, not the skeleton `scout_skel.dmx` the brief named, because a `RenderMeshFile` is loaded as mesh geometry. The skeleton stays at `scout_skel.dmx`, named by the `.vnmskel`, and the mesh DMX carries a `DmeModel` with the same 78 joints in the same order so it binds to that rig.
+- **Materials.** 15 `.vmt`, 15 `.vmat`, 15 `.png`. Five PNGs are the port's real art (`scout_blue`, `scout_head`, `scout_hands`, `scout_hands_normal`, `scout_normal`); ten are 8×8 grey placeholders so the materials compile.
+- **The app reads the produced files.** `mesh_state` parses the DMX, reads the `.vmdl`'s reference and counts the materials. Live: `mesh converted — 8,261 verts / 7,814 faces, 78 joints, weights 1.0–1.0, 2,461,515 B DMX, 15 .vmt / 15 .vmat`; `mesh-not-converted` is gone, and a partly-converted tree reports `mesh-partial` with the missing pieces. Probe 12/12, suite 407 passed, heredoc pass, `agents_audit --index` 7/7.
+- **Not done.** No VPK pack, no hero registration, no launch (`pack-not-built`, `hero-not-registered`, `not-observed`), no in-game deformation observed, and ten placeholder textures.
+
+## 2026-11-24 — Scout's four clips verified from compiled documents
+
+**The four clips are Deadlock animation documents, and their compiled bytes say so.** Every number here comes from decompiling the compiled `vnmclip_c`, converting its DMX with `dmxconvert`, and parsing the result.
+
+- **Shape established from a shipped document.** The Dota 2 tool-branch `biped_standard/dmx/animation/idle.dmx` (1,013,864 B) converts to 308 channels — **154 `_p` + 154 `_o`, 89 joints** — in `DmeChannelsClip`/`DmeChannel`/`DmeQuaternionLog`/`DmeTimeFrame`. That is the two-track-per-joint layout Scout's documents compile into.
+- **Sources are the port's own sequences.** `scout.qc` declares `PRIMARY_aimmatrix_idle` (832), `PRIMARY_aimmatrix_run` (834), `AttackStand_PRIMARY` (838), `PRIMARY_reload_loop` (852); their SMDs are the extracted animation data of `scout.mdl`, baked to four keyvalues2 animation DMXs (67,200 / 65,640 / 37,560 / 37,560 B) and converted to the binaries each `CNmClipDocument` names.
+- **Parsed from the compiled documents.** `Scout_Attack` 156 channels (78 `_p`/78 `_o`), 21 frames, 0.6667 s; `Scout_Reload` 156, 20 frames, 0.6332 s; `Scout_AimIdle` 156, 2 frames, 0.0332 s; `Scout_AimRun` 156, 2 frames, 0.0332 s. All four: 78/78 joints, names identical to the skeleton's, compiled bytes 4,096/4,099/4,096/4,096, documents 381/381/384/383 B.
+- **The added position tracks are holds, not animation.** The authored documents carry 78 orientation channels; the compiler samples them to 156. `bip_pelvis_p` in `Scout_Attack` has 23 samples and **3 unique values**, all within 0.0001 of zero.
+- **The graph reaches all four.** `scout.vnmgraph_c` 2,512 B → 30,255 B decompiled: 25 nodes, **4 clip references** (`scout_attack/reload/aimidle/aimrun.vnmclip`) under `state_Scout_Attack`, `state_Scout_Reload`, `aim_state_Scout_AimIdle`, `aim_state_Scout_AimRun`, skeleton `scout.vnmskel`, 0 `frank` references.
+- **End-to-end compile is zero-failure.** `tools/scout_anim.py`: **21/21 documents** — `scout.vnmskel_c`, 4 `*.vnmclip_c`, `scout.vnmgraph_c`, `scout_body.vmdl_c` 107,209 B, 15 `*.vmat_c`.
+- **The app reads the parses, not the bake.** `clips_state` reads `artifacts/scout-anim/parsed/<clip>.json`; it is `pass` only with 4 clips at 156 tracks and 78 joints, `clips-partial` when some are missing (the missing one named), `clips-not-converted` when none parse. `graph_state` prefers the clip references parsed from the decompiled graph.
+- **Evidence.** Live: `clips pass — 4/4 clips parsed, 156 channel tracks (78 joints x position+orientation), frames 21/20/2/2`; `graph pass — 2512 B compiled graph, 4 clip references from sequence/pose nodes, 2 motion states, 2 aim states, 78 joints`; `mesh converted` unchanged. Probe **12/12**, suite **411 passed** (4 new clip-state tests), `heredoc_audit` pass, `agents_audit --index` 7/7. Receipt `artifacts/receipts/scout-anim.json`; note `data/probes/2026-11-24-scout-clip-documents-verified.md`.
+- **Not done.** No VPK, no hero registration, no launch, no in-game playback; position tracks remain compiler-synthesised holds.
+
+## 2026-11-24 — Scout's clips measured for motion, translation carried
+
+**The clips were carrying motion, but not all of it: the aim clips are genuinely single-pose, and the translation on the pelvis and weapon bone was being dropped.** Both are now measured and one is fixed.
+
+- **Measured, not assumed.** `tools/scout_variance.py` parses each clip's animation document back through `dmxconvert` and records, per channel, samples, distinct values at 1e-4 tolerance and spread; it measures the source SMD the same way (joint angle in degrees, translation in units) and compares.
+- **`Scout_Attack`** — source 21 frames, document 21 samples, **22/78 orientation channels move** (exactly the 22 joints that move in the source), **2/78 position channels move**, **0 flat where the source moves**.
+- **`Scout_Reload`** — source 20 frames, 20 samples, **28/78** orientation, **2/78** position, **0 flat where the source moves**.
+- **The aim clips are single-pose, not truncated.** `PRIMARY_aimmatrix_idle` and `PRIMARY_aimmatrix_run` each contain **one skeleton frame**, 0 moving joints and 0 translating joints; the document's two samples are that pose duplicated. Kept as-is.
+- **The defect was translation.** `bip_pelvis` moves 0.456 units (0.165 in reload) and `weapon_bone` 0.361 (4.680) in the sources; the template had orientation channels only, so the bake could only hold positions. `forge.portskel.write_clip_template` now emits a `_p` channel per joint and `forge.clipbake.bake_kv2` writes the source delta onto the skeleton rest position; `tools/scout_graph.py compile` stages the DMX where the compiler reads it. Documents grew 67,200 / 65,640 / 37,560 / 37,560 B → **114,814 / 112,006 / 61,462 / 61,462 B**.
+- **`vnmclip_c` is a reference, not the samples.** 4,096–4,099 B each; changing one quaternion in the source DMX and recompiling moves exactly **4 bytes (905–908)** — a checksum. Source2Viewer's re-export is a 117,366 B rest-pose reconstruction, so it cannot be used as evidence of what a clip plays; the named DMX, converted and parsed, is.
+- **Rebuilt and recompiled.** **21/21 documents, 0 failed**; graph 2,512 B, 25 nodes, **4 clip references** across `state_Scout_Attack`, `state_Scout_Reload`, `aim_state_Scout_AimIdle`, `aim_state_Scout_AimRun`, **78 joints**; `scout_body.vmdl_c` 107,209 B still from `heroes_wip/scout/dmx/mesh/scout_body.dmx`; 15 `.vmat_c`.
+- **Checks.** **413 tests** (2 new: channel spread; position bake), probe **12/12** (`clips pass`, 4/4 parsed, 156 tracks, 78 joints, frames 21/20/2/2; `graph pass`), `heredoc_audit` pass.
+- **Recorded.** `artifacts/scout-anim/variance/*.json`, `variance` in `artifacts/receipts/scout-anim.json`, `artifacts/receipts/scout-own-clips.json` (position channels), probe note `data/probes/2026-11-24-scout-clip-documents-verified.md`, TICKET-0037.
+- **Not done.** No VPK, no hero registration, no in-game playback; aim clips remain single-pose because their source is.
+
+## 2026-11-24 — the source numbers, read from the model's own sequence descriptors
+
+**The frame counts behind Scout's four clips are now read from the model's own sequence descriptors: 21, 20, 1, 1 — the same numbers the SMDs carried — and the two aim sequences are single-pose in the model itself.** No clip was rebaked; the extraction was already faithful.
+
+- **Why re-derive.** The frame counts rested on decompiled SMDs and the QC's `$sequence` lines. The mission asked for the model's own declaration, decoded as a layout problem rather than by repeating the offsets that had already failed.
+- **The layout.** `studio.h`'s `mstudioseqdesc_t` offsets return zeros here: every field is **4 bytes later**. Measured: sequence table at header +192 (count +188), stride **212** (validated by the first entry's +28 field carrying `count × 212` and the table ending exactly there), label at entry + `i32(+4)`, activity at + `i32(+8)`, flags +12, numblends +56, anim-index block at + `i32(+60)`; anim descriptions at +184 (count +180), stride 100, name +4, fps +8, frames +16. 306/306 and 377/377 labels decode printable and unique; `ragdoll` → `ACT_DIERAGDOLL`, `AttackStand_PRIMARY` → `ACT_MP_ATTACK_STAND_PRIMARY`.
+- **The numbers.** `scout_animations.mdl` (5,017,436 B, md5 `74950ba0…`): `@AttackStand_PRIMARY` **21** frames @ 30 fps, `@PRIMARY_reload_loop` **20**, `PRIMARY_aimmatrix_idle`/`_run` **12 cells × 1 frame** each (flags 1044). `scout.mdl` names the same four in its 306-entry table but declares `numblends 0` and flags 2048 — it carries only 2 anim descriptions, so the data is in the animations companion.
+- **Beside the measurement.** Each variance result now carries `mdl` facts (descriptor offset, activity, flags, blends, anim names/frames/fps, declared frames, single-pose) and fails if the declared frames or the single-pose declaration disagree with the SMD. Recorded: 21/21, 20/20, 1/1, 1/1; moving channels unchanged at 22/28 orientation and 2/2 position; 0 flat where the source moves.
+- **The block that did not decode.** Each anim description's +56 points at data that is not a published `mstudioanim_t` (first int 9,313,280, past the 5 MB file; anim block table empty). No per-bone claim is made from it; the offsets and first bytes are dumped in `data/probes/2026-11-24-scout-mdl-source-frames.md`.
+- **Provenance.** `scout_animations.qc` line 1: `// Created by Crowbar 0.74`; `$modelname "player/scout_animations.mdl"`; `$sequence "AttackStand_PRIMARY"` names `scout_animations_anims\AttackStand_PRIMARY.smd` with the same activity the descriptor decodes; `scout_animations_anims/` holds 1,412 SMDs from that decompile (2026-05-12). Descriptor anim name → QC sequence → SMD filename agree at every step, then bake → DMX → variance.
+- **Re-verified.** `python tools/scout_anim.py`: **21/21 documents, 0 failed**, model 107,209 B, 15 `.vmat_c`, graph 2,512 B / 25 nodes / 4 clip refs. `scout_graph.py verify`: **PASS**, 4 clips × 78 channels, skeleton **78 joints**, no `frank`. **415 tests** (2 new for the decoder), probe **12/12**, `heredoc_audit` pass, `agents_audit --index` regenerated.
+- **Not done.** RLE payload undecoded; no VPK, no hero registration, no in-game playback.
+
+## 2026-11-24 — the port is installed in the live addon folder, and verified from there
+
+**Scout's port is now installed in the live Deadlock addon folder and verified from the installed bytes: 41 compiled files, 15,951,007 B, a 41-entry VPK, and the graph read back from there with four clips, 78 channels and 78 bones.**
+
+- **What was missing.** The compiled skeleton, four clips, authored graph, mesh model and materials only existed in the forge's CSDK mirror. Nothing had been written to `game/citadel_addons/` for the port; the only live addon was the older frank-bound `scout_animgraph` (4 leftover files).
+- **The install.** `tools/scout_install.py install` stages the compiled set by path (skeleton/clips/graph under `citadel_addons/scout_port`, model/materials under `game/models`), copies it to `D:\SteamLibrary\steamapps\common\Deadlock\game\citadel_addons\scout_port\`, packs the same 41 files to `artifacts/scout-update/vpk/scout_port_dir.vpk` (VPK v2, 15,952,866 B) and md5-compares every installed file with its staged source. The receipt per file is `artifacts/receipts/scout-install.json`.
+- **Why the DMX ship too.** A compiled `vnmclip_c` is a reference plus a checksum, not samples, so the four animation DMX the documents name ride with the clips.
+- **Read back where the game would.** `tools/scout_graph.py verify --csdk D:/SteamLibrary/steamapps/common/Deadlock` decompiles the **installed** `scout.vnmgraph_c`: 30,255 B, all four clips at 78 channels, motion and aim states, skeleton named, 78 bones, 0 frank references — PASS.
+- **The app reports it.** `pack_state()` reads the install receipt, re-checks that every named file is still in the addon folder, and the `pack` step is `pass` (41 files, 4 clips, 4 DMX, 30 materials, VPK 41 entries) or `pack-not-built` when it is not. The probe's downstream check requires pack pass and still refuses `hero` and `in_game`; 12/12.
+- **Kept, not deleted.** The frank-bound `scout_animgraph` addon and its VPK stay on disk and are named superseded.
+- **Still refused.** `hero-not-registered` (no hero-table entry names a Scout model) and `not-observed` (no map session launched).
+- **Checks.** install 41/41 + VPK 41/41, installed-graph verify PASS, install probe 4/4, app probe 12/12, **415 tests**.
+
+## 2026-11-24 — hero_scout registered, compiled, and resolved in the installed addon
+
+**Scout is registered: `hero_scout` now exists in the port's hero table, compiled into `scripts/heroes.vdata_c`, installed inside the live addon, and every path it names resolves in that installed copy to the 78-bone, 4-clip graph already verified there.**
+
+- **The entry.** Cloned from `hero_frank` (abilities, slots, stats and shop maps are the parts the engine resolves by name, so none was invented), with its own identity: `m_HeroID = 89` (ids ran to 88), `m_strModelName = resource_name:"models/heroes_wip/scout/scout_body.vmdl"`, and `m_sAG2VariationName = resource_name:"models/heroes_wip/scout/scout.vnmgraph"` — the field released heroes use for their hero graph. Written into `F:/Documents/heroes.vdata` with the backup `F:/Documents/heroes.pre-scout`; idempotent on re-run.
+- **The compile exists on this machine.** CSDK 13's `resourcecompiler` compiles the table when given `-game <csdk>/game/citadel` from the content root: `OK: 1 compiled, 0 failed, 0 skipped`, output `game/citadel_addons/scout_port/scripts/heroes.vdata_c` 89,695 B (the unmodified table compiled to 89,448 B first, so the tool was proven before the entry was added).
+- **Read back from the compiled bytes, not the source.** Source 2 Viewer decompiles the *installed* `heroes.vdata_c` to 2,612,838 B of text containing the `hero_scout` block with id 89 and both Scout resource paths.
+- **Resolved against the installed copy.** `tools/scout_install.py install` now ships 42 files / 16,040,702 B and checks that `scout_body.vmdl` → installed `scout_body.vmdl_c` (107,209 B) and `scout.vnmgraph` → installed `scout.vnmgraph_c` (2,512 B, md5 equal to the compiled graph), with the installed table md5 equal to the compiled table. VPK 42 entries, 16,042,604 B, read back 42/42.
+- **The graph is the verified one.** `scout_graph.py verify --csdk D:/SteamLibrary/steamapps/common/Deadlock` → PASS, four clips at 78 channels, 78 bones, no frank refs.
+- **The app and probes read it.** `hero_state()` reads the receipt and re-checks each named file; the hero step is `pass`; the app probe gained `hero-registered` (13/13) and `downstream-refused` now refuses only `in_game`; the install probe is 6/6.
+- **Checks.** 415 tests, both audits pass. No game session was launched: **in-game selection and playback are unobserved**, and the app still says `not-observed`.
+- **Kept.** The old frank-bound `scout_animgraph` addon and VPK untouched; the shared table's earlier backups intact.
+
+## 2026-11-24 — 2026-11-24 — Scout UI assets, and the graph field's observed contract
+
+**Scout's UI fields now name Scout images and the game's own default maps, none of Frank's; and the graph field's observed contract is a `hero.vnmgraph+<hero>.vnmgraph` variation, so the standalone graph is recorded as unverified instead of claimed to load.**
+
+- **The entry.** Six image fields now name `scout_sm.psd`, `scout_card.psd` and `scout_vertical.psd`; the shop, team-reveal and postgame maps are `default_shop.vmap`, `default_team_reveal.vmap` and `default_postgame_portrait.vmap` (the defaults 13 shipped entries name). Frank's portrait prefab and name logos are dropped, as 14 and 23 shipped heroes do. Block 41,414 B; compiled table 89,798 B, read back from the decompiled bytes.
+- **The images are built, not borrowed.** `tools/scout_ui.py` compiles three authored PNGs through one-texture `.vmat`s (the compiler refuses a `.png` directly: `Failed to find compiler for file`) into `panorama/images/heroes/scout_{sm,card,vertical}_psd.vtex_c` (1,400,244 / 1,398,612 / 1,398,612 B), the same `_psd.vtex_c` name the shipped `frank_sm_psd.vtex_c` uses. Each installed texture was read back with Source 2 Viewer. The art is generated placeholder art, not TF2 UI art.
+- **The install.** 45 files / 20,238,273 B in the live addon; VPK 45 entries / 20,240,300 B, read back 45/45; installed graph still PASS (4 clips × 78 channels, 78 bones, no Frank).
+- **The graph question.** Only 2 shipped entries set `m_sAG2VariationName` (vampirebat, and necro reusing vampirebat), both naming `animgraphs/animgraph2/hero/hero.vnmgraph+<hero>.vnmgraph`; 66 set nothing. The branch ships 51 such variations; its 26 standalone graphs are auxiliary (`*_abilitymask`, `*_loco_set_*`) and no entry names one. Decompiled, both forms are complete graphs (abrams 37 nodes/17 overrides vs Scout 12/4), so the variation name is a family name for a full hero graph. The live binaries carry no `m_sAG2VariationName` or `hero.vnmgraph` literal, so acceptance is not provable offline. The entry keeps naming the authored standalone graph, and the receipt, hero step and app probe report `ag2-hero-variation-required` (unverified); a real `hero.vnmgraph+scout` needs the 37-node locomotion/ability contract, which four clips do not cover.
+- **Checks.** Install probe 7/7 (new `hero-ui-resolve`), app probe 14/14 (new `ag2-binding-named`), `pytest -q` 415 passed, both audits pass.
+- **Not observed.** No game session was launched; icon rendering, map prefabs, roster selection and playback are unobserved (`not-observed`).
+
+## 2026-11-25 — 2026-11-25 — release 0.22.10 carries the roster fix, and CI builds the zip
+
+# Release 0.22.10 — the roster miss no longer blocks an update
+
+The owner hit `failed: Live hero models/heroes_staging/nano/nano_v2/nano.vmdl_c is no longer in the
+roster` while updating an old package, and said the updater must not gate work on a hand-rolled list.
+
+`forge.live.resolve_hero` replaces the three slug lookups that raised. It resolves an exact slug, then
+the same hero family on identity tokens with version suffixes removed, then the package's own model,
+then `None` — which `forge.migrate.update_from_package` already accepts by keeping the old body. The
+note (`roster-miss:<slug>-><slug>` / `:package-model` / `:no-model`) shows in job progress instead of a
+refusal. Probe: `data/probes/2026-11-25-roster-is-not-an-allowlist.md`.
+
+CI legs run locally before the tag: `python -m unittest discover -s tests` 263 tests OK,
+`python tools/secrets_gate.py --selftest` 6/6 and `--check` 0 findings, and
+`python tools/build_addon.py` wrote `dist/hero_retarget_workbench-0.22.10.zip`, 77 files, 567315 bytes,
+sha256 `f74092784c56735bcb155b60e88a854a6df16955f8254f435f1493b3669c55a2`.

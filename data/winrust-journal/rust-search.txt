@@ -1,0 +1,3 @@
+svc|WSearch|delayed-auto
+reg|HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\SearchHost.exe|Debugger|-
+reg|HKCU\Software\Microsoft\Windows\CurrentVersion\Search|SearchboxTaskbarMode|REG_DWORD|2

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout port · Popit</title>
+<link rel="stylesheet" href="/popit.css">
+</head>
+<body>
+<main class="popit" data-popit="scout-update">
+  <header class="bar">
+    <span class="mark" aria-hidden="true"><span></span></span>
+    <h1>scout port</h1>
+    <span class="bar-meta" id="bar-meta">deadlock model forge</span>
+  </header>
+
+  <section class="markers" aria-label="build markers">
+    <div class="marker"><span>game</span><b id="marker-game">unread</b></div>
+    <div class="marker"><span>mod scripts</span><b id="marker-mod">unread</b></div>
+    <div class="marker"><span>dota tools</span><b id="marker-dota">unread</b></div>
+    <div class="marker"><span>animgraph</span><b id="marker-graph">unread</b></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>port</h2>
+      <span class="state" id="port-state">reading</span>
+    </div>
+    <dl class="readings">
+      <div><dt>workspace</dt><dd id="workspace">—</dd></div>
+      <div><dt>mesh sources</dt><dd id="sources-mesh">—</dd></div>
+      <div><dt>animation sources</dt><dd id="sources-anim">—</dd></div>
+      <div><dt>hero entries</dt><dd id="hero-count">—</dd></div>
+      <div><dt>hero table bytes</dt><dd id="hero-bytes">—</dd></div>
+      <div><dt>hero table digest</dt><dd id="hero-digest" class="mono">—</dd></div>
+    </dl>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>live drift</h2>
+      <span class="state" id="drift-state">unmeasured</span>
+    </div>
+    <p class="hint" id="drift-hint">The live roster is read from the build's own scripts/heroes.vdata.</p>
+    <table class="data" id="drift-table">
+      <thead><tr><th>hero</th><th>mod</th><th>live</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>animgraph</h2>
+      <span class="state" id="graph-state">unread</span>
+    </div>
+    <dl class="readings">
+      <div><dt>variation</dt><dd id="graph-variation">—</dd></div>
+      <div><dt>skeleton</dt><dd id="graph-skeleton" class="mono">—</dd></div>
+      <div><dt>nodes</dt><dd id="graph-nodes">—</dd></div>
+      <div><dt>clip references</dt><dd id="graph-clips">—</dd></div>
+      <div><dt>sequences bound</dt><dd id="sequence-coverage">—</dd></div>
+      <div><dt>unbound</dt><dd id="sequence-unbound" class="mono">—</dd></div>
+    </dl>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>refusals</h2>
+      <span class="state" id="refusal-count">0</span>
+    </div>
+    <ul class="refusals" id="refusals"></ul>
+  </section>
+
+  <footer class="foot">
+    <span id="generated" class="mono">—</span>
+    <span>a refusal names the file it searched; it never fills the value in.</span>
+  </footer>
+</main>
+<script src="/popit.js"></script>
+</body>
+</html>

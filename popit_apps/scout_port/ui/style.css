@@ -1,0 +1,113 @@
+:root {
+  --ground: #0c0e11;
+  --panel: #12151a;
+  --line: #23272e;
+  --ink: #e6e8ec;
+  --muted: #8b929c;
+  --gold: #f0c454;
+  --pass: #7fbf7f;
+  --blocked: #d08b6a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 28px 32px 40px;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: Archivo, "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.mono, code, .facts b {
+  font-family: "IBM Plex Mono", Consolas, monospace;
+}
+
+.plate {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
+}
+
+.mark {
+  display: grid;
+  grid-template-columns: repeat(2, 10px);
+  gap: 3px;
+}
+
+.mark span {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--gold);
+}
+
+.plate h1 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 0.01em;
+}
+
+.plate p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+
+button {
+  margin-left: auto;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 7px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover { background: rgba(240, 196, 84, 0.1); }
+
+h2 {
+  margin: 30px 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.facts div {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+}
+
+.facts b { display: block; font-size: 20px; }
+.facts span { color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+table { width: 100%; border-collapse: collapse; }
+
+th, td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+th { color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
+
+td.state { white-space: nowrap; font-family: "IBM Plex Mono", monospace; }
+td.state.pass { color: var(--pass); }
+td.state.blocked { color: var(--blocked); }
+td.state.ready { color: var(--gold); }
+td small { color: var(--muted); }
+
+ul { margin: 0; padding-left: 18px; color: var(--muted); }
+ul li { margin-bottom: 6px; }
+
+footer { margin-top: 34px; color: var(--muted); font-size: 11px; }
